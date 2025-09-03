@@ -6,11 +6,11 @@ plugins {
 
 android {
     namespace = "com.umcspot.spot"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.umcspot.spot"
-        minSdk = 35
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
