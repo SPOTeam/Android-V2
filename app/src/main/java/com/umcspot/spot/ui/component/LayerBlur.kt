@@ -1,10 +1,9 @@
-package com.umcspot.spot.ui.asset
+package com.umcspot.spot.ui.component
 
 import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,22 +20,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.umcspot.spot.R
 
-// 공통: Layer blur 적용(요소 자체 흐림)
 private fun Modifier.layerBlur(blur: Dp, cornerRadius: Dp): Modifier {
     val shaped = this.clip(RoundedCornerShape(cornerRadius))
     return if (Build.VERSION.SDK_INT >= 31) {
         shaped.blur(blur)
-        // 또는 RenderEffect 사용
-        //.graphicsLayer {
-        //    val r = blur.toPx()
-        //    renderEffect = RenderEffect.createBlurEffect(r, r, Shader.TileMode.CLAMP)
-        //}
     } else {
-        shaped // API 30 이하는 의미 있는 레이어 블러 미지원 → 모서리만 클립
+        shaped
     }
 }
-
-// ===== L1~L4 프리셋 (xdp, ydp, image만 받음) =====
 
 @Composable
 fun L1(xdp: Dp, ydp: Dp, image: Painter, cornerRadius: Dp = 20.dp) {
@@ -58,7 +49,6 @@ fun L4(xdp: Dp, ydp: Dp, image: Painter, cornerRadius: Dp = 20.dp) {
     BaseLayerBlurImage(xdp, ydp, image, blur = 4.dp, cornerRadius = cornerRadius)
 }
 
-// 내부 공통 구현
 @Composable
 private fun BaseLayerBlurImage(
     xdp: Dp,
@@ -81,18 +71,32 @@ private fun BaseLayerBlurImage(
     }
 }
 
-@Preview(name = "Layer Blur Presets", showBackground = true, widthDp = 500)
-@Composable
-fun PreviewLayerBlurs() {
-    val sample = painterResource(id = R.drawable.spot_logo) // res/drawable/sample.jpg
+/* =================== Previews =================== */
 
-    Row(
-        modifier = Modifier.padding(24.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        L1(100.dp, 180.dp, image = sample)
-        L2(100.dp, 180.dp, image = sample)
-        L3(100.dp, 180.dp, image = sample)
-        L4(100.dp, 180.dp, image = sample)
-    }
+@Preview(name = "L1 Blur", showBackground = true)
+@Composable
+fun PreviewL1() {
+    val sample = painterResource(id = R.drawable.spot_logo)
+    L1(120.dp, 180.dp, image = sample)
+}
+
+@Preview(name = "L2 Blur", showBackground = true)
+@Composable
+fun PreviewL2() {
+    val sample = painterResource(id = R.drawable.spot_logo)
+    L2(120.dp, 180.dp, image = sample)
+}
+
+@Preview(name = "L3 Blur", showBackground = true)
+@Composable
+fun PreviewL3() {
+    val sample = painterResource(id = R.drawable.spot_logo)
+    L3(120.dp, 180.dp, image = sample)
+}
+
+@Preview(name = "L4 Blur", showBackground = true)
+@Composable
+fun PreviewL4() {
+    val sample = painterResource(id = R.drawable.spot_logo)
+    L4(120.dp, 180.dp, image = sample)
 }

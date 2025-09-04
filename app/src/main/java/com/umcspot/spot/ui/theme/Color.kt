@@ -22,6 +22,8 @@ val B400 = Color(0xFF337BFF)
 
 /** Secondary **/
 
+val Y400 = Color(0xFFFD8653)
+
 val R500 = Color(0xFFF34343)
 val B200 = Color(0xFFD3E1FD)
 val B100 = Color(0xFFEDF4FF)
@@ -35,6 +37,10 @@ val G300 = Color(0xFFC5C5CD)
 val G200 = Color(0xFFF0F0F4)
 val G100 = Color(0xFFF3F3F6)
 val White = Color(0xFFFCFCFF)
+
+val NaverGreen = Color(0xFF03CF5D)
+val KakaoYellow = Color(0xFFFFEC00)
+val KakaoText = Color(0xFF3C1E1E)
 
 /** Gradiant **/
 
