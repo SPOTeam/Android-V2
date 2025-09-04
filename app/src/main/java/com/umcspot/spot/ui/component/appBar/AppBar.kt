@@ -32,7 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.umcspot.spot.R
-import com.umcspot.spot.ui.component.shape.SpotShapes
+import com.umcspot.spot.ui.shapes.SpotShapes
 import com.umcspot.spot.ui.theme.G300
 import com.umcspot.spot.ui.theme.G400
 import com.umcspot.spot.ui.theme.SpotTypography

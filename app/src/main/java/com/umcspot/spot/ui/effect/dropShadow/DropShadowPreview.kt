@@ -1,4 +1,4 @@
-package com.umcspot.spot.ui.component.dropShadow
+package com.umcspot.spot.ui.effect.dropShadow
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.umcspot.spot.ui.component.shape.SpotShapes
+import com.umcspot.spot.ui.shapes.SpotShapes
 import com.umcspot.spot.ui.theme.B500
 import com.umcspot.spot.ui.theme.BlueGradient
 import com.umcspot.spot.ui.theme.G100

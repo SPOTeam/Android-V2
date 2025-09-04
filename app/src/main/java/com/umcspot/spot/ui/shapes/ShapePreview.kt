@@ -1,4 +1,4 @@
-package com.umcspot.spot.ui.component.shape
+package com.umcspot.spot.ui.shapes
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
