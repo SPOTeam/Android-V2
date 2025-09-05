@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -34,7 +36,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -178,12 +183,12 @@ private fun DayCellStyled(
             .padding(1.dp),
         contentAlignment = Alignment.Center
     ) {
-        val cellSize = min(maxWidth, maxHeight)
-        val circleSize = cellSize * 0.65f
+        val cellSide = min(maxWidth, maxHeight)
+        val bgSize = cellSide * 0.65f
 
+        // 눌림 상태
         val interactionSource = remember { MutableInteractionSource() }
         val isPressed by interactionSource.collectIsPressedAsState()
-
         val clickableModifier = Modifier.clickable(
             enabled = isThisMonth,
             interactionSource = interactionSource,
@@ -191,67 +196,54 @@ private fun DayCellStyled(
             onClick = onClick
         )
 
-        if (isSelected) {
-            Column(
-                modifier = Modifier
-                    .size(circleSize)
-                    .clip(shape = SpotShapes.Hard)
-                    .background(
-                        color = if (isPressed)
-                            B400.copy(alpha = 0.6f) // pressed
-                        else
-                            B400.copy(alpha = 0.10f) // normal
-                    )
-                    .then(clickableModifier),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = day.date.dayOfMonth.toString(),
-                    style = SpotTypography.bodyMedium600,
-                    fontSize = 18.sp,
-                    color = when {
-                        !isThisMonth -> G300
-                        isSunday     -> B500
-                        else         -> Black
-                    }
-                )
-                if (eventCount > 0 && isThisMonth) {
-                    Spacer(Modifier.size(2.dp))
-                    Box(
-                        modifier = Modifier
-                            .size(6.dp)
-                            .clip(CircleShape)
-                            .background(B400)
-                    )
-                }
+        val dateTextStyle = SpotTypography.bodyMedium600.copy(fontSize = 18.sp)
+        val measurer = rememberTextMeasurer()
+        val density = LocalDensity.current
+        val textHeightDp = remember(day.date.dayOfMonth) {
+            with(density) {
+                measurer
+                    .measure(AnnotatedString(day.date.dayOfMonth.toString()), style = dateTextStyle)
+                    .size.height.toDp()
             }
-        } else {
-            // 일반 날짜
-            Column(
-                modifier = clickableModifier,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = day.date.dayOfMonth.toString(),
-                    style = SpotTypography.bodyMedium600,
-                    fontSize = 18.sp,
-                    color = when {
-                        !isThisMonth -> G300
-                        isSunday     -> B500
-                        else         -> Black
-                    }
+        }
+
+        Box(modifier = clickableModifier.fillMaxSize()) {
+
+            // 선택 배경(Hard) - 중앙
+            if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .size(bgSize)
+                        .align(Alignment.Center)
+                        .clip(SpotShapes.Hard)
+                        .background(
+                            if (isPressed) B400.copy(alpha = 0.6f)
+                            else B400.copy(alpha = 0.10f)
+                        )
                 )
-                if (eventCount > 0 && isThisMonth) {
-                    Spacer(Modifier.size(2.dp))
-                    Box(
-                        modifier = Modifier
-                            .size(6.dp)
-                            .clip(CircleShape)
-                            .background(B400)
-                    )
-                }
+            }
+
+            Text(
+                text = day.date.dayOfMonth.toString(),
+                style = dateTextStyle,
+                color = when {
+                    !isThisMonth -> G300
+                    isSunday     -> B500
+                    else         -> Black
+                },
+                modifier = Modifier.align(Alignment.Center)
+            )
+
+            if (eventCount > 0 && isThisMonth) {
+                val gap = 4.dp
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .offset(y = textHeightDp / 2 + gap)
+                        .size(6.dp)
+                        .clip(CircleShape)
+                        .background(B400)
+                )
             }
         }
     }
