@@ -16,6 +16,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.core.data.board.BoardItem
+import com.example.core.data.board.BoardUiState
+import com.example.core.data.board.LabeledItem
+import com.example.core.data.global.SortType
 import com.example.core.ui.R
 import com.example.core.ui.theme.SpotTypography
 import com.example.core.ui.theme.B500
@@ -24,53 +30,15 @@ import com.example.core.ui.theme.White
 import com.example.core.ui.shapes.SpotShapes
 import com.example.core.ui.component.appBar.AppBarHome
 
-/** 정렬 탭 타입 */
-enum class SortType { LIVE, RECOMMEND, COMMENTS }
-
-/** 기본 보드 아이템 (랭크 리스트에서 사용) */
-data class BoardItem(
-    val id: String,
-    val title: String,
-    val count: Int
-)
-
-/** 라벨이 있는 보드 아이템 (파트너들 이야기 섹션에서 사용) */
-data class LabeledItem(
-    val id: String,
-    val label: String,
-    val title: String,
-    val count: Int
-)
-
 @Composable
 fun BoardScreen(
+    viewmodel: BoardViewModel = hiltViewModel(),
     onItemClick: (BoardItem) -> Unit = {},
     onLabeledItemClick: (LabeledItem) -> Unit = {},
     onMorePartnersClick: () -> Unit = {},
     onMoreNoticeClick: () -> Unit = {},
 ) {
-    var selected by remember { mutableStateOf(SortType.LIVE) }
-
-    // 미리보기/샘플 데이터 (실사용 시 VM으로 교체)
-    val hot = remember {
-        List(5) { i ->
-            BoardItem(id = "hot$i", title = "Lorem ipsum dolor sit amet consectetur…", count = listOf(10, 100, 9999, 10, 10)[i])
-        }
-    }
-    val partners = remember {
-        listOf(
-            LabeledItem("p1", "합격후기", "Lorem ipsum dolor sit amet consectetur…", 10),
-            LabeledItem("p2", "정보공유", "Lorem ipsum dolor sit amet consectetur…", 100),
-            LabeledItem("p3", "고민상담", "Lorem ipsum dolor sit amet consectetur…", 9999),
-            LabeledItem("p4", "취준토크", "Lorem ipsum dolor sit amet consectetur…", 10),
-            LabeledItem("p5", "자유토크", "Lorem ipsum dolor sit amet consectetur…", 10),
-        )
-    }
-    val notice = remember {
-        List(5) { i ->
-            BoardItem(id = "n$i", title = "Lorem ipsum dolor sit amet consectetur…", count = listOf(10, 100, 1100, 10, 10)[i])
-        }
-    }
+    val state by viewmodel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -107,8 +75,8 @@ fun BoardScreen(
                     )
                     Spacer(Modifier.weight(1f))
                     BoardTabs(
-                        selected = selected,
-                        onSelect = { selected = it }
+                        selected = state.selected,
+                        onSelect = viewmodel::selectSort
                     )
                 }
             }
@@ -116,7 +84,7 @@ fun BoardScreen(
             /* 실시간 인기글 카드 (랭크 리스트) */
             item {
                 RankCardList(
-                    items = hot,
+                    items = state.hot,
                     onItemClick = onItemClick
                 )
             }
@@ -130,7 +98,7 @@ fun BoardScreen(
             }
             item {
                 LabeledCardList(
-                    items = partners,
+                    items = state.partners,
                     onItemClick = onLabeledItemClick
                 )
             }
@@ -144,7 +112,7 @@ fun BoardScreen(
             }
             item {
                 RankCardList(
-                    items = notice,
+                    items = state.notice,
                     onItemClick = onItemClick
                 )
             }
@@ -239,7 +207,7 @@ private fun RankCardList(
 ) {
     Surface(
         shape = SpotShapes.Hard,
-        color = White,
+        color = Color.Transparent,
         tonalElevation = 0.dp,
         shadowElevation = 0.dp,
         modifier = Modifier.fillMaxWidth()
@@ -251,7 +219,7 @@ private fun RankCardList(
                     title = item.title,
                     count = item.count,
                     onClick = {
-                        /* 해당 게시글로 이등 */
+
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -270,7 +238,7 @@ private fun LabeledCardList(
 ) {
     Surface(
         shape = SpotShapes.Hard,
-        color = White,
+        color = Color.Transparent,
         tonalElevation = 0.dp,
         shadowElevation = 0.dp,
         modifier = Modifier.fillMaxWidth()
@@ -356,3 +324,83 @@ private fun RankRow(
     }
 }
 
+
+//Preview용 Compose
+@Composable
+fun BoardScreen(
+    state: BoardUiState,
+    onSelectTab: (SortType) -> Unit = {},
+    onRetry: () -> Unit = {},
+    onItemClick: (BoardItem) -> Unit = {},
+    onLabeledItemClick: (LabeledItem) -> Unit = {},
+    onMorePartnersClick: () -> Unit = {},
+    onMoreNoticeClick: () -> Unit = {},
+) {
+    Scaffold(
+        topBar = {
+            AppBarHome(
+                hasNotification = false,
+                onSearchClick = { /* TODO */ },
+                onNotificationClick = { /* TODO */ }
+            )
+        }
+    ) { inner ->
+        when {
+            state.isLoading -> Box(Modifier
+                .fillMaxSize()
+                .padding(inner), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+            state.error != null -> Box(Modifier
+                .fillMaxSize()
+                .padding(inner), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("문제가 발생했어요.\n${state.error}")
+                    Spacer(Modifier.height(8.dp))
+                    Button(onClick = onRetry) { Text("다시 시도") }
+                }
+            }
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(inner)
+                        .padding(horizontal = 14.dp),
+                    verticalArrangement = Arrangement.spacedBy(18.dp),
+                    contentPadding = PaddingValues(bottom = 88.dp)
+                ) {
+                    // 🔥 + 우측 정렬 탭
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 30.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.fire),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(22.dp)
+                                    .padding(end = 6.dp)
+                            )
+                            Spacer(Modifier.weight(1f))
+                            BoardTabs(selected = state.selected, onSelect = onSelectTab)
+                        }
+                    }
+
+                    // 실시간 인기글
+                    item { RankCardList(state.hot, onItemClick) }
+
+                    // 파트너들의 이야기
+                    item { SectionHeader("스터디 파트너들의 이야기", onMorePartnersClick) }
+                    item { LabeledCardList(state.partners, onLabeledItemClick) }
+
+                    // SPOT 공지
+                    item { SectionHeader("SPOT 공지", onMoreNoticeClick) }
+                    item { RankCardList(state.notice, onItemClick) }
+                }
+            }
+        }
+    }
+}
