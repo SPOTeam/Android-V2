@@ -114,11 +114,7 @@ fun MyNavigationHost(navController: NavHostController) {
                     currentTime = LocalTime.of(9, 41),
                     popularStudies = emptyList(),
                     recommendedStudies = emptyList(),
-                    onSeeAllPopularClick = {},
-                    onRefreshRecommendClick = {},
-                    onRetryClick = {},
-                    onStudyClick = {},
-                    onQuickMenuClick = {},
+                    onQuickMenuClick = {}
                 )
             } else {
                 HomeScreen(navController)
@@ -146,11 +142,12 @@ fun MainScreen() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     // 프리뷰 첫 프레임에서 null일 수 있으므로 기본값을 "홈"으로
-    val currentRoute = navBackStackEntry?.destination?.route ?: "홈"
+    val currentRoute = navBackStackEntry?.destination?.route ?: "커뮤니티"
 
     val bottomBarRoutes = items.map { it.route }
 
-    val showFab = currentRoute == "홈"
+    val showMakeStudyFab = currentRoute == "홈"
+    val showWritePost = currentRoute == "커뮤니티"
 
     Scaffold(
         bottomBar = {
@@ -159,11 +156,17 @@ fun MainScreen() {
             }
         },
         floatingActionButton = {
-            if (showFab) {
+            if (showMakeStudyFab) {
                 // FAB는 바텀바 바로 위에 자연스럽게 붙습니다
                 FloatingButton(
                     onClick = { /* TODO */ },
                     modifier = Modifier.padding(end = 8.dp, bottom = 8.dp) // 여백만 살짝
+                )
+            } else if(showWritePost) {
+                FloatingButton(
+                    onClick = { /* TODO */ },
+                    modifier = Modifier.padding(end = 8.dp, bottom = 8.dp),
+                    iconRes = R.drawable.write
                 )
             }
         },

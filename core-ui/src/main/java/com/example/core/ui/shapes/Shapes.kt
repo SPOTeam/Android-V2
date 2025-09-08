@@ -3,6 +3,7 @@ package com.example.core.ui.shapes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -46,11 +47,12 @@ fun ShapeBox(
     color: Color = Color.White,
     borderWidth: Dp = 0.dp,
     borderColor: Color? = Color.Transparent,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit = {}
+
 ) {
     Box(
         modifier = modifier
-            .size(width, height)
             .background(color, shape)
             .then(
                 if (borderColor != null && borderWidth > 0.dp) {
@@ -59,7 +61,34 @@ fun ShapeBox(
                     Modifier
                 }
             )
-    )
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun ShapeBox(
+    shape: Shape,
+    color: Color = Color.White,
+    borderWidth: Dp = 0.dp,
+    borderColor: Color? = Color.Transparent,
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit = {}
+
+) {
+    Box(
+        modifier = modifier
+            .background(color, shape)
+            .then(
+                if (borderColor != null && borderWidth > 0.dp) {
+                    Modifier.border(borderWidth, borderColor, shape)
+                } else {
+                    Modifier
+                }
+            )
+    ) {
+        content()
+    }
 }
 
 @Composable

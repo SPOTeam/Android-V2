@@ -1,12 +1,18 @@
 package com.example.feature.home
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,10 +27,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -40,6 +50,7 @@ import com.example.core.ui.R
 import com.example.core.ui.component.appBar.AppBarHome
 import com.example.core.ui.component.study.StudyListItem
 import com.example.core.ui.component.weather.WeatherCard
+import com.example.core.ui.shapes.SpotShapes
 
 import com.example.core.ui.theme.B500
 import com.example.core.ui.theme.Black
@@ -70,18 +81,12 @@ fun HomeScreen(
 
         onQuickMenuClick = { type ->
             when (type) {
-                QuickMenuType.REGION     -> navController.navigate("카테고리")
-                QuickMenuType.INTERESTS  -> navController.navigate("내 스터디")
-                QuickMenuType.RECRUITING -> navController.navigate("모집중루트")
-                QuickMenuType.BOARD      -> navController.navigate("게시판루트")
+                QuickMenuType.REGION     -> navController.navigate("내 지역")
+                QuickMenuType.INTERESTS  -> navController.navigate("내 관심사")
+                QuickMenuType.RECRUITING -> navController.navigate("모집 중")
+                QuickMenuType.BOARD      -> navController.navigate("게시판")
             }
-        },
-
-        onSeeAllPopularClick = { /* TODO */ },
-        onRefreshRecommendClick = viewmodel::refreshRecommend,
-
-        onRetryClick = viewmodel::load,
-        onStudyClick = onStudyClick,
+        }
     )
 }
 
@@ -126,16 +131,47 @@ fun QuickMenu(
 
 @Composable
 fun PopularPostNow(
-    title: String = "실시간 인기글",
+    title: String,
     subtitle: String,
+    selected: Boolean = false,
     modifier: Modifier = Modifier,
-    onContentClick: () -> Unit = {},
-    onMoreClick : () -> Unit = {},
-    @DrawableRes trailingIconRes: Int = R.drawable.arrow_right
+    onCardClick: () -> Unit = {},
+    onContentClick: () -> Unit = { },
+    onMoreClick: () -> Unit = {},
+    @DrawableRes trailingIconRes: Int = R.drawable.arrow_right,
+    itemShape: Shape = SpotShapes.Hard,
+
+    // 상태별 컨테이너 색상 커스터마이즈
+    idleContainerColor: Color = Color.Transparent,
+    selectedContainerColor: Color = B500.copy(alpha = 0.08f),
+    pressedContainerColor: Color = B500.copy(alpha = 0.14f),
+
+
 ) {
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+
+    val bg by animateColorAsState(
+        targetValue = when {
+            pressed  -> pressedContainerColor
+            selected -> selectedContainerColor
+            else     -> idleContainerColor
+        },
+        label = "popularPostNowBg"
+    )
+
     Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Bottom,
+        modifier = modifier
+            .clip(itemShape)
+            .fillMaxHeight()
+            .background(bg, itemShape)
+            .clickable(
+                interactionSource = interaction,
+                indication = null,
+                role = Role.Button,
+                onClick = onCardClick
+            ),
+        verticalAlignment = Alignment.Bottom
     ) {
         Column(
             modifier = Modifier.weight(1f),
@@ -145,11 +181,14 @@ fun PopularPostNow(
                 Text(
                     text = title,
                     style = SpotTypography.bodyMedium500.copy(fontSize = 16.sp),
+                    color = Black
                 )
                 Spacer(Modifier.width(4.dp))
-                Image(
+
+                Icon( // fire 이미지가 벡터면 Icon, 비트맵이면 Image로 사용
                     painter = painterResource(R.drawable.fire),
                     contentDescription = "fire",
+                    tint = Color.Unspecified,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -158,11 +197,15 @@ fun PopularPostNow(
                 style = SpotTypography.bodySmall500.copy(fontSize = 14.sp),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.clickable(onClick = onContentClick)
+                modifier = Modifier.clickable(onClick = onContentClick),
+                color = Black
             )
         }
 
-        IconButton(onClick = onMoreClick, modifier = Modifier.size(18.dp)) {
+        IconButton(
+            onClick = onMoreClick,
+            modifier = Modifier.size(18.dp)
+        ) {
             Icon(
                 painter = painterResource(trailingIconRes),
                 contentDescription = "더보기",
@@ -266,10 +309,6 @@ fun HomeScreenContent(
     popularStudies: List<StudyItem>,
     recommendedStudies: List<StudyItem>,
 
-    onSeeAllPopularClick: () -> Unit,
-    onRefreshRecommendClick: () -> Unit,
-    onRetryClick: () -> Unit,
-    onStudyClick: (StudyItem) -> Unit,
 ) {
     val listState = rememberLazyListState()
 
@@ -303,6 +342,7 @@ fun HomeScreenContent(
                         weatherType = requireNotNull(weatherType),
                         currentTime = requireNotNull(currentTime),
                     )
+
                     PopularPostNow(
                         title = "실시간 인기글",
                         subtitle = "sample 들어갈 예정sample 들어갈 예정sample 들어갈 예정",
@@ -310,7 +350,8 @@ fun HomeScreenContent(
                             .weight(1f)
                             .align(Alignment.CenterVertically),
                         onContentClick = { /* subtitle 클릭 */ },
-                        onMoreClick = { /* > 아이콘 클릭 */ }
+                        onMoreClick = { /* > 아이콘 클릭 */ },
+                        onCardClick = { }
                     )
                 }
             }

@@ -27,10 +27,6 @@ private fun HomeScreenContentPreview() {
             )
         },
         recommendedStudies = emptyList(),
-        onSeeAllPopularClick = {},
-        onRefreshRecommendClick = {},
-        onRetryClick = {},
-        onStudyClick = {},
         onQuickMenuClick = {}
     )
 }

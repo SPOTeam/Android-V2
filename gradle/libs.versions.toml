@@ -13,6 +13,7 @@ material = "1.12.0"
 hiltAndroidCompiler = "2.56.1"
 androidxNavigation = "2.8.9"
 androidxHilt = "1.2.0"
+foundationLayout = "1.9.0"
 
 
 [libraries]
@@ -36,6 +37,7 @@ hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltA
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidxNavigation" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidxHilt" }
+androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 
 
 [plugins]
