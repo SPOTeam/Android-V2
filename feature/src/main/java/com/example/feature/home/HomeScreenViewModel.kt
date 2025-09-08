@@ -2,7 +2,9 @@ package com.example.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.core.ui.component.weather.WeatherType
+import com.example.core.data.global.WeatherType
+import com.example.core.data.home.HomeUiState
+import com.example.core.data.study.StudyItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,82 +14,65 @@ import kotlinx.coroutines.launch
 import java.time.LocalTime
 import javax.inject.Inject
 
-// 화면 전체 상태
-data class HomeUiState(
-    val isLoading: Boolean = false,
-    val weatherTemp: Int? = null,
-    val weatherType: WeatherType? = null,
-    val currentTime: LocalTime? = null,
-    val popularStudies: List<StudyItem> = emptyList(),
-    val recommendedStudies: List<StudyItem> = emptyList(),
-    val error: String? = null
-)
-
-
-data class StudyItem(
-    val id: String,
-    val title: String,
-    val goal: String,
-    val members: String = "10/10",
-    val likes: String = "100",
-    val views: String = "999+",
-    val thumbnailRes: Int? = null // 실제 리소스 연결은 뷰에서
-)
-
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    // 나중에 Repository 주입
+    // TODO: Repository 주입 예정
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
+    private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState
 
     init {
         load()
     }
 
+    /** 초기 데이터 로드 (더미) */
     fun load() = viewModelScope.launch {
-        _uiState.update { it.copy(isLoading = true, error = null) }
         try {
-            // TODO: 실제 API 호출로 교체
-            delay(400)
+            // 실제 API 대체
+            delay(300)
 
             val now = LocalTime.now()
-            val pop = List(3) { i -> StudyItem("p$i", "Popular #$i", "Goal $i") }
-            val rec = List(3) { i -> StudyItem("r$i", "Recommend #$i", "Goal $i") }
+
+            val popular = listOf(
+                StudyItem(id = "p1", title = "Sample Study", goal = "Sample Goal", maxMember = 10, member = 10, likes = 100, views = 3400),
+                StudyItem(id = "p2", title = "Android Compose", goal = "UI 클린업",    maxMember = 8,  member = 6,  likes = 250,  views = 999),
+                StudyItem(id = "p3", title = "CS 기초",         goal = "알고리즘",     maxMember = 12, member = 9,  likes = 1200, views = 1200),
+            )
+
+            val recommended = listOf(
+                StudyItem(id = "r1", title = "코틀린 협업",  goal = "코루틴/Flow", maxMember = 6, member = 3, likes = 87,   views = 540),
+                StudyItem(id = "r2", title = "iOS 입문",     goal = "SwiftUI",    maxMember = 5, member = 1, likes = 12,   views = 88),
+                StudyItem(id = "r3", title = "백엔드 스터디", goal = "Spring",     maxMember = 10, member = 4, likes = 430,  views = 2000),
+            )
 
             _uiState.update {
                 it.copy(
-                    isLoading = false,
-                    weatherTemp = 15,
+                    weatherTemp = 23,
                     weatherType = WeatherType.SUNNY,
                     currentTime = now,
-                    popularStudies = pop,
-                    recommendedStudies = rec,
+                    popularStudies = popular,
+                    recommendedStudies = recommended,
                     error = null
                 )
             }
         } catch (t: Throwable) {
-            _uiState.update {
-                it.copy(isLoading = false, error = (t.message ?: "알 수 없는 오류"))
-            }
+            _uiState.update { it.copy(error = t.message ?: "알 수 없는 오류") }
         }
     }
 
+    /** 추천 스터디만 새로고침 (더미) */
     fun refreshRecommend() = viewModelScope.launch {
-        _uiState.update { it.copy(isLoading = true, error = null) }
         try {
-            // TODO: 추천만 갱신하는 실제 로직으로 교체
-            delay(250)
-            val rec = List(3) { i -> StudyItem("r${System.nanoTime()}-$i", "Refreshed #$i", "New Goal $i") }
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    recommendedStudies = rec
-                )
-            }
+            delay(200)
+            val refreshed = listOf(
+                StudyItem(id = "r${System.currentTimeMillis()}", title = "Refreshed A", goal = "New Goal A", maxMember = 8, member = 5, likes = 90,  views = 1300),
+                StudyItem(id = "r${System.nanoTime()}",          title = "Refreshed B", goal = "New Goal B", maxMember = 10, member = 7, likes = 12, views = 70),
+                StudyItem(id = "r${System.nanoTime()+1}",        title = "Refreshed C", goal = "New Goal C", maxMember = 12, member = 6, likes = 1005, views = 999),
+            )
+            _uiState.update { it.copy(recommendedStudies = refreshed) }
         } catch (t: Throwable) {
-            _uiState.update { it.copy(isLoading = false, error = (t.message ?: "추천 갱신 실패")) }
+            _uiState.update { it.copy(error = t.message ?: "추천 갱신 실패") }
         }
     }
 }

@@ -1,10 +1,15 @@
-package com.example.feature.main
+package com.example.feature
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,9 +27,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.core.data.global.WeatherType
 import com.example.core.ui.R
 import com.example.core.ui.component.FloatingButton
-import com.example.core.ui.component.weather.WeatherType
 import com.example.core.ui.theme.B500
 import com.example.core.ui.theme.Black
 import com.example.core.ui.theme.SpotTypography
@@ -104,18 +109,16 @@ fun MyNavigationHost(navController: NavHostController) {
         composable("홈") {
             if (isPreview) {
                 HomeScreenContent(
-                    isLoading = false,
-                    error = null,
                     temperature = 23,
                     weatherType = WeatherType.SUNNY,
                     currentTime = LocalTime.of(9, 41),
                     popularStudies = emptyList(),
                     recommendedStudies = emptyList(),
-                    onFabClick = {},
                     onSeeAllPopularClick = {},
                     onRefreshRecommendClick = {},
                     onRetryClick = {},
-                    onStudyClick = {}
+                    onStudyClick = {},
+                    onQuickMenuClick = {},
                 )
             } else {
                 HomeScreen(navController)

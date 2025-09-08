@@ -1,41 +1,57 @@
-// HomeScreen.kt
 package com.example.feature.home
 
-import android.graphics.Paint
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.motionEventSpy
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.core.ui.component.FloatingButton
+import com.example.core.data.global.QuickMenuType
+import com.example.core.data.global.WeatherType
+import com.example.core.data.home.QuickMenuItem
+import com.example.core.data.study.StudyItem
+import com.example.core.ui.R
 import com.example.core.ui.component.appBar.AppBarHome
+import com.example.core.ui.component.study.StudyListItem
 import com.example.core.ui.component.weather.WeatherCard
-import com.example.core.ui.component.weather.WeatherType
+
 import com.example.core.ui.theme.B500
+import com.example.core.ui.theme.Black
 import com.example.core.ui.theme.SpotTypography
 import java.time.LocalTime
-import com.example.core.ui.R
+
+val quickItems = listOf(
+    QuickMenuItem(R.drawable.prefer_location, "내 지역",   QuickMenuType.REGION),
+    QuickMenuItem(R.drawable.heart_clear,     "내 관심사", QuickMenuType.INTERESTS),
+    QuickMenuItem(R.drawable.recruiting,      "모집 중",   QuickMenuType.RECRUITING),
+    QuickMenuItem(R.drawable.bulletin_board,  "게시판",    QuickMenuType.BOARD),
+)
 
 @Composable
 fun HomeScreen(
@@ -46,23 +62,70 @@ fun HomeScreen(
     val state by viewmodel.uiState.collectAsStateWithLifecycle()
 
     HomeScreenContent(
-        isLoading = state.isLoading,
-        error = state.error,
         temperature = state.weatherTemp,
         weatherType = state.weatherType,
         currentTime = state.currentTime,
         popularStudies = state.popularStudies,
         recommendedStudies = state.recommendedStudies,
-        onFabClick = { /* TODO */ },
+
+        onQuickMenuClick = { type ->
+            when (type) {
+                QuickMenuType.REGION     -> navController.navigate("카테고리")
+                QuickMenuType.INTERESTS  -> navController.navigate("내 스터디")
+                QuickMenuType.RECRUITING -> navController.navigate("모집중루트")
+                QuickMenuType.BOARD      -> navController.navigate("게시판루트")
+            }
+        },
+
         onSeeAllPopularClick = { /* TODO */ },
         onRefreshRecommendClick = viewmodel::refreshRecommend,
+
         onRetryClick = viewmodel::load,
-        onStudyClick = onStudyClick
+        onStudyClick = onStudyClick,
     )
 }
 
 @Composable
-fun PopularNowRow(
+fun QuickMenu(
+    items: List<QuickMenuItem>,
+    modifier: Modifier = Modifier,
+    iconSize: Dp = 32.dp,
+    onItemClick: (QuickMenuType) -> Unit,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        items.forEach { item ->
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 8.dp)
+                    .clickable { onItemClick(item.type) },   // ← 식별자만 전달
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    painter = painterResource(item.iconRes),
+                    contentDescription = item.label,
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(iconSize)
+                )
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = item.label,
+                    style = SpotTypography.bodyMedium600,
+                    fontSize = 14.sp,
+                    color = Black,
+                    maxLines = 1
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun PopularPostNow(
     title: String = "실시간 인기글",
     subtitle: String,
     modifier: Modifier = Modifier,
@@ -71,44 +134,122 @@ fun PopularNowRow(
     @DrawableRes trailingIconRes: Int = R.drawable.arrow_right
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Bottom,
     ) {
         Column(
-            modifier = Modifier
-            .weight(1f),
-        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Bottom)
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Bottom)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = title,
-                    style = SpotTypography.bodyMedium500.copy(fontSize = 20.sp),
+                    style = SpotTypography.bodyMedium500.copy(fontSize = 16.sp),
                 )
-                Text(text = "🔥", fontSize = 18.sp)
-
+                Spacer(Modifier.width(4.dp))
+                Image(
+                    painter = painterResource(R.drawable.fire),
+                    contentDescription = "fire",
+                    modifier = Modifier.size(20.dp)
+                )
             }
             Text(
                 text = subtitle,
                 style = SpotTypography.bodySmall500.copy(fontSize = 14.sp),
-                maxLines = 1,                      // 2줄이면 2로
-                overflow = TextOverflow.Ellipsis,  // 넘치면 …
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.clickable(onClick = onContentClick)
             )
         }
 
-        IconButton(
-            onClick = onMoreClick,
-            modifier = Modifier.size(18.dp)
-
-        ) {
+        IconButton(onClick = onMoreClick, modifier = Modifier.size(18.dp)) {
             Icon(
                 painter = painterResource(trailingIconRes),
                 contentDescription = "더보기",
                 tint = B500,
-                modifier = Modifier.size(18.dp) // 아이콘 시각 크기
+                modifier = Modifier.size(18.dp)
+            )
+        }
+    }
+}
+
+/** 섹션: 지금 가장 인기있는 스터디 (StudyUi로 렌더) */
+@Composable
+fun PopularStudyNow(
+    items: List<StudyItem>,
+    modifier: Modifier = Modifier,
+    title: String = "지금 가장 인기있는 스터디",
+    onMoreClick: () -> Unit = {},
+    onItemClick: (StudyItem) -> Unit = {},
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = SpotTypography.bodyMedium500.copy(fontSize = 18.sp),
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(onClick = onMoreClick, modifier = Modifier.size(18.dp)) {
+                Icon(
+                    painter = painterResource(R.drawable.arrow_right),
+                    contentDescription = "더보기",
+                    tint = B500
+                )
+            }
+        }
+
+        items.forEach { item ->
+            StudyListItem(
+                item = item,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
+                onClick = { onItemClick(item) }
+            )
+        }
+    }
+}
+
+@Composable
+fun RecommendStudyNow(
+    items: List<StudyItem>,
+    modifier: Modifier = Modifier,
+    title: String = "당신을 기다리는 추천 스터디",
+    onRefreshClick: () -> Unit = {},
+    onItemClick: (StudyItem) -> Unit = {},
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = SpotTypography.bodyMedium500.copy(fontSize = 18.sp),
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(onClick = onRefreshClick, modifier = Modifier.size(18.dp)) {
+                Icon(
+                    painter = painterResource(R.drawable.refresh),
+                    contentDescription = "새로고침"
+                )
+            }
+        }
+
+        items.forEach { item ->
+            StudyListItem(
+                item = item,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
+                onClick = { onItemClick(item) }
             )
         }
     }
@@ -116,16 +257,15 @@ fun PopularNowRow(
 
 @Composable
 fun HomeScreenContent(
-    isLoading: Boolean,
-    error: String?,
     temperature: Int?,
     weatherType: WeatherType?,
     currentTime: LocalTime?,
 
+    onQuickMenuClick: (QuickMenuType) -> Unit,
+
     popularStudies: List<StudyItem>,
     recommendedStudies: List<StudyItem>,
 
-    onFabClick: () -> Unit,
     onSeeAllPopularClick: () -> Unit,
     onRefreshRecommendClick: () -> Unit,
     onRetryClick: () -> Unit,
@@ -141,31 +281,29 @@ fun HomeScreenContent(
                 onNotificationClick = { /* TODO */ }
             )
         },
-
     ) { innerPadding ->
-
         val topInsets = innerPadding.calculateTopPadding()
 
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = topInsets)
-                .padding(horizontal = 14.dp),
+                .padding(horizontal = 17.dp),
             state = listState,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // 날씨 카드
+            // 상단: 날씨 + 실시간 인기글
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     WeatherCard(
-                        temperature = temperature!!,
-                        weatherType = weatherType!!,
-                        currentTime = currentTime!!,
+                        temperature = requireNotNull(temperature),
+                        weatherType = requireNotNull(weatherType),
+                        currentTime = requireNotNull(currentTime),
                     )
-                    PopularNowRow(
+                    PopularPostNow(
                         title = "실시간 인기글",
                         subtitle = "sample 들어갈 예정sample 들어갈 예정sample 들어갈 예정",
                         modifier = Modifier
@@ -177,50 +315,34 @@ fun HomeScreenContent(
                 }
             }
 
-            // 인기 스터디
-            if (popularStudies.isNotEmpty()) {
-                items(popularStudies, key = { it.id }) { study ->
-                    // TODO: StudyListItem(...)
-                    // StudyListItem(item = study, onClick = { onStudyClick(study) })
-                }
-            } else {
-                item {
-                    // TODO: SectionEmpty("인기 스터디가 아직 없어요.")
-                }
+            item {
+                QuickMenu(
+                    items = quickItems,
+                    onItemClick = onQuickMenuClick,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
 
-            // 추천 스터디 (새로고침 버튼은 섹션 헤더에서 onRefreshRecommendClick 호출)
-            if (recommendedStudies.isNotEmpty()) {
-                items(recommendedStudies, key = { it.id }) { study ->
-                    // TODO: StudyListItem(...)
-                    // StudyListItem(item = study, onClick = { onStudyClick(study) })
-                }
-            } else {
-                item {
-                    // TODO: SectionEmpty("맞춤 추천을 준비 중이에요.")
-                }
+            // 지금 가장 인기 있는 스터디 섹션
+            item {
+                PopularStudyNow(
+                    items = popularStudies.map { it },
+                    modifier = Modifier.fillMaxWidth(),
+                    onMoreClick = { /* 전체보기 */ },
+                    onItemClick = { /* 아이템 클릭 */ }
+                )
+            }
+
+            // 당신을 기다리는 추천 스터디 섹션
+            item {
+                RecommendStudyNow(
+                    items = popularStudies.map { it },
+                    modifier = Modifier.fillMaxWidth(),
+                    onRefreshClick = { /* 새로고침 */ },
+                    onItemClick = { /* 아이템 클릭 */ }
+                )
             }
         }
-
     }
 }
 
-/* ── 3) 프리뷰: VM 없이도 독립적으로 미리보기 가능 ── */
-@Preview(showBackground = true)
-@Composable
-private fun HomeScreenContentPreview() {
-    HomeScreenContent(
-        isLoading = false,
-        error = null,
-        temperature = 23,
-        weatherType = WeatherType.SUNNY,
-        currentTime = LocalTime.of(9, 41),
-        popularStudies = List(2) { i -> StudyItem("p$i", "Popular #$i", "Goal $i") },
-        recommendedStudies = List(2) { i -> StudyItem("r$i", "Recommend #$i", "Goal $i") },
-        onFabClick = {},
-        onSeeAllPopularClick = {},
-        onRefreshRecommendClick = {},
-        onRetryClick = {},
-        onStudyClick = {}
-    )
-}

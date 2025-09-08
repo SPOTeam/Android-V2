@@ -22,12 +22,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.core.data.global.WeatherType
 import com.example.core.ui.R
 import com.example.core.ui.shapes.SpotShapes
 import com.example.core.ui.theme.SpotTypography
 import java.time.LocalTime
-
-enum class WeatherType { HEAVYRAIN, RAIN, SNOW, WIND, COLD, HOT, SUNNY }
 
 @Composable
 fun WeatherCard(
