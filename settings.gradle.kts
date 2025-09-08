@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "SPOT"
 include(":app")
- 
+include(":feature")
+include(":core-ui")
