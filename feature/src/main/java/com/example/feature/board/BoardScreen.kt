@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.example.core.data.board.BoardItem
 import com.example.core.data.board.BoardUiState
 import com.example.core.data.board.LabeledItem
@@ -32,6 +33,7 @@ import com.example.core.ui.component.appBar.AppBarHome
 
 @Composable
 fun BoardScreen(
+    navController: NavController,
     viewmodel: BoardViewModel = hiltViewModel(),
     onItemClick: (BoardItem) -> Unit = {},
     onLabeledItemClick: (LabeledItem) -> Unit = {},
@@ -55,7 +57,7 @@ fun BoardScreen(
                 .padding(inner)
                 .padding(horizontal = 14.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp),
-            contentPadding = PaddingValues(bottom = 88.dp)
+            contentPadding = PaddingValues(bottom = 20.dp)
         ) {
 
             /* 🔥 + 탭(우측정렬) */
@@ -189,7 +191,7 @@ private fun SectionHeader(
             style = SpotTypography.bodyMedium500.copy(fontSize = 18.sp),
             modifier = Modifier.weight(1f)
         )
-        IconButton(onClick = onMoreClick, modifier = Modifier.size(32.dp)) {
+        IconButton(onClick = onMoreClick, modifier = Modifier.size(28.dp)) {
             Icon(
                 painter = painterResource(R.drawable.arrow_right),
                 contentDescription = "더보기",
@@ -271,14 +273,6 @@ private fun LabeledCardList(
                         text = "(${cap(item.count)})",
                         style = SpotTypography.bodySmall500.copy(fontSize = 14.sp),
                         color = B500
-                    )
-                }
-
-                if (index != items.lastIndex) {
-                    HorizontalDivider(
-                        color = G300,
-                        thickness = 0.5.dp,
-                        modifier = Modifier.padding(horizontal = 12.dp)
                     )
                 }
             }
@@ -381,8 +375,7 @@ fun BoardScreen(
                                 painter = painterResource(R.drawable.fire),
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .size(22.dp)
-                                    .padding(end = 6.dp)
+                                    .size(30.dp)
                             )
                             Spacer(Modifier.weight(1f))
                             BoardTabs(selected = state.selected, onSelect = onSelectTab)

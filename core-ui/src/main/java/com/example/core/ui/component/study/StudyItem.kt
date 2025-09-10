@@ -44,24 +44,16 @@ fun StudyListItem(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 썸네일
-            if (item.studyImage != null) {
-                Image(
-                    painter = painterResource(item.studyImage!!),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(SpotShapes.Hard)
-                )
-            } else {
-                Image(
-                    painter = painterResource(R.drawable.spot_logo),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(SpotShapes.Hard)
-                )
-            }
+
+            val imageRes = item.studyImage ?: R.drawable.spot_logo
+
+            Image(
+                painter = painterResource(imageRes),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(SpotShapes.Hard)
+            )
 
             // 텍스트 + 통계
             Column(

@@ -1,9 +1,12 @@
 package com.example.feature
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -27,12 +30,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.core.data.global.QuickMenuType
 import com.example.core.data.global.WeatherType
 import com.example.core.ui.R
 import com.example.core.ui.component.FloatingButton
+import com.example.core.ui.component.appBar.AppBarHome
 import com.example.core.ui.theme.B500
 import com.example.core.ui.theme.Black
 import com.example.core.ui.theme.SpotTypography
+import com.example.feature.board.BoardScreen
 import com.example.feature.home.HomeScreen
 import com.example.feature.home.HomeScreenContent
 import java.time.LocalTime
@@ -42,6 +48,8 @@ data class MainTab(
     val iconResId: Int,
     val iconClickResId: Int
 )
+
+val extraRoutes = listOf("게시판")
 
 val items = listOf(
     MainTab("홈", R.drawable.home_default, R.drawable.home_filled),
@@ -114,7 +122,11 @@ fun MyNavigationHost(navController: NavHostController) {
                     currentTime = LocalTime.of(9, 41),
                     popularStudies = emptyList(),
                     recommendedStudies = emptyList(),
-                    onQuickMenuClick = {}
+                    onQuickMenuClick = { type ->
+                        if (type == QuickMenuType.BOARD) {
+                            navController.navigate("게시판")
+                        }
+                    }
                 )
             } else {
                 HomeScreen(navController)
@@ -126,6 +138,7 @@ fun MyNavigationHost(navController: NavHostController) {
         composable("내 스터디") { PlaceholderScreen("내 스터디") }
         composable("찜") { PlaceholderScreen("찜") }
         composable("마이페이지") { PlaceholderScreen("마이페이지") }
+        composable("게시판") { BoardScreen(navController) }
     }
 }
 
@@ -142,14 +155,25 @@ fun MainScreen() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     // 프리뷰 첫 프레임에서 null일 수 있으므로 기본값을 "홈"으로
-    val currentRoute = navBackStackEntry?.destination?.route ?: "커뮤니티"
+    val currentRoute = navBackStackEntry?.destination?.route ?: "홈"
 
-    val bottomBarRoutes = items.map { it.route }
+    val bottomBarRoutes = items.map { it.route } + extraRoutes
 
     val showMakeStudyFab = currentRoute == "홈"
-    val showWritePost = currentRoute == "커뮤니티"
+    val showWritePost = currentRoute == "게시판"
 
     Scaffold(
+        topBar = {
+            androidx.compose.foundation.layout.Box(
+                Modifier.windowInsetsPadding(WindowInsets.statusBars)
+            ) {
+                AppBarHome(
+                    hasNotification = false,
+                    onSearchClick = { /* TODO */ },
+                    onNotificationClick = { /* TODO */ }
+                )
+            }
+        },
         bottomBar = {
             if (currentRoute in bottomBarRoutes) {
                 MyBottomNavigation(navController)

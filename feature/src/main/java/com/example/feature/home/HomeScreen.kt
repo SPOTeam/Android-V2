@@ -312,78 +312,66 @@ fun HomeScreenContent(
 ) {
     val listState = rememberLazyListState()
 
-    Scaffold(
-        topBar = {
-            AppBarHome(
-                hasNotification = false,
-                onSearchClick = { /* TODO */ },
-                onNotificationClick = { /* TODO */ }
-            )
-        },
-    ) { innerPadding ->
-        val topInsets = innerPadding.calculateTopPadding()
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = topInsets)
-                .padding(horizontal = 17.dp),
-            state = listState,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            // 상단: 날씨 + 실시간 인기글
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    WeatherCard(
-                        temperature = requireNotNull(temperature),
-                        weatherType = requireNotNull(weatherType),
-                        currentTime = requireNotNull(currentTime),
-                    )
-
-                    PopularPostNow(
-                        title = "실시간 인기글",
-                        subtitle = "sample 들어갈 예정sample 들어갈 예정sample 들어갈 예정",
-                        modifier = Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically),
-                        onContentClick = { /* subtitle 클릭 */ },
-                        onMoreClick = { /* > 아이콘 클릭 */ },
-                        onCardClick = { }
-                    )
-                }
-            }
-
-            item {
-                QuickMenu(
-                    items = quickItems,
-                    onItemClick = onQuickMenuClick,
-                    modifier = Modifier.fillMaxWidth()
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 17.dp),
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        // 상단: 날씨 + 실시간 인기글
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                WeatherCard(
+                    temperature = temperature,
+                    weatherType = weatherType,
+                    currentTime = currentTime,
                 )
-            }
 
-            // 지금 가장 인기 있는 스터디 섹션
-            item {
-                PopularStudyNow(
-                    items = popularStudies.map { it },
-                    modifier = Modifier.fillMaxWidth(),
-                    onMoreClick = { /* 전체보기 */ },
-                    onItemClick = { /* 아이템 클릭 */ }
-                )
-            }
-
-            // 당신을 기다리는 추천 스터디 섹션
-            item {
-                RecommendStudyNow(
-                    items = popularStudies.map { it },
-                    modifier = Modifier.fillMaxWidth(),
-                    onRefreshClick = { /* 새로고침 */ },
-                    onItemClick = { /* 아이템 클릭 */ }
+                PopularPostNow(
+                    title = "실시간 인기글",
+                    subtitle = "sample 들어갈 예정sample 들어갈 예정sample 들어갈 예정",
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterVertically),
+                    onContentClick = { /* subtitle 클릭 */ },
+                    onMoreClick = { /* > 아이콘 클릭 */ },
+                    onCardClick = { }
                 )
             }
         }
+
+        item {
+            QuickMenu(
+                items = quickItems,
+                onItemClick = onQuickMenuClick,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        // 지금 가장 인기 있는 스터디 섹션
+        item {
+            PopularStudyNow(
+                items = popularStudies.map { it },
+                modifier = Modifier.fillMaxWidth(),
+                onMoreClick = { /* 전체보기 */ },
+                onItemClick = { /* 아이템 클릭 */ }
+            )
+        }
+
+        // 당신을 기다리는 추천 스터디 섹션
+        item {
+            RecommendStudyNow(
+                items = popularStudies.map { it },
+                modifier = Modifier.fillMaxWidth(),
+                onRefreshClick = { /* 새로고침 */ },
+                onItemClick = { /* 아이템 클릭 */ }
+            )
+        }
     }
+
 }
 
