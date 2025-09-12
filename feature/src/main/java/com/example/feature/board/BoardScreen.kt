@@ -45,9 +45,9 @@ fun BoardScreen(
     Scaffold(
         topBar = {
             AppBarHome(
-                hasNotification = false,
+                hasAlert = false,
                 onSearchClick = { /* TODO */ },
-                onNotificationClick = { /* TODO */ }
+                onAlertClick = { /* TODO */ }
             )
         }
     ) { inner ->
@@ -333,9 +333,9 @@ fun BoardScreen(
     Scaffold(
         topBar = {
             AppBarHome(
-                hasNotification = false,
+                hasAlert = false,
                 onSearchClick = { /* TODO */ },
-                onNotificationClick = { /* TODO */ }
+                onAlertClick = { /* TODO */ }
             )
         }
     ) { inner ->

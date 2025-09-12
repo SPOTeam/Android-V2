@@ -38,6 +38,7 @@ import com.example.core.ui.component.appBar.AppBarHome
 import com.example.core.ui.theme.B500
 import com.example.core.ui.theme.Black
 import com.example.core.ui.theme.SpotTypography
+import com.example.feature.alert.AlertScreen
 import com.example.feature.board.BoardScreen
 import com.example.feature.home.HomeScreen
 import com.example.feature.home.HomeScreenContent
@@ -138,7 +139,10 @@ fun MyNavigationHost(navController: NavHostController) {
         composable("내 스터디") { PlaceholderScreen("내 스터디") }
         composable("찜") { PlaceholderScreen("찜") }
         composable("마이페이지") { PlaceholderScreen("마이페이지") }
+
         composable("게시판") { BoardScreen(navController) }
+        composable("알림") { AlertScreen(navController) }
+
     }
 }
 
@@ -161,6 +165,7 @@ fun MainScreen() {
 
     val showMakeStudyFab = currentRoute == "홈"
     val showWritePost = currentRoute == "게시판"
+    val showToUp = currentRoute == "알림"
 
     Scaffold(
         topBar = {
@@ -168,9 +173,9 @@ fun MainScreen() {
                 Modifier.windowInsetsPadding(WindowInsets.statusBars)
             ) {
                 AppBarHome(
-                    hasNotification = false,
+                    hasAlert = false,
                     onSearchClick = { /* TODO */ },
-                    onNotificationClick = { /* TODO */ }
+                    onAlertClick = { /* TODO */ }
                 )
             }
         },
@@ -191,6 +196,12 @@ fun MainScreen() {
                     onClick = { /* TODO */ },
                     modifier = Modifier.padding(end = 8.dp, bottom = 8.dp),
                     iconRes = R.drawable.write
+                )
+            } else if(showToUp) {
+                FloatingButton(
+                    onClick = { /* TODO */ },
+                    modifier = Modifier.padding(end = 8.dp, bottom = 8.dp),
+                    iconRes = R.drawable.arrow_to_the_top
                 )
             }
         },

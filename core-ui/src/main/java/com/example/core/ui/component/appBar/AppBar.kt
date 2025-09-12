@@ -41,9 +41,9 @@ import com.example.core.ui.theme.White
 
 @Composable
 fun AppBarHome (
-    hasNotification: Boolean = false,
+    hasAlert: Boolean = false,
     onSearchClick: () -> Unit,
-    onNotificationClick: () -> Unit
+    onAlertClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -68,12 +68,12 @@ fun AppBarHome (
                 )
             }
             Spacer(modifier = Modifier.width(8.dp))
-            IconButton(onClick = onNotificationClick) {
+            IconButton(onClick = onAlertClick) {
                 Icon(
                     painter = painterResource(
-                        id = if (hasNotification) R.drawable.alert_noti else R.drawable.alert
+                        id = if (hasAlert) R.drawable.alert_noti else R.drawable.alert
                     ),
-                    contentDescription = if (hasNotification) "New Notifications" else "Notifications",
+                    contentDescription = if (hasAlert) "New Notifications" else "Notifications",
                     tint = Color.Unspecified,
                     modifier = Modifier.size(32.dp)
                 )
@@ -86,9 +86,9 @@ fun AppBarHome (
 @Composable
 fun TopBarPreview_NoNotification() {
     AppBarHome(
-        hasNotification = false,
+        hasAlert = false,
         onSearchClick = {},
-        onNotificationClick = {}
+        onAlertClick = {}
     )
 }
 
@@ -96,9 +96,9 @@ fun TopBarPreview_NoNotification() {
 @Composable
 fun TopBarPreview_WithNotification() {
     AppBarHome(
-        hasNotification = true,
+        hasAlert = true,
         onSearchClick = {},
-        onNotificationClick = {}
+        onAlertClick = {}
     )
 }
 
