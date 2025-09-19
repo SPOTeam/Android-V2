@@ -1,5 +1,7 @@
 package com.example.feature
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +14,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults.contentWindowInsets
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -51,6 +54,7 @@ data class MainTab(
 )
 
 val extraRoutes = listOf("게시판")
+val routesToHideHomeTopBar = setOf("알림")
 
 val items = listOf(
     MainTab("홈", R.drawable.home_default, R.drawable.home_filled),
@@ -111,10 +115,16 @@ fun MyBottomNavigation(navController: NavHostController) {
 
 @Composable
 fun MyNavigationHost(navController: NavHostController) {
-
     val isPreview = LocalInspectionMode.current
 
-    NavHost(navController, startDestination = "홈") {
+    NavHost(
+        navController,
+        startDestination = "홈",
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None },
+    ) {
         composable("홈") {
             if (isPreview) {
                 HomeScreenContent(
@@ -158,25 +168,27 @@ private fun PlaceholderScreen(name: String) {
 fun MainScreen() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    // 프리뷰 첫 프레임에서 null일 수 있으므로 기본값을 "홈"으로
+
     val currentRoute = navBackStackEntry?.destination?.route ?: "홈"
 
     val bottomBarRoutes = items.map { it.route } + extraRoutes
+    val showHomeTopBar = currentRoute !in routesToHideHomeTopBar
 
     val showMakeStudyFab = currentRoute == "홈"
     val showWritePost = currentRoute == "게시판"
     val showToUp = currentRoute == "알림"
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0),
         topBar = {
-            androidx.compose.foundation.layout.Box(
-                Modifier.windowInsetsPadding(WindowInsets.statusBars)
-            ) {
-                AppBarHome(
-                    hasAlert = false,
-                    onSearchClick = { /* TODO */ },
-                    onAlertClick = { /* TODO */ }
-                )
+            if(showHomeTopBar){
+                Box(Modifier.windowInsetsPadding(WindowInsets.statusBars)) {
+                    AppBarHome(
+                        hasAlert = false,
+                        onSearchClick = { /* TODO */ },
+                        onAlertClick = { navController.navigate("알림") }
+                    )
+                }
             }
         },
         bottomBar = {
@@ -199,8 +211,12 @@ fun MainScreen() {
                 )
             } else if(showToUp) {
                 FloatingButton(
-                    onClick = { /* TODO */ },
-                    modifier = Modifier.padding(end = 8.dp, bottom = 8.dp),
+                    onClick = {
+                        navController.currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("alert_scroll_to_top", System.currentTimeMillis())
+                        },
+                    modifier = Modifier.padding(end = 8.dp, bottom = 50.dp),
                     iconRes = R.drawable.arrow_to_the_top
                 )
             }

@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.core.ui.R
 import com.example.core.ui.shapes.SpotShapes
 import com.example.core.ui.theme.G300
@@ -106,33 +108,30 @@ fun TopBarPreview_WithNotification() {
 fun BackTopBar(
     title: String,
     onBackClick: () -> Unit,
-    textStyle: TextStyle? = null // 기본값
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start // ✅ 왼쪽 정렬 고정verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = onBackClick) {
+        IconButton(
+            onClick = onBackClick,
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_left),
-                contentDescription = "Back"
+                contentDescription = "Back",
+                modifier = Modifier.size(25.dp)
             )
         }
 
-        Spacer(modifier = Modifier.width(4.dp))
-
-        if (textStyle != null) {
-            Text(
-                text = title,
-                style = textStyle // ← 폰트 스타일 적용
-            )
-        } else {
-            Text(
-                text = title
-            )
-        }
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = title,
+            style = SpotTypography.bodyLarge500,
+            fontSize = 18.sp
+        )
     }
 }
 
@@ -142,7 +141,6 @@ fun BackTopBarPreview_Title() {
     BackTopBar(
         title = "홈",
         onBackClick = {},
-        textStyle = SpotTypography.bodySmall500
     )
 }
 
@@ -162,14 +160,15 @@ fun SearchTopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp),
+            .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Back
         IconButton(onClick = onBackClick) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_left),
-                contentDescription = "Back"
+                contentDescription = "Back",
+                modifier = Modifier.size(25.dp)
             )
         }
 

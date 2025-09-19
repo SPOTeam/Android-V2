@@ -7,6 +7,7 @@ import com.example.core.data.global.AlertKind
 import com.example.core.ui.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 
 class AlertViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(sampleUiState())
@@ -16,6 +17,13 @@ class AlertViewModel : ViewModel() {
     }
 
     fun onClickAlert(item: AlertItem) {
+        _uiState.update { state ->
+            state.copy(
+                alerts = state.alerts.map {
+                    if (it.id == item.id) it.copy(isRead = true) else it
+                }
+            )
+        }
     }
 
     companion object {
@@ -70,6 +78,57 @@ class AlertViewModel : ViewModel() {
                     add(
                         AlertItem(
                             id = 5,
+                            kind = AlertKind.POPULAR_POST,
+                            title = "실시간 인기 글",
+                            subtitle = "Another Popular Post"
+                        )
+                    )
+                    add(
+                        AlertItem(
+                            id = 6,
+                            kind = AlertKind.POPULAR_POST,
+                            title = "실시간 인기 글",
+                            subtitle = "Sample Post Title",
+                            isRead = false,
+                        )
+                    )
+                    // 📢 STUDY_NOTICE: 스터디 이미지 필요 → 리소스 채움(null이면 기본으로 대체)
+                    add(
+                        AlertItem(
+                            id = 7,
+                            kind = AlertKind.STUDY_NOTICE,
+                            title = "내 스터디 '공지' 업데이트",
+                            subtitle = "\"Sample Study\"의 새로운 공지",
+                            studyImageRes = R.drawable.sample, // 임시 썸네일
+                            isRead = false
+                        )
+                    )
+                    // 📅 STUDY_SCHEDULE
+                    add(
+                        AlertItem(
+                            id = 8,
+                            kind = AlertKind.STUDY_SCHEDULE,
+                            title = "내 스터디 '새 일정' 등록",
+                            subtitle = "\"Sample Study\"의 새로운 일정",
+                            studyImageRes = R.drawable.sample,
+                            isRead = false
+                        )
+                    )
+                    // ✅ TODO_DONE
+                    add(
+                        AlertItem(
+                            id = 9,
+                            kind = AlertKind.TODO_DONE,
+                            title = "'사용자'님의 \"Sample Todolist …\" 할 일 완료!",
+                            subtitle = "\"Sample Study\"의 '사용자'님",
+                            studyImageRes = R.drawable.sample,
+                            isRead = false
+                        )
+                    )
+                    // 또 하나의 인기글
+                    add(
+                        AlertItem(
+                            id = 10,
                             kind = AlertKind.POPULAR_POST,
                             title = "실시간 인기 글",
                             subtitle = "Another Popular Post"

@@ -308,10 +308,8 @@ fun HomeScreenContent(
 
     popularStudies: List<StudyItem>,
     recommendedStudies: List<StudyItem>,
-
 ) {
     val listState = rememberLazyListState()
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()

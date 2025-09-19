@@ -5,27 +5,36 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -38,9 +47,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.core.data.alert.AlertItem
+import com.example.core.data.alert.AlertUiState
 import com.example.core.data.global.AlertKind
 import com.example.core.ui.R
 import com.example.core.ui.component.appBar.BackTopBar
+import com.example.core.ui.component.empty.EmptyAlert
 import com.example.core.ui.shapes.ShapeBox
 import com.example.core.ui.shapes.ShapeImageBox
 import com.example.core.ui.shapes.ShapeImageWithBadge
@@ -51,19 +62,10 @@ import com.example.core.ui.theme.B400
 import com.example.core.ui.theme.B500
 import com.example.core.ui.theme.Black
 import com.example.core.ui.theme.G300
-import com.example.core.ui.theme.G400
 import com.example.core.ui.theme.SpotTypography
 import com.example.core.ui.theme.White
+import kotlinx.coroutines.launch
 
-@DrawableRes
-fun AlertKind.iconRes(): Int = when (this) {
-    AlertKind.POPULAR_POST -> R.drawable.fire
-    AlertKind.STUDY_NOTICE,
-    AlertKind.STUDY_SCHEDULE,
-    AlertKind.TODO_DONE -> R.drawable.announce
-}
-
-fun AlertKind.needsStudyImage(): Boolean = this != AlertKind.POPULAR_POST
 
 @Composable
 fun AlertScreen(
@@ -72,46 +74,33 @@ fun AlertScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            BackTopBar(
-                title = "알림",
-                onBackClick = { navController.popBackStack() }
-            )
-        },
-    ) { innerPadding ->
-        if (uiState.alerts.isEmpty()) {
-            // 완전 빈 상태
-            EmptyAlert(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            )
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentPadding = PaddingValues(bottom = 24.dp)
-            ) {
-                if (uiState.showAppliedStudyCard) {
-                    item(key = "applied_card") {
-                        EnrollStudyCard(
-                            isAvailable = true,
-                            onClick = { viewModel.onClickAppliedStudyCard() }
-                        )
-                        Spacer(Modifier.height(8.dp))
-                    }
-                }
-                items(items = uiState.alerts, key = { it.id }) { item ->
-                    AlertRow(
-                        data = item,
-                        onClick = { viewModel.onClickAlert(item) }
-                    )
-                }
-            }
+
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+
+    // ✅ getBackStackEntry는 remember로 감싸기 (navController가 키)
+    val alertEntry = remember(navController) {
+        navController.getBackStackEntry("알림")
+    }
+
+    // ✅ lifecycleOwner를 명시적으로 전달 (경고/수명 문제 예방)
+    val scrollSignal by alertEntry.savedStateHandle
+        .getStateFlow("alert_scroll_to_top", 0L)
+        .collectAsStateWithLifecycle(lifecycleOwner = alertEntry)
+
+    LaunchedEffect(scrollSignal) {
+        if (scrollSignal != 0L) {
+            scope.launch { listState.animateScrollToItem(0) }
         }
     }
+
+    AlertScreenContent(
+        uiState = uiState,
+        onBack = { navController.popBackStack() },
+        onClickAppliedStudyCard = { viewModel.onClickAppliedStudyCard() },
+        onClickAlert = { item -> viewModel.onClickAlert(item) },
+        listState = listState
+    )
 }
 
 @Composable
@@ -127,7 +116,7 @@ fun AlertRow(
 }
 
 @Composable
-private fun EnrollStudyCard(
+fun EnrollStudyCard(
     modifier: Modifier = Modifier,
     isAvailable : Boolean = false,
     onClick: () -> Unit
@@ -144,7 +133,9 @@ private fun EnrollStudyCard(
 
     ElevatedCard(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp),
         interactionSource = interactionSource,
         colors = CardDefaults.elevatedCardColors(
             containerColor = containerColor
@@ -181,38 +172,6 @@ private fun EnrollStudyCard(
 }
 
 @Composable
-private fun EmptyAlert(
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Image(
-            painter = painterResource(R.drawable.alert),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(G300),
-            modifier = Modifier.size(50.dp)
-        )
-        Spacer(Modifier.height(12.dp))
-        Text(
-            text = "아직 알림이 없어요.",
-            style = SpotTypography.header05,
-            fontSize = 30.sp,
-            color = B500
-        )
-        Spacer(Modifier.height(15.dp))
-        Text(
-            text = "스팟에서 내 목표를 이뤄봐요.",
-            style = SpotTypography.header05,
-            color = G400,
-            fontSize = 25.sp,
-        )
-    }
-}
-
-@Composable
 fun PopularPostAlert(
     modifier: Modifier  = Modifier,
     data: AlertItem,
@@ -230,7 +189,7 @@ fun PopularPostAlert(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .padding(horizontal = 12.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Card(
@@ -326,7 +285,7 @@ fun StudyNotiAlert(
                     interactionSource = interactionSource,
                     indication = null,
                     onClick = {
-                        onClick(data.copy(isRead = true)) // ✅ 클릭 시 true로 바꾼 값 전달
+                        onClick(data) // ✅ 클릭 시 true로 바꾼 값 전달
                     }
                 ),
             shape = SpotShapes.Hard,
@@ -397,99 +356,66 @@ fun NewBadge(
     }
 }
 
-
-@Preview(showBackground = true)
 @Composable
-fun PopularPostAlertIsReadPreview() {
-    val test = AlertItem(
-        id = 1,
-        kind = AlertKind.POPULAR_POST,
-        title = "PostTitle",
-        isRead = true
-    )
+fun AlertScreenContent(
+    uiState: AlertUiState,
+    onBack: () -> Unit,
+    onClickAppliedStudyCard: () -> Unit,
+    onClickAlert: (AlertItem) -> Unit,
+    listState: LazyListState // ✅ 추가
+) {
+    Scaffold(
+        contentWindowInsets = WindowInsets(0), // ✅ 부모가 인셋 꺼놨으니 자식에서도 명시
+        topBar = {
+            Box(Modifier.windowInsetsPadding(WindowInsets.statusBars)) {
+                BackTopBar(
+                    title = "알림",
+                    onBackClick = onBack
+                )
+            }
+        }
+    ) { innerPadding ->
+        if (uiState.alerts.isEmpty()) {
+            EmptyAlert(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                painter = painterResource(R.drawable.alert),
+                alertTitle = "아직 알림이 없어요.",
+                alertDes = "스팟에서 내 목표를 이뤄봐요."
+            )
+        } else {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .windowInsetsPadding(WindowInsets.navigationBars), // ✅ 하단 SafeArea
+            ) {
+                if (uiState.showAppliedStudyCard) {
+                    item(key = "applied_card") {
+                        EnrollStudyCard(
+                            isAvailable = true,
+                            onClick = onClickAppliedStudyCard
+                        )
+                    }
+                }
+                items(items = uiState.alerts, key = { it.id }) { item ->
+                    AlertRow(
+                        data = item,
+                        onClick = onClickAlert
+                    )
 
-    PopularPostAlert(
-        modifier = Modifier.padding(10.dp),
-        data = test,
-        onClick = { }
-    )
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        color = G300,
+                        thickness = 0.5.dp
+                    )
+                }
+            }
+        }
+    }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PopularPostAlertPreview() {
-    val test = AlertItem(
-        id = 1,
-        kind = AlertKind.POPULAR_POST,
-        title = "PostTitle",
-    )
-
-    PopularPostAlert(
-        modifier = Modifier.padding(10.dp),
-        data = test,
-        onClick = { }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun StudyNotiAlertIsReadPreview() {
-    val test = AlertItem(
-        id = 1,
-        studyImageRes = R.drawable.sample,
-        kind = AlertKind.STUDY_NOTICE,
-        title = "PostTitle",
-        isRead = true
-    )
-
-    StudyNotiAlert(
-        modifier = Modifier.padding(10.dp),
-        data = test,
-        onClick = { }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun StudyNotiAlertPreview() {
-    val test = AlertItem(
-        id = 1,
-        studyImageRes = R.drawable.sample,
-        kind = AlertKind.STUDY_NOTICE,
-        title = "PostTitle",
-    )
-
-    StudyNotiAlert(
-        modifier = Modifier.padding(10.dp),
-        data = test,
-        onClick = { }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun EnrollStudyCardDisabledPreview() {
-    EnrollStudyCard(
-        modifier = Modifier.padding(10.dp),
-        isAvailable = false,
-        onClick = { }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun EnrollStudyCardPreview() {
-    EnrollStudyCard(
-        modifier = Modifier.padding(10.dp),
-        isAvailable = true,
-        onClick = { }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun EmptyAlertPreview() {
-    EmptyAlert(
-        modifier = Modifier.padding(10.dp)
-    )
-}

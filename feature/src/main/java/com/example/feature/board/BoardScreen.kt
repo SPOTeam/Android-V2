@@ -42,82 +42,70 @@ fun BoardScreen(
 ) {
     val state by viewmodel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            AppBarHome(
-                hasAlert = false,
-                onSearchClick = { /* TODO */ },
-                onAlertClick = { /* TODO */ }
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 14.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp),
+        contentPadding = PaddingValues(bottom = 20.dp)
+    ) {
+        /* 🔥 + 탭(우측정렬) */
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 30.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.fire),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(22.dp)
+                        .padding(end = 6.dp)
+                )
+                Spacer(Modifier.weight(1f))
+                BoardTabs(
+                    selected = state.selected,
+                    onSelect = viewmodel::selectSort
+                )
+            }
+        }
+
+        /* 실시간 인기글 카드 (랭크 리스트) */
+        item {
+            RankCardList(
+                items = state.hot,
+                onItemClick = onItemClick
             )
         }
-    ) { inner ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(inner)
-                .padding(horizontal = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp),
-            contentPadding = PaddingValues(bottom = 20.dp)
-        ) {
 
-            /* 🔥 + 탭(우측정렬) */
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 30.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.fire),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(22.dp)
-                            .padding(end = 6.dp)
-                    )
-                    Spacer(Modifier.weight(1f))
-                    BoardTabs(
-                        selected = state.selected,
-                        onSelect = viewmodel::selectSort
-                    )
-                }
-            }
+        /* 스터디 파트너들의 이야기 (섹션 헤더 + 라벨 리스트) */
+        item {
+            SectionHeader(
+                title = "스터디 파트너들의 이야기",
+                onMoreClick = onMorePartnersClick
+            )
+        }
+        item {
+            LabeledCardList(
+                items = state.partners,
+                onItemClick = onLabeledItemClick
+            )
+        }
 
-            /* 실시간 인기글 카드 (랭크 리스트) */
-            item {
-                RankCardList(
-                    items = state.hot,
-                    onItemClick = onItemClick
-                )
-            }
-
-            /* 스터디 파트너들의 이야기 (섹션 헤더 + 라벨 리스트) */
-            item {
-                SectionHeader(
-                    title = "스터디 파트너들의 이야기",
-                    onMoreClick = onMorePartnersClick
-                )
-            }
-            item {
-                LabeledCardList(
-                    items = state.partners,
-                    onItemClick = onLabeledItemClick
-                )
-            }
-
-            /* SPOT 공지 (섹션 헤더 + 랭크 리스트) */
-            item {
-                SectionHeader(
-                    title = "SPOT 공지",
-                    onMoreClick = onMoreNoticeClick
-                )
-            }
-            item {
-                RankCardList(
-                    items = state.notice,
-                    onItemClick = onItemClick
-                )
-            }
+        /* SPOT 공지 (섹션 헤더 + 랭크 리스트) */
+        item {
+            SectionHeader(
+                title = "SPOT 공지",
+                onMoreClick = onMoreNoticeClick
+            )
+        }
+        item {
+            RankCardList(
+                items = state.notice,
+                onItemClick = onItemClick
+            )
         }
     }
 }
@@ -221,7 +209,7 @@ private fun RankCardList(
                     title = item.title,
                     count = item.count,
                     onClick = {
-
+                        onItemClick
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -296,7 +284,7 @@ private fun RankRow(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
 
-    ) {
+        ) {
         Text(
             text = rank.toString().padStart(2, '0'),
             style = SpotTypography.bodySmall500.copy(fontSize = 14.sp),
@@ -340,20 +328,26 @@ fun BoardScreen(
         }
     ) { inner ->
         when {
-            state.isLoading -> Box(Modifier
-                .fillMaxSize()
-                .padding(inner), contentAlignment = Alignment.Center) {
+            state.isLoading -> Box(
+                Modifier
+                    .fillMaxSize()
+                    .padding(inner), contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator()
             }
-            state.error != null -> Box(Modifier
-                .fillMaxSize()
-                .padding(inner), contentAlignment = Alignment.Center) {
+
+            state.error != null -> Box(
+                Modifier
+                    .fillMaxSize()
+                    .padding(inner), contentAlignment = Alignment.Center
+            ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("문제가 발생했어요.\n${state.error}")
                     Spacer(Modifier.height(8.dp))
                     Button(onClick = onRetry) { Text("다시 시도") }
                 }
             }
+
             else -> {
                 LazyColumn(
                     modifier = Modifier
