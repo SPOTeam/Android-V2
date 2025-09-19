@@ -49,85 +49,85 @@ val SpotTypography = CustomTypography (
         fontFamily = Suit,
         fontWeight = FontWeight.Bold,
         fontSize = 85.sp, // 64pt ≈ 85sp
-        lineHeight = (85.sp * 1.5f), // 150%
+//        lineHeight = (85.sp * 1.5f), // 150%
     ),
     header02 = TextStyle(
         fontFamily = Suit,
         fontWeight = FontWeight.Bold,
         fontSize = 69.sp, // 52pt ≈ 69sp
-        lineHeight = (69.sp * 1.54f), // 154%
+//        lineHeight = (69.sp * 1.54f), // 154%
     ),
     header03 = TextStyle(
         fontFamily = Suit,
         fontWeight = FontWeight.Bold,
         fontSize = 48.sp, // 48pt ≈ 64sp
-        lineHeight = (64.sp * 1.5f), // 150%
+//        lineHeight = (64.sp * 1.5f), // 150%
     ),
     header04 = TextStyle(
         fontFamily = Suit,
         fontWeight = FontWeight.Bold,
         fontSize = 44.sp, // 44pt ≈ 58sp
-        lineHeight = (58.sp * 1.54f), // 154%
+//        lineHeight = (58.sp * 1.54f), // 154%
     ),
     header05 = TextStyle(
         fontFamily = Suit,
         fontWeight = FontWeight.Bold,
         fontSize = 40.sp, // 40pt ≈ 53sp
-        lineHeight = (53.sp * 1.5f), // 150%
+//        lineHeight = (53.sp * 1.5f), // 150%
     ),
     bodyLarge600 = TextStyle(
         fontFamily = Suit,
         fontWeight = FontWeight.SemiBold,
         fontSize = 44.sp,
-        lineHeight = (58.sp * 1.46f) // 146%
+//        lineHeight = (58.sp * 1.46f) // 146%
     ),
     bodyLarge500 = TextStyle(
         fontFamily = Suit,
         fontWeight = FontWeight.Medium,
         fontSize = 44.sp,
-        lineHeight = (58.sp * 1.46f) // 146%
+//        lineHeight = (58.sp * 1.46f) // 146%
     ),
     bodyMedium600 = TextStyle(
         fontFamily = Suit,
         fontWeight = FontWeight.SemiBold,
         fontSize = 40.sp,
-        lineHeight = (53.sp * 1.56f) // 156%
+//        lineHeight = (53.sp * 1.56f) // 156%
     ),
     bodyMedium500 = TextStyle(
         fontFamily = Suit,
         fontWeight = FontWeight.Medium,
         fontSize = 40.sp,
-        lineHeight = (53.sp * 1.56f) // 156%
+//        lineHeight = (53.sp * 1.56f) // 156%
     ),
     bodyRegular500 = TextStyle(
         fontFamily = Suit,
         fontWeight = FontWeight.Medium,
         fontSize = 36.sp,
-        lineHeight = (48.sp * 1.44f) // 144%
+//        lineHeight = (48.sp * 1.44f) // 144%
     ),
     bodyRegular400 = TextStyle(
         fontFamily = Suit,
         fontWeight = FontWeight.Normal,
         fontSize = 36.sp,
-        lineHeight = (48.sp * 1.44f) // 144%
+//        lineHeight = (48.sp * 1.44f) // 144%
     ),
     bodySmall500 = TextStyle(
         fontFamily = Suit,
         fontWeight = FontWeight.Medium,
         fontSize = 32.sp,
-        lineHeight = (42.sp * 1.5f) // 150%
+//        lineHeight = (42.sp * 1.5f) // 150%
     ),
     bodySmall400 = TextStyle(
         fontFamily = Suit,
         fontWeight = FontWeight.Normal,
         fontSize = 32.sp,
-        lineHeight = (42.sp * 1.5f) // 150%
+//        lineHeight = (42.sp * 1.5f) // 150%
     ),
     bodySmall300 = TextStyle(
         fontFamily = Suit,
         fontWeight = FontWeight.Light,
         fontSize = 32.sp,
-        lineHeight = (42.sp * 1.5f) // 150%
+//        lineHeight = (42.sp * 1.5f) // 150%
     )
 )
 
