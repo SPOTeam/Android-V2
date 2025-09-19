@@ -4,8 +4,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -127,12 +129,11 @@ fun TextButtonR500(
     ) {
         // 배경 박스
         ShapeBox(
-            width = size.minWidth,
-            height = size.minHeight,
             shape = size.shape,
             color = bgColor,
             borderWidth = 1.dp,
-            borderColor = borderColor
+            borderColor = borderColor,
+            modifier = Modifier.width(size.minWidth).height(size.minHeight)
         )
 
         // 콘텐츠 (정중앙)
