@@ -30,7 +30,7 @@ class AlertViewModel : ViewModel() {
                             kind = AlertKind.POPULAR_POST,
                             title = "실시간 인기 글",
                             subtitle = "Sample Post Title",
-                            hasBlueBadge = false,
+                            isRead = false,
                         )
                     )
                     // 📢 STUDY_NOTICE: 스터디 이미지 필요 → 리소스 채움(null이면 기본으로 대체)
@@ -41,7 +41,7 @@ class AlertViewModel : ViewModel() {
                             title = "내 스터디 '공지' 업데이트",
                             subtitle = "\"Sample Study\"의 새로운 공지",
                             studyImageRes = R.drawable.sample, // 임시 썸네일
-                            hasBlueBadge = true
+                            isRead = false
                         )
                     )
                     // 📅 STUDY_SCHEDULE
@@ -52,7 +52,7 @@ class AlertViewModel : ViewModel() {
                             title = "내 스터디 '새 일정' 등록",
                             subtitle = "\"Sample Study\"의 새로운 일정",
                             studyImageRes = R.drawable.sample,
-                            hasBlueBadge = true
+                            isRead = false
                         )
                     )
                     // ✅ TODO_DONE
@@ -63,7 +63,7 @@ class AlertViewModel : ViewModel() {
                             title = "'사용자'님의 \"Sample Todolist …\" 할 일 완료!",
                             subtitle = "\"Sample Study\"의 '사용자'님",
                             studyImageRes = R.drawable.sample,
-                            hasBlueBadge = true
+                            isRead = false
                         )
                     )
                     // 또 하나의 인기글

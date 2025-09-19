@@ -6,9 +6,9 @@ data class AlertItem(
     val id: Int,
     val kind: AlertKind,
     val title: String,
-    val subtitle: String,
+    val subtitle: String = "",
     val studyImageRes: Int? = null,
-    val hasBlueBadge: Boolean = false
+    val isRead: Boolean = false
 )
 
 
