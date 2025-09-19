@@ -1,17 +1,26 @@
 package com.example.core.ui.shapes
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.core.ui.R
 import com.example.core.ui.theme.B400
 import com.example.core.ui.theme.G500
 import com.example.core.ui.theme.R500
@@ -40,20 +49,66 @@ object SpotShapes {
 }
 
 @Composable
-fun ShapeBox(
-    width: Dp,
-    height: Dp,
+fun ShapeImageWithBadge(
+    painter: Painter,
+    contentDescription: String? = null,
     shape: Shape,
-    color: Color = Color.White,
-    borderWidth: Dp = 0.dp,
-    borderColor: Color? = Color.Transparent,
+    size: Dp = 40.dp,
     modifier: Modifier = Modifier,
-    content: @Composable BoxScope.() -> Unit = {}
+    borderWidth: Dp = 0.dp,
+    padding: Dp = 2.dp,
+    borderColor: Color? = Color.Transparent,
+    contentScale: ContentScale = ContentScale.Crop,
+    badgeSize: Dp = 16.dp,
+) {
+    Box(
+        modifier = modifier.size(size),
+        contentAlignment = Alignment.Center
+    ) {
+        ShapeImageBox(
+            painter = painter,
+            contentDescription = contentDescription,
+            shape = shape,
+            size = size,
+            modifier = modifier,
+            borderWidth = borderWidth,
+            padding = padding,
+            borderColor = borderColor,
+            contentScale = contentScale
 
+        )
+
+        Icon(
+            painter = painterResource(R.drawable.announce),
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .size(badgeSize),
+            contentDescription = null
+        )
+    }
+}
+
+
+@Composable
+fun ShapeImageBox(
+    painter: Painter,
+    contentDescription: String? = null,
+    shape: Shape,
+    size: Dp = 20.dp,
+    modifier: Modifier = Modifier,
+    borderWidth: Dp = 0.dp,
+    padding: Dp = 5.dp,
+    borderColor: Color? = Color.Transparent,
+    contentScale: ContentScale = ContentScale.Crop,
+    backgroundColor : Color = Color.Transparent,
+    content: @Composable BoxScope.() -> Unit = {}   // ✅ 추가
 ) {
     Box(
         modifier = modifier
-            .background(color, shape)
+            .size(size)
+            .clip(shape)
+            .background(backgroundColor)
             .then(
                 if (borderColor != null && borderWidth > 0.dp) {
                     Modifier.border(borderWidth, borderColor, shape)
@@ -62,6 +117,13 @@ fun ShapeBox(
                 }
             )
     ) {
+        Image(
+            painter = painter,
+            contentDescription = contentDescription,
+            contentScale = contentScale,
+            modifier = Modifier.padding(padding)
+        )
+
         content()
     }
 }
@@ -93,15 +155,12 @@ fun ShapeBox(
 
 @Composable
 fun StateCardActive(
-    width: Dp,
-    height: Dp,
     shape: Shape = SpotShapes.Hard,
     color: Color = White,
     borderWidth: Dp = 1.dp,
     modifier: Modifier = Modifier
 ) = ShapeBox(
-    width = width,
-    height = height,
+
     shape = shape,
     color = color,
     borderWidth = borderWidth,
@@ -111,15 +170,11 @@ fun StateCardActive(
 
 @Composable
 fun StateCardSuccess(
-    width: Dp,
-    height: Dp,
     shape: Shape = SpotShapes.Hard,
     color: Color = White,
     borderWidth: Dp = 1.dp,
     modifier: Modifier = Modifier
 ) = ShapeBox(
-    width = width,
-    height = height,
     shape = shape,
     color = color,
     borderWidth = borderWidth,
@@ -129,15 +184,11 @@ fun StateCardSuccess(
 
 @Composable
 fun StateCardError(
-    width: Dp,
-    height: Dp,
     shape: Shape = SpotShapes.Hard,
     color: Color = White,
     borderWidth: Dp = 1.dp,
     modifier: Modifier = Modifier
 ) = ShapeBox(
-    width = width,
-    height = height,
     shape = shape,
     color = color,
     borderWidth = borderWidth,
@@ -147,15 +198,11 @@ fun StateCardError(
 
 @Composable
 fun StateCardWarning(
-    width: Dp,
-    height: Dp,
     shape: Shape = SpotShapes.Hard,
     color: Color = White,
     borderWidth: Dp = 1.dp,
     modifier: Modifier = Modifier
 ) = ShapeBox(
-    width = width,
-    height = height,
     shape = shape,
     color = color,
     borderWidth = borderWidth,

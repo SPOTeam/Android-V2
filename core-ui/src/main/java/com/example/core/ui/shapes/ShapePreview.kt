@@ -1,10 +1,14 @@
 package com.example.core.ui.shapes
 
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.core.ui.R
 import com.example.core.ui.theme.B100
 import com.example.core.ui.theme.B200
 import com.example.core.ui.theme.B400
@@ -19,11 +23,12 @@ import com.example.core.ui.theme.R500
 @Composable
 fun HardShapePreview() {
     ShapeBox(
-        width = 200.dp,
-        height = 80.dp,
         shape = SpotShapes.Hard,
         color = B100,
-        modifier = Modifier.padding(8.dp),
+        modifier = Modifier
+            .padding(8.dp)
+            .width(200.dp)
+            .height(80.dp),
         borderWidth = 1.dp,
         borderColor = B500
     )
@@ -33,10 +38,21 @@ fun HardShapePreview() {
 @Composable
 fun SoftShapePreview() {
     ShapeBox(
-        width = 200.dp,
-        height = 80.dp,
         shape = SpotShapes.Soft,
         color = B400,
+        modifier = Modifier
+            .padding(8.dp)
+            .width(200.dp)
+            .height(80.dp),
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ShapeImageWithBadgePreview() {
+    ShapeImageWithBadge(
+        painter = painterResource(R.drawable.spot_logo),
+        shape = SpotShapes.Hard,
         modifier = Modifier.padding(8.dp)
     )
 }
@@ -45,11 +61,12 @@ fun SoftShapePreview() {
 @Composable
 fun RoundShapePreview() {
     ShapeBox(
-        width = 200.dp,
-        height = 80.dp,
         shape = SpotShapes.Round,
         color = R500,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier
+            .padding(8.dp)
+            .width(200.dp)
+            .height(80.dp),
     )
 }
 
@@ -57,11 +74,13 @@ fun RoundShapePreview() {
 @Composable
 fun SoftLeftShapePreview() {
     ShapeBox(
-        width = 200.dp,
-        height = 80.dp,
+
         shape = SpotShapes.SoftLeft,
         color = B200,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier
+            .padding(8.dp)
+            .width(200.dp)
+            .height(80.dp)
     )
 }
 
@@ -69,11 +88,12 @@ fun SoftLeftShapePreview() {
 @Composable
 fun SoftRightShapePreview() {
     ShapeBox(
-        width = 200.dp,
-        height = 80.dp,
         shape = SpotShapes.SoftRight,
         color = B200,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier
+            .padding(8.dp)
+            .width(200.dp)
+            .height(80.dp),
     )
 }
 
@@ -81,11 +101,12 @@ fun SoftRightShapePreview() {
 @Composable
 fun RoundLeftShapePreview() {
     ShapeBox(
-        width = 200.dp,
-        height = 80.dp,
         shape = SpotShapes.RoundLeft,
         color = G300,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier
+            .padding(8.dp)
+            .width(200.dp)
+            .height(80.dp),
     )
 }
 
@@ -93,11 +114,12 @@ fun RoundLeftShapePreview() {
 @Composable
 fun RoundRightShapePreview() {
     ShapeBox(
-        width = 200.dp,
-        height = 80.dp,
         shape = SpotShapes.RoundRight,
         color = G500,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier
+            .padding(8.dp)
+            .width(200.dp)
+            .height(80.dp),
     )
 }
 
@@ -107,9 +129,10 @@ fun RoundRightShapePreview() {
 @Composable
 fun StateActivePreview() {
     StateCardActive(
-        width = 160.dp,
-        height = 88.dp,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier
+            .padding(8.dp)
+            .width(200.dp)
+            .height(80.dp)
     )
 }
 
@@ -117,9 +140,10 @@ fun StateActivePreview() {
 @Composable
 fun StateSuccessPreview() {
     StateCardSuccess(
-        width = 160.dp,
-        height = 88.dp,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier
+            .padding(8.dp)
+            .width(200.dp)
+            .height(80.dp)
     )
 }
 
@@ -127,9 +151,10 @@ fun StateSuccessPreview() {
 @Composable
 fun StateErrorPreview() {
     StateCardError(
-        width = 160.dp,
-        height = 88.dp,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier
+            .padding(8.dp)
+            .width(200.dp)
+            .height(80.dp)
     )
 }
 
@@ -137,8 +162,9 @@ fun StateErrorPreview() {
 @Composable
 fun StateWarningPreview() {
     StateCardWarning(
-        width = 160.dp,
-        height = 88.dp,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier
+            .padding(8.dp)
+            .width(200.dp)
+            .height(80.dp)
     )
 }
