@@ -100,7 +100,7 @@ fun EnrollStudyCardPreview() {
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 380, heightDp = 800)
 @Composable
 fun AlertScreenPreview() {
     val sampleUi = AlertUiState(

@@ -1,5 +1,6 @@
 package com.example.feature.alert
 
+import android.annotation.SuppressLint
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -67,6 +69,7 @@ import com.example.core.ui.theme.White
 import kotlinx.coroutines.launch
 
 
+@SuppressLint("UnrememberedGetBackStackEntry")
 @Composable
 fun AlertScreen(
     navController: NavController,
@@ -135,6 +138,7 @@ fun EnrollStudyCard(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
+            .wrapContentHeight()
             .padding(horizontal = 12.dp),
         interactionSource = interactionSource,
         colors = CardDefaults.elevatedCardColors(
@@ -275,6 +279,7 @@ fun StudyNotiAlert(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .wrapContentHeight()
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -30,6 +31,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.ui.R
+import com.example.core.ui.component.button.ButtonState
+import com.example.core.ui.component.button.TextButtonXL
 import com.example.core.ui.shapes.SpotShapes
 import com.example.core.ui.theme.B200
 import com.example.core.ui.theme.B500
@@ -110,39 +113,7 @@ fun EmptyAlertWithButton(
         alertTitle = alertTitle,
         alertDes = alertDes
     ) {
-        Card(
-            modifier = Modifier
-                .wrapContentSize()
-                .border( // ✅ 선 색상 & 두께
-                    width = 1.dp,
-                    color = borderColor,
-                    shape = SpotShapes.Hard
-                )
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null,
-                    onClick = {
-                        onClick()
-                    }
-                ),
-            shape = SpotShapes.Hard,
-            colors = CardDefaults.cardColors(containerColor = backgroundColor)
-        ) {
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 80.dp, vertical = 10.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = buttonText,
-                    style = SpotTypography.bodyMedium500,
-                    fontSize = 20.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = textColor
-                )
-            }
-        }
+        TextButtonXL(text = buttonText, onClick = {}, state = ButtonState.B400State)
     }
 }
 

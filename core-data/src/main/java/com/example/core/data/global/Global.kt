@@ -1,5 +1,7 @@
 package com.example.core.data.global
 
+import android.graphics.Color
+
 enum class WeatherType { HEAVYRAIN, RAIN, SNOW, WIND, COLD, HOT, SUNNY }
 
 enum class QuickMenuType { REGION, INTERESTS, RECRUITING, BOARD }
