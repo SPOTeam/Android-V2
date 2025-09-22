@@ -1,4 +1,4 @@
-package com.example.core.ui.component.button.b100
+package com.example.core.ui.component.button
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -28,22 +29,117 @@ import com.example.core.ui.shapes.ShapeBox
 import com.example.core.ui.shapes.SpotShapes
 import com.example.core.ui.theme.B100
 import com.example.core.ui.theme.B200
+import com.example.core.ui.theme.B400
 import com.example.core.ui.theme.B500
 import com.example.core.ui.theme.Black
 import com.example.core.ui.theme.G300
 import com.example.core.ui.theme.G400
+import com.example.core.ui.theme.G500
+import com.example.core.ui.theme.R500
 import com.example.core.ui.theme.SpotTypography
 import com.example.core.ui.theme.White
 
-// ---------------------- //
-//        Tokens          //
-// ---------------------- //
+// ---------- Color Tokens ----------
 
-enum class TextButtonB100Size(
+data class ButtonColors(
+    val bg: Color,
+    val text: Color,
+    val border: Color
+)
+
+enum class ButtonState(
+    val normal: ButtonColors,
+    val disabled: ButtonColors,
+    val pressed: ButtonColors,
+    val checked: ButtonColors
+) {
+    B400State(
+        normal = ButtonColors(
+            bg = White,
+            text = B500,
+            border = B500
+        ),
+        disabled = ButtonColors(
+            bg = White,
+            text = G400,
+            border = G300
+        ),
+        pressed = ButtonColors(
+            bg = B500,
+            text = White,
+            border = B500
+        ),
+        checked = ButtonColors(
+            bg = B500,
+            text = White,
+            border = B500
+        )
+    ),
+
+    G500State(
+        normal = ButtonColors(
+            bg = White,
+            text = G500,
+            border = G500
+        ),
+        disabled = ButtonColors(
+            bg = White,
+            text = G400,
+            border = G300
+        ),
+        pressed = ButtonColors(
+            bg = G500,
+            text = White,
+            border = G500
+        ),
+        checked = ButtonColors(
+            bg = G500,
+            text = White,
+            border = G500
+        )
+    ),
+
+
+    // 거절 스타일
+    R500State(
+        normal = ButtonColors(
+            bg = White,
+            text = R500,
+            border = R500
+        ),
+        disabled = ButtonColors(
+            bg = White,
+            text = G400,
+            border = G300
+        ),
+        pressed = ButtonColors(
+            bg = R500,
+            text = White,
+            border = R500
+        ),
+        checked = ButtonColors(
+            bg = R500,
+            text = White,
+            border = R500
+        )
+    ),
+}
+
+// 상태 팔레트 선택
+private fun ButtonState.resolveColors(enabled: Boolean, isPressed: Boolean): ButtonColors =
+    when {
+        !enabled -> disabled
+        isPressed -> pressed
+        else -> normal
+    }
+
+// ---------- Size Tokens ----------
+
+enum class TextButtonSize(
     val minHeight: Dp,
     val shape: Shape,
     val textStyle: TextStyle,
-    val fontSize : TextUnit
+    val fontSize: TextUnit
 ) {
     XL(
         minHeight = 56.dp,
@@ -56,14 +152,12 @@ enum class TextButtonB100Size(
         shape = SpotShapes.Hard,
         textStyle = SpotTypography.header03,
         fontSize = 15.sp
-
     ),
     M(
         minHeight = 48.dp,
         shape = SpotShapes.Hard,
         textStyle = SpotTypography.header04,
         fontSize = 15.sp
-
     ),
     S(
         minHeight = 44.dp,
@@ -79,58 +173,43 @@ enum class TextButtonB100Size(
     )
 }
 
+// ---------- Component ----------
+
 @Composable
-fun TextButtonB100(
+fun TextButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: TextButtonB100Size = TextButtonB100Size.M,
-    width: Dp = 160.dp,              // ✅ 에셋용 기본 폭 (원하면 바꿔 쓰기)
-    checked: Boolean = false,
+    size: TextButtonSize = TextButtonSize.M,
+    width: Dp = 160.dp,
     enabled: Boolean = true,
+    state: ButtonState = ButtonState.B400State,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val isPressed by interactionSource.collectIsPressedAsState()
+    val colors = state.resolveColors(enabled = enabled, isPressed = isPressed)
 
-    // 상태별 토큰 매핑
-    val bgColor = when {
-        !enabled -> White
-        checked -> B100
-        isPressed -> B200
-        else -> White
-    }
-    val textColor = when {
-        !enabled -> G400
-        checked -> B500
-        isPressed -> B500
-        else -> Black
-    }
-    val borderColor = when {
-        !enabled -> G300
-        checked -> B500
-        isPressed -> G300
-        else -> G300
-    }
-
-    // 배경/보더를 먼저 그림 (ShapeBox), 그 위에 텍스트 오버레이
     Box(
         modifier = modifier
+            .width(width)
             .heightIn(min = size.minHeight)
             .semantics { role = Role.Button }
             .clickable(
                 enabled = enabled,
                 interactionSource = interactionSource,
-                indication = null, // 필요시 기본 리플 끄기
+                indication = null, // 필요 시 리플로 교체
                 onClick = onClick
             )
     ) {
-        // 배경 박스
+        // 배경/보더
         ShapeBox(
             shape = size.shape,
-            color = bgColor,
+            color = colors.bg,
             borderWidth = 0.5.dp,
-            borderColor = borderColor,
-            modifier = Modifier.width(width).height(size.minHeight)
+            borderColor = colors.border,
+            modifier = Modifier
+                .width(width)
+                .height(size.minHeight)
         )
 
         // 콘텐츠 (정중앙)
@@ -143,103 +222,101 @@ fun TextButtonB100(
                 textAlign = TextAlign.Center,
                 style = size.textStyle,
                 fontSize = size.fontSize,
-                color = textColor,
+                color = colors.text,
                 maxLines = 1
             )
         }
     }
 }
 
-// ---------------------- //
-//   Size Convenience     //
-// ---------------------- //
+// ---------- Size Convenience ----------
 
 @Composable
-fun TextButtonB100XL(
+fun TextButtonXL(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    width: Dp = 200.dp,             // XL 권장 폭 예시
-    checked: Boolean = false,
+    width: Dp = 200.dp,
     enabled: Boolean = true,
-) = TextButtonB100(
+    state: ButtonState = ButtonState.B400State,
+) = TextButton(
     text = text,
     onClick = onClick,
     modifier = modifier,
-    size = TextButtonB100Size.XL,
+    size = TextButtonSize.XL,
     width = width,
-    checked = checked,
-    enabled = enabled
+    enabled = enabled,
+    state = state
 )
 
 @Composable
-fun TextButtonB100L(
+fun TextButtonL(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     width: Dp = 180.dp,
-    checked: Boolean = false,
     enabled: Boolean = true,
-) = TextButtonB100(
+    state: ButtonState = ButtonState.B400State,
+) = TextButton(
     text = text,
     onClick = onClick,
     modifier = modifier,
-    size = TextButtonB100Size.L,
+    size = TextButtonSize.L,
     width = width,
-    checked = checked,
-    enabled = enabled
+    enabled = enabled,
+    state = state
 )
 
 @Composable
-fun TextButtonB100M(
+fun TextButtonM(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     width: Dp = 160.dp,
-    checked: Boolean = false,
     enabled: Boolean = true,
-) = TextButtonB100(
+    state: ButtonState = ButtonState.B400State,
+) = TextButton(
     text = text,
     onClick = onClick,
     modifier = modifier,
-    size = TextButtonB100Size.M,
+    size = TextButtonSize.M,
     width = width,
-    checked = checked,
-    enabled = enabled
+    enabled = enabled,
+    state = state
 )
 
 @Composable
-fun TextButtonB100S(
+fun TextButtonS(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     width: Dp = 140.dp,
-    checked: Boolean = false,
     enabled: Boolean = true,
-) = TextButtonB100(
+    state: ButtonState = ButtonState.B400State,
+) = TextButton(
     text = text,
     onClick = onClick,
     modifier = modifier,
-    size = TextButtonB100Size.S,
+    size = TextButtonSize.S,
     width = width,
-    checked = checked,
-    enabled = enabled
+    enabled = enabled,
+    state = state
 )
 
 @Composable
-fun TextButtonB100XS(
+fun TextButtonXS(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     width: Dp = 70.dp,
-    checked: Boolean = false,
     enabled: Boolean = true,
-) = TextButtonB100(
+    state: ButtonState = ButtonState.B400State,
+) = TextButton(
     text = text,
     onClick = onClick,
     modifier = modifier,
-    size = TextButtonB100Size.XS,
+    size = TextButtonSize.XS,
     width = width,
-    checked = checked,
-    enabled = enabled
+    enabled = enabled,
+    state = state
 )
