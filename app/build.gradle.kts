@@ -1,25 +1,26 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.spot.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.spot.android.hilt)
 }
 
 android {
     namespace = "com.umcspot.spot"
-    compileSdk = 35
 
-    defaultConfig {
-        applicationId = "com.umcspot.spot"
-        minSdk = 35
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    signingConfigs {
+        getByName("debug") {
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+            storeFile = file("debug.keystore")
+        }
     }
 
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
+            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -27,33 +28,19 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-    buildFeatures {
-        compose = true
-    }
 }
 
 dependencies {
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(projects.feature.home)
+    implementation(projects.feature.main)
+    implementation(projects.feature.mypage)
+    implementation(projects.domain.home)
+    implementation(projects.core.ui)
+    implementation(projects.core.network)
+    implementation(projects.core.model)
+    implementation(projects.core.designsystem)
+    implementation(projects.core.common)
+    implementation(projects.core.buildconfig)
+    implementation(projects.core.navigation)
+    implementation(projects.data.home)
 }

@@ -1,4 +1,6 @@
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -21,4 +23,16 @@ dependencyResolutionManagement {
 
 rootProject.name = "SPOT"
 include(":app")
- 
+include(":core:designsystem")
+include(":core:buildconfig")
+include(":core:common")
+include(":core:model")
+include(":core:navigation")
+include(":core:network")
+include(":data:home")
+include(":domain:home")
+include(":feature:home")
+include(":core:ui")
+include(":feature:main")
+include(":feature:mypage")
+include(":core:datastore")
