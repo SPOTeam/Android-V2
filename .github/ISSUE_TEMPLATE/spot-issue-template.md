@@ -1,5 +1,5 @@
 ---
-name: byeboo issue temlate
+name: spot issue temlate
 about: 이슈를 설명해주세요.
 title: ''
 labels: ''
