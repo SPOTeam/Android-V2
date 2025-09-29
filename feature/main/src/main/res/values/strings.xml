@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- bottom bar-->
+    <string name="ic_home_desc">홈</string>
+    <string name="ic_mypage_desc">마이페이지</string>
+</resources>
