@@ -8,4 +8,8 @@ android {
 dependencies {
     implementation(projects.core.ui)
     implementation(libs.flexible.bottomsheet)
+    implementation(libs.kizitonwose.calendar.compose)
+
+    implementation(projects.domain.weather)
+    implementation(projects.domain.study)
 }

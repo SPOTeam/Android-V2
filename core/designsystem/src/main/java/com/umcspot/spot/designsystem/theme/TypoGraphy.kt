@@ -1,207 +1,202 @@
 package com.umcspot.spot.designsystem.theme
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.em
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.umcspot.spot.designsystem.R
 
-val pretendardSemiBold = FontFamily(Font(R.font.pretendard_semibold, FontWeight.SemiBold))
-val pretendardMedium = FontFamily(Font(R.font.pretendard_medium, FontWeight.Medium))
-val pretendardRegular = FontFamily(Font(R.font.pretendard_regular, FontWeight.Normal))
-
-private fun SpotTextStyle(
-    fontFamily: FontFamily,
-    fontSize: TextUnit,
-    lineHeight: TextUnit,
-    letterSpacing: TextUnit
-): TextStyle = TextStyle(
-    fontFamily = fontFamily,
-    fontSize = fontSize,
-    lineHeight = lineHeight,
-    letterSpacing = letterSpacing,
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Center,
-        trim = LineHeightStyle.Trim.None
-    )
+val Suit = FontFamily(
+    Font(R.font.suit_thin, weight = FontWeight.W100),
+    Font(R.font.suit_extralight, weight = FontWeight.W200),
+    Font(R.font.suit_light, weight = FontWeight.W300),
+    Font(R.font.suit_regular, weight = FontWeight.W400),
+    Font(R.font.suit_medium, weight = FontWeight.W500),
+    Font(R.font.suit_semibold, weight = FontWeight.W600),
+    Font(R.font.suit_bold, weight = FontWeight.W700),
+    Font(R.font.suit_extrabold, weight = FontWeight.W800),
 )
 
-@Stable
-class SpotTypography internal constructor(
-    head1: TextStyle,
-    head2: TextStyle,
-    sub1: TextStyle,
-    sub2: TextStyle,
-    sub3: TextStyle,
-    sub4: TextStyle,
-    body1: TextStyle,
-    body2: TextStyle,
-    body3: TextStyle,
-    body4: TextStyle,
-    body5: TextStyle,
-    body6: TextStyle,
-    cap1: TextStyle,
-    cap2: TextStyle
+/**
+ * SpotTheme가 CompositionLocal로 제공/갱신할 실제 타입.
+ * var + update(other) 형태로 remember{copy()}/update() 패턴을 지원한다.
+ */
+data class SpotTypography(
+    var header01: TextStyle,
+    var header02: TextStyle,
+    var header03: TextStyle,
+    var header04: TextStyle,
+    var header05: TextStyle,
+    var bodyLarge600: TextStyle,
+    var bodyLarge500: TextStyle,
+    var bodyMedium600: TextStyle,
+    var bodyMedium500: TextStyle,
+    var bodyRegular500: TextStyle,
+    var bodyRegular400: TextStyle,
+    var bodySmall500: TextStyle,
+    var bodySmall400: TextStyle,
+    var bodySmall300: TextStyle,
 ) {
-    var head1 by mutableStateOf(head1)
-        private set
-    var head2 by mutableStateOf(head2)
-        private set
-    var sub1 by mutableStateOf(sub1)
-        private set
-    var sub2 by mutableStateOf(sub2)
-        private set
-    var sub3 by mutableStateOf(sub3)
-        private set
-    var sub4 by mutableStateOf(sub4)
-        private set
-    var body1 by mutableStateOf(body1)
-        private set
-    var body2 by mutableStateOf(body2)
-        private set
-    var body3 by mutableStateOf(body3)
-        private set
-    var body4 by mutableStateOf(body4)
-        private set
-    var body5 by mutableStateOf(body5)
-        private set
-    var body6 by mutableStateOf(body6)
-        private set
-    var cap1 by mutableStateOf(cap1)
-        private set
-    var cap2 by mutableStateOf(cap2)
-        private set
-
-    fun copy(): SpotTypography = SpotTypography(
-        head1 = head1,
-        head2 = head2,
-        sub1 = sub1,
-        sub2 = sub2,
-        sub3 = sub3,
-        sub4 = sub4,
-        body1 = body1,
-        body2 = body2,
-        body3 = body3,
-        body4 = body4,
-        body5 = body5,
-        body6 = body6,
-        cap1 = cap1,
-        cap2 = cap2
-    )
-
-    fun update(typography: SpotTypography) {
-        head1 = typography.head1
-        head2 = typography.head2
-        sub1 = typography.sub1
-        sub2 = typography.sub2
-        sub3 = typography.sub3
-        sub4 = typography.sub4
-        body1 = typography.body1
-        body2 = typography.body2
-        body3 = typography.body3
-        body4 = typography.body4
-        body5 = typography.body5
-        body6 = typography.body6
-        cap1 = typography.cap1
-        cap2 = typography.cap2
+    fun update(other: SpotTypography) {
+        header01 = other.header01
+        header02 = other.header02
+        header03 = other.header03
+        header04 = other.header04
+        header05 = other.header05
+        bodyLarge600 = other.bodyLarge600
+        bodyLarge500 = other.bodyLarge500
+        bodyMedium600 = other.bodyMedium600
+        bodyMedium500 = other.bodyMedium500
+        bodyRegular500 = other.bodyRegular500
+        bodyRegular400 = other.bodyRegular400
+        bodySmall500 = other.bodySmall500
+        bodySmall400 = other.bodySmall400
+        bodySmall300 = other.bodySmall300
     }
 }
 
-@Composable
-fun SpotTypography(): SpotTypography {
-    return SpotTypography(
-        head1 = SpotTextStyle(
-            fontFamily = pretendardMedium,
-            fontSize = 24.sp,
-            lineHeight = 31.sp,
-            letterSpacing = 0.em
-        ),
-        head2 = SpotTextStyle(
-            fontFamily = pretendardMedium,
-            fontSize = 22.sp,
-            lineHeight = 26.sp,
-            letterSpacing = 0.em
-        ),
-        sub1 = SpotTextStyle(
-            fontFamily = pretendardSemiBold,
-            fontSize = 20.sp,
-            lineHeight = 24.sp,
-            letterSpacing = 0.em
-        ),
-        sub2 = SpotTextStyle(
-            fontFamily = pretendardSemiBold,
-            fontSize = 18.sp,
-            lineHeight = 22.sp,
-            letterSpacing = 0.em
-        ),
-        sub3 = SpotTextStyle(
-            fontFamily = pretendardMedium,
-            fontSize = 18.sp,
-            lineHeight = 22.sp,
-            letterSpacing = 0.em
-        ),
-        sub4 = SpotTextStyle(
-            fontFamily = pretendardRegular,
-            fontSize = 18.sp,
-            lineHeight = 22.sp,
-            letterSpacing = 0.em
-        ),
-        body1 = SpotTextStyle(
-            fontFamily = pretendardSemiBold,
-            fontSize = 16.sp,
-            lineHeight = 21.sp,
-            letterSpacing = 0.em
-        ),
-        body2 = SpotTextStyle(
-            fontFamily = pretendardMedium,
-            fontSize = 16.sp,
-            lineHeight = 21.sp,
-            letterSpacing = 0.em
-        ),
-        body3 = SpotTextStyle(
-            fontFamily = pretendardRegular,
-            fontSize = 16.sp,
-            lineHeight = 21.sp,
-            letterSpacing = 0.em
-        ),
-        body4 = SpotTextStyle(
-            fontFamily = pretendardSemiBold,
-            fontSize = 14.sp,
-            lineHeight = 18.sp,
-            letterSpacing = 0.em
-        ),
-        body5 = SpotTextStyle(
-            fontFamily = pretendardMedium,
-            fontSize = 14.sp,
-            lineHeight = 18.sp,
-            letterSpacing = 0.em
-        ),
-        body6 = SpotTextStyle(
-            fontFamily = pretendardRegular,
-            fontSize = 14.sp,
-            lineHeight = 18.sp,
-            letterSpacing = 0.em
-        ),
-        cap1 = SpotTextStyle(
-            fontFamily = pretendardMedium,
-            fontSize = 12.sp,
-            lineHeight = 16.sp,
-            letterSpacing = 0.em
-        ),
-        cap2 = SpotTextStyle(
-            fontFamily = pretendardRegular,
-            fontSize = 12.sp,
-            lineHeight = 16.sp,
-            letterSpacing = 0.em
-        )
+/** 기본 SpotTypography 세트를 생성하는 팩토리 함수 */
+fun SpotTypography(): SpotTypography = SpotTypography(
+    header01 = TextStyle(
+        fontFamily = Suit,
+        fontWeight = FontWeight.Bold,
+        fontSize = 85.sp, // 64pt ≈ 85sp
+    ),
+    header02 = TextStyle(
+        fontFamily = Suit,
+        fontWeight = FontWeight.Bold,
+        fontSize = 69.sp, // 52pt ≈ 69sp
+    ),
+    header03 = TextStyle(
+        fontFamily = Suit,
+        fontWeight = FontWeight.Bold,
+        fontSize = 48.sp, // 48pt ≈ 64sp
+    ),
+    header04 = TextStyle(
+        fontFamily = Suit,
+        fontWeight = FontWeight.Bold,
+        fontSize = 44.sp, // 44pt ≈ 58sp
+    ),
+    header05 = TextStyle(
+        fontFamily = Suit,
+        fontWeight = FontWeight.Bold,
+        fontSize = 40.sp, // 40pt ≈ 53sp
+    ),
+    bodyLarge600 = TextStyle(
+        fontFamily = Suit,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 44.sp,
+    ),
+    bodyLarge500 = TextStyle(
+        fontFamily = Suit,
+        fontWeight = FontWeight.Medium,
+        fontSize = 44.sp,
+    ),
+    bodyMedium600 = TextStyle(
+        fontFamily = Suit,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 40.sp,
+    ),
+    bodyMedium500 = TextStyle(
+        fontFamily = Suit,
+        fontWeight = FontWeight.Medium,
+        fontSize = 40.sp,
+    ),
+    bodyRegular500 = TextStyle(
+        fontFamily = Suit,
+        fontWeight = FontWeight.Medium,
+        fontSize = 36.sp,
+    ),
+    bodyRegular400 = TextStyle(
+        fontFamily = Suit,
+        fontWeight = FontWeight.Normal,
+        fontSize = 36.sp,
+    ),
+    bodySmall500 = TextStyle(
+        fontFamily = Suit,
+        fontWeight = FontWeight.Medium,
+        fontSize = 32.sp,
+    ),
+    bodySmall400 = TextStyle(
+        fontFamily = Suit,
+        fontWeight = FontWeight.Normal,
+        fontSize = 32.sp,
+    ),
+    bodySmall300 = TextStyle(
+        fontFamily = Suit,
+        fontWeight = FontWeight.Light,
+        fontSize = 32.sp,
     )
+)
+
+/**
+ * M3 Typography 매핑.
+ * - Material 컴포넌트에서 사용할 수 있게 연결
+ * - SpotTheme() 내부에서 typography = AppTypography 로 전달됨
+ */
+private val DefaultSpotTypography = SpotTypography()
+
+val AppTypography: Typography = Typography(
+    displayLarge  = DefaultSpotTypography.header01,
+    displayMedium = DefaultSpotTypography.header02,
+    displaySmall  = DefaultSpotTypography.header03,
+
+    headlineLarge  = DefaultSpotTypography.header04,
+    headlineMedium = DefaultSpotTypography.header05,
+
+    titleLarge  = DefaultSpotTypography.bodyLarge600,
+    titleMedium = DefaultSpotTypography.bodyMedium600,
+    titleSmall  = DefaultSpotTypography.bodySmall500,
+
+    bodyLarge = DefaultSpotTypography.bodyLarge500,
+    bodyMedium = DefaultSpotTypography.bodyMedium500,
+    bodySmall = DefaultSpotTypography.bodySmall400,
+
+    labelLarge = DefaultSpotTypography.bodyRegular500,
+    labelMedium = DefaultSpotTypography.bodyRegular400,
+    labelSmall = DefaultSpotTypography.bodySmall300
+)
+
+/** 미리보기 */
+@Composable
+fun TypographyPreviewContent() {
+    Surface {
+        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+            val t = SpotTheme.typography
+            Text("Header01 - 64sp Bold", style = t.header01)
+            Text("Header02 - 52sp Bold", style = t.header02)
+            Text("Header03 - 48sp Bold", style = t.header03)
+            Text("Header04 - 44sp Bold", style = t.header04)
+            Text("Header05 - 40sp Bold", style = t.header05)
+
+            Text("BodyLarge600 - 44sp SemiBold", style = t.bodyLarge600)
+            Text("BodyLarge500 - 44sp Medium", style = t.bodyLarge500)
+            Text("BodyMedium600 - 40sp SemiBold", style = t.bodyMedium600)
+            Text("BodyMedium500 - 40sp Medium", style = t.bodyMedium500)
+            Text("BodyRegular500 - 36sp Medium", style = t.bodyRegular500)
+            Text("BodyRegular400 - 36sp Normal", style = t.bodyRegular400)
+            Text("BodySmall500 - 32sp Medium", style = t.bodySmall500)
+            Text("BodySmall400 - 32sp Normal", style = t.bodySmall400)
+            Text("BodySmall300 - 32sp Light", style = t.bodySmall300)
+        }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 400, heightDp = 3000)
+@Composable
+fun TypographyPreview() {
+    SpotTheme {
+        TypographyPreviewContent()
+    }
 }

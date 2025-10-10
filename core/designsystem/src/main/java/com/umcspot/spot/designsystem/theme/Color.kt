@@ -4,83 +4,73 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+/****************** base color ******************/
+val Purple80 = Color(0xFFD0BCFF)
+val PurpleGrey80 = Color(0xFFCCC2DC)
+val Pink80 = Color(0xFFEFB8C8)
 
-// primary
-val primary50 = Color(0xFFF5F2FC)
-val primary100 = Color(0xFFF0EBFA)
-val primary200 = Color(0xFFE0D5F5)
-val primary300 = Color(0xFFAA7CFF)
-val primary400 = Color(0xFF8C6DC8)
-val primary500 = Color(0xFF7D61B2)
-val primary600 = Color(0xFF755BA7)
-val primary700 = Color(0xFF5E4985)
-val primary800 = Color(0xFF463664)
-val primary900 = Color(0xFF372A4E)
+val Purple40 = Color(0xFF6650a4)
+val PurpleGrey40 = Color(0xFF625b71)
+val Pink40 = Color(0xFF7D5260)
 
-// secondary
-val secondary50 = Color(0xFFFFFAEE)
-val secondary100 = Color(0xFFFFF8E5)
-val secondary300 = Color(0xFFFFCD54)
 
-// olive_green
-val oliveGreen300 = Color(0xFF96CE5A)
-val oliveGreen700 = Color(0xFF5A7C37)
+/****************** SPOT COLOR ******************/
 
-// soft_blue
-val softBlue200 = Color(0xFFD4EEFA)
-val softBlue300 = Color(0xFF75C8EE)
-val softBlue600 = Color(0xFF5896B3)
+/** Primary **/
 
-// sub
-val sand100 = Color(0xFFFFF8E5)
+val B500 = Color(0xFF005BFF)
+val B400 = Color(0xFF337BFF)
 
-val orange300 = Color(0xFFFDC6B0)
+/** Secondary **/
 
-val warning50 = Color(0xFFFFF5E6)
-val warning300 = Color(0xFFFFA01A)
+val Y400 = Color(0xFFFD8653)
 
-// state
-val success50 = Color(0xFFE8F4FC)
-val success300 = Color(0xFF2C9CE3)
+val R500 = Color(0xFFF34343)
+val B200 = Color(0xFFD3E1FD)
+val B100 = Color(0xFFEDF4FF)
 
-val error50 = Color(0xFFFCEAEA)
-val error300 = Color(0xFFF15655)
+/** Gray Scale **/
 
-// grayscale
-val gray50 = Color(0xFFFEFEFE)
-val gray100 = Color(0xFFF4F4F4)
-val gray200 = Color(0xFFE2E2E2)
-val gray300 = Color(0xFFC4C4C4)
-val gray400 = Color(0xFFA6A6A6)
-val gray500 = Color(0xFF878787)
-val gray600 = Color(0xFF6E6E6E)
-val gray700 = Color(0xFF404040)
-val gray800 = Color(0xFF262626)
-val gray900 = Color(0xFF161616)
+val Black = Color(0xFF1E1E1E)
+val G500 = Color(0xFF4F4F56)
+val G400 = Color(0xFF8F8F99)
+val G300 = Color(0xFFC5C5CD)
+val G200 = Color(0xFFF0F0F4)
+val G100 = Color(0xFFF3F3F6)
+val White = Color(0xFFFCFCFF)
 
-// black_and_white
-val black = Color(0xFF000000)
-val white = Color(0xFFFFFFFF)
+val NaverGreen = Color(0xFF03CF5D)
+val KakaoYellow = Color(0xFFFFEC00)
+val KakaoText = Color(0xFF3C1E1E)
 
-// opacity
-val blackAlpha80 = black.copy(alpha = 0.8f)
-val blackAlpha50 = black.copy(alpha = 0.5f)
+/** Gradiant **/
 
-val whiteAlpha50 = white.copy(alpha = 0.5f)
-val whiteAlpha10 = white.copy(alpha = 0.1f)
+val BlueGradient = Brush.linearGradient(
+    colors = listOf(B400, B500),
+    start = Offset(0f, 0f),    // A 지점
+    end = Offset(1000f, 500f)  // B 지점 (대각선)
+)
 
-val primary300Alpha10 = primary300.copy(alpha = 0.1f)
-val primary300Alpha20 = primary300.copy(alpha = 0.2f)
-val primary50Alpha50 = primary50.copy(alpha = 0.5f)
+val GrayGradient = Brush.linearGradient(
+    colors = listOf(G300, G500),
+    start = Offset(0f, 0f),    // A 지점
+    end = Offset(1000f, 500f)  // B 지점
+)
 
-val secondary300Alpha30 = secondary300.copy(alpha = 0.3f)
-val secondary300Alpha10 = secondary300.copy(alpha = 0.1f)
+/*
+    Gradiant 적용 예시
 
-val gray900Alpha80 = gray900.copy(alpha = 0.8f)
+    Box(
+    modifier = Modifier
+        .fillMaxWidth()
+        .height(200.dp)
+        .background(BlueGradient) // 또는 GrayGradient
+    )
 
-// kakao
-val kakaoYellow = Color(0xFFFEE500)
+ */
 
 @Stable
 class SpotColors(
