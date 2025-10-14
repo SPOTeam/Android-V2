@@ -21,8 +21,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.example.core.ui.theme.Black
-import com.example.core.ui.theme.White
+import com.umcspot.spot.designsystem.theme.*
 
 /**
  * Shape 전체 윤곽에 맞춰 그림자를 그려주는 DropShadow Modifier.
@@ -87,9 +86,9 @@ fun ShadowedShapeBox(
     shadowY: Dp,
     shadowBlur: Dp,
     shadowOpacity: Float,
-    shadowColor: Color = Black,
+    shadowColor: Color = SpotTheme.colors.black,
     brush: Brush? = null,
-    backgroundColor: Color = White,
+    backgroundColor: Color = SpotTheme.colors.white,
     borderWidth: Dp = 0.dp,
     borderColor: Color = Color.Transparent,
     modifier: Modifier = Modifier
@@ -124,7 +123,7 @@ fun DS100(
     height: Dp,
     shape: Shape,
     brush: Brush? = null,
-    backgroundColor: Color = White,
+    backgroundColor: Color = SpotTheme.colors.white,
     borderWidth: Dp = 0.dp,
     borderColor: Color = Color.Transparent
 ) = ShadowedShapeBox(
@@ -147,7 +146,7 @@ fun DS100_Y(
     height: Dp,
     shape: Shape,
     brush: Brush? = null,
-    backgroundColor: Color = White,
+    backgroundColor: Color = SpotTheme.colors.White,
     borderWidth: Dp = 0.dp,
     borderColor: Color = Color.Transparent
 ) = ShadowedShapeBox(
@@ -170,7 +169,7 @@ fun DS200(
     height: Dp,
     shape: Shape,
     brush: Brush? = null,
-    backgroundColor: Color = White,
+    backgroundColor: Color = SpotTheme.colors.White,
     borderWidth: Dp = 0.dp,
     borderColor: Color = Color.Transparent
 ) = ShadowedShapeBox(
@@ -193,7 +192,7 @@ fun DS300(
     height: Dp,
     shape: Shape,
     brush: Brush? = null,
-    backgroundColor: Color = White,
+    backgroundColor: Color = SpotTheme.colors.White,
     borderWidth: Dp = 0.dp,
     borderColor: Color = Color.Transparent
 ) = ShadowedShapeBox(
@@ -216,7 +215,7 @@ fun DS400(
     height: Dp,
     shape: Shape,
     brush: Brush? = null,
-    backgroundColor: Color = White,
+    backgroundColor: Color = SpotTheme.colors.White,
     borderWidth: Dp = 0.dp,
     borderColor: Color = Color.Transparent
 ) = ShadowedShapeBox(

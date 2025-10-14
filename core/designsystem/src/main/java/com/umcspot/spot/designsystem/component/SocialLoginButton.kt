@@ -19,10 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.core.ui.theme.KakaoText
-import com.example.core.ui.theme.KakaoYellow
-import com.example.core.ui.theme.NaverGreen
-import com.example.core.ui.theme.White
+import com.umcspot.spot.designsystem.theme.*
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.SpotTypography
@@ -70,7 +67,7 @@ private fun SocialSignButton(
             // 텍스트: 항상 가운데 정렬
             Text(
                 text = text,
-                style = SpotTypography().bodyMedium600,
+                style = SpotTheme.typography.bodyMedium600,
                 fontSize = 18.sp,
                 modifier = Modifier.align(Alignment.Center)
             )
@@ -91,8 +88,8 @@ fun KakaoStartButton(
     modifier = modifier,
     text = text,
     iconRes = R.drawable.kakaotalk, // 고정
-    backgroundColor = KakaoYellow,
-    contentColor = KakaoText,
+    backgroundColor = SpotTheme.colors.KakaoYellow,
+    contentColor = SpotTheme.colors.KakaoText,
     onClick = onClick,
     enabled = enabled
 )
@@ -108,7 +105,7 @@ fun NaverStartButton(
     modifier = modifier,
     text = text,
     iconRes = R.drawable.naver,
-    backgroundColor = NaverGreen,
+    backgroundColor = SpotTheme.colors.NaverGreen,
     contentColor = White,
     onClick = onClick,
     enabled = enabled
@@ -125,8 +122,8 @@ fun KakaoLoginButton(
     modifier = modifier,
     text = text,
     iconRes = R.drawable.kakaotalk,
-    backgroundColor = KakaoYellow,
-    contentColor = KakaoText,
+    backgroundColor = SpotTheme.colors.KakaoYellow,
+    contentColor = SpotTheme.colors.KakaoText,
     onClick = onClick,
     enabled = enabled
 )
@@ -142,8 +139,8 @@ fun NaverLoginButton(
     modifier = modifier,
     text = text,
     iconRes = R.drawable.naver,
-    backgroundColor = NaverGreen,
-    contentColor = White,
+    backgroundColor = SpotTheme.colors.NaverGreen,
+    contentColor = SpotTheme.colors.White,
     onClick = onClick,
     enabled = enabled
 )
@@ -153,34 +150,42 @@ fun NaverLoginButton(
 @Preview(showBackground = true, widthDp = 360)
 @Composable
 fun KakaoStartButtonPreview() {
-    KakaoStartButton(
-        modifier = Modifier.padding(10.dp),
-        onClick = {}
-    )
+    SpotTheme {
+        KakaoStartButton(
+            modifier = Modifier.padding(10.dp),
+            onClick = {}
+        )
+    }
 }
 
 @Preview(showBackground = true, widthDp = 360)
 @Composable
 fun NaverStartButtonPreview() {
-    NaverStartButton(
-        modifier = Modifier.padding(10.dp),
-        onClick = {}
-    )
+    SpotTheme {
+        NaverStartButton(
+            modifier = Modifier.padding(10.dp),
+            onClick = {}
+        )
+    }
 }
 
 @Preview(showBackground = true, widthDp = 360)
 @Composable
 fun KakaoLoginButtonPreview() {
-    KakaoLoginButton (
-        modifier = Modifier.padding(10.dp),
-        onClick = {})
+    SpotTheme {
+        KakaoLoginButton (
+            modifier = Modifier.padding(10.dp),
+            onClick = {})
+    }
 }
 
 @Preview(showBackground = true, widthDp = 360)
 @Composable
 fun NaverLoginButtonPreview() {
-    NaverLoginButton(
-        modifier = Modifier.padding(10.dp),
-        onClick = {}
-    )
+    SpotTheme {
+        NaverLoginButton(
+            modifier = Modifier.padding(10.dp),
+            onClick = {}
+        )
+    }
 }

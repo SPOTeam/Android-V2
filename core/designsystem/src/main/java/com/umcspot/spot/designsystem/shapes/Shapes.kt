@@ -20,11 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.core.ui.theme.B400
-import com.example.core.ui.theme.G500
-import com.example.core.ui.theme.R500
-import com.example.core.ui.theme.White
-import com.example.core.ui.theme.Y400
+import com.umcspot.spot.designsystem.theme.*
 import com.umcspot.spot.designsystem.R
 
 object SpotShapes {
@@ -131,7 +127,7 @@ fun ShapeImageBox(
 @Composable
 fun ShapeBox(
     shape: Shape,
-    color: Color = Color.White,
+    color: Color = SpotTheme.colors.white,
     borderWidth: Dp = 0.dp,
     borderColor: Color? = Color.Transparent,
     modifier: Modifier = Modifier,
@@ -156,7 +152,7 @@ fun ShapeBox(
 @Composable
 fun StateCardActive(
     shape: Shape = SpotShapes.Hard,
-    color: Color = White,
+    color: Color = SpotTheme.colors.white,
     borderWidth: Dp = 1.dp,
     modifier: Modifier = Modifier
 ) = ShapeBox(
@@ -164,49 +160,49 @@ fun StateCardActive(
     shape = shape,
     color = color,
     borderWidth = borderWidth,
-    borderColor = G500,
+    borderColor = SpotTheme.colors.gray500,
     modifier = modifier
 )
 
 @Composable
 fun StateCardSuccess(
     shape: Shape = SpotShapes.Hard,
-    color: Color = White,
+    color: Color = SpotTheme.colors.white,
     borderWidth: Dp = 1.dp,
     modifier: Modifier = Modifier
 ) = ShapeBox(
     shape = shape,
     color = color,
     borderWidth = borderWidth,
-    borderColor = B400,
+    borderColor = SpotTheme.colors.B400,
     modifier = modifier
 )
 
 @Composable
 fun StateCardError(
     shape: Shape = SpotShapes.Hard,
-    color: Color = White,
+    color: Color = SpotTheme.colors.white,
     borderWidth: Dp = 1.dp,
     modifier: Modifier = Modifier
 ) = ShapeBox(
     shape = shape,
     color = color,
     borderWidth = borderWidth,
-    borderColor = R500,
+    borderColor = SpotTheme.colors.R500,
     modifier = modifier
 )
 
 @Composable
 fun StateCardWarning(
     shape: Shape = SpotShapes.Hard,
-    color: Color = White,
+    color: Color = SpotTheme.colors.white,
     borderWidth: Dp = 1.dp,
     modifier: Modifier = Modifier
 ) = ShapeBox(
     shape = shape,
     color = color,
     borderWidth = borderWidth,
-    borderColor = Y400,
+    borderColor = SpotTheme.colors.Y400,
     modifier = modifier
 )
 

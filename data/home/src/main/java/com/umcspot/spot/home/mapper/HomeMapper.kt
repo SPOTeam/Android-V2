@@ -1,18 +1,24 @@
 package com.umcspot.spot.home.mapper
 
-
 import com.umcspot.spot.home.dto.request.HomeRequestDto
-import com.umcspot.spot.home.dto.response.HomeResponseDto
-import com.umcspot.spot.home.model.Dummy
-import com.umcspot.spot.home.model.DummyResult
+import com.umcspot.spot.home.model.Home
 
-fun Dummy.toData(): HomeRequestDto =
+// Domain -> DTO
+fun Home.toData(): HomeRequestDto =
     HomeRequestDto(
         id = this.id,
         email = this.email
     )
 
-fun HomeResponseDto.toDomain(): DummyResult =
-    DummyResult(
-        info = info
-    )
+//// DTO -> Domain
+//fun HomeResponseDto.toDomain(
+//    weather : WeatherResponseDto,
+//    popularStudy : StudyResponseDto,
+//    recommendedStudy : StudyResponseDto
+//): HomeResult =
+//    HomeResult(
+//        info = this.info,
+//        weatherInfo = weather.toDomain(),
+//        popularStudies = popularStudy.toList(),
+//        recommendedStudies = recommendedStudy.toList()
+//    )

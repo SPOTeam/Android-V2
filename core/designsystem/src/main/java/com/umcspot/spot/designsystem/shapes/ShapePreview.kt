@@ -7,117 +7,127 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.core.ui.theme.B100
-import com.example.core.ui.theme.B200
-import com.example.core.ui.theme.B400
-import com.example.core.ui.theme.B500
-import com.example.core.ui.theme.G300
-import com.example.core.ui.theme.G500
-import com.example.core.ui.theme.R500
+import com.umcspot.spot.designsystem.theme.*
+
 
 /** Border Shape **/
 
 @Preview(showBackground = true)
 @Composable
 fun HardShapePreview() {
-    ShapeBox(
-        shape = SpotShapes.Hard,
-        color = B100,
-        modifier = Modifier
-            .padding(8.dp)
-            .width(200.dp)
-            .height(80.dp),
-        borderWidth = 1.dp,
-        borderColor = B500
-    )
+    SpotTheme {
+        ShapeBox(
+            shape = SpotShapes.Hard,
+            color = SpotTheme.colors.B100,
+            modifier = Modifier
+                .padding(8.dp)
+                .width(200.dp)
+                .height(80.dp),
+            borderWidth = 1.dp,
+            borderColor = B500
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun SoftShapePreview() {
-    ShapeBox(
-        shape = SpotShapes.Soft,
-        color = B400,
-        modifier = Modifier
-            .padding(8.dp)
-            .width(200.dp)
-            .height(80.dp),
-    )
+    SpotTheme {
+        ShapeBox(
+            shape = SpotShapes.Soft,
+            color = SpotTheme.colors.B400,
+            modifier = Modifier
+                .padding(8.dp)
+                .width(200.dp)
+                .height(80.dp),
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun ShapeImageWithBadgePreview() {
-    ShapeImageWithBadge(
-        shape = SpotShapes.Hard,
-        modifier = Modifier.padding(8.dp)
-    )
+    SpotTheme {
+        ShapeImageWithBadge(
+            shape = SpotShapes.Hard,
+            modifier = Modifier.padding(8.dp)
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun RoundShapePreview() {
-    ShapeBox(
-        shape = SpotShapes.Round,
-        color = R500,
-        modifier = Modifier
-            .padding(8.dp)
-            .width(200.dp)
-            .height(80.dp),
-    )
+    SpotTheme {
+        ShapeBox(
+            shape = SpotShapes.Round,
+            color = SpotTheme.colors.R500,
+            modifier = Modifier
+                .padding(8.dp)
+                .width(200.dp)
+                .height(80.dp),
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun SoftLeftShapePreview() {
-    ShapeBox(
-
-        shape = SpotShapes.SoftLeft,
-        color = B200,
-        modifier = Modifier
-            .padding(8.dp)
-            .width(200.dp)
-            .height(80.dp)
-    )
+    SpotTheme {
+        ShapeBox(
+            shape = SpotShapes.SoftLeft,
+            color = SpotTheme.colors.B200,
+            modifier = Modifier
+                .padding(8.dp)
+                .width(200.dp)
+                .height(80.dp)
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun SoftRightShapePreview() {
-    ShapeBox(
-        shape = SpotShapes.SoftRight,
-        color = B200,
-        modifier = Modifier
-            .padding(8.dp)
-            .width(200.dp)
-            .height(80.dp),
-    )
+    SpotTheme {
+        ShapeBox(
+            shape = SpotShapes.SoftRight,
+            color = SpotTheme.colors.B200,
+            modifier = Modifier
+                .padding(8.dp)
+                .width(200.dp)
+                .height(80.dp),
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun RoundLeftShapePreview() {
-    ShapeBox(
-        shape = SpotShapes.RoundLeft,
-        color = G300,
-        modifier = Modifier
-            .padding(8.dp)
-            .width(200.dp)
-            .height(80.dp),
-    )
+    SpotTheme {
+        ShapeBox(
+            shape = SpotShapes.RoundLeft,
+            color = SpotTheme.colors.G300,
+            modifier = Modifier
+                .padding(8.dp)
+                .width(200.dp)
+                .height(80.dp),
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun RoundRightShapePreview() {
-    ShapeBox(
-        shape = SpotShapes.RoundRight,
-        color = G500,
-        modifier = Modifier
-            .padding(8.dp)
-            .width(200.dp)
-            .height(80.dp),
-    )
+    SpotTheme {
+        ShapeBox(
+            shape = SpotShapes.RoundRight,
+            color = SpotTheme.colors.G500,
+            modifier = Modifier
+                .padding(8.dp)
+                .width(200.dp)
+                .height(80.dp),
+        )
+    }
 }
 
 /** Style Shape **/
@@ -125,43 +135,51 @@ fun RoundRightShapePreview() {
 @Preview(showBackground = true)
 @Composable
 fun StateActivePreview() {
-    StateCardActive(
-        modifier = Modifier
-            .padding(8.dp)
-            .width(200.dp)
-            .height(80.dp)
-    )
+    SpotTheme {
+        StateCardActive(
+            modifier = Modifier
+                .padding(8.dp)
+                .width(200.dp)
+                .height(80.dp)
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun StateSuccessPreview() {
-    StateCardSuccess(
-        modifier = Modifier
-            .padding(8.dp)
-            .width(200.dp)
-            .height(80.dp)
-    )
+    SpotTheme {
+        StateCardSuccess(
+            modifier = Modifier
+                .padding(8.dp)
+                .width(200.dp)
+                .height(80.dp)
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun StateErrorPreview() {
-    StateCardError(
-        modifier = Modifier
-            .padding(8.dp)
-            .width(200.dp)
-            .height(80.dp)
-    )
+    SpotTheme {
+        StateCardError(
+            modifier = Modifier
+                .padding(8.dp)
+                .width(200.dp)
+                .height(80.dp)
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun StateWarningPreview() {
-    StateCardWarning(
-        modifier = Modifier
-            .padding(8.dp)
-            .width(200.dp)
-            .height(80.dp)
-    )
+    SpotTheme {
+        StateCardWarning(
+            modifier = Modifier
+                .padding(8.dp)
+                .width(200.dp)
+                .height(80.dp)
+        )
+    }
 }

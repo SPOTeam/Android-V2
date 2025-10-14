@@ -7,13 +7,13 @@ plugins {
 android {
     namespace = "com.umcspot.spot"
 
-    signingConfigs {
-        getByName("debug") {
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
-            storeFile = file("debug.keystore")
-        }
-    }
+//    signingConfigs {
+//        getByName("debug") {
+//            keyAlias = "androiddebugkey"
+//            keyPassword = "android"
+//            storeFile = file("debug.keystore")
+//        }
+//    }
 
     buildTypes {
         debug {
@@ -33,6 +33,7 @@ android {
 dependencies {
     implementation(projects.feature.home)
     implementation(projects.feature.main)
+    implementation(projects.feature.board)
     implementation(projects.feature.mypage)
     implementation(projects.domain.home)
     implementation(projects.core.ui)
@@ -43,4 +44,6 @@ dependencies {
     implementation(projects.core.buildconfig)
     implementation(projects.core.navigation)
     implementation(projects.data.home)
+    implementation(projects.data.weather)
+    implementation(projects.data.study)
 }

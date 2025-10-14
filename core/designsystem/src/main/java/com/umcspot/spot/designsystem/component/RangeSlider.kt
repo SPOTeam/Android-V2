@@ -26,9 +26,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.core.ui.theme.B500
-import com.example.core.ui.theme.G100
-import com.example.core.ui.theme.White
+import com.umcspot.spot.designsystem.theme.*
+
 
 /* ============ 커스텀 Thumb (원형 + 테두리) ============ */
 @Composable
@@ -62,9 +61,9 @@ fun SpotRangeSlider(
     thumbSize: Dp = 22.dp,               // 썸 지름
     thumbBorderWidth: Dp = 1.dp,
     trackHeight: Dp = 8.dp,
-    activeColor: Color = B500,
-    inactiveColor: Color = G100,
-    thumbFill: Color = White,
+    activeColor: Color = SpotTheme.colors.B500,
+    inactiveColor: Color = SpotTheme.colors.G100,
+    thumbFill: Color = SpotTheme.colors.white,
     onValueChangeFinished: (() -> Unit)? = null
 ) {
     val startIS = remember { MutableInteractionSource() }

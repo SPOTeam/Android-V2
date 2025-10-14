@@ -27,12 +27,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.core.ui.theme.Black
-import com.example.core.ui.theme.G300
-import com.example.core.ui.theme.G400
-import com.example.core.ui.theme.White
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.SpotTypography
+import com.umcspot.spot.designsystem.theme.Black
+import com.umcspot.spot.designsystem.theme.G300
+import com.umcspot.spot.designsystem.theme.G400
+import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.designsystem.theme.White
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
@@ -123,9 +123,9 @@ fun CompactDateTimeRow(
     ) {
         Text(
             text = label,
-            style = SpotTypography().bodyMedium600,
+            style = SpotTheme.typography.bodyMedium600,
             fontSize = 12.sp,
-            color = G400,
+            color = SpotTheme.colors.G400,
             modifier = Modifier.weight(1f)
         )
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -151,7 +151,7 @@ private fun PillChip(
 ) {
     Surface(
         color = Color(0xFFE4EDFF),      // 연한 파랑 배경
-        contentColor = Black,
+        contentColor = SpotTheme.colors.black,
         shape = SpotShapes.Soft,
         modifier = modifier
             .height(24.dp)
@@ -163,7 +163,7 @@ private fun PillChip(
         ) {
             Text(
                 text = text,
-                style = SpotTypography().bodyMedium500,
+                style = SpotTheme.typography.bodyMedium500,
                 fontSize = 12.sp
             )
         }
@@ -185,11 +185,13 @@ private fun InlineDateCalendarFieldPreview() {
         LocalDate.of(y, 2, 12) to 2
     )
 
-    DateHeader(
-        label = "시작",
-        dateTime = dt,
-        onDateChange = { dt = it },
-        eventsByDate = events,
-        modifier = Modifier.padding(10.dp)
-    )
+    SpotTheme {
+        DateHeader(
+            label = "시작",
+            dateTime = dt,
+            onDateChange = { dt = it },
+            eventsByDate = events,
+            modifier = Modifier.padding(10.dp)
+        )
+    }
 }

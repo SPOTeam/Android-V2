@@ -18,8 +18,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.core.ui.theme.B500
-import com.example.core.ui.theme.G100
+import com.umcspot.spot.designsystem.theme.*
 
 /**
  * 게이지 바 (Progress / Gauge)
@@ -39,8 +38,8 @@ fun GaugeBar(
     value: Float,
     modifier: Modifier = Modifier,
     height: Dp = 12.dp,
-    trackColor: Color = G100,
-    fillColor: Color = B500,
+    trackColor: Color = SpotTheme.colors.G100,
+    fillColor: Color = SpotTheme.colors.B500,
     shape: Shape = RoundedCornerShape(50), // 높이에 관계없이 pill
     animate: Boolean = true,
     borderWidth: Dp = 0.dp,
@@ -81,7 +80,7 @@ fun Preview_GaugeBar_15() {
         GaugeBar(
             value = 0.15f, // 퍼센트 조절 가능
             height = 12.dp,
-            trackColor = G100,
+            trackColor = SpotTheme.colors.G100,
             borderWidth = 0.dp
         )
     }
@@ -94,7 +93,7 @@ fun Preview_GaugeBar_75() {
         GaugeBar(
             value = 0.75f, // 퍼센트 조절 가능
             height = 12.dp,
-            trackColor = G100,
+            trackColor = SpotTheme.colors.G100,
             borderWidth = 0.dp
         )
     }

@@ -42,17 +42,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
-import com.example.core.ui.theme.B400
-import com.example.core.ui.theme.B500
-import com.example.core.ui.theme.Black
-import com.example.core.ui.theme.G300
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.SpotTypography
+import com.umcspot.spot.designsystem.theme.B400
+import com.umcspot.spot.designsystem.theme.B500
+import com.umcspot.spot.designsystem.theme.Black
+import com.umcspot.spot.designsystem.theme.G300
+import com.umcspot.spot.designsystem.theme.SpotTheme
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -103,7 +103,7 @@ fun SpotMonthCalendar(
 
             Text(
                 text = "${currentYm.year}년 ${currentYm.monthValue}월",
-                style = SpotTypography().bodyMedium600,
+                style = SpotTheme.typography.bodyMedium600,
                 fontSize = 26.sp,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
@@ -152,10 +152,10 @@ private fun WeekdayRow() {
         labels.forEachIndexed { idx, label ->
             Text(
                 text = label,
-                style = SpotTypography().bodyMedium600,
+                style = SpotTheme.typography.bodyMedium600,
                 fontSize = 16.sp,
                 // ✅ 일요일 컬럼은 헤더도 B500
-                color = if (idx == 6) B500 else Black,
+                color = if (idx == 6) SpotTheme.colors.B500 else SpotTheme.colors.black,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f)
             )
@@ -193,7 +193,7 @@ private fun DayCellStyled(
             onClick = onClick
         )
 
-        val dateTextStyle = SpotTypography().bodyMedium600.copy(fontSize = 18.sp)
+        val dateTextStyle = SpotTheme.typography.bodyMedium600.copy(fontSize = 18.sp)
         val measurer = rememberTextMeasurer()
         val density = LocalDensity.current
         val textHeightDp = remember(day.date.dayOfMonth) {
@@ -214,8 +214,8 @@ private fun DayCellStyled(
                         .align(Alignment.Center)
                         .clip(SpotShapes.Hard)
                         .background(
-                            if (isPressed) B400.copy(alpha = 0.6f)
-                            else B400.copy(alpha = 0.10f)
+                            if (isPressed) SpotTheme.colors.B400.copy(alpha = 0.6f)
+                            else SpotTheme.colors.B400.copy(alpha = 0.10f)
                         )
                 )
             }
@@ -224,9 +224,9 @@ private fun DayCellStyled(
                 text = day.date.dayOfMonth.toString(),
                 style = dateTextStyle,
                 color = when {
-                    !isThisMonth -> G300
-                    isSunday     -> B500
-                    else         -> Black
+                    !isThisMonth -> SpotTheme.colors.G300
+                    isSunday     -> SpotTheme.colors.B500
+                    else         -> SpotTheme.colors.Black
                 },
                 modifier = Modifier.align(Alignment.Center)
             )
@@ -239,7 +239,7 @@ private fun DayCellStyled(
                         .offset(y = textHeightDp / 2 + gap)
                         .size(6.dp)
                         .clip(CircleShape)
-                        .background(B400)
+                        .background(SpotTheme.colors.B400)
                 )
             }
         }

@@ -1,4 +1,4 @@
-package com.example.core.ui.component.appBar
+package com.umcspot.spot.designsystem.component.appBar
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
@@ -33,22 +32,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.core.ui.R
-import com.example.core.ui.shapes.SpotShapes
-import com.example.core.ui.theme.G300
-import com.example.core.ui.theme.G400
-import com.example.core.ui.theme.SpotTypography
-import com.example.core.ui.theme.White
+import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.shapes.SpotShapes
+import com.umcspot.spot.designsystem.theme.G300
+import com.umcspot.spot.designsystem.theme.G400
+import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.designsystem.theme.White
 
 
 @Composable
 fun AppBarHome (
     hasAlert: Boolean = false,
     onSearchClick: () -> Unit,
-    onAlertClick: () -> Unit
+    onAlertClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -129,7 +129,7 @@ fun BackTopBar(
         Spacer(Modifier.width(8.dp))
         Text(
             text = title,
-            style = SpotTypography.bodyLarge500,
+            style = SpotTheme.typography.bodyLarge500,
             fontSize = 18.sp
         )
     }
@@ -138,10 +138,12 @@ fun BackTopBar(
 @Preview(showBackground = true)
 @Composable
 fun BackTopBarPreview_Title() {
-    BackTopBar(
-        title = "홈",
-        onBackClick = {},
-    )
+    SpotTheme{
+        BackTopBar(
+            title = "홈",
+            onBackClick = {},
+        )
+    }
 }
 
 @Composable
@@ -154,11 +156,12 @@ fun SearchTopBar(
     shape: Shape = SpotShapes.Hard,
     textStyle: TextStyle? = null,
     borderWidth : Dp = 1.dp,
-    borderColor: Color = G300,
+    borderColor: Color = SpotTheme.colors.G300,
     backgroundColor: Color = White,
+    modifier: Modifier = Modifier, // ✅ 추가
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -199,7 +202,7 @@ fun SearchTopBar(
                             if (value.isEmpty()) {
                                 Text(
                                     text = placeholder,
-                                    color = G400,
+                                    color = SpotTheme.colors.G400,
                                     style = textStyle ?: TextStyle.Default
                                 )
                             }
@@ -227,8 +230,11 @@ fun SearchTopBar(
 @Composable
 fun PreviewSearchTopBarWithText() {
     var text by remember { mutableStateOf("안녕하세요") }
-    SearchTopBar(
-        value = text,
-        onValueChange = { text = it }
-    )
+
+    SpotTheme{
+        SearchTopBar(
+            value = text,
+            onValueChange = { text = it }
+        )
+    }
 }

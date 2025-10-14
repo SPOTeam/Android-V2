@@ -24,13 +24,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.SpotTypography
-import com.umcspot.spot.weather.model.WeatherType
+import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.model.WeatherType
 import java.time.LocalTime
 
 @Composable
 fun WeatherCard(
-    temperature: Int? = null,
+    temperature: Double? = null,
     weatherType: WeatherType? = null,
     currentTime: LocalTime? = null,
     modifier: Modifier = Modifier,
@@ -92,16 +92,16 @@ fun WeatherCard(
                         Spacer(Modifier.width(8.dp))
                         Text(
                             text = "${"%.1f".format(temperature?.toFloat())} °C",
-                            style = SpotTypography().header01,
+                            style = SpotTheme.typography.header01,
                             fontSize = 25.sp,
-                            color = Color.White
+                            color = SpotTheme.colors.white
                         )
                     }
                     Text(
                         text = message,
-                        style = SpotTypography().bodySmall500,
+                        style = SpotTheme.typography.bodySmall500,
                         fontSize = 14.sp,
-                        color = Color.White
+                        color = SpotTheme.colors.white
                     )
                 }
             }

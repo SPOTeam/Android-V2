@@ -18,20 +18,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.core.ui.theme.G300
+import coil.compose.AsyncImage
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.SpotTypography
-import com.umcspot.spot.study.model.StudyItem
+import com.umcspot.spot.designsystem.theme.G300
+import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.study.model.ImageRef
+import com.umcspot.spot.study.model.StudyResult
 
 @Composable
 fun StudyListItem(
-    item: StudyItem,
+    item: StudyResult,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
@@ -41,12 +44,8 @@ fun StudyListItem(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-            val resId = item.studyImage ?: R.drawable.spot_logo
-
-            Image(
-                painter = painterResource(resId as Int),
-                contentDescription = null,
+            StudyThumbnail(
+                imageRef = item.studyImage,
                 modifier = Modifier
                     .size(56.dp)
                     .clip(SpotShapes.Hard)
@@ -59,13 +58,13 @@ fun StudyListItem(
             ) {
                 Text(
                     text = item.title,
-                    style = SpotTypography().bodyMedium500.copy(fontSize = 16.sp),
+                    style = SpotTheme.typography.bodyMedium500.copy(fontSize = 16.sp),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = item.goal,
-                    style = SpotTypography().bodySmall500.copy(fontSize = 14.sp),
+                    style = SpotTheme.typography.bodySmall500.copy(fontSize = 14.sp),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -88,7 +87,7 @@ fun StudyListItem(
         HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth(),
-            color = G300,
+            color = SpotTheme.colors.G300,
             thickness = 0.5.dp
         )
     }
@@ -111,7 +110,44 @@ private fun Stat(
             modifier = Modifier.size(14.dp)
         )
 
-        Text(text = display, style = SpotTypography().bodySmall500.copy(fontSize = 12.sp))
+        Text(text = display, style = SpotTheme.typography.bodySmall500.copy(fontSize = 12.sp))
+    }
+}
+
+@Composable
+private fun StudyThumbnail(
+    imageRef: ImageRef?,
+    @DrawableRes placeholder: Int = R.drawable.spot_logo, // 적절한 플레이스홀더
+    modifier: Modifier = Modifier
+) {
+    val ctx = LocalContext.current
+    when (val img = imageRef) {
+        is ImageRef.LocalName -> {
+            // drawable 이름 → 리소스 id 변환
+            val id = ctx.resources.getIdentifier(img.name, "drawable", ctx.packageName)
+            val safeId = if (id != 0) id else placeholder
+            Image(
+                painter = painterResource(safeId),
+                contentDescription = null,
+                modifier = modifier
+            )
+        }
+        is ImageRef.Url -> {
+            AsyncImage(
+                model = img.url,
+                contentDescription = null,
+                placeholder = painterResource(placeholder),
+                error = painterResource(placeholder),
+                modifier = modifier
+            )
+        }
+        ImageRef.None, null -> {
+            Image(
+                painter = painterResource(placeholder),
+                contentDescription = null,
+                modifier = modifier
+            )
+        }
     }
 }
 
@@ -120,17 +156,20 @@ private fun Stat(
 @Preview(showBackground = true, widthDp = 300)
 @Composable
 private fun StudyListItemPreview() {
-    StudyListItem(
-        item = StudyItem(
-            id = "1",
-            title = "Sample Study",
-            goal = "Sample Goal",
-            maxMember = 10,
-            member = 5,
-            likes = 400,
-            views = 1200,
-        ),
-        modifier = Modifier.padding(10.dp),
-        onClick = {}
-    )
+    SpotTheme{
+        StudyListItem(
+            item = StudyResult(
+                studyId = "1",
+                title = "Sample Study",
+                goal = "Sample Goal",
+                maxMember = 10,
+                member = 5,
+                likes = 400,
+                views = 1200,
+            ),
+            modifier = Modifier.padding(10.dp),
+            onClick = {}
+        )
+    }
 }
+

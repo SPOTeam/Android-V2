@@ -2,16 +2,25 @@ package com.umcspot.spot.main
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
+import com.umcspot.spot.category.navigation.categoryGraph
+import com.umcspot.spot.feature.board.navigation.boardGraph
+import com.umcspot.spot.feature.board.navigation.navigateToBoard
 import com.umcspot.spot.home.navigation.homeGraph
+import com.umcspot.spot.jjim.navigation.jjimGraph
 import com.umcspot.spot.mypage.navigation.mypageGraph
+import com.umcspot.spot.model.QuickMenuType
+import com.umcspot.spot.mystudy.navigation.myStudyGraph
 
 @Composable
 fun MainNavHost(
     navigator: MainNavigator,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding : PaddingValues = PaddingValues(0.dp)
 ) {
     NavHost(
         enterTransition = { EnterTransition.None },
@@ -21,7 +30,25 @@ fun MainNavHost(
         navController = navigator.navController,
         startDestination = navigator.startDestination
     ) {
-        homeGraph()
+        homeGraph(
+            contentPadding = contentPadding,
+            onQuickMenuClick = { type ->
+                when (type) {
+                    QuickMenuType.BOARD      -> navigator.navController.navigateToBoard()
+                    QuickMenuType.REGION     -> { /* navigator.navController.navigate(Region) */ }
+                    QuickMenuType.INTERESTS  -> { /* navigator.navController.navigate(Interests) */ }
+                    QuickMenuType.RECRUITING -> { /* navigator.navController.navigate(Recruiting) */ }
+                }
+            }
+        )
+        categoryGraph()
+        myStudyGraph()
+        jjimGraph()
         mypageGraph()
+
+
+        boardGraph(
+            contentPadding = contentPadding,
+        )
     }
 }

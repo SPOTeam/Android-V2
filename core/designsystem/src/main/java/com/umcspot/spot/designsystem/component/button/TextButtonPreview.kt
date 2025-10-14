@@ -1,4 +1,4 @@
-package com.example.core.ui.component.button
+package com.umcspot.spot.designsystem.component.button
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

@@ -7,47 +7,42 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.core.ui.effect.dropShadow.DS100
-import com.example.core.ui.effect.dropShadow.DS100_Y
-import com.example.core.ui.effect.dropShadow.DS200
-import com.example.core.ui.effect.dropShadow.DS300
-import com.example.core.ui.effect.dropShadow.DS400
-import com.example.core.ui.theme.B500
-import com.example.core.ui.theme.BlueGradient
-import com.example.core.ui.theme.G100
-import com.example.core.ui.theme.GrayGradient
-import com.example.core.ui.theme.R500
+import com.umcspot.spot.designsystem.theme.*
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 
 @Preview(name = "Hard", showBackground = true)
 @Composable
 fun Preview_DS100() {
-    Box(
-        modifier = Modifier.padding(10.dp)
-    ) {
-        DS100(
-            width = 200.dp,
-            height = 100.dp,
-            shape = SpotShapes.Hard,
-            backgroundColor = B500,
-            borderWidth = 3.dp,
-            borderColor = Color.Black
-        )
+    SpotTheme {
+        Box(
+            modifier = Modifier.padding(10.dp)
+        ) {
+            DS100(
+                width = 200.dp,
+                height = 100.dp,
+                shape = SpotShapes.Hard,
+                backgroundColor = SpotTheme.colors.B500,
+                borderWidth = 3.dp,
+                borderColor = Color.Black
+            )
+        }
     }
 }
 
 @Preview(name = "Soft", showBackground = true)
 @Composable
 fun Preview_DS100_Y() {
-    Box(
-        modifier = Modifier.padding(10.dp)
-    ) {
-        DS100_Y(
-            width = 200.dp,
-            height = 100.dp,
-            shape = SpotShapes.Soft,
-            brush = BlueGradient
-        )
+    SpotTheme {
+        Box(
+            modifier = Modifier.padding(10.dp)
+        ) {
+            DS100_Y(
+                width = 200.dp,
+                height = 100.dp,
+                shape = SpotShapes.Soft,
+                brush = SpotTheme.colors.blueGradient()
+            )
+        }
     }
 }
 

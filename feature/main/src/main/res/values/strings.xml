@@ -2,5 +2,8 @@
 <resources>
     <!-- bottom bar-->
     <string name="ic_home_desc">홈</string>
+    <string name="ic_category_desc">카테고리</string>
+    <string name="ic_mystudy_desc">내 스터디</string>
+    <string name="ic_jjim_desc">찜</string>
     <string name="ic_mypage_desc">마이페이지</string>
 </resources>

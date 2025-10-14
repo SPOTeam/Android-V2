@@ -17,15 +17,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.umcspot.spot.designsystem.R
 
-val Suit = FontFamily(
-    Font(R.font.suit_thin, weight = FontWeight.W100),
-    Font(R.font.suit_extralight, weight = FontWeight.W200),
-    Font(R.font.suit_light, weight = FontWeight.W300),
-    Font(R.font.suit_regular, weight = FontWeight.W400),
-    Font(R.font.suit_medium, weight = FontWeight.W500),
-    Font(R.font.suit_semibold, weight = FontWeight.W600),
-    Font(R.font.suit_bold, weight = FontWeight.W700),
-    Font(R.font.suit_extrabold, weight = FontWeight.W800),
+val Pretendard = FontFamily(
+    Font(R.font.pretendard_thin, weight = FontWeight.W100),
+    Font(R.font.pretendard_extralight, weight = FontWeight.W200),
+    Font(R.font.pretendard_light, weight = FontWeight.W300),
+    Font(R.font.pretendard_regular, weight = FontWeight.W400),
+    Font(R.font.pretendard_medium, weight = FontWeight.W500),
+    Font(R.font.pretendard_semibold, weight = FontWeight.W600),
+    Font(R.font.pretendard_bold, weight = FontWeight.W700),
+    Font(R.font.pretendard_extrabold, weight = FontWeight.W800),
 )
 
 /**
@@ -69,72 +69,72 @@ data class SpotTypography(
 /** 기본 SpotTypography 세트를 생성하는 팩토리 함수 */
 fun SpotTypography(): SpotTypography = SpotTypography(
     header01 = TextStyle(
-        fontFamily = Suit,
+        fontFamily = Pretendard,
         fontWeight = FontWeight.Bold,
         fontSize = 85.sp, // 64pt ≈ 85sp
     ),
     header02 = TextStyle(
-        fontFamily = Suit,
+        fontFamily = Pretendard,
         fontWeight = FontWeight.Bold,
         fontSize = 69.sp, // 52pt ≈ 69sp
     ),
     header03 = TextStyle(
-        fontFamily = Suit,
+        fontFamily = Pretendard,
         fontWeight = FontWeight.Bold,
         fontSize = 48.sp, // 48pt ≈ 64sp
     ),
     header04 = TextStyle(
-        fontFamily = Suit,
+        fontFamily = Pretendard,
         fontWeight = FontWeight.Bold,
         fontSize = 44.sp, // 44pt ≈ 58sp
     ),
     header05 = TextStyle(
-        fontFamily = Suit,
+        fontFamily = Pretendard,
         fontWeight = FontWeight.Bold,
         fontSize = 40.sp, // 40pt ≈ 53sp
     ),
     bodyLarge600 = TextStyle(
-        fontFamily = Suit,
+        fontFamily = Pretendard,
         fontWeight = FontWeight.SemiBold,
         fontSize = 44.sp,
     ),
     bodyLarge500 = TextStyle(
-        fontFamily = Suit,
+        fontFamily = Pretendard,
         fontWeight = FontWeight.Medium,
         fontSize = 44.sp,
     ),
     bodyMedium600 = TextStyle(
-        fontFamily = Suit,
+        fontFamily = Pretendard,
         fontWeight = FontWeight.SemiBold,
         fontSize = 40.sp,
     ),
     bodyMedium500 = TextStyle(
-        fontFamily = Suit,
+        fontFamily = Pretendard,
         fontWeight = FontWeight.Medium,
         fontSize = 40.sp,
     ),
     bodyRegular500 = TextStyle(
-        fontFamily = Suit,
+        fontFamily = Pretendard,
         fontWeight = FontWeight.Medium,
         fontSize = 36.sp,
     ),
     bodyRegular400 = TextStyle(
-        fontFamily = Suit,
+        fontFamily = Pretendard,
         fontWeight = FontWeight.Normal,
         fontSize = 36.sp,
     ),
     bodySmall500 = TextStyle(
-        fontFamily = Suit,
+        fontFamily = Pretendard,
         fontWeight = FontWeight.Medium,
         fontSize = 32.sp,
     ),
     bodySmall400 = TextStyle(
-        fontFamily = Suit,
+        fontFamily = Pretendard,
         fontWeight = FontWeight.Normal,
         fontSize = 32.sp,
     ),
     bodySmall300 = TextStyle(
-        fontFamily = Suit,
+        fontFamily = Pretendard,
         fontWeight = FontWeight.Light,
         fontSize = 32.sp,
     )

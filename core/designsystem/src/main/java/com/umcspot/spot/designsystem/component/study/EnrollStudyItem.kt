@@ -20,18 +20,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.core.ui.component.button.ButtonState
-import com.example.core.ui.component.button.TextButtonM
-import com.example.core.ui.theme.G300
 import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.button.ButtonState
+import com.umcspot.spot.designsystem.component.button.TextButtonM
 import com.umcspot.spot.designsystem.shapes.SpotShapes
+import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.designsystem.theme.SpotTypography
-import com.umcspot.spot.study.model.StudyItem
+import com.umcspot.spot.study.model.StudyResult
 
 @Composable
 fun EnrollStudyListItem(
-    item: StudyItem,
+    item: StudyResult,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
@@ -45,7 +44,7 @@ fun EnrollStudyListItem(
             val imageRes = item.studyImage ?: R.drawable.spot_logo
 
             Image(
-                painter = painterResource(imageRes),
+                painter = painterResource(imageRes as Int),
                 contentDescription = null,
                 modifier = Modifier
                     .size(56.dp)
@@ -91,7 +90,7 @@ fun EnrollStudyListItem(
         HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth(),
-            color = G300,
+            color = SpotTheme.colors.G300,
             thickness = 0.5.dp
         )
     }
@@ -103,8 +102,8 @@ fun EnrollStudyListItem(
 @Composable
 private fun EnrollStudyListItemPreview() {
     EnrollStudyListItem(
-        item = StudyItem(
-            id = "1",
+        item = StudyResult(
+            studyId = "1",
             title = "Sample Study",
             goal = "Sample Goal",
             maxMember = 10,

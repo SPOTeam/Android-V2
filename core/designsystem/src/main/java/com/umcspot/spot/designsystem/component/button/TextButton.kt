@@ -1,4 +1,4 @@
-package com.example.core.ui.component.button
+package com.umcspot.spot.designsystem.component.button
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -25,19 +25,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.core.ui.shapes.ShapeBox
-import com.example.core.ui.shapes.SpotShapes
-import com.example.core.ui.theme.B100
-import com.example.core.ui.theme.B200
-import com.example.core.ui.theme.B400
-import com.example.core.ui.theme.B500
-import com.example.core.ui.theme.Black
-import com.example.core.ui.theme.G300
-import com.example.core.ui.theme.G400
-import com.example.core.ui.theme.G500
-import com.example.core.ui.theme.R500
-import com.example.core.ui.theme.SpotTypography
-import com.example.core.ui.theme.White
+import com.umcspot.spot.designsystem.shapes.ShapeBox
+import com.umcspot.spot.designsystem.shapes.SpotShapes
+import com.umcspot.spot.designsystem.theme.*
+
 
 // ---------- Color Tokens ----------
 
@@ -137,41 +128,24 @@ private fun ButtonState.resolveColors(enabled: Boolean, isPressed: Boolean): But
 
 enum class TextButtonSize(
     val minHeight: Dp,
-    val shape: Shape,
-    val textStyle: TextStyle,
-    val fontSize: TextUnit
+    val fontSize: TextUnit,
 ) {
-    XL(
-        minHeight = 56.dp,
-        shape = SpotShapes.Hard,
-        textStyle = SpotTypography.header03,
-        fontSize = 15.sp
-    ),
-    L(
-        minHeight = 52.dp,
-        shape = SpotShapes.Hard,
-        textStyle = SpotTypography.header03,
-        fontSize = 15.sp
-    ),
-    M(
-        minHeight = 48.dp,
-        shape = SpotShapes.Hard,
-        textStyle = SpotTypography.header04,
-        fontSize = 15.sp
-    ),
-    S(
-        minHeight = 44.dp,
-        shape = SpotShapes.Hard,
-        textStyle = SpotTypography.header05,
-        fontSize = 15.sp
-    ),
-    XS(
-        minHeight = 40.dp,
-        shape = SpotShapes.Hard,
-        textStyle = SpotTypography.header05,
-        fontSize = 15.sp
-    )
+    XL(56.dp, 15.sp),
+    L (52.dp, 15.sp),
+    M (48.dp, 15.sp),
+    S (44.dp, 15.sp),
+    XS(40.dp, 15.sp);
 }
+
+@Composable
+fun TextButtonSize.textStyle(): TextStyle = when (this) {
+    TextButtonSize.XL, TextButtonSize.L -> SpotTheme.typography.header03
+    TextButtonSize.M -> SpotTheme.typography.header04
+    TextButtonSize.S, TextButtonSize.XS -> SpotTheme.typography.header05
+}
+
+@Composable
+fun TextButtonSize.shape(): Shape = SpotShapes.Hard
 
 // ---------- Component ----------
 
@@ -203,7 +177,7 @@ fun TextButton(
     ) {
         // 배경/보더
         ShapeBox(
-            shape = size.shape,
+            shape = size.shape(),
             color = colors.bg,
             borderWidth = 0.5.dp,
             borderColor = colors.border,
@@ -220,7 +194,7 @@ fun TextButton(
             Text(
                 text = text,
                 textAlign = TextAlign.Center,
-                style = size.textStyle,
+                style = size.textStyle(),
                 fontSize = size.fontSize,
                 color = colors.text,
                 maxLines = 1

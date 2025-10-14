@@ -1,23 +1,15 @@
-package com.example.core.ui.component.empty
+package com.umcspot.spot.designsystem.component.empty
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -26,20 +18,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.core.ui.R
-import com.example.core.ui.component.button.ButtonState
-import com.example.core.ui.component.button.TextButtonXL
-import com.example.core.ui.shapes.SpotShapes
-import com.example.core.ui.theme.B200
-import com.example.core.ui.theme.B500
-import com.example.core.ui.theme.G300
-import com.example.core.ui.theme.G400
-import com.example.core.ui.theme.SpotTypography
-import com.example.core.ui.theme.White
+import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.button.ButtonState
+import com.umcspot.spot.designsystem.component.button.TextButtonXL
+import com.umcspot.spot.designsystem.theme.B500
+import com.umcspot.spot.designsystem.theme.G300
+import com.umcspot.spot.designsystem.theme.G400
+import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.designsystem.theme.White
 
 @Composable
 fun EmptyAlert(
@@ -63,15 +52,15 @@ fun EmptyAlert(
         Spacer(Modifier.height(12.dp))
         Text(
             text = alertTitle,
-            style = SpotTypography.header05,
+            style = SpotTheme.typography.header05,
             fontSize = 30.sp,
-            color = B500
+            color = SpotTheme.colors.B500
         )
         Spacer(Modifier.height(15.dp))
         Text(
             text = alertDes,
-            style = SpotTypography.header05,
-            color = G400,
+            style = SpotTheme.typography.header05,
+            color = SpotTheme.colors.G400,
             fontSize = 25.sp,
         )
         Spacer(Modifier.height(40.dp))
@@ -103,8 +92,8 @@ fun EmptyAlertWithButton(
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val (backgroundColor, borderColor, textColor) = when {
-        isPressed -> Triple(B500, B500, White) // 눌림: 파란 배경 + 흰 글자
-        else -> Triple(White, B500, B500)      // 기본: 흰 배경 + 파란 글자/테두리
+        isPressed -> Triple(SpotTheme.colors.B500, SpotTheme.colors.B500, SpotTheme.colors.white) // 눌림: 파란 배경 + 흰 글자
+        else -> Triple(SpotTheme.colors.white, SpotTheme.colors.B500, SpotTheme.colors.B500)      // 기본: 흰 배경 + 파란 글자/테두리
     }
 
     EmptyAlert(

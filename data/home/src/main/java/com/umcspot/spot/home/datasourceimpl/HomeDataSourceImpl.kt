@@ -4,7 +4,7 @@ import com.umcspot.spot.home.datasource.HomeDataSource
 import com.umcspot.spot.home.dto.request.HomeRequestDto
 import com.umcspot.spot.home.dto.response.HomeResponseDto
 import com.umcspot.spot.home.service.HomeService
-import network.model.BaseResponse
+import com.umcspot.spot.network.model.BaseResponse
 import javax.inject.Inject
 
 

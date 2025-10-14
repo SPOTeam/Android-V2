@@ -1,4 +1,5 @@
 package com.umcspot.spot.designsystem.component
+
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -11,21 +12,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.core.ui.theme.G100
 import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.theme.SpotTypography
+import com.umcspot.spot.designsystem.theme.G100
+import com.umcspot.spot.designsystem.theme.SpotTheme
 
 @Composable
 fun SheetTopBar(
     title: String,
     onCloseClick: () -> Unit,
     modifier: Modifier = Modifier,
-    titleStyle: TextStyle = SpotTypography().header05,
-    backgroundColor: androidx.compose.ui.graphics.Color = G100,
+    titleStyle: TextStyle = SpotTheme.typography.header05,
+    backgroundColor: Color = SpotTheme.colors.G100,
     @DrawableRes closeIconRes: Int = R.drawable.dismiss
 ) {
     Box(
@@ -60,8 +62,10 @@ fun SheetTopBar(
 @Preview(showBackground = true, name = "SheetTopBar - Default")
 @Composable
 fun Preview_SheetTopBar_Default() {
-    SheetTopBar(
-        title = "Sheet Title",
-        onCloseClick = {}
-    )
+    SpotTheme {
+        SheetTopBar(
+            title = "Sheet Title",
+            onCloseClick = {}
+        )
+    }
 }

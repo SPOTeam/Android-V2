@@ -18,8 +18,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.core.ui.theme.B400
-import com.example.core.ui.theme.White
+import com.umcspot.spot.designsystem.theme.*
 import com.umcspot.spot.designsystem.R
 
 @Composable
@@ -27,8 +26,8 @@ fun FloatingButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 50.dp,
-    backgroundColor: Color = B400,
-    contentColor: Color = White,
+    backgroundColor: Color = SpotTheme.colors.B400,
+    contentColor: Color = SpotTheme.colors.White,
 //    elevation: Dp = 6.dp,
     iconSize: Dp = 23.dp,
     @DrawableRes iconRes: Int = R.drawable.multiple
@@ -56,8 +55,10 @@ fun FloatingButton(
 @Preview(showBackground = true)
 @Composable
 fun Preview_SpotFabSolid_Custom() {
-    FloatingButton(
-        onClick = {},
-        modifier = Modifier.padding(6.dp)
-    )
+    SpotTheme{
+        FloatingButton(
+            onClick = {},
+            modifier = Modifier.padding(6.dp)
+        )
+    }
 }
