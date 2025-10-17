@@ -4,5 +4,5 @@ import com.umcspot.spot.home.model.HomeResult
 import com.umcspot.spot.ui.state.UiState
 
 data class HomeState(
-    var user: UiState<HomeResult> = UiState.Loading
+    var user: UiState<HomeResult> = UiState.Empty
 )

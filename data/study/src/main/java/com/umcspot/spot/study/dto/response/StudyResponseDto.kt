@@ -8,6 +8,13 @@ import kotlinx.serialization.Serializable
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class StudyResponseDto(
+    @SerialName("studyList")
+    val studyList : List<Study>
+)
+
+@SuppressLint("UnsafeOptInUsageError")
+@Serializable
+data class Study (
     @SerialName("StudyId")
     val studyId: String,
 
@@ -30,5 +37,5 @@ data class StudyResponseDto(
     val views: Int = 0,
 
     @SerialName("studyImage")
-    val studyImage: ImageRef = ImageRef.None
+    val studyImage: ImageRef
 )

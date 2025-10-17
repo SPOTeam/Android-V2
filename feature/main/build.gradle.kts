@@ -11,7 +11,10 @@ dependencies {
     implementation(projects.feature.mystudy)
     implementation(projects.feature.jjim)
     implementation(projects.feature.mypage)
+
     implementation(projects.feature.board)
+    implementation(projects.feature.alert)
+
     implementation(projects.core.model)
     implementation(libs.androidx.splashscreen)
     implementation(libs.lottie)

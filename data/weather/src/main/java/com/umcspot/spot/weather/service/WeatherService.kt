@@ -10,7 +10,7 @@ import retrofit2.http.GET
 
 interface WeatherService {
     @GET("/api/v1/service")
-    suspend fun getDummies(
+    suspend fun getWeather(
         @Body request: WeatherRequestDto
     ): BaseResponse<WeatherResponseDto>
 }

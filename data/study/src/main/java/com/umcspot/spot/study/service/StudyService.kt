@@ -8,7 +8,14 @@ import retrofit2.http.GET
 
 interface StudyService {
     @GET("/api/v1/service")
-    suspend fun getDummies(
+    suspend fun getPopularStudies(
 //        @Body request: StudyRequestDto
     ): BaseResponse<StudyResponseDto>
+
+    @GET("/api/v1/service")
+    suspend fun getRecommendStudies(
+//        @Body request: StudyRequestDto
+    ): BaseResponse<StudyResponseDto>
+
+
 }

@@ -10,7 +10,7 @@ import retrofit2.http.POST
 
 interface HomeService {
     @POST("/api/v1/service")
-    suspend fun getDummies(
+    suspend fun getHomeData(
         @Body request: HomeRequestDto
     ): BaseResponse<HomeResponseDto>
 }

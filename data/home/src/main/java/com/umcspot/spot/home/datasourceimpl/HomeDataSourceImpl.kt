@@ -11,8 +11,8 @@ import javax.inject.Inject
 class HomeDataSourceImpl @Inject constructor(
     private val homeService: HomeService
 ) : HomeDataSource {
-    override suspend fun getDummies(
+    override suspend fun getHomeData(
         request: HomeRequestDto
     ): BaseResponse<HomeResponseDto> =
-        homeService.getDummies(request)
+        homeService.getHomeData(request)
 }

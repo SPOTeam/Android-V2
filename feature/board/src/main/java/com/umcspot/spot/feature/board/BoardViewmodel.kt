@@ -2,87 +2,92 @@ package com.umcspot.spot.feature.board
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.umcspot.spot.domain.board.model.Board
-import com.umcspot.spot.domain.board.model.Labeled
+import com.umcspot.spot.domain.board.repository.BoardRepository
 import com.umcspot.spot.model.SortType
+import com.umcspot.spot.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class BoardViewModel @Inject constructor(
-    // TODO: Repository 주입 시 여기에 넣기
+    private val boardRepository: BoardRepository // 실제 구현 주입
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(BoardUiState(isLoading = true))
-    val uiState: StateFlow<BoardUiState> = _uiState
+    data class BoardUiState(val user: UiState<BoardPayload> = UiState.Empty)
 
-    init {
-        load()
-    }
+    private val _uiState = MutableStateFlow(BoardUiState())
+    val uiState: StateFlow<BoardUiState> = _uiState.asStateFlow()
 
-    /** 초기/재로딩 */
-    fun load() = viewModelScope.launch {
-        _uiState.update { it.copy(isLoading = true, error = null) }
-        try {
-            // TODO: 실제 API 호출로 교체
-            delay(250)
+    /** 최초/재로딩: HomeViewModel.getDummies() 스타일 */
+    fun load(selected: SortType) {
+        // 1) 로딩으로 전환
+        _uiState.update { it.copy(user = UiState.Loading) }
 
-            val hot = List(5) { i ->
-                Board(
-                    id = "hot$i",
-                    title = "Lorem ipsum dolor sit amet consectetur…",
-                    count = listOf(10, 100, 9999, 10, 10)[i]
+        // 2) 실제 호출
+        viewModelScope.launch {
+            runCatching {
+                val tagDeferred = async { boardRepository.getTagBoardData(selected) }
+                val rankedDeferred = async { boardRepository.getRankedBoardData() }
+                val labeledDeferred = async { boardRepository.getLabeledBoardData() }
+
+                val tagBoards = tagDeferred.await().getOrThrow()
+                val rankedBoards = rankedDeferred.await().getOrThrow()
+                val labeledBoards = labeledDeferred.await().getOrThrow()
+
+                BoardPayload(
+                    tagBoards = tagBoards,
+                    rankedBoards = rankedBoards,
+                    labeledBoards = labeledBoards,
+                    selected = selected
                 )
+            }.onSuccess { payload ->
+                _uiState.update { it.copy(user = UiState.Success(payload)) }
+            }.onFailure {
+                // UiState.Error 타입이 없다면 Empty로 복구
+                _uiState.update { it.copy(user = UiState.Empty) }
             }
-            val partners = listOf(
-                Labeled("p1", "합격후기", "Lorem ipsum dolor sit amet consectetur…", 10),
-                Labeled("p2", "정보공유", "Lorem ipsum dolor sit amet consectetur…", 100),
-                Labeled("p3", "고민상담", "Lorem ipsum dolor sit amet consectetur…", 9999),
-                Labeled("p4", "취준토크", "Lorem ipsum dolor sit amet consectetur…", 10),
-                Labeled("p5", "자유토크", "Lorem ipsum dolor sit amet consectetur…", 10),
-            )
-            val notice = List(5) { i ->
-                Board(
-                    id = "n$i",
-                    title = "Lorem ipsum dolor sit amet consectetur…",
-                    count = listOf(10, 100, 1100, 10, 10)[i]
-                )
-            }
-
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    hot = hot,
-                    partners = partners,
-                    notice = notice
-                )
-            }
-        } catch (t: Throwable) {
-            _uiState.update { it.copy(isLoading = false, error = t.message ?: "알 수 없는 오류") }
         }
     }
 
-    /** 탭 선택 변경 */
+    /** Tag 값만 새로고침 */
     fun selectSort(type: SortType) {
-        _uiState.update { it.copy(selected = type) }
-        // 필요하면 type에 따라 재정렬/재요청
-        // e.g. refreshFor(type)
+        val cur = (uiState.value.user as? UiState.Success<BoardPayload>)?.data
+        if (cur == null) {
+            load(type) // 최초엔 전체 로드
+            return
+        }
+
+        viewModelScope.launch {
+            // 1) 탭 선택 즉시 반영(UX 빠르게)
+            _uiState.update { it.copy(user = UiState.Success(cur.copy(selected = type))) }
+
+            // 2) 새 정렬(랜덤 순서 포함)로 tagBoards 가져와서 반영+
+            runCatching { boardRepository.getTagBoardData(type).getOrThrow() }
+                .onSuccess { newTagBoards ->
+                    _uiState.update {
+                        it.copy(user = UiState.Success(
+                            cur.copy(
+                                selected = type,
+                                tagBoards = newTagBoards
+                            )
+                        ))
+                    }
+                }
+                .onFailure {
+                    // 필요 시 에러 처리(토스트/스낵바 등). 최소한 선택값은 유지됨.
+                }
+        }
     }
 
-    /** 예: 실시간 섹션만 새로고침 */
-    fun refreshHot() = viewModelScope.launch {
-        _uiState.update { it.copy(isLoading = true) }
-        try {
-            delay(150)
-            val refreshed = _uiState.value.hot.shuffled() // 샘플: 순서 랜덤
-            _uiState.update { it.copy(isLoading = false, hot = refreshed) }
-        } catch (t: Throwable) {
-            _uiState.update { it.copy(isLoading = false, error = "새로고침 실패") }
-        }
+    /** 전체 새로고침이 필요할 때 */
+    fun refreshAll() {
+        val sel = (uiState.value.user as? UiState.Success<BoardPayload>)?.data?.selected ?: return
+        load(sel)
     }
 }

@@ -14,5 +14,5 @@ import javax.inject.Singleton
 abstract class HomeDataModule {
     @Binds
     @Singleton
-    abstract fun bindDummyRemoteDataSource(impl: HomeDataSourceImpl): HomeDataSource
+    abstract fun bindHomeRemoteDataSource(impl: HomeDataSourceImpl): HomeDataSource
 }

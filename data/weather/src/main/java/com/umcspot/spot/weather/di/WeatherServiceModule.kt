@@ -13,7 +13,7 @@ import javax.inject.Singleton
 object WeatherServiceModule {
     @Provides
     @Singleton
-    fun providesDummyService(retrofit: Retrofit): WeatherService = retrofit.create(
+    fun providesWeatherService(retrofit: Retrofit): WeatherService = retrofit.create(
         WeatherService::class.java
     )
 }

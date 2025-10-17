@@ -13,7 +13,7 @@ import javax.inject.Singleton
 object StudyServiceModule {
     @Provides
     @Singleton
-    fun providesDummyService(retrofit: Retrofit): StudyService = retrofit.create(
+    fun providesStudyService(retrofit: Retrofit): StudyService = retrofit.create(
         StudyService::class.java
     )
 }

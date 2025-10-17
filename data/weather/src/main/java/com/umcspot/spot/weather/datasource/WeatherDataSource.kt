@@ -5,5 +5,5 @@ import com.umcspot.spot.weather.dto.request.WeatherRequestDto
 import com.umcspot.spot.weather.dto.response.WeatherResponseDto
 
 interface WeatherDataSource {
-    suspend fun getDummies(request: WeatherRequestDto): BaseResponse<WeatherResponseDto>
+    suspend fun getWeather(request: WeatherRequestDto): BaseResponse<WeatherResponseDto>
 }

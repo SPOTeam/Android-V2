@@ -11,8 +11,10 @@ import javax.inject.Inject
 class WeatherDataSourceImpl @Inject constructor(
     private val weatherService: WeatherService
 ) : WeatherDataSource {
-    override suspend fun getDummies(
+
+    override suspend fun getWeather(
         request: WeatherRequestDto
     ): BaseResponse<WeatherResponseDto> =
-        weatherService.getDummies(request)
+        weatherService.getWeather(request)
+
 }

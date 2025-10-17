@@ -14,5 +14,5 @@ import javax.inject.Singleton
 abstract class StudyRepositoryModule {
     @Binds
     @Singleton
-    abstract fun bindsDummyRepository(dummyRepositoryImpl: StudyRepositoryImpl): StudyRepository
+    abstract fun bindsStudyRepository(dummyRepositoryImpl: StudyRepositoryImpl): StudyRepository
 }

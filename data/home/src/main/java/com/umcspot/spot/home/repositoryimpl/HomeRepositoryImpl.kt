@@ -13,16 +13,16 @@ class HomeRepositoryImpl @Inject constructor(
     private val weatherRepository: WeatherRepository,
     private val studyRepository: StudyRepository
 ) : HomeRepository {
-    override suspend fun getDummies(request: Home): Result<HomeResult> = runCatching {
+    override suspend fun getHomeData(request: Home): Result<HomeResult> = runCatching {
         coroutineScope {
-            val weatherDef = async { weatherRepository.getDummies(request.weather) }  // Result<WeatherResult> 를 반환한다고 가정
-            val popularDef  = async { studyRepository.getDummies() }   // Result<StudyResult>
-            val recommendedDef  = async { studyRepository.getDummies() }   // Result<StudyResult>
+            val weatherDef = async { weatherRepository.getWeather(request.weather) }  // Result<WeatherResult> 를 반환한다고 가정
+            val popularDef  = async { studyRepository.getPopularStudies() }   // Result<StudyResult>
+            val recommendedDef  = async { studyRepository.getRecommendStudies() }   // Result<StudyResult>
 
             HomeResult(
                 weatherInfo = weatherDef.await().getOrThrow(),
-                popularStudies = listOf(popularDef.await().getOrThrow()),
-                recommendedStudies = listOf(recommendedDef.await().getOrThrow())
+                popularStudies = popularDef.await().getOrThrow(),
+                recommendedStudies = recommendedDef.await().getOrThrow()
             )
         }
     }

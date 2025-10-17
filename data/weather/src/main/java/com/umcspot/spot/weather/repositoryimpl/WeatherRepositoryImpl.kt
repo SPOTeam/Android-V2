@@ -11,10 +11,12 @@ import javax.inject.Inject
 class WeatherRepositoryImpl @Inject constructor(
     private val weatherService: WeatherService
 ) : WeatherRepository {
-    override suspend fun getDummies(request : Weather): Result<WeatherResult> =
+    override suspend fun getWeather(request: Weather): Result<WeatherResult> =
         runCatching {
-            val response = weatherService.getDummies(request = request.toData())
+            val response = weatherService.getWeather(request.toData())
             response.data.toDomain()
+        }.recoverCatching {
+            // API 미연결/예외 시 더미로 복구
+            WeatherResult.dummyFrom()
         }
-
 }

@@ -1,14 +1,7 @@
 package com.umcspot.spot.domain.board.model
 
-data class Board(
-    val id: String,
-    val title: String,
-    val count: Int
-)
+import com.umcspot.spot.model.SortType
 
-data class Labeled(
-    val id: String,
-    val label: String,
-    val title: String,
-    val count: Int
+data class Board (
+    val sortType : SortType
 )

@@ -46,4 +46,6 @@ dependencies {
     implementation(projects.data.home)
     implementation(projects.data.weather)
     implementation(projects.data.study)
+    implementation(projects.data.alert)
+    implementation(projects.data.board)
 }

@@ -4,5 +4,5 @@ import com.umcspot.spot.home.model.Home
 import com.umcspot.spot.home.model.HomeResult
 
 interface HomeRepository {
-    suspend fun getDummies(request : Home): Result<HomeResult>
+    suspend fun getHomeData(request : Home): Result<HomeResult>
 }

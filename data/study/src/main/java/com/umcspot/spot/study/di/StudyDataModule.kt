@@ -14,5 +14,5 @@ import javax.inject.Singleton
 abstract class StudyDataModule {
     @Binds
     @Singleton
-    abstract fun bindDummyRemoteDataSource(impl: StudyDataSourceImpl): StudyDataSource
+    abstract fun bindStudyRemoteDataSource(impl: StudyDataSourceImpl): StudyDataSource
 }

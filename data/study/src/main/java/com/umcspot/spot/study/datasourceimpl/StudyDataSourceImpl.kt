@@ -9,7 +9,11 @@ import javax.inject.Inject
 class StudyDataSourceImpl @Inject constructor(
     private val studyService: StudyService
 ) : StudyDataSource {
-    override suspend fun getDummies(
+    override suspend fun getPopularStudies(
     ): BaseResponse<StudyResponseDto> =
-        studyService.getDummies()
+        studyService.getPopularStudies()
+
+    override suspend fun getRecommendStudies(
+    ): BaseResponse<StudyResponseDto> =
+        studyService.getRecommendStudies()
 }

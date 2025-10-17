@@ -50,6 +50,7 @@ import com.umcspot.spot.home.model.QuickMenuItem
 import com.umcspot.spot.model.QuickMenuType
 import com.umcspot.spot.model.WeatherType
 import com.umcspot.spot.study.model.StudyResult
+import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.ui.state.UiState
 import java.time.LocalTime
 
@@ -329,8 +330,8 @@ fun HomeScreenContent(
 
     onQuickMenuClick: (QuickMenuType) -> Unit,
 
-    popularStudies: List<StudyResult>,
-    recommendedStudies: List<StudyResult>,
+    popularStudies: StudyResultList,
+    recommendedStudies: StudyResultList,
     bottomInset: Dp = 0.dp // ← 추가
 ) {
     val listState = rememberLazyListState()
@@ -380,7 +381,7 @@ fun HomeScreenContent(
         // 지금 가장 인기 있는 스터디 섹션
         item {
             PopularStudyNow(
-                items = popularStudies.map { it },
+                items = popularStudies.studyList.map { it },
                 modifier = Modifier.fillMaxWidth(),
                 onMoreClick = { /* 전체보기 */ },
                 onItemClick = { /* 아이템 클릭 */ }
@@ -390,7 +391,7 @@ fun HomeScreenContent(
         // 당신을 기다리는 추천 스터디 섹션
         item {
             RecommendStudyNow(
-                items = recommendedStudies.map { it },
+                items = recommendedStudies.studyList.map { it },
                 modifier = Modifier.fillMaxWidth(),
                 onRefreshClick = { /* 새로고침 */ },
                 onItemClick = { /* 아이템 클릭 */ }
