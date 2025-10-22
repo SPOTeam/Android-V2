@@ -114,7 +114,7 @@ fun AcceptDialog(
 @Preview(showBackground = true, widthDp = 360, heightDp = 640)
 @Composable
 fun AcceptDialog_Preview() {
-    Surface {
+    SpotTheme {
         AcceptDialog(
             visible = true,
             onDismiss = {},

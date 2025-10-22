@@ -1,6 +1,9 @@
 package com.umcspot.spot.alert
 
+import android.content.Context
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -10,6 +13,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,13 +41,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.rememberAsyncImagePainter
+import com.umcspot.spot.alert.model.AlertInfo
 import com.umcspot.spot.alert.model.AlertResult
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
@@ -60,17 +69,24 @@ import com.umcspot.spot.designsystem.theme.Black
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.AlertKind
+import com.umcspot.spot.model.ImageRef
+import com.umcspot.spot.ui.state.UiState
 import kotlinx.coroutines.launch
+import java.io.File
 
 @Composable
 fun AlertScreen(
     viewModel: AlertViewModel = hiltViewModel(),
     scrollToTopTick: Long? = null,
-    contentPadding : PaddingValues
+    contentPadding : PaddingValues,
+    onClickApplied: () -> Unit          // ✅ 추가
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
+
+    val topPad = contentPadding.calculateTopPadding()
+    val bottomPad = contentPadding.calculateBottomPadding()
 
     LaunchedEffect(scrollToTopTick) {
         if (scrollToTopTick != null && scrollToTopTick != 0L) {
@@ -78,19 +94,48 @@ fun AlertScreen(
         }
     }
 
-    AlertScreenContent(
-        uiState = uiState,
-        onBack = { /* TODO: NavController.popBackStack() 등 연결 */ },
-        onClickAppliedStudyCard = { viewModel.onClickAppliedStudyCard() },
-        onClickAlert = { item -> viewModel.onClickAlert(item) },
-        listState = listState
-    )
+    LaunchedEffect(Unit) { viewModel.load() }
+
+    when (val state = uiState.general) {
+        is UiState.Loading -> Text("로딩 중...", color = Color.Gray)
+
+        is UiState.Failure -> Text("에러: ${state.msg}", color = Color.Red)
+
+        is UiState.Empty -> {
+            EmptyAlert(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = topPad, bottom = bottomPad),
+                painter = painterResource(R.drawable.alert),
+                alertTitle = "아직 알림이 없어요.",
+                alertDes = "스팟에서 내 목표를 이뤄봐요."
+            )
+        }
+
+        is UiState.Success -> {
+            val alerts: List<AlertInfo> = state.data.alerts
+            val showAppliedCard =
+                uiState.hasAppliedData && (uiState.applied as? UiState.Success)?.data?.alerts?.isNotEmpty() == true
+
+            AlertScreenContent(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(SpotTheme.colors.white)
+                    .padding(top = topPad, bottom = bottomPad),
+                alerts = alerts,
+                showAppliedStudyCard = showAppliedCard,
+                onClickAppliedStudyCard = onClickApplied,
+                onClickAlert = { item -> viewModel.onClickAlert(item) },
+                listState = listState
+            )
+        }
+    }
 }
 
 @Composable
 fun AlertRow(
-    data: AlertResult,
-    onClick: (AlertResult) -> Unit
+    data: AlertInfo,
+    onClick: (AlertInfo) -> Unit
 ) {
     if (data.kind == AlertKind.POPULAR_POST) {
         PopularPostAlert(data = data, onClick = onClick)
@@ -157,8 +202,8 @@ fun EnrollStudyCard(
 @Composable
 fun PopularPostAlert(
     modifier: Modifier = Modifier,
-    data: AlertResult,
-    onClick: (AlertResult) -> Unit
+    data: AlertInfo,
+    onClick: (AlertInfo) -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -172,7 +217,7 @@ fun PopularPostAlert(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 14.dp),
+            .padding(horizontal = 12.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Card(
@@ -228,8 +273,8 @@ fun PopularPostAlert(
 @Composable
 fun StudyNotiAlert(
     modifier: Modifier = Modifier,
-    data: AlertResult,
-    onClick: (AlertResult) -> Unit
+    data: AlertInfo,
+    onClick: (AlertInfo) -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -254,7 +299,7 @@ fun StudyNotiAlert(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .padding(horizontal = 16.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Card(
@@ -272,8 +317,8 @@ fun StudyNotiAlert(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ShapeImageWithBadge(
-                    painter = painterResource(
-                        data.studyImageRes ?: R.drawable.spot_logo
+                    painter = rememberImageRefPainter(
+                        ref = data.studyImageRes,            // ImageRef.None / LocalName / UriRef / Url
                     ),
                     shape = SpotShapes.Soft,
                     size = 55.dp,
@@ -326,66 +371,65 @@ fun NewBadge(
 
 @Composable
 fun AlertScreenContent(
-    uiState: AlertUiState,
-    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    alerts: List<AlertInfo>,
+    showAppliedStudyCard: Boolean,
     onClickAppliedStudyCard: () -> Unit,
-    onClickAlert: (AlertResult) -> Unit,
+    onClickAlert: (AlertInfo) -> Unit,
     listState: LazyListState
 ) {
-    // 기본 인셋을 끄고, 상/하단 인셋은 각 영역에서 명시적으로 처리
-    Scaffold(
-        contentWindowInsets = WindowInsets(0),
-        topBar = {
-            Box(Modifier.windowInsetsPadding(WindowInsets.statusBars)) {
-                BackTopBar(
-                    title = "알림",
-                    onBackClick = onBack
+    LazyColumn(
+        state = listState,
+        modifier = modifier
+    ) {
+        if (showAppliedStudyCard) {
+            item(key = "applied_card") {
+                EnrollStudyCard(
+                    isAvailable = true,
+                    onClick = onClickAppliedStudyCard
                 )
             }
         }
-    ) { innerPadding ->
-        if (uiState.alerts.isEmpty()) {
-            EmptyAlert(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                painter = painterResource(R.drawable.alert),
-                alertTitle = "아직 알림이 없어요.",
-                alertDes = "스팟에서 내 목표를 이뤄봐요."
+        items(
+            items = alerts,
+            key = { it.id }
+        ) { item ->
+            AlertRow(
+                data = item,
+                onClick = onClickAlert
             )
-        } else {
-            LazyColumn(
-                state = listState,
+            HorizontalDivider(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .windowInsetsPadding(WindowInsets.navigationBars), // 하단 SafeArea
-            ) {
-                if (uiState.showAppliedStudyCard) {
-                    item(key = "applied_card") {
-                        EnrollStudyCard(
-                            isAvailable = true,
-                            onClick = onClickAppliedStudyCard
-                        )
-                    }
-                }
-                items(
-                    items = uiState.alerts,
-                    key = { it.id }
-                ) { item ->
-                    AlertRow(
-                        data = item,
-                        onClick = onClickAlert
-                    )
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        color = SpotTheme.colors.G300,
-                        thickness = 0.5.dp
-                    )
-                }
-            }
+                    .fillMaxWidth()
+                    .padding(horizontal = 25.dp),
+                color = SpotTheme.colors.G300,
+                thickness = 0.5.dp
+            )
         }
     }
 }
+
+/****** 유틸리티 *******/
+
+@Composable
+fun rememberImageRefPainter(
+    ref: ImageRef,
+    @DrawableRes fallback: Int = R.drawable.spot_logo
+): Painter {
+    val context = LocalContext.current
+    return when (ref) {
+        is ImageRef.LocalName -> {
+            val id = context.resources.getIdentifier(ref.name, "drawable", context.packageName)
+            painterResource(id.takeIf { it != 0 } ?: fallback)
+        }
+        is ImageRef.LocalPath -> rememberAsyncImagePainter(model = File(ref.path))
+        is ImageRef.Url -> rememberAsyncImagePainter(model = ref.url)
+        ImageRef.None -> painterResource(fallback)
+    }
+}
+
+private fun Context.drawableIdByName(name: String): Int? {
+    val id = resources.getIdentifier(name, "drawable", packageName)
+    return if (id != 0) id else null
+}
+

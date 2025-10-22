@@ -1,10 +1,6 @@
 package com.umcspot.spot.study.model
 
-sealed interface ImageRef {
-    data object None : ImageRef
-    data class Url(val url: String) : ImageRef
-    data class LocalName(val name: String) : ImageRef // "ic_study_default" 같은 이름
-}
+import com.umcspot.spot.model.ImageRef
 
 data class StudyResultList (
     val studyList: List<StudyResult>

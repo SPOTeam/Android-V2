@@ -1,5 +1,6 @@
 package com.umcspot.spot.home
 
+import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -31,6 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
@@ -39,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.rememberAsyncImagePainter
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.study.StudyListItem
 import com.umcspot.spot.designsystem.component.weather.WeatherCard
@@ -47,11 +51,13 @@ import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.Black
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.home.model.QuickMenuItem
+import com.umcspot.spot.model.ImageRef
 import com.umcspot.spot.model.QuickMenuType
 import com.umcspot.spot.model.WeatherType
 import com.umcspot.spot.study.model.StudyResult
 import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.ui.state.UiState
+import java.io.File
 import java.time.LocalTime
 
 val quickItems = listOf(
@@ -76,7 +82,7 @@ fun HomeScreen(
     // 🔹 최초 진입 시 한 번만 호출해서 로딩 시작 + 더미 fallback 타이머 시작
     androidx.compose.runtime.LaunchedEffect(Unit) {
         // 좌표 전달 방식에 맞게 채워주세요 (예: Home(weather = Weather(...)))
-        viewModel.getDummies()
+        viewModel.load()
     }
 
     Column(
@@ -209,7 +215,7 @@ fun PopularPostNow(
                 )
                 Spacer(Modifier.width(4.dp))
 
-                Icon( // fire 이미지가 벡터면 Icon, 비트맵이면 Image로 사용
+                Icon(
                     painter = painterResource(R.drawable.fire),
                     contentDescription = "fire",
                     tint = Color.Unspecified,
@@ -398,5 +404,28 @@ fun HomeScreenContent(
             )
         }
     }
+}
 
+/****** 유틸리티 *******/
+
+@Composable
+fun rememberImageRefPainter(
+    ref: ImageRef,
+    @DrawableRes fallback: Int = R.drawable.spot_logo
+): Painter {
+    val context = LocalContext.current
+    return when (ref) {
+        is ImageRef.LocalName -> {
+            val id = context.resources.getIdentifier(ref.name, "drawable", context.packageName)
+            painterResource(id.takeIf { it != 0 } ?: fallback)
+        }
+        is ImageRef.LocalPath -> rememberAsyncImagePainter(model = File(ref.path))
+        is ImageRef.Url -> rememberAsyncImagePainter(model = ref.url)
+        ImageRef.None -> painterResource(fallback)
+    }
+}
+
+private fun Context.drawableIdByName(name: String): Int? {
+    val id = resources.getIdentifier(name, "drawable", packageName)
+    return if (id != 0) id else null
 }

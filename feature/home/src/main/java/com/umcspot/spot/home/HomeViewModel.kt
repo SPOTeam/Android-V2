@@ -21,10 +21,12 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val homeRepository: HomeRepository
 ) : ViewModel() {
-    data class HomeUiState(val user: UiState<HomeResult> = UiState.Empty)
+    data class HomeUiState(
+        val user: UiState<HomeResult> = UiState.Empty,
+    )
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
-    fun getDummies() {
+    fun load() {
         val request = Home(
             id = 1,
             email = "123123123",
@@ -44,7 +46,6 @@ class HomeViewModel @Inject constructor(
                     _uiState.update { it.copy(user = UiState.Success(result)) }
                 }
                 .onFailure {
-                    // 실패 시에도 더미로 대체
 //                    _uiState.update { it.copy(user = UiState.Success(HomeDummies.home())) }
                 }
         }

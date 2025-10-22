@@ -1,140 +1,83 @@
 package com.umcspot.spot.alert
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.umcspot.spot.alert.model.AlertInfo
 import com.umcspot.spot.alert.model.AlertResult
-import com.umcspot.spot.model.AlertKind
+import com.umcspot.spot.alert.model.AppliedAlertInfo
+import com.umcspot.spot.alert.model.AppliedAlertResult
+import com.umcspot.spot.alert.repository.AlertRepository
+import com.umcspot.spot.ui.state.UiState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import com.umcspot.spot.designsystem.R
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.fold
 
-class AlertViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(sampleUiState())
-    val uiState: StateFlow<AlertUiState> = _uiState
+@HiltViewModel
+class AlertViewModel @Inject constructor (
+    private val alertRepository: AlertRepository
+) : ViewModel() {
 
-    fun onClickAppliedStudyCard() {
-    }
+    data class AlertUiState(
+        val general: UiState<AlertResult> = UiState.Empty,
+        val applied: UiState<AppliedAlertResult> = UiState.Empty,
+        val hasAppliedData: Boolean = false
+    )
+    private val _uiState = MutableStateFlow(AlertUiState())
 
-    fun onClickAlert(item: AlertResult) {
-        _uiState.update { state ->
-            state.copy(
-                alerts = state.alerts.map {
-                    if (it.id == item.id) it.copy(isRead = true) else it
-                }
-            )
+    val uiState: StateFlow<AlertUiState> = _uiState.asStateFlow()
+
+    fun load() {
+        _uiState.update { it.copy(general = UiState.Loading, applied = UiState.Loading) }
+
+        viewModelScope.launch {
+            // 병렬 요청
+            val generalDefer = async { alertRepository.getAlerts() }                 // Result<AlertResult>
+            val appliedDefer = async { alertRepository.getAppliedAlerts() }          // Result<AppliedAlertResult>
+
+            val generalRes = generalDefer.await()
+            val appliedRes = appliedDefer.await()
+
+            // general 반영
+            _uiState.update { prev ->
+                val newGeneral = generalRes.fold(
+                    onSuccess = { UiState.Success(it) },
+                    onFailure = { UiState.Failure(it.toString()) }
+                )
+                prev.copy(general = newGeneral)
+            }
+
+            // applied 반영 + 데이터 존재 여부 계산
+            _uiState.update { prev ->
+                val newApplied = appliedRes.fold(
+                    onSuccess = { UiState.Success(it) },
+                    onFailure = { UiState.Failure(it.toString()) }
+                )
+                val hasApplied = (newApplied as? UiState.Success)?.data?.alerts?.isNotEmpty() == true
+                prev.copy(applied = newApplied, hasAppliedData = hasApplied)
+            }
         }
     }
 
-    companion object {
-        private fun sampleUiState(): AlertUiState {
-            return AlertUiState(
-                showAppliedStudyCard = true,
-                alerts = buildList {
-                    // 🔥 POPULAR_POST: 스터디 이미지 불필요+
-                    add(
-                        AlertResult(
-                            id = 1,
-                            kind = AlertKind.POPULAR_POST,
-                            title = "실시간 인기 글",
-                            subtitle = "Sample Post Title",
-                            isRead = false,
-                        )
-                    )
-                    // 📢 STUDY_NOTICE: 스터디 이미지 필요 → 리소스 채움(null이면 기본으로 대체)
-                    add(
-                        AlertResult(
-                            id = 2,
-                            kind = AlertKind.STUDY_NOTICE,
-                            title = "내 스터디 '공지' 업데이트",
-                            subtitle = "\"Sample Study\"의 새로운 공지",
-                            studyImageRes = R.drawable.sample, // 임시 썸네일
-                            isRead = false
-                        )
-                    )
-                    // 📅 STUDY_SCHEDULE
-                    add(
-                        AlertResult(
-                            id = 3,
-                            kind = AlertKind.STUDY_SCHEDULE,
-                            title = "내 스터디 '새 일정' 등록",
-                            subtitle = "\"Sample Study\"의 새로운 일정",
-                            studyImageRes = R.drawable.sample,
-                            isRead = false
-                        )
-                    )
-                    // ✅ TODO_DONE
-                    add(
-                        AlertResult(
-                            id = 4,
-                            kind = AlertKind.TODO_DONE,
-                            title = "'사용자'님의 \"Sample Todolist …\" 할 일 완료!",
-                            subtitle = "\"Sample Study\"의 '사용자'님",
-                            studyImageRes = R.drawable.sample,
-                            isRead = false
-                        )
-                    )
-                    // 또 하나의 인기글
-                    add(
-                        AlertResult(
-                            id = 5,
-                            kind = AlertKind.POPULAR_POST,
-                            title = "실시간 인기 글",
-                            subtitle = "Another Popular Post"
-                        )
-                    )
-                    add(
-                        AlertResult(
-                            id = 6,
-                            kind = AlertKind.POPULAR_POST,
-                            title = "실시간 인기 글",
-                            subtitle = "Sample Post Title",
-                            isRead = false,
-                        )
-                    )
-                    // 📢 STUDY_NOTICE: 스터디 이미지 필요 → 리소스 채움(null이면 기본으로 대체)
-                    add(
-                        AlertResult(
-                            id = 7,
-                            kind = AlertKind.STUDY_NOTICE,
-                            title = "내 스터디 '공지' 업데이트",
-                            subtitle = "\"Sample Study\"의 새로운 공지",
-                            studyImageRes = R.drawable.sample, // 임시 썸네일
-                            isRead = false
-                        )
-                    )
-                    // 📅 STUDY_SCHEDULE
-                    add(
-                        AlertResult(
-                            id = 8,
-                            kind = AlertKind.STUDY_SCHEDULE,
-                            title = "내 스터디 '새 일정' 등록",
-                            subtitle = "\"Sample Study\"의 새로운 일정",
-                            studyImageRes = R.drawable.sample,
-                            isRead = false
-                        )
-                    )
-                    // ✅ TODO_DONE
-                    add(
-                        AlertResult(
-                            id = 9,
-                            kind = AlertKind.TODO_DONE,
-                            title = "'사용자'님의 \"Sample Todolist …\" 할 일 완료!",
-                            subtitle = "\"Sample Study\"의 '사용자'님",
-                            studyImageRes = R.drawable.sample,
-                            isRead = false
-                        )
-                    )
-                    // 또 하나의 인기글
-                    add(
-                        AlertResult(
-                            id = 10,
-                            kind = AlertKind.POPULAR_POST,
-                            title = "실시간 인기 글",
-                            subtitle = "Another Popular Post"
-                        )
-                    )
-                }
-            )
-        }
+    /** 일반 알림 개별 클릭 -> 읽음 처리 */
+    fun onClickAlert(item: AlertInfo) {
+        val currentGeneral = (_uiState.value.general as? UiState.Success)?.data ?: return
+        val updated = currentGeneral.copy(
+            alerts = currentGeneral.alerts.map { if (it.id == item.id) it.copy(isRead = true) else it }
+        )
+        _uiState.update { it.copy(general = UiState.Success(updated)) }
+    }
+
+    fun onRejectClick(item: AppliedAlertInfo) {
+
+    }
+
+    fun onAcceptClick(item: AppliedAlertInfo) {
+
     }
 }

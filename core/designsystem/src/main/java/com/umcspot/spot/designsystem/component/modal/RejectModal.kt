@@ -114,7 +114,7 @@ fun RejectDialog(
 @Preview(showBackground = true, widthDp = 360, heightDp = 640)
 @Composable
 fun ReDialog_Preview() {
-    Surface {
+    SpotTheme {
         RejectDialog(
             visible = true,
             modalTitle = "불참하시겠습니까?",

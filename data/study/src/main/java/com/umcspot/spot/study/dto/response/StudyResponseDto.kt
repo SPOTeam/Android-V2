@@ -1,7 +1,7 @@
 package com.umcspot.spot.study.dto.response
 
 import android.annotation.SuppressLint
-import com.umcspot.spot.study.model.ImageRef
+import com.umcspot.spot.model.ImageRef
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

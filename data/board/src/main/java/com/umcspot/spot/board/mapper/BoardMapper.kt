@@ -9,12 +9,6 @@ import com.umcspot.spot.domain.board.model.LabeledBoardResultList
 import com.umcspot.spot.domain.board.model.RankedBoardResult
 import com.umcspot.spot.domain.board.model.RankedBoardResultList
 
-// Domain -> DTO
-//fun Board.toData(): BoardRequestDto =
-//    BoardRequestDto(
-//        sortType = this.sortType
-//    )
-
 fun LabeledBoardItem.toDomain() : LabeledBoardResult =
     LabeledBoardResult (
         id = this.id,

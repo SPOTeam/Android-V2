@@ -71,12 +71,14 @@ fun EmptyAlert(
 @Preview(showBackground = true)
 @Composable
 fun EmptyAlertPreview() {
-    EmptyAlert(
-        modifier = Modifier.padding(10.dp),
-        painter = painterResource( R.drawable.alert),
-        alertTitle = "신청한 스터디가 아직 없어요!",
-        alertDes = "스팟에서 내 목표를 이뤄봐요"
-    )
+    SpotTheme {
+        EmptyAlert(
+            modifier = Modifier.padding(10.dp),
+            painter = painterResource(R.drawable.alert),
+            alertTitle = "신청한 스터디가 아직 없어요!",
+            alertDes = "스팟에서 내 목표를 이뤄봐요"
+        )
+    }
 }
 
 @Composable
@@ -109,12 +111,14 @@ fun EmptyAlertWithButton(
 @Preview(showBackground = true)
 @Composable
 fun EmptyAlertWithButtonPreview() {
-    EmptyAlertWithButton(
-        modifier = Modifier.padding(10.dp),
-        painter = painterResource( R.drawable.alert),
-        alertTitle = "신청한 스터디가 아직 없어요!",
-        alertDes = "스팟에서 내 목표를 이뤄봐요",
-        buttonText = "스터디 둘러보기",
-        onClick = {}
-    )
+    SpotTheme {
+        EmptyAlertWithButton(
+            modifier = Modifier.padding(10.dp),
+            painter = painterResource( R.drawable.alert),
+            alertTitle = "신청한 스터디가 아직 없어요!",
+            alertDes = "스팟에서 내 목표를 이뤄봐요",
+            buttonText = "스터디 둘러보기",
+            onClick = {}
+        )
+    }
 }

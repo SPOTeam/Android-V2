@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import com.umcspot.spot.alert.navigation.Alert
 import com.umcspot.spot.category.navigation.navigateToCategory
 import com.umcspot.spot.feature.board.navigation.Board
 import com.umcspot.spot.home.navigation.Home
@@ -16,6 +17,7 @@ import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.navigateToJJim
 import com.umcspot.spot.mypage.navigation.navigateToMypage
 import com.umcspot.spot.mystudy.navigation.navigateToMyStudy
+import kotlin.reflect.KClass
 
 class MainNavigator(
     val navController: NavHostController
@@ -59,9 +61,16 @@ class MainNavigator(
         val dest = currentDestination ?: return false
         val inMainTabs = MainNavTab.contains { dest.hasRoute(it::class) }
 
-        val inBoard = dest.hierarchy.any { it.hasRoute(Board::class) } // ✅ 보드 그래프 포함
+        val showBottomBar = dest.isInAnyGraph(
+            Board::class,
+            Alert::class,
+        )
 
-        return inMainTabs || inBoard
+        return inMainTabs || showBottomBar
+    }
+
+    private fun NavDestination.isInAnyGraph(vararg graphs: KClass<*>): Boolean {
+        return hierarchy.any { h -> graphs.any { k -> h.hasRoute(k) } }
     }
 
     fun navigateUp() {

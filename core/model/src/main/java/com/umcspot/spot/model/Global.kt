@@ -18,3 +18,4 @@ val BoardType.korean: String
     }
 
 enum class AlertKind { POPULAR_POST, STUDY_NOTICE, STUDY_SCHEDULE, TODO_DONE }
+

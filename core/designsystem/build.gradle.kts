@@ -13,4 +13,5 @@ dependencies {
 
     implementation(projects.domain.weather)
     implementation(projects.domain.study)
+    implementation(projects.domain.alert)
 }

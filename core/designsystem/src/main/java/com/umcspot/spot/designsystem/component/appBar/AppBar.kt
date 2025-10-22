@@ -108,9 +108,10 @@ fun TopBarPreview_WithNotification() {
 fun BackTopBar(
     title: String,
     onBackClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,

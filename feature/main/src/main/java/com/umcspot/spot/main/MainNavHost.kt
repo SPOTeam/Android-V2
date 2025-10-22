@@ -7,6 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
+import com.umcspot.spot.alert.navigation.alertGraph
+import com.umcspot.spot.alert.navigation.appliedAlertGraph
+import com.umcspot.spot.alert.navigation.navigateToAlert
+import com.umcspot.spot.alert.navigation.navigateToAppliedAlert
 import com.umcspot.spot.category.navigation.categoryGraph
 import com.umcspot.spot.feature.board.navigation.boardGraph
 import com.umcspot.spot.feature.board.navigation.navigateToBoard
@@ -49,6 +53,15 @@ fun MainNavHost(
 
         boardGraph(
             contentPadding = contentPadding,
+        )
+
+        alertGraph(
+            contentPadding = contentPadding,
+            onClickApplied = {navigator.navController.navigateToAppliedAlert()}
+        )
+
+        appliedAlertGraph(
+            contentPadding = contentPadding
         )
     }
 }
