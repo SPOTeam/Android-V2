@@ -1,5 +1,7 @@
 package com.umcspot.spot.study.datasourceimpl
 
+import com.umcspot.spot.model.RecruitingStudySort
+import com.umcspot.spot.model.SortType
 import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.study.datasource.StudyDataSource
 import com.umcspot.spot.study.dto.response.StudyResponseDto
@@ -16,4 +18,8 @@ class StudyDataSourceImpl @Inject constructor(
     override suspend fun getRecommendStudies(
     ): BaseResponse<StudyResponseDto> =
         studyService.getRecommendStudies()
+
+    override suspend fun getRecruitingStudies(sortType : RecruitingStudySort) : BaseResponse<StudyResponseDto> =
+        studyService.getRecruitingStudies(sortType)
+
 }

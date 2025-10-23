@@ -80,7 +80,7 @@ data class AlertInfo(
                         kind = kind,
                         title = "내 스터디 '공지' 업데이트",
                         subtitle = "\"Sample Study\"의 새로운 공지",
-                        studyImageRes = ImageRef.LocalName("ic_study_default"),
+                        studyImageRes = ImageRef.LocalName("sample"),
                         isRead = false
                     )
 

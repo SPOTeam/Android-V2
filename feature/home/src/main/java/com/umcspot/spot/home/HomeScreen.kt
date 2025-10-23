@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -21,10 +22,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,6 +52,7 @@ import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.study.StudyListItem
 import com.umcspot.spot.designsystem.component.weather.WeatherCard
 import com.umcspot.spot.designsystem.shapes.SpotShapes
+import com.umcspot.spot.designsystem.theme.B100
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.Black
 import com.umcspot.spot.designsystem.theme.SpotTheme
@@ -71,6 +77,7 @@ val quickItems = listOf(
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onQuickMenuClick: (QuickMenuType) -> Unit,
+//    onPopularPostMoreClick : (StudyResult) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp) // ← 추가
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -80,8 +87,7 @@ fun HomeScreen(
     val bottomPad = contentPadding.calculateBottomPadding()
 
     // 🔹 최초 진입 시 한 번만 호출해서 로딩 시작 + 더미 fallback 타이머 시작
-    androidx.compose.runtime.LaunchedEffect(Unit) {
-        // 좌표 전달 방식에 맞게 채워주세요 (예: Home(weather = Weather(...)))
+    LaunchedEffect(Unit) {
         viewModel.load()
     }
 
@@ -93,7 +99,7 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        when (val state = uiState.user) {
+        when (val state = uiState.state) {
             is UiState.Success -> {
                 HomeScreenContent(
                     temperature = state.data.weatherInfo.weatherTemp,
@@ -101,6 +107,7 @@ fun HomeScreen(
                     currentTime = state.data.weatherInfo.currentTime,
                     popularStudies = state.data.popularStudies,
                     recommendedStudies = state.data.recommendedStudies,
+//                    onPopularPostMoreClick = onPopularPostMoreClick(state.data.popularStudies.studyList.get(1)),
                     onQuickMenuClick = onQuickMenuClick,
                     bottomInset = bottomPad
                 )
@@ -167,7 +174,7 @@ fun PopularPostNow(
     modifier: Modifier = Modifier,
     onCardClick: () -> Unit = {},
     onContentClick: () -> Unit = { },
-    onMoreClick: () -> Unit = {},
+    onPopularPostMoreClick: () -> Unit = {},
     @DrawableRes trailingIconRes: Int = R.drawable.arrow_right,
     itemShape: Shape = SpotShapes.Hard,
 
@@ -175,7 +182,6 @@ fun PopularPostNow(
     idleContainerColor: Color = Color.Transparent,
     selectedContainerColor: Color = B500.copy(alpha = 0.08f),
     pressedContainerColor: Color = B500.copy(alpha = 0.14f),
-
 
     ) {
     val interaction = remember { MutableInteractionSource() }
@@ -233,7 +239,7 @@ fun PopularPostNow(
         }
 
         IconButton(
-            onClick = onMoreClick,
+            onClick = onPopularPostMoreClick,
             modifier = Modifier.size(18.dp)
         ) {
             Icon(
@@ -267,11 +273,20 @@ fun PopularStudyNow(
                 style = SpotTheme.typography.bodyMedium500.copy(fontSize = 18.sp),
                 modifier = Modifier.weight(1f)
             )
-            IconButton(onClick = onMoreClick, modifier = Modifier.size(18.dp)) {
+
+            FilledIconButton(
+                onClick = onMoreClick,
+                shape = SpotShapes.Hard,
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    containerColor = SpotTheme.colors.white,
+                    contentColor = B500
+                ),
+                modifier = Modifier.size(32.dp) // 권장: 48 유지
+            ) {
                 Icon(
                     painter = painterResource(R.drawable.arrow_right),
                     contentDescription = "더보기",
-                    tint = B500
+                    modifier = Modifier.size(18.dp)
                 )
             }
         }
@@ -336,6 +351,8 @@ fun HomeScreenContent(
 
     onQuickMenuClick: (QuickMenuType) -> Unit,
 
+//    onPopularPostMoreClick :
+
     popularStudies: StudyResultList,
     recommendedStudies: StudyResultList,
     bottomInset: Dp = 0.dp // ← 추가
@@ -370,7 +387,7 @@ fun HomeScreenContent(
                         .weight(1f)
                         .align(Alignment.CenterVertically),
                     onContentClick = { /* subtitle 클릭 */ },
-                    onMoreClick = { /* > 아이콘 클릭 */ },
+                    onPopularPostMoreClick = { /* > 아이콘 클릭 */ },
                     onCardClick = { }
                 )
             }

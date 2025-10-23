@@ -38,7 +38,7 @@ private fun SocialSignButton(
     Button(
         onClick = onClick,
         enabled = enabled,
-        shape = SpotShapes.Hard,
+        shape = SpotShapes.Soft,
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor,
             contentColor = contentColor,
@@ -77,12 +77,12 @@ private fun SocialSignButton(
 
 // ===== 4가지 래퍼 =====
 
-// 1) 카카오 – “카카오톡으로 3초 시작하기”
+// 1) 카카오 – “카카오톡으로 시작하기”
 @Composable
 fun KakaoStartButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    text: String = "카카오톡으로 3초 시작하기",
+    text: String = "카카오톡으로 시작하기",
     enabled: Boolean = true
 ) = SocialSignButton(
     modifier = modifier,

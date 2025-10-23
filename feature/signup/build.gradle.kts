@@ -3,5 +3,5 @@ plugins {
 }
 
 android {
-    namespace = "com.umcspot.spot.mystudy"
+    namespace = "com.umcspot.spot.signup"
 }

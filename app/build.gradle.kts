@@ -35,7 +35,11 @@ dependencies {
     implementation(projects.feature.main)
     implementation(projects.feature.board)
     implementation(projects.feature.mypage)
+    implementation(projects.feature.study)
+    implementation(projects.feature.signup)
+
     implementation(projects.domain.home)
+
     implementation(projects.core.ui)
     implementation(projects.core.network)
     implementation(projects.core.model)
@@ -43,6 +47,7 @@ dependencies {
     implementation(projects.core.common)
     implementation(projects.core.buildconfig)
     implementation(projects.core.navigation)
+
     implementation(projects.data.home)
     implementation(projects.data.weather)
     implementation(projects.data.study)

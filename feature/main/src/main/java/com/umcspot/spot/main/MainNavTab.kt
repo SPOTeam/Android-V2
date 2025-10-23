@@ -17,7 +17,7 @@ import com.umcspot.spot.main.R.string.ic_mystudy_desc
 import com.umcspot.spot.main.R.string.ic_jjim_desc
 import com.umcspot.spot.main.R.string.ic_mypage_desc
 import com.umcspot.spot.mypage.navigation.Mypage
-import com.umcspot.spot.mystudy.navigation.MyStudy
+import com.umcspot.spot.study.navigation.MyStudy
 import com.umcspot.spot.navigation.MainTabRoute
 import com.umcspot.spot.navigation.Route
 

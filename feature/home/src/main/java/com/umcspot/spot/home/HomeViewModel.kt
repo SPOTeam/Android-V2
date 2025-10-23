@@ -22,7 +22,7 @@ class HomeViewModel @Inject constructor(
     private val homeRepository: HomeRepository
 ) : ViewModel() {
     data class HomeUiState(
-        val user: UiState<HomeResult> = UiState.Empty,
+        val state: UiState<HomeResult> = UiState.Empty,
     )
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -37,13 +37,13 @@ class HomeViewModel @Inject constructor(
         )
 
         // 1) 먼저 로딩으로 전환
-        _uiState.update { it.copy(user = UiState.Loading) }
+        _uiState.update { it.copy(state = UiState.Loading) }
 
         // 3) 실제 호출 (지금은 API가 안 떠 있어도 OK)
         viewModelScope.launch {
             homeRepository.getHomeData(request)
                 .onSuccess { result ->
-                    _uiState.update { it.copy(user = UiState.Success(result)) }
+                    _uiState.update { it.copy(state = UiState.Success(result)) }
                 }
                 .onFailure {
 //                    _uiState.update { it.copy(user = UiState.Success(HomeDummies.home())) }

@@ -1,5 +1,6 @@
 package com.umcspot.spot.study.repositoryimpl
 
+import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.study.mapper.toDomainList
 import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.study.repository.StudyRepository
@@ -14,7 +15,6 @@ class StudyRepositoryImpl @Inject constructor(
             val response = studyService.getPopularStudies()
             response.data.toDomainList()
         }.recoverCatching {
-            // API 미연결/예외 시 더미로 복구
             setPopularDummies()
         }
 
@@ -27,11 +27,19 @@ class StudyRepositoryImpl @Inject constructor(
             val response = studyService.getPopularStudies()
             response.data.toDomainList()
         }.recoverCatching {
-            // API 미연결/예외 시 더미로 복구
             setRecommendDummies()
         }
 
     private fun setRecommendDummies(count: Int = 5): StudyResultList =
         StudyResultList(StudyResultList.getRecommendedDummies(count))
+
+
+    override suspend fun getRecruitingStudies(sortType : RecruitingStudySort): Result<StudyResultList> =
+        runCatching {
+            val response = studyService.getRecruitingStudies(sortType = sortType)
+            response.data.toDomainList()
+        }.recoverCatching {
+            setRecommendDummies(30)
+        }
 
 }

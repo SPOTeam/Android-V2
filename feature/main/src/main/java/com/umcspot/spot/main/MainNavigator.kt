@@ -16,8 +16,10 @@ import com.umcspot.spot.feature.board.navigation.Board
 import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.navigateToJJim
+import com.umcspot.spot.landing.Landing
 import com.umcspot.spot.mypage.navigation.navigateToMypage
-import com.umcspot.spot.mystudy.navigation.navigateToMyStudy
+import com.umcspot.spot.study.navigation.Recruiting
+import com.umcspot.spot.study.navigation.navigateToMyStudy
 import kotlin.reflect.KClass
 
 class MainNavigator(
@@ -28,7 +30,7 @@ class MainNavigator(
             navController
                 .currentBackStackEntryAsState().value?.destination
 
-    val startDestination = Home
+    val startDestination = Landing
 
     val currentTab: MainNavTab?
         @Composable get() =
@@ -63,13 +65,16 @@ class MainNavigator(
         return dest.hierarchy.any { h -> graphs.any { g -> h.hasRoute(g) } }
     }
 
+    @Composable
+    fun isInLanding(): Boolean = inAnyGraph(Landing::class)
+
     /** 상단 뒤로가기 TopBar 노출 조건 */
     @Composable
     fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class)
 
     /** 스크롤-투-탑 FAB 노출 조건 */
     @Composable
-    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class)
+    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class)
 
     /** 멀티 FAB(게시판 등) 노출 조건 */
     @Composable
@@ -81,7 +86,7 @@ class MainNavigator(
         val inMainTabs = MainNavTab.contains { dest.hasRoute(it::class) }
 
         val showBottomBar = dest.isInAnyGraph(
-            Board::class,
+            Board::class, Recruiting::class
         )
 
         return inMainTabs || showBottomBar

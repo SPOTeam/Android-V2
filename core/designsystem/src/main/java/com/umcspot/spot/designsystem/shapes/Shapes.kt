@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,22 +26,42 @@ import com.umcspot.spot.designsystem.R
 
 object SpotShapes {
 
+    val HardDp : Dp = 9.dp
+    val SoftDp : Dp = 12.dp
+    val RoundDp : Dp = 16.dp
+
+
     // ===== Shape 정의 (모서리) =====
-    val Hard: Shape  = RoundedCornerShape(9.dp) // 20pt
-    val Soft: Shape  = RoundedCornerShape(14.dp) // 32pt
-    val Round: Shape = RoundedCornerShape(18.dp) // 42pt
+    val Hard: Shape  = RoundedCornerShape(HardDp)
+    val Soft: Shape  = RoundedCornerShape(SoftDp)
+    val Round: Shape = RoundedCornerShape(RoundDp)
 
     val SoftLeft: Shape  = RoundedCornerShape(
-        topStart = 14.dp, topEnd = 0.dp, bottomStart = 14.dp, bottomEnd = 0.dp
+        topStart = SoftDp, topEnd = 0.dp, bottomStart = SoftDp, bottomEnd = 0.dp
     )
     val SoftRight: Shape = RoundedCornerShape(
-        topStart = 0.dp, topEnd = 14.dp, bottomStart = 0.dp, bottomEnd = 14.dp
+        topStart = 0.dp, topEnd = SoftDp, bottomStart = 0.dp, bottomEnd = SoftDp
     )
+
+    val SoftTop: Shape  = RoundedCornerShape(
+        topStart = SoftDp, topEnd = SoftDp, bottomStart = 0.dp, bottomEnd = 0.dp
+    )
+    val SoftBottom: Shape = RoundedCornerShape(
+        topStart = 0.dp, topEnd = 0.dp, bottomStart = SoftDp, bottomEnd = SoftDp
+    )
+
     val RoundLeft: Shape  = RoundedCornerShape(
-        topStart = 18.dp, topEnd = 0.dp, bottomStart = 18.dp, bottomEnd = 0.dp,
+        topStart = RoundDp, topEnd = 0.dp, bottomStart = RoundDp, bottomEnd = 0.dp,
     )
     val RoundRight: Shape = RoundedCornerShape(
-        topStart = 0.dp, topEnd = 18.dp, bottomStart = 0.dp, bottomEnd = 18.dp
+        topStart = 0.dp, topEnd = RoundDp, bottomStart = 0.dp, bottomEnd = RoundDp
+    )
+
+    val RoundTop: Shape  = RoundedCornerShape(
+        topStart = RoundDp, topEnd = RoundDp, bottomStart = 0.dp, bottomEnd = 0.dp,
+    )
+    val RoundBottom: Shape = RoundedCornerShape(
+        topStart = 0.dp, topEnd = 0.dp, bottomStart = RoundDp, bottomEnd = RoundDp
     )
 }
 
@@ -54,7 +75,7 @@ fun ShapeImageWithBadge(
     borderWidth: Dp = 0.dp,
     padding: Dp = 2.dp,
     borderColor: Color? = Color.Transparent,
-    contentScale: ContentScale = ContentScale.Crop,
+    contentScale: ContentScale = ContentScale.Fit,
     badgeSize: Dp = 16.dp,
 ) {
     Box(
@@ -66,12 +87,10 @@ fun ShapeImageWithBadge(
             contentDescription = contentDescription,
             shape = shape,
             size = size,
-            modifier = modifier,
             borderWidth = borderWidth,
             padding = padding,
             borderColor = borderColor,
             contentScale = contentScale
-
         )
 
         Icon(
@@ -96,7 +115,7 @@ fun ShapeImageBox(
     borderWidth: Dp = 0.dp,
     padding: Dp = 5.dp,
     borderColor: Color? = Color.Transparent,
-    contentScale: ContentScale = ContentScale.Crop,
+    contentScale: ContentScale = ContentScale.Fit,
     backgroundColor : Color = Color.Transparent,
     content: @Composable BoxScope.() -> Unit = {}   // ✅ 추가
 ) {
@@ -111,15 +130,17 @@ fun ShapeImageBox(
                 } else {
                     Modifier
                 }
-            )
+            ),
+        contentAlignment = Alignment.Center
     ) {
         Image(
             painter = painter,
             contentDescription = contentDescription,
             contentScale = contentScale,
-            modifier = Modifier.padding(padding)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
         )
-
         content()
     }
 }
