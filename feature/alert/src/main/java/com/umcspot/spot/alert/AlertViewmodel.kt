@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.fold
 
 @HiltViewModel
 class AlertViewModel @Inject constructor (
@@ -36,33 +35,27 @@ class AlertViewModel @Inject constructor (
         _uiState.update { it.copy(general = UiState.Loading, applied = UiState.Loading) }
 
         viewModelScope.launch {
-            // 병렬 요청
-            val generalDefer = async { alertRepository.getAlerts() }                 // Result<AlertResult>
-            val appliedDefer = async { alertRepository.getAppliedAlerts() }          // Result<AppliedAlertResult>
+            val generalDefer = async { alertRepository.getAlerts() }          // Result<AlertResult>
+            val appliedDefer = async { alertRepository.getAppliedAlerts() }   // Result<AppliedAlertResult>
 
             val generalRes = generalDefer.await()
             val appliedRes = appliedDefer.await()
 
-            // general 반영
+            // general: alerts가 비면 UiState.Empty
             _uiState.update { prev ->
-                val newGeneral = generalRes.fold(
-                    onSuccess = { UiState.Success(it) },
-                    onFailure = { UiState.Failure(it.toString()) }
-                )
+                val newGeneral = generalRes.toUiState { result -> result.alerts.isEmpty() }
                 prev.copy(general = newGeneral)
             }
 
-            // applied 반영 + 데이터 존재 여부 계산
+            // applied: alerts가 비면 UiState.Empty + hasAppliedData 계산
             _uiState.update { prev ->
-                val newApplied = appliedRes.fold(
-                    onSuccess = { UiState.Success(it) },
-                    onFailure = { UiState.Failure(it.toString()) }
-                )
-                val hasApplied = (newApplied as? UiState.Success)?.data?.alerts?.isNotEmpty() == true
+                val newApplied = appliedRes.toUiState { result -> result.alerts.isEmpty() }
+                val hasApplied = newApplied is UiState.Success
                 prev.copy(applied = newApplied, hasAppliedData = hasApplied)
             }
         }
     }
+
 
     /** 일반 알림 개별 클릭 -> 읽음 처리 */
     fun onClickAlert(item: AlertInfo) {
@@ -74,10 +67,18 @@ class AlertViewModel @Inject constructor (
     }
 
     fun onRejectClick(item: AppliedAlertInfo) {
-
+        // 거절 API 호출
     }
 
     fun onAcceptClick(item: AppliedAlertInfo) {
-
+        // 승인 API 호출
     }
 }
+
+// AlertViewModel 내부(클래스 바디 최하단이나 load 위)에 추가
+private inline fun <T> Result<T>.toUiState(
+    crossinline isEmpty: (T) -> Boolean
+): UiState<T> = fold(
+    onSuccess = { data -> if (isEmpty(data)) UiState.Empty else UiState.Success(data) },
+    onFailure = { e -> UiState.Failure(e.message ?: e.toString()) }
+)

@@ -1,6 +1,8 @@
 package com.umcspot.spot.alert
 
 import android.content.Context
+import android.util.Log
+import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -54,6 +56,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.umcspot.spot.alert.model.AlertInfo
 import com.umcspot.spot.alert.model.AlertResult
+import com.umcspot.spot.alert.model.AppliedAlertInfo
+import com.umcspot.spot.alert.model.AppliedAlertResult
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.component.empty.EmptyAlert
@@ -77,9 +81,9 @@ import java.io.File
 @Composable
 fun AlertScreen(
     viewModel: AlertViewModel = hiltViewModel(),
-    scrollToTopTick: Long? = null,
     contentPadding : PaddingValues,
-    onClickApplied: () -> Unit          // ✅ 추가
+    onClickApplied: () -> Unit,
+    onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
@@ -88,9 +92,11 @@ fun AlertScreen(
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
 
-    LaunchedEffect(scrollToTopTick) {
-        if (scrollToTopTick != null && scrollToTopTick != 0L) {
-            scope.launch { listState.animateScrollToItem(0) }
+    LaunchedEffect(Unit) {
+        onRegisterScrollToTop {
+            scope.launch {
+                listState.animateScrollToItem(0)
+            }
         }
     }
 
@@ -101,21 +107,9 @@ fun AlertScreen(
 
         is UiState.Failure -> Text("에러: ${state.msg}", color = Color.Red)
 
-        is UiState.Empty -> {
-            EmptyAlert(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = topPad, bottom = bottomPad),
-                painter = painterResource(R.drawable.alert),
-                alertTitle = "아직 알림이 없어요.",
-                alertDes = "스팟에서 내 목표를 이뤄봐요."
-            )
-        }
-
-        is UiState.Success -> {
-            val alerts: List<AlertInfo> = state.data.alerts
-            val showAppliedCard =
-                uiState.hasAppliedData && (uiState.applied as? UiState.Success)?.data?.alerts?.isNotEmpty() == true
+        is UiState.Success, UiState.Empty -> {
+            val alerts: List<AlertInfo> = (state as? UiState.Success)?.data?.alerts.orEmpty()
+            val applied: List<AppliedAlertInfo> = (uiState.applied as? UiState.Success)?.data?.alerts.orEmpty()
 
             AlertScreenContent(
                 modifier = Modifier
@@ -123,7 +117,7 @@ fun AlertScreen(
                     .background(SpotTheme.colors.white)
                     .padding(top = topPad, bottom = bottomPad),
                 alerts = alerts,
-                showAppliedStudyCard = showAppliedCard,
+                applied = applied,
                 onClickAppliedStudyCard = onClickApplied,
                 onClickAlert = { item -> viewModel.onClickAlert(item) },
                 listState = listState
@@ -299,7 +293,7 @@ fun StudyNotiAlert(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
+            .padding(horizontal = 12.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Card(
@@ -373,38 +367,49 @@ fun NewBadge(
 fun AlertScreenContent(
     modifier: Modifier = Modifier,
     alerts: List<AlertInfo>,
-    showAppliedStudyCard: Boolean,
+    applied : List<AppliedAlertInfo>,
     onClickAppliedStudyCard: () -> Unit,
     onClickAlert: (AlertInfo) -> Unit,
     listState: LazyListState
 ) {
-    LazyColumn(
-        state = listState,
-        modifier = modifier
+    Column(
+        modifier = modifier.fillMaxSize()
     ) {
-        if (showAppliedStudyCard) {
-            item(key = "applied_card") {
-                EnrollStudyCard(
-                    isAvailable = true,
-                    onClick = onClickAppliedStudyCard
-                )
+        EnrollStudyCard(
+            isAvailable = !applied.isEmpty(),
+            onClick = onClickAppliedStudyCard,
+            modifier = Modifier.padding(bottom = 5.dp)
+        )
+
+        if (alerts.isEmpty()) {
+            EmptyAlert(
+                modifier = Modifier.fillMaxSize(),
+                painter = painterResource(R.drawable.alert),
+                alertTitle = "아직 알림이 없어요.",
+                alertDes = "스팟에서 내 목표를 이뤄봐요."
+            )
+        } else {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize().weight(1f),
+            ) {
+                items(
+                    items = alerts,
+                    key = { it.id }
+                ) { item ->
+                    AlertRow(
+                        data = item,
+                        onClick = onClickAlert
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 25.dp),
+                        color = SpotTheme.colors.G300,
+                        thickness = 0.5.dp
+                    )
+                }
             }
-        }
-        items(
-            items = alerts,
-            key = { it.id }
-        ) { item ->
-            AlertRow(
-                data = item,
-                onClick = onClickAlert
-            )
-            HorizontalDivider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 25.dp),
-                color = SpotTheme.colors.G300,
-                thickness = 0.5.dp
-            )
         }
     }
 }

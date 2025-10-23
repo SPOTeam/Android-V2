@@ -24,7 +24,9 @@ import com.umcspot.spot.mystudy.navigation.myStudyGraph
 fun MainNavHost(
     navigator: MainNavigator,
     modifier: Modifier = Modifier,
-    contentPadding : PaddingValues = PaddingValues(0.dp)
+    contentPadding : PaddingValues = PaddingValues(0.dp),
+    onRegisterScrollToTop: ((() -> Unit)?) -> Unit, // ✅ 추가
+
 ) {
     NavHost(
         enterTransition = { EnterTransition.None },
@@ -57,11 +59,14 @@ fun MainNavHost(
 
         alertGraph(
             contentPadding = contentPadding,
-            onClickApplied = {navigator.navController.navigateToAppliedAlert()}
+            onClickApplied = {navigator.navController.navigateToAppliedAlert()},
+            onRegisterScrollToTop = onRegisterScrollToTop
         )
 
         appliedAlertGraph(
-            contentPadding = contentPadding
+            contentPadding = contentPadding,
+            onRegisterScrollToTop = onRegisterScrollToTop,
+            onMoveToStudyScreenClick = {navigator.navController.navigateToBoard()} // Study로 수정 필요
         )
     }
 }

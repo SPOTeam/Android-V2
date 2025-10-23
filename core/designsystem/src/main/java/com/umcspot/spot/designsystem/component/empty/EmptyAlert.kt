@@ -1,6 +1,7 @@
 package com.umcspot.spot.designsystem.component.empty
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -39,7 +40,8 @@ fun EmptyAlert(
     content: @Composable () -> Unit = {}
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .background(SpotTheme.colors.white),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -90,21 +92,13 @@ fun EmptyAlertWithButton(
     buttonText : String,
     onClick : () -> Unit
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-
-    val (backgroundColor, borderColor, textColor) = when {
-        isPressed -> Triple(SpotTheme.colors.B500, SpotTheme.colors.B500, SpotTheme.colors.white) // 눌림: 파란 배경 + 흰 글자
-        else -> Triple(SpotTheme.colors.white, SpotTheme.colors.B500, SpotTheme.colors.B500)      // 기본: 흰 배경 + 파란 글자/테두리
-    }
-
     EmptyAlert(
         modifier = modifier,
         painter = painter,
         alertTitle = alertTitle,
         alertDes = alertDes
     ) {
-        TextButtonXL(text = buttonText, onClick = {}, state = ButtonState.B400State)
+        TextButtonXL(text = buttonText, onClick = onClick, state = ButtonState.B400State)
     }
 }
 

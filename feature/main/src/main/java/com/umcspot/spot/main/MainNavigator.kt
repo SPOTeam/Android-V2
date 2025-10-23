@@ -10,6 +10,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.umcspot.spot.alert.navigation.Alert
+import com.umcspot.spot.alert.navigation.AppliedAlert
 import com.umcspot.spot.category.navigation.navigateToCategory
 import com.umcspot.spot.feature.board.navigation.Board
 import com.umcspot.spot.home.navigation.Home
@@ -57,13 +58,30 @@ class MainNavigator(
     }
 
     @Composable
+    private fun inAnyGraph(vararg graphs: KClass<*>): Boolean {
+        val dest = currentDestination ?: return false
+        return dest.hierarchy.any { h -> graphs.any { g -> h.hasRoute(g) } }
+    }
+
+    /** 상단 뒤로가기 TopBar 노출 조건 */
+    @Composable
+    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class)
+
+    /** 스크롤-투-탑 FAB 노출 조건 */
+    @Composable
+    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class)
+
+    /** 멀티 FAB(게시판 등) 노출 조건 */
+    @Composable
+    fun showMultipleFab(): Boolean = inAnyGraph(Board::class)
+
+    @Composable
     fun showBottomBar() : Boolean {
         val dest = currentDestination ?: return false
         val inMainTabs = MainNavTab.contains { dest.hasRoute(it::class) }
 
         val showBottomBar = dest.isInAnyGraph(
             Board::class,
-            Alert::class,
         )
 
         return inMainTabs || showBottomBar
@@ -77,6 +95,8 @@ class MainNavigator(
         navController.navigateUp()
     }
 }
+
+
 
 @Composable
 fun rememberMainNavigator(

@@ -22,21 +22,29 @@ fun NavController.navigateToAppliedAlert(navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.alertGraph(
     contentPadding : PaddingValues,
-    onClickApplied : () -> Unit
+    onClickApplied : () -> Unit,
+    onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
 ) {
     composable<Alert> {
         AlertScreen(
             contentPadding = contentPadding,
-            onClickApplied = onClickApplied
+            onClickApplied = onClickApplied,
+            onRegisterScrollToTop = onRegisterScrollToTop
         )
     }
 }
 
 fun NavGraphBuilder.appliedAlertGraph(
-    contentPadding : PaddingValues
+    contentPadding : PaddingValues,
+    onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
+    onMoveToStudyScreenClick : () -> Unit
 ) {
     composable<AppliedAlert> {
-        EnrolledAlertScreen(contentPadding = contentPadding)
+        EnrolledAlertScreen(
+            contentPadding = contentPadding,
+            onRegisterScrollToTop = onRegisterScrollToTop,
+            onMoveToStudyScreenClick = onMoveToStudyScreenClick
+        )
     }
 }
 

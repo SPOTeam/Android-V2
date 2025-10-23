@@ -405,27 +405,3 @@ fun HomeScreenContent(
         }
     }
 }
-
-/****** 유틸리티 *******/
-
-@Composable
-fun rememberImageRefPainter(
-    ref: ImageRef,
-    @DrawableRes fallback: Int = R.drawable.spot_logo
-): Painter {
-    val context = LocalContext.current
-    return when (ref) {
-        is ImageRef.LocalName -> {
-            val id = context.resources.getIdentifier(ref.name, "drawable", context.packageName)
-            painterResource(id.takeIf { it != 0 } ?: fallback)
-        }
-        is ImageRef.LocalPath -> rememberAsyncImagePainter(model = File(ref.path))
-        is ImageRef.Url -> rememberAsyncImagePainter(model = ref.url)
-        ImageRef.None -> painterResource(fallback)
-    }
-}
-
-private fun Context.drawableIdByName(name: String): Int? {
-    val id = resources.getIdentifier(name, "drawable", packageName)
-    return if (id != 0) id else null
-}

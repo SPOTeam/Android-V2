@@ -11,10 +11,10 @@ data class AppliedAlertResult (
 ) {
     companion object {
         @JvmStatic
-        fun getAppliedAlertDummies(total: Int = 10): List<AppliedAlertInfo> =
-            List(total) { i ->
-                AppliedAlertInfo.dummyAppliedAlert(id = i + 1, total = total)
-            }
+        fun getAppliedAlertDummies(total: Int = 10): List<AppliedAlertInfo> = emptyList()
+//            List(total) { i ->
+//                AppliedAlertInfo.dummyAppliedAlert(id = i + 1, total = total)
+//            }
     }
 }
 
@@ -44,7 +44,7 @@ data class AlertResult (
 ) {
     companion object {
         @JvmStatic
-        fun getAlertDummies(total: Int = 30): List<AlertInfo> =
+        fun getAlertDummies(total: Int = 30): List<AlertInfo> = /*emptyList()*/
             List(total) { i ->
                 AlertInfo.dummyAlert(id = i + 1, total = total)
             }

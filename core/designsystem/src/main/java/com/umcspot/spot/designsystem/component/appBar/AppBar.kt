@@ -50,6 +50,7 @@ fun AppBarHome (
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .background(SpotTheme.colors.white)
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -87,21 +88,25 @@ fun AppBarHome (
 @Preview(showBackground = true)
 @Composable
 fun TopBarPreview_NoNotification() {
-    AppBarHome(
-        hasAlert = false,
-        onSearchClick = {},
-        onAlertClick = {}
-    )
+    SpotTheme {
+        AppBarHome(
+            hasAlert = false,
+            onSearchClick = {},
+            onAlertClick = {}
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun TopBarPreview_WithNotification() {
-    AppBarHome(
-        hasAlert = true,
-        onSearchClick = {},
-        onAlertClick = {}
-    )
+    SpotTheme{
+        AppBarHome(
+            hasAlert = true,
+            onSearchClick = {},
+            onAlertClick = {}
+        )
+    }
 }
 
 @Composable
@@ -113,6 +118,7 @@ fun BackTopBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .background(SpotTheme.colors.white)
             .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start // ✅ 왼쪽 정렬 고정verticalAlignment = Alignment.CenterVertically
@@ -164,6 +170,7 @@ fun SearchTopBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .background(SpotTheme.colors.white)
             .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

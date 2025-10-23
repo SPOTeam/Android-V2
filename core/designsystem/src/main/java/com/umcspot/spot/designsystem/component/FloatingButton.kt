@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
@@ -28,14 +29,14 @@ fun FloatingButton(
     size: Dp = 50.dp,
     backgroundColor: Color = SpotTheme.colors.B400,
     contentColor: Color = SpotTheme.colors.White,
-//    elevation: Dp = 6.dp,
+    elevation: Dp = 3.dp,
     iconSize: Dp = 23.dp,
     @DrawableRes iconRes: Int = R.drawable.multiple
 ) {
     Box(
         modifier = modifier
             .size(size)
-//            .shadow(elevation, CircleShape, clip = false)
+            .shadow(elevation, CircleShape, clip = false)
             .clip(CircleShape)
             .background(backgroundColor, CircleShape)
             .clickable(role = Role.Button, onClick = onClick),
@@ -50,15 +51,53 @@ fun FloatingButton(
     }
 }
 
+@Composable
+fun FloatingToUpButton (
+    modifier : Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    FloatingButton(
+        modifier = modifier,
+        onClick = onClick,
+        backgroundColor = White,
+        contentColor = B500,
+        iconRes = R.drawable.arrow_to_the_top
+    )
+}
+
+@Composable
+fun FloatingMultipleButton (
+    modifier : Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    FloatingButton(
+        modifier = modifier,
+        onClick = onClick,
+        iconRes = R.drawable.multiple
+    )
+}
+
 /* =================== Previews =================== */
 
 @Preview(showBackground = true)
 @Composable
-fun Preview_SpotFabSolid_Custom() {
+fun Preview_SpotFabSolid_TOTOP() {
     SpotTheme{
-        FloatingButton(
+        FloatingToUpButton(
             onClick = {},
             modifier = Modifier.padding(6.dp)
         )
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun Preview_SpotFabSolid_MULTIPLE() {
+    SpotTheme{
+        FloatingMultipleButton(
+            onClick = {},
+            modifier = Modifier.padding(6.dp)
+        )
+    }
+}
+
