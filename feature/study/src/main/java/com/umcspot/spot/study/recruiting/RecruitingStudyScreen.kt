@@ -1,4 +1,4 @@
-package com.umcspot.spot.study
+package com.umcspot.spot.study.recruiting
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,25 +8,26 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -55,6 +56,7 @@ import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G300
+import com.umcspot.spot.study.recruiting.RecruitingStudyViewModel
 
 @Composable
 fun RecruitingStudyScreen(
@@ -214,6 +216,7 @@ fun HeaderRow(
             ) {
                 Text(
                     text = sortType.label,
+                    color = SpotTheme.colors.black,
                     style = SpotTheme.typography.bodyMedium500.copy(fontSize = 12.sp)
                 )
                 Spacer(Modifier.width(5.dp))
@@ -227,7 +230,8 @@ fun HeaderRow(
             IconButton(onClick = onFilterClick) {
                 Icon(
                     painter = painterResource(R.drawable.filter),
-                    contentDescription = "필터"
+                    contentDescription = "필터",
+                    modifier = Modifier.size(22.dp)
                 )
             }
         }
@@ -246,7 +250,10 @@ fun SortTypeBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        dragHandle = { BottomSheetDefaults.DragHandle() }
+        containerColor = SpotTheme.colors.white,
+        dragHandle = { },
+        contentWindowInsets = { WindowInsets(0) },
+        tonalElevation = 0.dp
     ) {
         Column(
             modifier = Modifier
@@ -255,6 +262,11 @@ fun SortTypeBottomSheet(
         ) {
             RecruitingStudySort.entries.forEachIndexed { index, option ->
                 ListItem(
+                    colors = ListItemDefaults.colors(
+                        containerColor = SpotTheme.colors.white,
+                        headlineColor = SpotTheme.colors.black,   // (선택) 텍스트 색 명시
+                        trailingIconColor = SpotTheme.colors.B500 // (선택)
+                    ),
                     headlineContent = {
                         Text(
                             text = option.label,
@@ -266,6 +278,7 @@ fun SortTypeBottomSheet(
                             Icon(
                                 painter = painterResource(R.drawable.success_default),
                                 tint = SpotTheme.colors.B500,
+                                modifier = Modifier.size(20.dp),
                                 contentDescription = "선택됨",
                             )
                         }
@@ -285,7 +298,6 @@ fun SortTypeBottomSheet(
                     )
                 }
             }
-            Spacer(Modifier.height(16.dp))
         }
     }
 }

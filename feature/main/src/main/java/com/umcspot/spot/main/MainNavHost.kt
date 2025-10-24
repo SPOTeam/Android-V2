@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
+import androidx.navigation.navigation
 import com.umcspot.spot.alert.navigation.alertGraph
 import com.umcspot.spot.alert.navigation.appliedAlertGraph
 import com.umcspot.spot.alert.navigation.navigateToAppliedAlert
@@ -19,11 +20,14 @@ import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.jjimGraph
 import com.umcspot.spot.landing.Landing
 import com.umcspot.spot.landing.landingGraph
-import com.umcspot.spot.mypage.navigation.mypageGraph
 import com.umcspot.spot.model.QuickMenuType
-import com.umcspot.spot.study.navigation.Recruiting
-import com.umcspot.spot.study.navigation.myStudyGraph
-import com.umcspot.spot.study.navigation.recruitingStudyGraph
+import com.umcspot.spot.mypage.navigation.mypageGraph
+import com.umcspot.spot.study.my.navigation.myStudyGraph
+import com.umcspot.spot.study.recruiting.navigation.Recruiting
+import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudy
+import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudyFilter
+import com.umcspot.spot.study.recruiting.navigation.recruitingStudyFilterGraph
+import com.umcspot.spot.study.recruiting.navigation.recruitingStudyGraph
 
 @Composable
 fun MainNavHost(
@@ -44,7 +48,6 @@ fun MainNavHost(
         landingGraph(
             onKakaoClick = { navigator.navController.navigateToHome(
                 navOptions {
-                    // Landing을 백스택에서 제거
                     popUpTo(Landing) { inclusive = true }
                     launchSingleTop = true
                     restoreState = true
@@ -67,7 +70,7 @@ fun MainNavHost(
                     QuickMenuType.BOARD      -> navigator.navController.navigateToBoard()
                     QuickMenuType.REGION     -> { /* navigator.navController.navigate(Region) */ }
                     QuickMenuType.INTERESTS  -> { /* navigator.navController.navigate(Interests) */ }
-                    QuickMenuType.RECRUITING -> { navigator.navController.navigate(Recruiting) }
+                    QuickMenuType.RECRUITING -> { navigator.navController.navigateToRecruitingStudy() }
                 }
             }
         )
@@ -76,17 +79,28 @@ fun MainNavHost(
         jjimGraph()
         mypageGraph()
 
+        navigation(
+            startDestination = requireNotNull(Recruiting::class.qualifiedName),
+            route =
+        ) {
+            recruitingStudyGraph(
+                contentPadding = contentPadding,
+                onRegisterScrollToTop = onRegisterScrollToTop,
+                onFilterClick = { navigator.navController.navigateToRecruitingStudyFilter() },
+                onItemClick = {}
+            )
 
-        recruitingStudyGraph(
-            contentPadding = contentPadding,
-            onRegisterScrollToTop = onRegisterScrollToTop,
-            onFilterClick = {},
-            onItemClick = {}
-        )
+            recruitingStudyFilterGraph(
+                contentPadding = contentPadding,
+                onAcceptFilterClick = { navigator.navController.popBackStack() }
+            )
+        }
 
         boardGraph(
             contentPadding = contentPadding,
         )
+
+
 
         alertGraph(
             contentPadding = contentPadding,

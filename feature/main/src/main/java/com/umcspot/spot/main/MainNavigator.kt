@@ -13,13 +13,12 @@ import com.umcspot.spot.alert.navigation.Alert
 import com.umcspot.spot.alert.navigation.AppliedAlert
 import com.umcspot.spot.category.navigation.navigateToCategory
 import com.umcspot.spot.feature.board.navigation.Board
-import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.navigateToJJim
 import com.umcspot.spot.landing.Landing
 import com.umcspot.spot.mypage.navigation.navigateToMypage
-import com.umcspot.spot.study.navigation.Recruiting
-import com.umcspot.spot.study.navigation.navigateToMyStudy
+import com.umcspot.spot.study.recruiting.navigation.Recruiting
+import com.umcspot.spot.study.my.navigation.navigateToMyStudy
 import kotlin.reflect.KClass
 
 class MainNavigator(
@@ -100,8 +99,6 @@ class MainNavigator(
         navController.navigateUp()
     }
 }
-
-
 
 @Composable
 fun rememberMainNavigator(

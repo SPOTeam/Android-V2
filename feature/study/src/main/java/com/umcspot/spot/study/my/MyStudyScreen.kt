@@ -1,4 +1,4 @@
-package com.umcspot.spot.study
+package com.umcspot.spot.study.my
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

@@ -15,9 +15,11 @@ import com.umcspot.spot.designsystem.theme.SpotTheme
 fun TextButtonXL_AssetsPreview() {
     SpotTheme {
         Row(Modifier.padding(12.dp)) {
-            TextButtonXL(text = "Button Text", onClick = {}, state = ButtonState.B400State)
+            TextButtonXL(text = "Button Text", onClick = {}, state = TextButtonState.B400State)
             Spacer(Modifier.width(8.dp))
-            TextButtonXL(text = "Button Text", onClick = {}, state = ButtonState.B400State, enabled = false)
+            TextButtonXL(text = "Button Text", onClick = {}, state = TextButtonState.B400State, enabled = false)
+            Spacer(Modifier.width(8.dp))
+            TextButtonXL(text = "Button Text", onClick = {}, state = TextButtonState.B400State, checked = true)
         }
     }
 }
@@ -27,9 +29,11 @@ fun TextButtonXL_AssetsPreview() {
 fun TextButtonL_AssetsPreview() {
     SpotTheme {
         Row(Modifier.padding(12.dp)) {
-            TextButtonL(text = "Button Text", onClick = {}, state = ButtonState.R500State)
+            TextButtonL(text = "Button Text", onClick = {}, state = TextButtonState.R500State)
             Spacer(Modifier.width(8.dp))
-            TextButtonL(text = "Button Text", onClick = {}, state = ButtonState.R500State, enabled = false)
+            TextButtonL(text = "Button Text", onClick = {}, state = TextButtonState.R500State, enabled = false)
+            Spacer(Modifier.width(8.dp))
+            TextButtonL(text = "Button Text", onClick = {}, state = TextButtonState.R500State, checked = true)
         }
     }
 }
@@ -39,9 +43,11 @@ fun TextButtonL_AssetsPreview() {
 fun TextButtonM_AssetsPreview() {
     SpotTheme {
         Row(Modifier.padding(12.dp)) {
-            TextButtonM(text = "Button Text", onClick = {}, state = ButtonState.G500State)
+            TextButtonM(text = "Button Text", onClick = {}, state = TextButtonState.G500State)
             Spacer(Modifier.width(8.dp))
-            TextButtonM(text = "Button Text", onClick = {}, state = ButtonState.G500State, enabled = false)
+            TextButtonM(text = "Button Text", onClick = {}, state = TextButtonState.G500State, enabled = false)
+            Spacer(Modifier.width(8.dp))
+            TextButtonM(text = "Button Text", onClick = {}, state = TextButtonState.G500State, checked = true)
         }
     }
 }
@@ -51,9 +57,11 @@ fun TextButtonM_AssetsPreview() {
 fun TextButtonS_AssetsPreview() {
     SpotTheme {
         Row(Modifier.padding(12.dp)) {
-            TextButtonS(text = "Button Text", onClick = {}, state = ButtonState.B400State)
+            TextButtonS(text = "Button Text", onClick = {}, state = TextButtonState.B400State)
             Spacer(Modifier.width(8.dp))
-            TextButtonS(text = "Button Text", onClick = {}, state = ButtonState.B400State, enabled = false)
+            TextButtonS(text = "Button Text", onClick = {}, state = TextButtonState.B400State, enabled = false)
+            Spacer(Modifier.width(8.dp))
+            TextButtonS(text = "Button Text", onClick = {}, state = TextButtonState.B400State, checked = true)
         }
     }
 }
@@ -63,9 +71,11 @@ fun TextButtonS_AssetsPreview() {
 fun TextButtonXS_AssetsPreview() {
     SpotTheme {
         Row(Modifier.padding(12.dp)) {
-            TextButtonXS(text = "Btn", onClick = {}, state = ButtonState.R500State)
+            TextButtonXS(text = "Btn", onClick = {}, state = TextButtonState.R500State)
             Spacer(Modifier.width(8.dp))
-            TextButtonXS(text = "Btn", onClick = {}, state = ButtonState.R500State, enabled = false)
+            TextButtonXS(text = "Btn", onClick = {}, state = TextButtonState.R500State, enabled = false)
+            Spacer(Modifier.width(8.dp))
+            TextButtonXS(text = "Btn", onClick = {}, state = TextButtonState.R500State, checked = true)
         }
     }
 }

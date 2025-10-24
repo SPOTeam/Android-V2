@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
@@ -22,45 +23,57 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.Dp.Companion.Unspecified
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 import com.umcspot.spot.designsystem.shapes.ShapeBox
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.*
+import com.umcspot.spot.designsystem.theme.B100
+import com.umcspot.spot.designsystem.theme.B200
+import com.umcspot.spot.designsystem.theme.B500
+import com.umcspot.spot.designsystem.theme.Black
+import com.umcspot.spot.designsystem.theme.G200
+import com.umcspot.spot.designsystem.theme.G300
+import com.umcspot.spot.designsystem.theme.G400
+import com.umcspot.spot.designsystem.theme.G500
+import com.umcspot.spot.designsystem.theme.R500
+import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.designsystem.theme.White
 
 
 // ---------- Color Tokens ----------
 
-data class ButtonColors(
+data class TextButtonColors(
     val bg: Color,
     val text: Color,
     val border: Color
 )
 
-enum class ButtonState(
-    val normal: ButtonColors,
-    val disabled: ButtonColors,
-    val pressed: ButtonColors,
-    val checked: ButtonColors
+enum class TextButtonState(
+    val normal: TextButtonColors,
+    val disabled: TextButtonColors,
+    val pressed: TextButtonColors,
+    val selected: TextButtonColors
 ) {
     B400State(
-        normal = ButtonColors(
+        normal = TextButtonColors(
             bg = White,
             text = B500,
             border = B500
         ),
-        disabled = ButtonColors(
+        disabled = TextButtonColors(
             bg = White,
             text = G400,
             border = G300
         ),
-        pressed = ButtonColors(
+        pressed = TextButtonColors(
             bg = B500,
             text = White,
             border = B500
         ),
-        checked = ButtonColors(
+        selected = TextButtonColors(
             bg = B500,
             text = White,
             border = B500
@@ -68,22 +81,22 @@ enum class ButtonState(
     ),
 
     G500State(
-        normal = ButtonColors(
+        normal = TextButtonColors(
             bg = White,
             text = G500,
             border = G500
         ),
-        disabled = ButtonColors(
+        disabled = TextButtonColors(
             bg = White,
             text = G400,
             border = G300
         ),
-        pressed = ButtonColors(
+        pressed = TextButtonColors(
             bg = G500,
             text = White,
             border = G500
         ),
-        checked = ButtonColors(
+        selected = TextButtonColors(
             bg = G500,
             text = White,
             border = G500
@@ -93,36 +106,63 @@ enum class ButtonState(
 
     // 거절 스타일
     R500State(
-        normal = ButtonColors(
+        normal = TextButtonColors(
             bg = White,
             text = R500,
             border = R500
         ),
-        disabled = ButtonColors(
+        disabled = TextButtonColors(
             bg = White,
             text = G400,
             border = G300
         ),
-        pressed = ButtonColors(
+        pressed = TextButtonColors(
             bg = R500,
             text = White,
             border = R500
         ),
-        checked = ButtonColors(
+        selected = TextButtonColors(
             bg = R500,
             text = White,
             border = R500
         )
     ),
+
+    Toggle(
+        normal = TextButtonColors(
+            bg = White,
+            text = Black,
+            border = G200
+        ),
+        disabled = TextButtonColors(
+            bg = White,
+            text = G400,
+            border = G200
+        ),
+        pressed = TextButtonColors(
+            bg = B200,
+            text = B500,
+            border = B200
+        ),
+        selected = TextButtonColors(
+            bg = B100,
+            text = B500,
+            border = B100
+        )
+    )
 }
 
 // 상태 팔레트 선택
-private fun ButtonState.resolveColors(enabled: Boolean, isPressed: Boolean): ButtonColors =
-    when {
-        !enabled -> disabled
-        isPressed -> pressed
-        else -> normal
-    }
+fun TextButtonState.resolveColors(
+    enabled: Boolean,
+    isPressed: Boolean,
+    checked: Boolean
+): TextButtonColors = when {
+    !enabled -> disabled
+    checked  -> selected
+    isPressed -> pressed
+    else -> normal
+}
 
 // ---------- Size Tokens ----------
 
@@ -147,7 +187,6 @@ fun TextButtonSize.textStyle(): TextStyle = when (this) {
 @Composable
 fun TextButtonSize.shape(): Shape = SpotShapes.Hard
 
-// ---------- Component ----------
 
 @Composable
 fun TextButton(
@@ -155,17 +194,20 @@ fun TextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: TextButtonSize = TextButtonSize.M,
-    width: Dp = 160.dp,
+    width: Dp = Unspecified,
     enabled: Boolean = true,
-    state: ButtonState = ButtonState.B400State,
+    checked : Boolean = false,
+    state: TextButtonState = TextButtonState.B400State,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val isPressed by interactionSource.collectIsPressedAsState()
-    val colors = state.resolveColors(enabled = enabled, isPressed = isPressed)
+    val colors = state.resolveColors(enabled = enabled, isPressed = isPressed, checked = checked)
+
+    val widthMod = if (width.isSpecified) Modifier.width(width) else Modifier.fillMaxWidth()
 
     Box(
         modifier = modifier
-            .width(width)
+            .then(widthMod)
             .heightIn(min = size.minHeight)
             .semantics { role = Role.Button }
             .clickable(
@@ -181,14 +223,13 @@ fun TextButton(
             color = colors.bg,
             borderWidth = 0.5.dp,
             borderColor = colors.border,
-            modifier = Modifier
-                .width(width)
-                .height(size.minHeight)
+            modifier = widthMod.height(size.minHeight)   // ✅ 동일 로직 적용
+
         )
 
         // 콘텐츠 (정중앙)
         Box(
-            modifier = Modifier.size(width, size.minHeight),
+            modifier = widthMod.height(size.minHeight),  // ✅ size(width, h) 대신 조합
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -212,7 +253,8 @@ fun TextButtonXL(
     modifier: Modifier = Modifier,
     width: Dp = 200.dp,
     enabled: Boolean = true,
-    state: ButtonState = ButtonState.B400State,
+    checked : Boolean = false,
+    state: TextButtonState = TextButtonState.B400State,
 ) = TextButton(
     text = text,
     onClick = onClick,
@@ -220,6 +262,7 @@ fun TextButtonXL(
     size = TextButtonSize.XL,
     width = width,
     enabled = enabled,
+    checked = checked,
     state = state
 )
 
@@ -230,7 +273,8 @@ fun TextButtonL(
     modifier: Modifier = Modifier,
     width: Dp = 180.dp,
     enabled: Boolean = true,
-    state: ButtonState = ButtonState.B400State,
+    checked : Boolean = false,
+    state: TextButtonState = TextButtonState.B400State,
 ) = TextButton(
     text = text,
     onClick = onClick,
@@ -238,6 +282,7 @@ fun TextButtonL(
     size = TextButtonSize.L,
     width = width,
     enabled = enabled,
+    checked = checked,
     state = state
 )
 
@@ -248,7 +293,8 @@ fun TextButtonM(
     modifier: Modifier = Modifier,
     width: Dp = 160.dp,
     enabled: Boolean = true,
-    state: ButtonState = ButtonState.B400State,
+    checked : Boolean = false,
+    state: TextButtonState = TextButtonState.B400State,
 ) = TextButton(
     text = text,
     onClick = onClick,
@@ -256,6 +302,7 @@ fun TextButtonM(
     size = TextButtonSize.M,
     width = width,
     enabled = enabled,
+    checked = checked,
     state = state
 )
 
@@ -266,7 +313,8 @@ fun TextButtonS(
     modifier: Modifier = Modifier,
     width: Dp = 140.dp,
     enabled: Boolean = true,
-    state: ButtonState = ButtonState.B400State,
+    checked : Boolean = false,
+    state: TextButtonState = TextButtonState.B400State,
 ) = TextButton(
     text = text,
     onClick = onClick,
@@ -274,6 +322,7 @@ fun TextButtonS(
     size = TextButtonSize.S,
     width = width,
     enabled = enabled,
+    checked = checked,
     state = state
 )
 
@@ -284,7 +333,8 @@ fun TextButtonXS(
     modifier: Modifier = Modifier,
     width: Dp = 70.dp,
     enabled: Boolean = true,
-    state: ButtonState = ButtonState.B400State,
+    checked : Boolean = false,
+    state: TextButtonState = TextButtonState.B400State,
 ) = TextButton(
     text = text,
     onClick = onClick,
@@ -292,5 +342,26 @@ fun TextButtonXS(
     size = TextButtonSize.XS,
     width = width,
     enabled = enabled,
+    checked = checked,
+    state = state
+)
+
+@Composable
+fun TextToggleButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    width: Dp = 126.dp,
+    enabled: Boolean = true,
+    checked : Boolean = false,
+    state: TextButtonState = TextButtonState.Toggle,
+) = TextButton(
+    text = text,
+    onClick = onClick,
+    modifier = modifier,
+    size = TextButtonSize.XS,
+    width = width,
+    enabled = enabled,
+    checked = checked,
     state = state
 )

@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.component.button.ButtonState
+import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.component.button.TextButtonM
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B500
@@ -76,14 +76,14 @@ fun AcceptModal(
                     TextButtonM(
                         text = buttonText,
                         onClick = onClick,
-                        state = ButtonState.B400State,
+                        state = TextButtonState.B400State,
                         modifier = Modifier.weight(1f)
                     )
 
                     TextButtonM(
                         text = "취소",
                         onClick = onCancel,
-                        state = ButtonState.G500State,
+                        state = TextButtonState.G500State,
                         modifier = Modifier.weight(1f)
                     )
                 }

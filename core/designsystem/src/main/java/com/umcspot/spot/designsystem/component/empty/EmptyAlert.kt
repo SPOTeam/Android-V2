@@ -2,8 +2,6 @@ package com.umcspot.spot.designsystem.component.empty
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -23,13 +19,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.component.button.ButtonState
+import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.component.button.TextButtonXL
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.G400
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.designsystem.theme.White
 
 @Composable
 fun EmptyAlert(
@@ -98,7 +93,7 @@ fun EmptyAlertWithButton(
         alertTitle = alertTitle,
         alertDes = alertDes
     ) {
-        TextButtonXL(text = buttonText, onClick = onClick, state = ButtonState.B400State)
+        TextButtonXL(text = buttonText, onClick = onClick, state = TextButtonState.B400State)
     }
 }
 

@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.umcspot.spot.alert.model.AppliedAlertInfo
-import com.umcspot.spot.designsystem.component.button.ButtonState
+import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.component.button.TextButtonM
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.G300
@@ -68,14 +68,14 @@ fun EnrollStudyListItem(
                     TextButtonM(
                         text = "불참",
                         onClick = onRejectClick,
-                        state = ButtonState.R500State,
+                        state = TextButtonState.R500State,
                         modifier = Modifier.height(30.dp).weight(1f)
                     )
 
                     TextButtonM(
                         text = "참여",
                         onClick = onAcceptClick,
-                        state = ButtonState.B400State,
+                        state = TextButtonState.B400State,
                         modifier = Modifier.height(30.dp).weight(1f)
                     )
                 }

@@ -9,4 +9,10 @@ android {
 dependencies {
     implementation(projects.domain.study)
     implementation(projects.core.designsystem)
+
+    implementation(libs.lottie)
+    implementation(libs.lottie.compose)
+    implementation(libs.material3.compose)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.google.material)
 }
