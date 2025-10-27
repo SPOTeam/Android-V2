@@ -1,6 +1,9 @@
 package com.umcspot.spot.study.service
 
+import com.umcspot.spot.model.ActivityType
+import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.RecruitingStudySort
+import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
@@ -22,6 +25,9 @@ interface StudyService {
 
     @GET("/api/v1/service")
     suspend fun getRecruitingStudies(
-        @Query("sortType") sortType: RecruitingStudySort
+        @Query("sortType") sortType: RecruitingStudySort,
+        @Query("activityType") activityType: ActivityType?,
+        @Query("theme") theme: StudyTheme?,
+        @Query("feeRange") feeRange: FeeRange?
     ): BaseResponse<StudyResponseDto>
 }

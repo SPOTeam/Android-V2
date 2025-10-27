@@ -23,24 +23,14 @@ fun NavGraphBuilder.recruitingStudyGraph(
     onFilterClick : () -> Unit,
     onItemClick : (StudyResult) -> Unit
 ) {
-    composable<Recruiting> { backStackEntry ->
-        // ✅ 부모 그래프(= "recruiting_graph")의 BackStackEntry를 ViewModelStoreOwner로 지정
-        val parentEntry = remember(backStackEntry) {
-            backStackEntry.navController.getBackStackEntry(RecruitingGraph.ROUTE)
-        }
-        CompositionLocalProvider(LocalViewModelStoreOwner provides parentEntry) {
-            RecruitingStudyScreen(
-                contentPadding = contentPadding,
-                onRegisterScrollToTop = onRegisterScrollToTop,
-                onFilterClick = onFilterClick,
-                onItemClick = onItemClick
-            )
-        }
+    composable<Recruiting> {
+        RecruitingStudyScreen(
+            contentPadding = contentPadding,
+            onRegisterScrollToTop = onRegisterScrollToTop,
+            onFilterClick = onFilterClick,
+            onItemClick = onItemClick
+        )
     }
-}
-
-internal object RecruitingGraph {
-    const val ROUTE = "recruiting_graph" // 외부에 Route로 노출하지 않음(문자열만)
 }
 
 @Serializable

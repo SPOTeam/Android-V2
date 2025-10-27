@@ -45,9 +45,9 @@ class RecruitingStudyViewModel @Inject constructor(
         _uiState.update { it.copy(studies = UiState.Loading) }
         viewModelScope.launch {
             val res = studyRepository.getRecruitingStudies(
-                sort = _sortType.value,
-                activity = _activity.value,
-                fee = _fee.value,
+                sortType = _sortType.value,
+                activityType = _activity.value,
+                feeRange = _fee.value,
                 theme = _theme.value
             )
             val newState: UiState<StudyResultList> = res.fold(

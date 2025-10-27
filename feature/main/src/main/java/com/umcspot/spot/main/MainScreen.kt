@@ -29,6 +29,7 @@ import com.umcspot.spot.designsystem.component.appBar.AppBarHome
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.main.component.MainBottomBar
 import com.umcspot.spot.study.recruiting.navigation.Recruiting
+import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
@@ -49,7 +50,7 @@ fun MainScreen(
                         when {
                             dest?.hasRoute(Alert::class) == true -> "알림"
                             dest?.hasRoute(AppliedAlert::class) == true -> "신청한 알림"
-                            dest?.hasRoute(Recruiting::class) == true -> "모집중인 스터디"
+                            dest?.hasRoute(RecruitingFilter::class) == true -> "모집중인 스터디"
                             else -> ""
                         }
                     BackTopBar(

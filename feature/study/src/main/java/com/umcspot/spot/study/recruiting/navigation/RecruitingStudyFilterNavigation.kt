@@ -20,24 +20,14 @@ fun NavController.navigateToRecruitingStudyFilter(navOptions: NavOptions? = null
 
 fun NavGraphBuilder.recruitingStudyFilterGraph(
     contentPadding: PaddingValues,
-    onAcceptFilterClick: @Composable () -> Unit,
+    onAcceptFilterClick: () -> Unit,
 ) {
-    composable<RecruitingFilter> { backStackEntry ->
-        val parentEntry = remember( backStackEntry) {
-            backStackEntry.navController.getBackStackEntry(RecruitingGraph.ROUTE)
-        }
-        CompositionLocalProvider(LocalViewModelStoreOwner provides parentEntry) {
-            RecruitingStudyFilterScreen(
-                contentPadding = contentPadding,
-                onAcceptFilterClick = onAcceptFilterClick,
-            )
-        }
+    composable<RecruitingFilter> {
+        RecruitingStudyFilterScreen(
+            contentPadding = contentPadding,
+            onAcceptFilterClick = onAcceptFilterClick,
+        )
     }
 }
-
-internal object RecruitingGraph {
-    const val ROUTE = "recruiting_graph" // 외부에 Route로 노출하지 않음(문자열만)
-}
-
 @Serializable
 data object RecruitingFilter : Route

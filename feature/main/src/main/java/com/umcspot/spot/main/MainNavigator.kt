@@ -19,6 +19,7 @@ import com.umcspot.spot.landing.Landing
 import com.umcspot.spot.mypage.navigation.navigateToMypage
 import com.umcspot.spot.study.recruiting.navigation.Recruiting
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
+import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import kotlin.reflect.KClass
 
 class MainNavigator(
@@ -69,7 +70,7 @@ class MainNavigator(
 
     /** 상단 뒤로가기 TopBar 노출 조건 */
     @Composable
-    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class)
+    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, RecruitingFilter::class)
 
     /** 스크롤-투-탑 FAB 노출 조건 */
     @Composable

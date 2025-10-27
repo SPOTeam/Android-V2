@@ -79,22 +79,19 @@ fun MainNavHost(
         jjimGraph()
         mypageGraph()
 
-        navigation(
-            startDestination = requireNotNull(Recruiting::class.qualifiedName),
-            route =
-        ) {
-            recruitingStudyGraph(
-                contentPadding = contentPadding,
-                onRegisterScrollToTop = onRegisterScrollToTop,
-                onFilterClick = { navigator.navController.navigateToRecruitingStudyFilter() },
-                onItemClick = {}
-            )
 
-            recruitingStudyFilterGraph(
-                contentPadding = contentPadding,
-                onAcceptFilterClick = { navigator.navController.popBackStack() }
-            )
-        }
+        recruitingStudyGraph(
+            contentPadding = contentPadding,
+            onRegisterScrollToTop = onRegisterScrollToTop,
+            onFilterClick = { navigator.navController.navigateToRecruitingStudyFilter() },
+            onItemClick = {}
+        )
+
+        recruitingStudyFilterGraph(
+            contentPadding = contentPadding,
+            onAcceptFilterClick = { navigator.navController.popBackStack() }
+        )
+
 
         boardGraph(
             contentPadding = contentPadding,
