@@ -1,5 +1,6 @@
 package com.umcspot.spot.study.recruiting
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +58,7 @@ import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.study.recruiting.RecruitingStudyViewModel
+import timber.log.Timber
 
 @Composable
 fun RecruitingStudyScreen(
@@ -70,7 +72,6 @@ fun RecruitingStudyScreen(
     val sort by viewmodel.sortType.collectAsStateWithLifecycle()
 
     var showSortSheet by remember { mutableStateOf(false) }
-
 
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()

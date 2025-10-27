@@ -7,7 +7,6 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.landing.LandingScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

@@ -38,8 +38,6 @@ dependencies {
     implementation(projects.feature.study)
     implementation(projects.feature.signup)
 
-    implementation(projects.domain.home)
-
     implementation(projects.core.ui)
     implementation(projects.core.network)
     implementation(projects.core.model)
@@ -53,4 +51,5 @@ dependencies {
     implementation(projects.data.study)
     implementation(projects.data.alert)
     implementation(projects.data.board)
+    implementation(projects.data.user)
 }
