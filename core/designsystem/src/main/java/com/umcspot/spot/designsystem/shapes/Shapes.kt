@@ -147,13 +147,12 @@ fun ShapeImageBox(
 
 @Composable
 fun ShapeBox(
-    shape: Shape,
+    shape: Shape = SpotShapes.Hard,
     color: Color = SpotTheme.colors.white,
     borderWidth: Dp = 0.dp,
     borderColor: Color? = Color.Transparent,
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit = {}
-
 ) {
     Box(
         modifier = modifier
