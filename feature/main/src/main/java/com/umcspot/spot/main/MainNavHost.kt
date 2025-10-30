@@ -94,7 +94,14 @@ fun MainNavHost(
         categoryGraph()
         myStudyGraph()
         jjimGraph()
-        mypageGraph()
+        mypageGraph(
+            contentPadding = contentPadding,
+            onParticipatingClick = {},
+            onMyAppliedClick = {},
+            onEditInterestClick = {},
+            onMyRecruitingClick = {},
+            onEditInterestLocationClick = {}
+        )
 
 
         recruitingStudyGraph(

@@ -16,10 +16,10 @@ import com.umcspot.spot.checkList.navigation.CheckList
 import com.umcspot.spot.feature.board.navigation.Board
 import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.navigateToJJim
-import com.umcspot.spot.landing.SavingScreen
 import com.umcspot.spot.landing.navigation.Landing
 import com.umcspot.spot.landing.navigation.Saving
-import com.umcspot.spot.mypage.navigation.navigateToMypage
+import com.umcspot.spot.mypage.navigation.MyPage
+import com.umcspot.spot.mypage.navigation.navigateToMyPage
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
 import com.umcspot.spot.study.recruiting.navigation.Recruiting
@@ -59,7 +59,7 @@ class MainNavigator(
             MainNavTab.CATEGORY -> navController.navigateToCategory(navOptions)
             MainNavTab.MYSTUDY -> navController.navigateToMyStudy(navOptions)
             MainNavTab.JJIM -> navController.navigateToJJim(navOptions)
-            MainNavTab.MYPAGE -> navController.navigateToMypage(navOptions)
+            MainNavTab.MYPAGE -> navController.navigateToMyPage(navOptions)
         }
     }
 
@@ -75,7 +75,7 @@ class MainNavigator(
     /** 상단 뒤로가기 TopBar 노출 조건 */
     @Composable
     fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, RecruitingFilter::class,
-        SignUp::class, CheckList::class)
+        SignUp::class, CheckList::class, MyPage::class)
 
     /** 스크롤-투-탑 FAB 노출 조건 */
     @Composable
