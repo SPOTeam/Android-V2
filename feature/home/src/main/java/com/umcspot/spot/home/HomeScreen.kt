@@ -49,8 +49,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.button.BlankButton
+import com.umcspot.spot.designsystem.component.button.ImageButtonSize
 import com.umcspot.spot.designsystem.component.study.StudyListItem
 import com.umcspot.spot.designsystem.component.weather.WeatherCard
+import com.umcspot.spot.designsystem.shapes.ShapeBox
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B100
 import com.umcspot.spot.designsystem.theme.B500
@@ -135,32 +138,37 @@ fun QuickMenu(
     onItemClick: (QuickMenuType) -> Unit,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         items.forEach { item ->
-            Column(
+            BlankButton(
+                size = 71.dp,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(vertical = 8.dp)
-                    .clickable { onItemClick(item.type) },   // ← 식별자만 전달
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(vertical = 8.dp),
+                onClick = { onItemClick(item.type) }
             ) {
-                Icon(
-                    painter = painterResource(item.iconRes),
-                    contentDescription = item.label,
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(iconSize)
-                )
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    text = item.label,
-                    style = SpotTheme.typography.bodyMedium600,
-                    fontSize = 14.sp,
-                    color = Black,
-                    maxLines = 1
-                )
+                Column (
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        painter = painterResource(item.iconRes),
+                        contentDescription = item.label,
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(iconSize)
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = item.label,
+                        style = SpotTheme.typography.bodyMedium600,
+                        fontSize = 14.sp,
+                        color = Black,
+                        maxLines = 1
+                    )
+                }
             }
         }
     }
