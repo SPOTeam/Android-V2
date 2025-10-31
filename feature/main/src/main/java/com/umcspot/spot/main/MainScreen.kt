@@ -93,8 +93,8 @@ fun MainScreen(
             }
         },
         modifier = Modifier
-                .background(Color.White)
-                .fillMaxSize()
+            .background(Color.White)
+            .fillMaxSize()
     ) { innerPadding ->
         MainNavHost(
             navigator = navigator,

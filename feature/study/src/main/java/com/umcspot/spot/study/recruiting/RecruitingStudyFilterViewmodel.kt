@@ -1,4 +1,4 @@
-package com.umcspot.spot.study.filter
+package com.umcspot.spot.study.recruiting
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

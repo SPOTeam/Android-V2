@@ -19,6 +19,8 @@ import com.umcspot.spot.landing.Landing
 import com.umcspot.spot.mypage.navigation.navigateToMypage
 import com.umcspot.spot.study.recruiting.navigation.Recruiting
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
+import com.umcspot.spot.study.preferLocation.PreferLocationStudyScreen
+import com.umcspot.spot.study.preferLocation.navigation.PreferLocation
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import kotlin.reflect.KClass
 
@@ -74,7 +76,8 @@ class MainNavigator(
 
     /** 스크롤-투-탑 FAB 노출 조건 */
     @Composable
-    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class)
+    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class,
+        PreferLocation::class, )
 
     /** 멀티 FAB(게시판 등) 노출 조건 */
     @Composable

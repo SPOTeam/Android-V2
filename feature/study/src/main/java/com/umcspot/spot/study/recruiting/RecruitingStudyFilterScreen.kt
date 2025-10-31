@@ -1,4 +1,4 @@
-package com.umcspot.spot.study.filter
+package com.umcspot.spot.study.recruiting
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -32,8 +31,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -41,9 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.MultiButton
-import com.umcspot.spot.designsystem.component.button.MultiButtonM
 import com.umcspot.spot.designsystem.component.button.TextButton
-import com.umcspot.spot.designsystem.component.button.TextButtonM
 import com.umcspot.spot.designsystem.component.button.TextToggleButton
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ActivityType

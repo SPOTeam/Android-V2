@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
-import androidx.navigation.navigation
 import com.umcspot.spot.alert.navigation.alertGraph
 import com.umcspot.spot.alert.navigation.appliedAlertGraph
 import com.umcspot.spot.alert.navigation.navigateToAppliedAlert
@@ -23,7 +22,8 @@ import com.umcspot.spot.landing.landingGraph
 import com.umcspot.spot.model.QuickMenuType
 import com.umcspot.spot.mypage.navigation.mypageGraph
 import com.umcspot.spot.study.my.navigation.myStudyGraph
-import com.umcspot.spot.study.recruiting.navigation.Recruiting
+import com.umcspot.spot.study.preferLocation.navigation.navigateToPreferLocationStudy
+import com.umcspot.spot.study.preferLocation.navigation.preferLocationStudyGraph
 import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudy
 import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudyFilter
 import com.umcspot.spot.study.recruiting.navigation.recruitingStudyFilterGraph
@@ -67,8 +67,8 @@ fun MainNavHost(
             contentPadding = contentPadding,
             onQuickMenuClick = { type ->
                 when (type) {
-                    QuickMenuType.BOARD      -> navigator.navController.navigateToBoard()
-                    QuickMenuType.REGION     -> { /* navigator.navController.navigate(Region) */ }
+                    QuickMenuType.BOARD      -> { navigator.navController.navigateToBoard() }
+                    QuickMenuType.REGION     -> { navigator.navController.navigateToPreferLocationStudy() }
                     QuickMenuType.INTERESTS  -> { /* navigator.navController.navigate(Interests) */ }
                     QuickMenuType.RECRUITING -> { navigator.navController.navigateToRecruitingStudy() }
                 }
@@ -83,13 +83,20 @@ fun MainNavHost(
         recruitingStudyGraph(
             contentPadding = contentPadding,
             onRegisterScrollToTop = onRegisterScrollToTop,
+            onItemClick = { },
             onFilterClick = { navigator.navController.navigateToRecruitingStudyFilter() },
-            onItemClick = {}
         )
 
         recruitingStudyFilterGraph(
             contentPadding = contentPadding,
             onAcceptFilterClick = { navigator.navController.popBackStack() }
+        )
+
+        preferLocationStudyGraph(
+            contentPadding = contentPadding,
+            onRegisterScrollToTop = onRegisterScrollToTop,
+            onItemClick = { },
+            onFilterClick = {  },
         )
 
 

@@ -12,4 +12,5 @@ interface StudyRepository {
     suspend fun getPopularStudies(): Result<StudyResultList>
     suspend fun getRecommendStudies(): Result<StudyResultList>
     suspend fun getRecruitingStudies(sortType : RecruitingStudySort, activityType: ActivityType?, theme: StudyTheme?, feeRange: FeeRange?): Result<StudyResultList>
+    suspend fun getPreferLocationStudies(sortType : RecruitingStudySort, activityType: ActivityType?, theme: StudyTheme?, feeRange: FeeRange?): Result<StudyResultList>
 }

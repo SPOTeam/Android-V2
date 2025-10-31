@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,7 +52,8 @@ fun EmptyAlert(
             text = alertTitle,
             style = SpotTheme.typography.header05,
             fontSize = 30.sp,
-            color = SpotTheme.colors.B500
+            color = SpotTheme.colors.B500,
+            textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(15.dp))
         Text(
@@ -59,6 +61,7 @@ fun EmptyAlert(
             style = SpotTheme.typography.header05,
             color = SpotTheme.colors.G400,
             fontSize = 25.sp,
+            textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(40.dp))
         content() // ✅ 여기로 버튼 등 추가

@@ -45,4 +45,12 @@ class StudyRepositoryImpl @Inject constructor(
             setRecommendDummies(30)
         }
 
+    override suspend fun getPreferLocationStudies(sortType : RecruitingStudySort, activityType: ActivityType?, theme: StudyTheme?, feeRange: FeeRange?): Result<StudyResultList> =
+        runCatching {
+            val response = studyService.getRecruitingStudies(sortType = sortType, activityType = activityType, theme = theme, feeRange = feeRange)
+            response.data.toDomainList()
+        }.recoverCatching {
+            setRecommendDummies(0)
+        }
+
 }
