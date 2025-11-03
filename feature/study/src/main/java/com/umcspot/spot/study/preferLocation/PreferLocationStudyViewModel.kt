@@ -1,6 +1,7 @@
 package com.umcspot.spot.study.preferLocation
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umcspot.spot.common.location.LocationRow
@@ -59,6 +60,10 @@ class PreferLocationStudyViewModel @Inject constructor(
     private val _results = MutableStateFlow<List<LocationRow>>(emptyList())
     val results = _results.asStateFlow()
 
+    private val _selected = MutableStateFlow<List<String>>(emptyList())
+    val selected = _selected.asStateFlow()
+
+
     /** ---------------- 초기 네트워크 fetch ---------------- */
     init {
         combine(_sortType, _activity, _fee, _theme) { s, a, f, t ->
@@ -103,21 +108,34 @@ class PreferLocationStudyViewModel @Inject constructor(
         _theme.value = null
     }
 
+    fun add(name: String) = _selected.update { if (name in it || it.size>=10) it else it + name }
+    fun remove(name: String) = _selected.update { it - name }
+    fun clear() = _selected.update { emptyList() }
+
     /** ---------------- 행정구역 검색용 메서드 ---------------- */
     fun loadLocationData() {
         viewModelScope.launch(Dispatchers.IO) {
-            allLocations = LocationStore.load(appContext)
-        }
+            allLocations = LocationStore.load(appContext)}
     }
 
     fun searchLocation(query: String) {
         _query.value = query
-        if (allLocations.isEmpty() || query.isBlank()) {
-            _results.value = emptyList()
-            return
+        viewModelScope.launch(Dispatchers.IO) {
+            if (query.isBlank()) {
+                _results.value = emptyList()
+                return@launch
+            }
+
+            if (allLocations.isEmpty()) {
+                allLocations = LocationStore.load(appContext)
+            }
+
+            val filtered = searchLocations(query, allLocations)
+
+            _results.value = filtered
         }
-        _results.value = searchLocations(query, allLocations)
     }
+
 
     private data class Params(
         val sort: RecruitingStudySort,

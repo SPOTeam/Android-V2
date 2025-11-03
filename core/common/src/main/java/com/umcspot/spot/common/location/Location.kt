@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.nio.charset.Charset
 
 data class LocationRow(
     val code: String,
@@ -23,8 +24,10 @@ object LocationStore {
 
         val lines = try {
             context.assets.open("Location_info.txt")
-                .bufferedReader(Charsets.UTF_8)
-                .use { it.readLines() }
+                .bufferedReader(Charset.forName("EUC-KR"))
+                .use {
+                    it.readLines()
+                }
         } catch (e: Exception) {
             Log.e("LocationStore", "❌ Failed to load asset: ${e.message}", e)
             emptyList()
@@ -55,11 +58,6 @@ fun searchLocations(query: String, list: List<LocationRow>, limit: Int = 20): Li
     val results = list.filter {
         it.name.replace(" ", "").lowercase().contains(normalized)
     }.take(limit)
-
-    Log.d(
-        "LocationSearch",
-        "🔍 Query=\"$query\" → Found ${results.size} results (from ${list.size} total)"
-    )
 
     return results
 }
