@@ -23,11 +23,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.umcspot.spot.alert.navigation.Alert
 import com.umcspot.spot.alert.navigation.AppliedAlert
 import com.umcspot.spot.alert.navigation.navigateToAlert
+import com.umcspot.spot.checkList.navigation.CheckList
 import com.umcspot.spot.designsystem.component.FloatingMultipleButton
 import com.umcspot.spot.designsystem.component.FloatingToUpButton
 import com.umcspot.spot.designsystem.component.appBar.AppBarHome
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.main.component.MainBottomBar
+import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.recruiting.navigation.Recruiting
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import kotlinx.collections.immutable.toImmutableList
@@ -51,6 +53,8 @@ fun MainScreen(
                             dest?.hasRoute(Alert::class) == true -> "알림"
                             dest?.hasRoute(AppliedAlert::class) == true -> "신청한 알림"
                             dest?.hasRoute(RecruitingFilter::class) == true -> "모집중인 스터디"
+                            dest?.hasRoute(SignUp::class) == true -> "회원가입"
+                            dest?.hasRoute(CheckList::class) == true -> "체크리스트"
                             else -> ""
                         }
                     BackTopBar(

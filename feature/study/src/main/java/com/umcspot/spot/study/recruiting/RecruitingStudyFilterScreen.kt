@@ -1,5 +1,8 @@
 package com.umcspot.spot.study.recruiting
 
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -44,6 +47,8 @@ import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.StudyTheme
+import com.umcspot.spot.study.filter.RecruitingStudyFilterViewModel
+import timber.log.Timber
 
 @Composable
 fun RecruitingStudyFilterScreen(
@@ -55,7 +60,6 @@ fun RecruitingStudyFilterScreen(
     val fee by vm.fee.collectAsStateWithLifecycle()
     val theme by vm.theme.collectAsStateWithLifecycle()
     val acceptEnabled by vm.notNull.collectAsStateWithLifecycle()
-
 
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()

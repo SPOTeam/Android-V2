@@ -12,15 +12,17 @@ import androidx.navigation.navOptions
 import com.umcspot.spot.alert.navigation.Alert
 import com.umcspot.spot.alert.navigation.AppliedAlert
 import com.umcspot.spot.category.navigation.navigateToCategory
+import com.umcspot.spot.checkList.navigation.CheckList
 import com.umcspot.spot.feature.board.navigation.Board
 import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.navigateToJJim
-import com.umcspot.spot.landing.Landing
+import com.umcspot.spot.landing.SavingScreen
+import com.umcspot.spot.landing.navigation.Landing
+import com.umcspot.spot.landing.navigation.Saving
 import com.umcspot.spot.mypage.navigation.navigateToMypage
-import com.umcspot.spot.study.recruiting.navigation.Recruiting
+import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
-import com.umcspot.spot.study.preferLocation.PreferLocationStudyScreen
-import com.umcspot.spot.study.preferLocation.navigation.PreferLocation
+import com.umcspot.spot.study.recruiting.navigation.Recruiting
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import kotlin.reflect.KClass
 
@@ -68,16 +70,16 @@ class MainNavigator(
     }
 
     @Composable
-    fun isInLanding(): Boolean = inAnyGraph(Landing::class)
+    fun isInLanding(): Boolean = inAnyGraph(Landing::class, Saving::class)
 
     /** 상단 뒤로가기 TopBar 노출 조건 */
     @Composable
-    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, RecruitingFilter::class)
+    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, RecruitingFilter::class,
+        SignUp::class, CheckList::class)
 
     /** 스크롤-투-탑 FAB 노출 조건 */
     @Composable
-    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class,
-        PreferLocation::class, )
+    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class)
 
     /** 멀티 FAB(게시판 등) 노출 조건 */
     @Composable
