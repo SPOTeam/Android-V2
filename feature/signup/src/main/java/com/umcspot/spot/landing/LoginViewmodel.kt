@@ -44,7 +44,21 @@ class LandingViewModel @Inject constructor(
                     if (error != null) {
                         Log.e(TAG, "로그인 실패", error)
                     } else if (token != null) {
-                        Log.i(TAG, "로그인 성공 ${token.accessToken}")
+//                        Log.i(TAG, "로그인 성공 ${token.accessToken}")
+                        viewModelScope.launch {
+                            runCatching {
+                                // 보통은 accessToken만 넘김
+                                loginRepository.finishSocialLogin(
+                                    type = lastSocialLoginType!!,
+                                    accessToken = token.accessToken
+                                )
+                            }.onSuccess {
+                                _events.emit(LoginEvent.LoginSucceeded)
+                            }.onFailure { e ->
+                                Log.e(TAG, "서버 로그인 실패", e)
+                                _events.emit(LoginEvent.ShowError("서버 로그인 실패: ${e.message}"))
+                            }
+                        }
                     }
                 }
             } catch (e: Exception) {

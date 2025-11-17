@@ -10,21 +10,13 @@ import javax.inject.Inject
 class LoginRepositoryImpl @Inject constructor(
     private val studyService: LoginService
 ) : TokenRepository {
-    override suspend fun getRedirectUrl(
-        type : SocialLoginType
-    ): Result<String> =
-        runCatching {
-            val response = studyService.getRedirectUrl(type.title)
-            response.result
-        }
 
-
-    override suspend fun getCallBackToken(
-        type : SocialLoginType,
-        code : String
+    override suspend fun finishSocialLogin(
+        type: SocialLoginType,
+        accessToken: String
     ): Result<TokenResult> =
         runCatching {
-            val response = studyService.getCallBackToken(type.title, code)
+            val response = studyService.getCallBackToken(type.title, accessToken)
             response.result.toDomain()
         }
 }
