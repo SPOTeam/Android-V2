@@ -1,5 +1,6 @@
 package com.umcspot.spot.landing
 
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,14 +35,13 @@ import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.SocialLoginType
 
-/**
- * 1) Route: 상태/이벤트 처리 + UI 호출
- */
 @Composable
 fun LandingScreen(
     onLoginSuccess: () -> Unit,
     viewModel: LandingViewModel = hiltViewModel(),
 ) {
+    val activity = LocalContext.current as? Activity
+
     LaunchedEffect(Unit) {
         viewModel.events.collect { ev ->
             when (ev) {
@@ -54,8 +55,16 @@ fun LandingScreen(
     }
 
     LandingScreenContent(
-        onKakaoClick = { viewModel.startSocialLogin(SocialLoginType.KAKAO) },
-        onNaverClick = { viewModel.startSocialLogin(SocialLoginType.NAVER) },
+        onKakaoClick = {
+            activity?.let { act ->
+                viewModel.startSocialLogin(SocialLoginType.KAKAO, act)
+            }
+        },
+        onNaverClick = {
+            activity?.let { act ->
+                viewModel.startSocialLogin(SocialLoginType.NAVER, act)
+            }
+        },
     )
 }
 

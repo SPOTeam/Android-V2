@@ -17,4 +17,7 @@ dependencies {
     implementation(libs.kakao.login)
     implementation(libs.kakao.auth)
     implementation(libs.kakao.common)
+
+    implementation(libs.naver.oauth)
+//    implementation(libs.naver.jdk)
 }

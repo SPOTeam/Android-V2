@@ -271,6 +271,7 @@ kizitonwose-calendar-compose = { module = "com.kizitonwose.calendar:compose", ve
 
 #naver login
 naver-oauth = { module = "com.navercorp.nid:oauth", version.ref = "naver-oauth" }
+naver-jdk = { module = "com.navercorp.nid:oauth-jdk8", version.ref = "naver-oauth" }
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastoreCore" }
 

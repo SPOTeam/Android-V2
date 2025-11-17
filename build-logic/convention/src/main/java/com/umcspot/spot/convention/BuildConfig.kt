@@ -7,20 +7,46 @@ import org.gradle.api.Project
 internal fun Project.configureBuildConfig(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
+    val properties = gradleLocalProperties(rootDir, providers)
+
+    val baseUrl = properties.getProperty("BASE_URL") ?: "https://api-spot.site/"
+    val kakaoNativeKey = properties.getProperty("KAKAO_NATIVE_KEY") ?: ""
+    val naverClientId = properties.getProperty("NAVER_CLIENT_ID") ?: ""
+    val naverClientSecret = properties.getProperty("NAVER_CLIENT_SECRET") ?: ""
+    val appName = properties.getProperty("APP_NAME") ?: "SPOT"
+
+
     commonExtension.apply {
         defaultConfig {
-            val properties = gradleLocalProperties(rootDir, providers)
 
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"${properties.getProperty("base.url") ?: "https://api-spot.site/"}\""
+                "\"$baseUrl\""
             )
 
             buildConfigField(
                 "String",
                 "KAKAO_NATIVE_KEY",
-                "\"${properties.getProperty("kakao.native.key") ?: ""}\""
+                "\"$kakaoNativeKey\""
+            )
+
+            buildConfigField(
+                "String",
+                "NAVER_CLIENT_ID",
+                "\"$naverClientId\""
+            )
+
+            buildConfigField(
+                "String",
+                "NAVER_CLIENT_SECRET",
+                "\"$naverClientSecret\""
+            )
+
+            buildConfigField(
+                "String",
+                "APP_NAME",
+                "\"$appName\""
             )
         }
 
