@@ -5,7 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.umcspot.spot.navigation.Route
-import com.umcspot.spot.signup.landing.LandingScreen
+import com.umcspot.spot.landing.LandingScreen
 import kotlinx.serialization.Serializable
 
 fun NavController.navigateToLanding(navOptions: NavOptions? = null) {
@@ -13,13 +13,11 @@ fun NavController.navigateToLanding(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.landingGraph(
-    onKakaoClick: () -> Unit,
-    onNaverClick: () -> Unit
+    onLoginSuccess : () -> Unit
 ) {
     composable<Landing> {
         LandingScreen(
-            onKakaoClick = onKakaoClick,
-            onNaverClick = onNaverClick
+            onLoginSuccess = onLoginSuccess
         )
     }
 }

@@ -14,8 +14,9 @@ internal fun Project.configureBuildConfig(
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"${properties.getProperty("base.url") ?: "https://default-url.com/"}\""
+                "\"${properties.getProperty("base.url") ?: "https://api-spot.site/"}\""
             )
+
             buildConfigField(
                 "String",
                 "KAKAO_NATIVE_KEY",

@@ -52,4 +52,5 @@ dependencies {
     implementation(projects.data.alert)
     implementation(projects.data.board)
     implementation(projects.data.user)
+    implementation(projects.data.login)
 }

@@ -16,7 +16,7 @@ class StudyRepositoryImpl @Inject constructor(
     override suspend fun getPopularStudies(): Result<StudyResultList> =
         runCatching {
             val response = studyService.getPopularStudies()
-            response.data.toDomainList()
+            response.result.toDomainList()
         }.recoverCatching {
             setPopularDummies()
         }
@@ -28,7 +28,7 @@ class StudyRepositoryImpl @Inject constructor(
     override suspend fun getRecommendStudies(): Result<StudyResultList> =
         runCatching {
             val response = studyService.getPopularStudies()
-            response.data.toDomainList()
+            response.result.toDomainList()
         }.recoverCatching {
             setRecommendDummies()
         }
@@ -40,7 +40,7 @@ class StudyRepositoryImpl @Inject constructor(
     override suspend fun getRecruitingStudies(sortType : RecruitingStudySort, activityType: ActivityType?, theme: StudyTheme?, feeRange: FeeRange?): Result<StudyResultList> =
         runCatching {
             val response = studyService.getRecruitingStudies(sortType = sortType, activityType = activityType, theme = theme, feeRange = feeRange)
-            response.data.toDomainList()
+            response.result.toDomainList()
         }.recoverCatching {
             setRecommendDummies(30)
         }
@@ -48,7 +48,7 @@ class StudyRepositoryImpl @Inject constructor(
     override suspend fun getPreferLocationStudies(sortType : RecruitingStudySort, activityType: ActivityType?, theme: StudyTheme?, feeRange: FeeRange?): Result<StudyResultList> =
         runCatching {
             val response = studyService.getRecruitingStudies(sortType = sortType, activityType = activityType, theme = theme, feeRange = feeRange)
-            response.data.toDomainList()
+            response.result.toDomainList()
         }.recoverCatching {
             setRecommendDummies(0)
         }

@@ -3,7 +3,6 @@ package com.umcspot.spot.signup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umcspot.spot.ui.state.UiState
-import com.umcspot.spot.user.model.UserResult
 import com.umcspot.spot.user.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

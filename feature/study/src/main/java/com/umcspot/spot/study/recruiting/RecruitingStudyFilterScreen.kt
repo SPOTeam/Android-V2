@@ -47,8 +47,6 @@ import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.StudyTheme
-import com.umcspot.spot.study.filter.RecruitingStudyFilterViewModel
-import timber.log.Timber
 
 @Composable
 fun RecruitingStudyFilterScreen(

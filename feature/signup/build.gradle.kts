@@ -7,6 +7,10 @@ android {
 }
 
 dependencies {
-    implementation(projects.domain.user)
+    implementation(projects.domain.token)
     implementation(projects.core.designsystem)
+    implementation(projects.domain.user)
+
+    implementation(libs.naver.oauth)
+    implementation(libs.androidx.browser) // jdk 17
 }

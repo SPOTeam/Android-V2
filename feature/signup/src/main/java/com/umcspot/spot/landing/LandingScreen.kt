@@ -1,4 +1,4 @@
-package com.umcspot.spot.signup.landing
+package com.umcspot.spot.landing
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -22,16 +25,44 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.KakaoStartButton
 import com.umcspot.spot.designsystem.component.NaverStartButton
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.model.SocialLoginType
 
+/**
+ * 1) Route: 상태/이벤트 처리 + UI 호출
+ */
 @Composable
 fun LandingScreen(
-    onKakaoClick : () -> Unit,
-    onNaverClick : () -> Unit
+    onLoginSuccess: () -> Unit,
+    viewModel: LandingViewModel = hiltViewModel(),
+) {
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { ev ->
+            when (ev) {
+                is LandingViewModel.LoginEvent.LoginSucceeded -> {
+                    onLoginSuccess()
+                }
+                is LandingViewModel.LoginEvent.ShowError -> {
+                }
+            }
+        }
+    }
+
+    LandingScreenContent(
+        onKakaoClick = { viewModel.startSocialLogin(SocialLoginType.KAKAO) },
+        onNaverClick = { viewModel.startSocialLogin(SocialLoginType.NAVER) },
+    )
+}
+
+@Composable
+fun LandingScreenContent(
+    onKakaoClick: () -> Unit,
+    onNaverClick: () -> Unit,
 ) {
     Surface(
         modifier = Modifier
@@ -46,7 +77,6 @@ fun LandingScreen(
                 .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 상단 여백 + 중앙 컨텐츠
             Spacer(Modifier.height(48.dp))
 
             Column(
@@ -59,8 +89,7 @@ fun LandingScreen(
                 Image(
                     painter = painterResource(R.drawable.spot_logo),
                     contentDescription = "SPOT 로고",
-                    modifier = Modifier
-                        .size(33.dp),
+                    modifier = Modifier.size(33.dp),
                     contentScale = ContentScale.Fit
                 )
                 Spacer(Modifier.height(52.dp))
@@ -73,19 +102,14 @@ fun LandingScreen(
                 )
             }
 
-            // 하단 액션 버튼들
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 60.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                KakaoStartButton(
-                    onClick = onKakaoClick
-                )
-                NaverStartButton(
-                    onClick = onNaverClick
-                )
+                KakaoStartButton(onClick = onKakaoClick)
+                NaverStartButton(onClick = onNaverClick)
             }
         }
     }
@@ -93,9 +117,9 @@ fun LandingScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun LandingScreenPreview() {
+private fun LandingScreenPreview() {
     SpotTheme {
-        LandingScreen(
+        LandingScreenContent(
             onKakaoClick = {},
             onNaverClick = {}
         )

@@ -58,3 +58,10 @@ enum class StudyTheme(
     MAJOR("전공 / 진로 학습"),
     ETC("기타")
 }
+
+enum class SocialLoginType(
+    val title: String
+) {
+    KAKAO("kakao"),
+    NAVER("naver"),
+}

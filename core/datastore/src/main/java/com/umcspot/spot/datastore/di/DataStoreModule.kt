@@ -1,11 +1,9 @@
-package com.umcspot.spot.datastore.di
+package com.umcspot.spot.datastore
 
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
-import com.umcspot.spot.datastore.SpotSecureDataStoreSerializer
-import com.umcspot.spot.datastore.SpotTokenData
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,17 +14,16 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataStoreModule {
+
     @Provides
     @Singleton
-    fun providesDataStore(
+    fun provideSpotTokenDataStore(
         @ApplicationContext context: Context,
-        spotSecureDataStoreSerializer: SpotSecureDataStoreSerializer
-    ): DataStore<SpotTokenData> =
-        DataStoreFactory.create(
-            serializer = spotSecureDataStoreSerializer
-        ) {
-            context.dataStoreFile(DATASTORE_PREFERENCES)
-        }
-
-    private const val DATASTORE_PREFERENCES = "com.umcspot.spot.datastore"
+        serializer: SpotSecureDataStoreSerializer
+    ): DataStore<SpotTokenData> {
+        return DataStoreFactory.create(
+            serializer = serializer,
+            produceFile = { context.dataStoreFile("spot_tokens.secure") }
+        )
+    }
 }

@@ -53,8 +53,17 @@ fun MainNavHost(
         startDestination = navigator.startDestination
     ) {
         landingGraph(
-            onKakaoClick = { navigator.navController.navigateToSignUp() },
-            onNaverClick = { navigator.navController.navigateToSignUp() }
+            onLoginSuccess= {
+                navigator.navController.navigateToSignUp(
+                    navOptions {
+                        popUpTo(navigator.navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                        restoreState = false
+                    }
+                )
+            }
         )
 
         signupGraph(

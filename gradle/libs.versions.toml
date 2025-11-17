@@ -98,6 +98,10 @@ runtimeAndroid = "1.7.8"
 flexibleBottomSheet = "0.1.5"
 annotationJvm = "1.9.1"
 
+# naver login
+browser = "1.8.0"
+naver-oauth = "5.11.0"
+
 [plugins]
 # Gradle Plugins
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
@@ -259,6 +263,10 @@ flexible-bottomsheet = { group = "com.github.skydoves", name = "flexible-bottoms
 
 #CalendarLibrary
 kizitonwose-calendar-compose = { module = "com.kizitonwose.calendar:compose", version.ref = "kizitonwose-calendar" }
+
+#naver login
+naver-oauth = { module = "com.navercorp.nid:oauth", version.ref = "naver-oauth" }
+androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 
 [bundles]
 coil = ["coil", "coil-svg", "coil-gif"]
