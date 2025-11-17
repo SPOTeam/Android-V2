@@ -92,14 +92,14 @@ fun WeatherCard(
                         Spacer(Modifier.width(8.dp))
                         Text(
                             text = "${"%.1f".format(temperature?.toFloat())} °C",
-                            style = SpotTheme.typography.header01,
+                            style = SpotTheme.typography.h1,
                             fontSize = 25.sp,
                             color = SpotTheme.colors.white
                         )
                     }
                     Text(
                         text = message,
-                        style = SpotTheme.typography.bodySmall500,
+                        style = SpotTheme.typography.medium_500,
                         fontSize = 14.sp,
                         color = SpotTheme.colors.white
                     )

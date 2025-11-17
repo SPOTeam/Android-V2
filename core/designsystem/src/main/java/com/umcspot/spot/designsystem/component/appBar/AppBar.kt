@@ -136,7 +136,7 @@ fun BackTopBar(
         Spacer(Modifier.width(8.dp))
         Text(
             text = title,
-            style = SpotTheme.typography.bodyLarge500,
+            style = SpotTheme.typography.medium_500,
             fontSize = 18.sp
         )
     }

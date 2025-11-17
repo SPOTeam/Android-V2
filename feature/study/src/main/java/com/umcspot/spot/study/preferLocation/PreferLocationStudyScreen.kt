@@ -108,7 +108,7 @@ fun PreferLocationStudyScreen(
         // 타이틀
         Text(
             text = "내 지역 스터디",
-            style = SpotTheme.typography.bodySmall400.copy(fontSize = 20.sp)
+            style = SpotTheme.typography.small_400
         )
 
         Spacer(Modifier.height(8.dp))
@@ -204,7 +204,7 @@ private fun HeaderRow(
     ) {
         Text(
             text = "%02d건".format(size),
-            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 12.sp),
+            style = SpotTheme.typography.medium_500,
             color = SpotTheme.colors.gray500
         )
 
@@ -218,7 +218,7 @@ private fun HeaderRow(
                 Text(
                     text = sortType.label,
                     color = SpotTheme.colors.black,
-                    style = SpotTheme.typography.bodyMedium500.copy(fontSize = 12.sp)
+                    style = SpotTheme.typography.medium_500
                 )
                 Spacer(Modifier.width(5.dp))
                 Icon(
@@ -305,7 +305,7 @@ private fun SelectedLocationTabs(
                 ) {
                     Text(
                         text = name,
-                        style = SpotTheme.typography.bodyMedium600.copy(fontSize = 14.sp),
+                        style = SpotTheme.typography.medium_500,
                         modifier = Modifier.padding(horizontal = horizPad, vertical = 10.dp)
                     )
                 }

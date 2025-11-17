@@ -123,7 +123,7 @@ fun CompactDateTimeRow(
     ) {
         Text(
             text = label,
-            style = SpotTheme.typography.bodyMedium600,
+            style = SpotTheme.typography.medium_500,
             fontSize = 12.sp,
             color = SpotTheme.colors.G400,
             modifier = Modifier.weight(1f)
@@ -163,7 +163,7 @@ private fun PillChip(
         ) {
             Text(
                 text = text,
-                style = SpotTheme.typography.bodyMedium500,
+                style = SpotTheme.typography.medium_500,
                 fontSize = 12.sp
             )
         }

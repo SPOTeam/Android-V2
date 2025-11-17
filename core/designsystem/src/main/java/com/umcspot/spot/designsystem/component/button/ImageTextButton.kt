@@ -109,9 +109,9 @@ enum class MultiButtonSize(
 }
 @Composable
 fun MultiButtonSize.textStyle(): TextStyle = when (this) {
-    MultiButtonSize.XL, MultiButtonSize.L -> SpotTheme.typography.header03
-    MultiButtonSize.M -> SpotTheme.typography.header04
-    MultiButtonSize.S, MultiButtonSize.XS -> SpotTheme.typography.header05
+    MultiButtonSize.XL, MultiButtonSize.L -> SpotTheme.typography.h3
+    MultiButtonSize.M -> SpotTheme.typography.h4
+    MultiButtonSize.S, MultiButtonSize.XS -> SpotTheme.typography.h5
 }
 
 private val MultiButtonSize.horizontalPadding: Dp get() = when (this) {

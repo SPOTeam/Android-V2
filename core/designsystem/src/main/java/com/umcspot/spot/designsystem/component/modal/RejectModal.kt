@@ -60,13 +60,13 @@ fun RejectModal(
             ) {
                 Text(
                     text = modalTitle,
-                    style = SpotTheme.typography.bodyMedium500.copy(fontSize = 16.sp),
+                    style = SpotTheme.typography.medium_500,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = modalDes,
-                    style = SpotTheme.typography.bodySmall500.copy(fontSize = 12.sp)
+                    style = SpotTheme.typography.medium_500
                 )
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

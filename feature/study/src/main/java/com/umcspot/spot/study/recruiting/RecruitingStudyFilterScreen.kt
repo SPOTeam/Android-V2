@@ -166,7 +166,7 @@ fun ActivityTypeSection(
     ) {
         Text(
             text = "활동",
-            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 15.sp),
+            style = SpotTheme.typography.medium_500,
             color = SpotTheme.colors.black
         )
 
@@ -203,7 +203,7 @@ fun ActivityFeeSection(
     ) {
         Text(
             text = "활동비",
-            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 15.sp),
+            style = SpotTheme.typography.medium_500,
             color = SpotTheme.colors.black
         )
         Spacer(modifier = Modifier.height(10.dp))
@@ -235,7 +235,7 @@ fun ActivityThemeSection(
     ) {
         Text(
             text = "스터디 테마",
-            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 15.sp),
+            style = SpotTheme.typography.medium_500,
             color = SpotTheme.colors.black
         )
         Spacer(modifier = Modifier.height(10.dp))
@@ -278,9 +278,7 @@ fun ResetFilterText(
     Text(
         text = "필터 초기화",
         color = SpotTheme.colors.gray400,
-        style = SpotTheme.typography.bodySmall400.copy(
-            fontSize = 13.sp,
-            textDecoration = TextDecoration.Underline
+        style = SpotTheme.typography.medium_400.copy(textDecoration = TextDecoration.Underline
         ),
         modifier = modifier
             .semantics { role = Role.Button }

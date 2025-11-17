@@ -67,7 +67,7 @@ private fun SocialSignButton(
             // 텍스트: 항상 가운데 정렬
             Text(
                 text = text,
-                style = SpotTheme.typography.bodyMedium600,
+                style = SpotTheme.typography.medium_500,
                 fontSize = 18.sp,
                 modifier = Modifier.align(Alignment.Center)
             )

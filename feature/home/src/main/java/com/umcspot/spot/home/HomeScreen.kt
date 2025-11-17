@@ -163,7 +163,7 @@ fun QuickMenu(
                     Spacer(Modifier.height(6.dp))
                     Text(
                         text = item.label,
-                        style = SpotTheme.typography.bodyMedium600,
+                        style = SpotTheme.typography.medium_500,
                         fontSize = 14.sp,
                         color = Black,
                         maxLines = 1
@@ -224,7 +224,7 @@ fun PopularPostNow(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = title,
-                    style = SpotTheme.typography.bodyMedium500.copy(fontSize = 16.sp),
+                    style = SpotTheme.typography.medium_500,
                     color = Black
                 )
                 Spacer(Modifier.width(4.dp))
@@ -238,7 +238,7 @@ fun PopularPostNow(
             }
             Text(
                 text = subtitle,
-                style = SpotTheme.typography.bodySmall500.copy(fontSize = 14.sp),
+                style = SpotTheme.typography.medium_500,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.clickable(onClick = onContentClick),
@@ -278,7 +278,7 @@ fun PopularStudyNow(
         ) {
             Text(
                 text = title,
-                style = SpotTheme.typography.bodyMedium500.copy(fontSize = 18.sp),
+                style = SpotTheme.typography.medium_500,
                 modifier = Modifier.weight(1f)
             )
 
@@ -328,7 +328,7 @@ fun RecommendStudyNow(
         ) {
             Text(
                 text = title,
-                style = SpotTheme.typography.bodyMedium500.copy(fontSize = 18.sp),
+                style = SpotTheme.typography.medium_500,
                 modifier = Modifier.weight(1f)
             )
             IconButton(onClick = onRefreshClick, modifier = Modifier.size(18.dp)) {

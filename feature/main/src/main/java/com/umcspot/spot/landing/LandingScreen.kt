@@ -99,7 +99,7 @@ fun LandingScreen(
                     textAlign = TextAlign.Center,
                     lineHeight = 45.sp,
                     color = SpotTheme.colors.B500,
-                    style = SpotTheme.typography.bodySmall400
+                    style = SpotTheme.typography.small_400
                 )
             }
 

@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B500
+import com.umcspot.spot.designsystem.theme.Black
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.domain.board.model.LabeledBoardResult
@@ -88,20 +92,38 @@ fun BoardScreen(
                 verticalArrangement = Arrangement.spacedBy(18.dp),
                 contentPadding = PaddingValues(bottom = 24.dp)
             ) {
+                /* 스터디 파트너들의 이야기 (라벨 리스트) */
+                item {
+                    SectionHeader(
+                        title = "스터디 파트너들의 이야기",
+                        onMoreClick = {  }
+                    )
+                }
+
+                item {
+                    LabeledCardList(
+                        items = payload.labeledBoards, // ← payload에서 가져오기
+                        onItemClick = {  }
+                    )
+                }
+
+
                 /* 🔥 + 탭(우측정렬) */
                 item {
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 30.dp),
+                            .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Text(
+                            text = "Best 인기글",
+                            style = SpotTheme.typography.h3
+                        )
                         Image(
                             painter = painterResource(R.drawable.fire),
                             contentDescription = null,
                             modifier = Modifier
-                                .size(22.dp)
-                                .padding(end = 6.dp)
+                                .size(28.dp)
                         )
                         Spacer(Modifier.weight(1f))
                         BoardTabs(
@@ -115,34 +137,6 @@ fun BoardScreen(
                 item {
                     RankCardList(
                         items = payload.tagBoards, // ← payload에서 가져오기
-                        onItemClick = {  }
-                    )
-                }
-
-                /* 스터디 파트너들의 이야기 (라벨 리스트) */
-                item {
-                    SectionHeader(
-                        title = "스터디 파트너들의 이야기",
-                        onMoreClick = {  }
-                    )
-                }
-                item {
-                    LabeledCardList(
-                        items = payload.labeledBoards, // ← payload에서 가져오기
-                        onItemClick = {  }
-                    )
-                }
-
-                /* SPOT 공지 (랭크 리스트: noticeBoards) */
-                item {
-                    SectionHeader(
-                        title = "SPOT 공지",
-                        onMoreClick = {  }
-                    )
-                }
-                item {
-                    RankCardList(
-                        items = payload.rankedBoards,
                         onItemClick = {  }
                     )
                 }
@@ -172,7 +166,7 @@ private fun BoardTabChip(
     ) {
         Text(
             text = text,
-            style = SpotTheme.typography.bodySmall500.copy(fontSize = 13.sp),
+            style = SpotTheme.typography.medium_500,
             color = fg
         )
     }
@@ -188,6 +182,10 @@ private fun BoardTabs(
             text = "실시간",
             selected = selected == SortType.LIVE,
             onClick = { onSelect(SortType.LIVE) }
+        )
+        VerticalDivider(
+            modifier = Modifier
+                .fillMaxHeight()
         )
         BoardTabChip(
             text = "추천순",
@@ -216,14 +214,14 @@ private fun SectionHeader(
     ) {
         Text(
             text = title,
-            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 18.sp),
+            style = SpotTheme.typography.medium_500,
             modifier = Modifier.weight(1f)
         )
-        IconButton(onClick = onMoreClick, modifier = Modifier.size(28.dp)) {
+        IconButton(onClick = onMoreClick, modifier = Modifier.size(20.dp)) {
             Icon(
                 painter = painterResource(R.drawable.arrow_right),
                 contentDescription = "더보기",
-                tint = SpotTheme.colors.B500
+                tint = SpotTheme.colors.Black
             )
         }
     }
@@ -287,14 +285,14 @@ private fun LabeledCardList(
                     // 왼쪽 라벨
                     Text(
                         text = item.label.korean,
-                        style = SpotTheme.typography.bodySmall500.copy(fontSize = 14.sp),
+                        style = SpotTheme.typography.medium_500,
                         color = SpotTheme.colors.B500,
                         modifier = Modifier.widthIn(min = 56.dp)
                     )
                     // 제목
                     Text(
                         text = item.title,
-                        style = SpotTheme.typography.bodyMedium500.copy(fontSize = 14.sp),
+                        style = SpotTheme.typography.medium_500,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
@@ -302,7 +300,7 @@ private fun LabeledCardList(
                     // 카운트
                     Text(
                         text = "(${cap(item.count)})",
-                        style = SpotTheme.typography.bodySmall500.copy(fontSize = 14.sp),
+                        style = SpotTheme.typography.medium_500,
                         color = SpotTheme.colors.B500
                     )
                 }
@@ -332,20 +330,20 @@ private fun RankRow(
     ) {
         Text(
             text = rank.toString().padStart(2, '0'),
-            style = SpotTheme.typography.bodySmall500.copy(fontSize = 14.sp),
+            style = SpotTheme.typography.medium_500,
             color = SpotTheme.colors.B500,
             modifier = Modifier.width(28.dp)
         )
         Text(
             text = title,
-            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 14.sp),
+            style = SpotTheme.typography.medium_500,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)
         )
         Text(
             text = "(${cap(count)})",
-            style = SpotTheme.typography.bodySmall500.copy(fontSize = 14.sp),
+            style = SpotTheme.typography.medium_500,
             color = SpotTheme.colors.B500
         )
     }
