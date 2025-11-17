@@ -17,7 +17,7 @@ class UserRepositoryImpl @Inject constructor(
             val userName = userService.getUser()
             userName.result.toDomain()
         }.recoverCatching {
-            UserResult(name = "추연우")
+            UserResult(name = "123")
         }
 
     override suspend fun setUserTheme(theme: List<StudyTheme>): Result<UserTheme> =

@@ -9,9 +9,8 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 
 interface UserService {
-    @GET("/api/v1/service")
+    @GET("/api/members/name")
     suspend fun getUser(
-
     ): BaseResponse<UserResponseDto>
 
     @GET("/api/v1/service")

@@ -101,6 +101,7 @@ annotationJvm = "1.9.1"
 # naver login
 browser = "1.8.0"
 naver-oauth = "5.11.0"
+datastoreCore = "1.1.7"
 
 [plugins]
 # Gradle Plugins
@@ -271,6 +272,7 @@ kizitonwose-calendar-compose = { module = "com.kizitonwose.calendar:compose", ve
 #naver login
 naver-oauth = { module = "com.navercorp.nid:oauth", version.ref = "naver-oauth" }
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
+datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastoreCore" }
 
 [bundles]
 coil = ["coil", "coil-svg", "coil-gif"]

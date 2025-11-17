@@ -44,7 +44,7 @@ class LandingViewModel @Inject constructor(
                     if (error != null) {
                         Log.e(TAG, "로그인 실패", error)
                     } else if (token != null) {
-//                        Log.i(TAG, "로그인 성공 ${token.accessToken}")
+                        Log.i(TAG, "로그인 성공 ${token.accessToken}")
                         viewModelScope.launch {
                             runCatching {
                                 // 보통은 accessToken만 넘김

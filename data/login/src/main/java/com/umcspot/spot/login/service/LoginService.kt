@@ -13,4 +13,5 @@ interface LoginService {
         @Path("type") type : String,
         @Query("accessToken") accessToken : String
     ) : BaseResponse<TokenResponseDto>
+
 }
