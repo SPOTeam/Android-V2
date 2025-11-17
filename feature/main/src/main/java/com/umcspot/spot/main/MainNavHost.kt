@@ -7,70 +7,56 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
-import androidx.navigation.navOptions
 import com.umcspot.spot.alert.navigation.alertGraph
 import com.umcspot.spot.alert.navigation.appliedAlertGraph
-import com.umcspot.spot.alert.navigation.navigateToAppliedAlert
 import com.umcspot.spot.category.navigation.categoryGraph
 import com.umcspot.spot.feature.board.navigation.boardGraph
-import com.umcspot.spot.feature.board.navigation.navigateToBoard
 import com.umcspot.spot.home.navigation.homeGraph
-import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.jjimGraph
-import com.umcspot.spot.landing.Landing
 import com.umcspot.spot.landing.landingGraph
 import com.umcspot.spot.model.QuickMenuType
 import com.umcspot.spot.mypage.navigation.mypageGraph
 import com.umcspot.spot.study.my.navigation.myStudyGraph
-import com.umcspot.spot.study.preferLocation.navigation.navigateToPreferLocationStudy
 import com.umcspot.spot.study.preferLocation.navigation.preferLocationStudyGraph
-import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudy
-import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudyFilter
 import com.umcspot.spot.study.recruiting.navigation.recruitingStudyFilterGraph
 import com.umcspot.spot.study.recruiting.navigation.recruitingStudyGraph
+import com.umcspot.spot.study.register.navigation.registerStudyGraph
 
 @Composable
 fun MainNavHost(
     navigator: MainNavigator,
     modifier: Modifier = Modifier,
-    contentPadding : PaddingValues = PaddingValues(0.dp),
-    onRegisterScrollToTop: ((() -> Unit)?) -> Unit, // ✅ 추가
-
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
 ) {
     NavHost(
+        navController = navigator.navController,
+        startDestination = navigator.startDestination,
+        modifier = modifier,
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None },
         popEnterTransition = { EnterTransition.None },
         popExitTransition = { ExitTransition.None },
-        navController = navigator.navController,
-        startDestination = navigator.startDestination
     ) {
         landingGraph(
-            onKakaoClick = { navigator.navController.navigateToHome(
-                navOptions {
-                    popUpTo(Landing) { inclusive = true }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            ) },
-            onNaverClick = { navigator.navController.navigateToHome(
-                navOptions {
-                    // Landing을 백스택에서 제거
-                    popUpTo(Landing) { inclusive = true }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            ) }
+            onKakaoClick = {
+                navigator.navigateToHomeAfterLogin()
+            },
+            onNaverClick = {
+                navigator.navigateToHomeAfterLogin()
+            }
         )
 
         homeGraph(
             contentPadding = contentPadding,
             onQuickMenuClick = { type ->
                 when (type) {
-                    QuickMenuType.BOARD      -> { navigator.navController.navigateToBoard() }
-                    QuickMenuType.REGION     -> { navigator.navController.navigateToPreferLocationStudy() }
-                    QuickMenuType.INTERESTS  -> { /* navigator.navController.navigate(Interests) */ }
-                    QuickMenuType.RECRUITING -> { navigator.navController.navigateToRecruitingStudy() }
+                    QuickMenuType.BOARD -> navigator.navigateToBoard()
+                    QuickMenuType.REGION -> navigator.navigateToPreferLocationStudy()
+                    QuickMenuType.INTERESTS -> { /* TODO */
+                    }
+
+                    QuickMenuType.RECRUITING -> navigator.navigateToRecruitingStudy()
                 }
             }
         )
@@ -79,45 +65,45 @@ fun MainNavHost(
         jjimGraph()
         mypageGraph()
 
-
         recruitingStudyGraph(
             contentPadding = contentPadding,
             onRegisterScrollToTop = onRegisterScrollToTop,
             onItemClick = { },
-            onFilterClick = { navigator.navController.navigateToRecruitingStudyFilter() },
+            onFilterClick = { navigator.navigateToRecruitingStudyFilter() },
         )
 
         recruitingStudyFilterGraph(
             contentPadding = contentPadding,
-            onAcceptFilterClick = { navigator.navController.popBackStack() }
+            onAcceptFilterClick = { navigator.popBackStack() }
         )
 
         preferLocationStudyGraph(
             contentPadding = contentPadding,
             onRegisterScrollToTop = onRegisterScrollToTop,
             onItemClick = { },
-            onFilterClick = {  },
+            onFilterClick = { },
         )
-
 
         boardGraph(
             contentPadding = contentPadding,
         )
 
-
-
         alertGraph(
             contentPadding = contentPadding,
-            onClickApplied = {navigator.navController.navigateToAppliedAlert()},
+            onClickApplied = { navigator.navigateToAppliedAlert() },
             onRegisterScrollToTop = onRegisterScrollToTop
         )
 
         appliedAlertGraph(
             contentPadding = contentPadding,
             onRegisterScrollToTop = onRegisterScrollToTop,
-            onMoveToStudyScreenClick = {navigator.navController.navigateToBoard()} // Study로 수정 필요
+            onMoveToStudyScreenClick = { navigator.navigateToBoard() }
         )
 
-
+        registerStudyGraph(
+            contentPadding = contentPadding,
+            onBackClick = { navigator.popBackStack() },
+            navigateToHome = { navigator.navigateToHome() },
+        )
     }
 }
