@@ -55,13 +55,13 @@ fun EnrollStudyListItem(
             ) {
                 Text(
                     text = item.title,
-                    style = SpotTheme.typography.bodyMedium500.copy(fontSize = 16.sp),
+                    style = SpotTheme.typography.medium_500.copy(fontSize = 16.sp),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = "호스트가 스터디 참여를 수락했어요.\n스터디 참여 여부를 최종 픽스해주세요.",
-                    style = SpotTheme.typography.bodySmall500.copy(fontSize = 12.sp)
+                    style = SpotTheme.typography.small_500.copy(fontSize = 12.sp)
                 )
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -155,7 +155,7 @@ fun PreferLocationBottomSheet(
                         Spacer(Modifier.width(24.dp))
                         Text(
                             text = "스터디 지역",
-                            style = SpotTheme.typography.bodySmall400.copy(fontSize = 18.sp),
+                            style = SpotTheme.typography.small_400.copy(fontSize = 18.sp),
                             color = SpotTheme.colors.black
                         )
                         IconButton(onClick = { animateAndDismiss() }) {
@@ -171,12 +171,12 @@ fun PreferLocationBottomSheet(
 
                     Text(
                         text = "스터디를 진행하고 싶은 지역을 추가해주세요.",
-                        style = SpotTheme.typography.bodyMedium600.copy(fontSize = 15.sp),
+                        style = SpotTheme.typography.h3.copy(fontSize = 15.sp),
                         color = SpotTheme.colors.gray500
                     )
                     Text(
                         text = "최대 10개까지 추가할 수 있어요",
-                        style = SpotTheme.typography.bodySmall300.copy(fontSize = 13.sp),
+                        style = SpotTheme.typography.h5.copy(fontSize = 13.sp),
                         color = SpotTheme.colors.gray500
                     )
 
@@ -186,13 +186,13 @@ fun PreferLocationBottomSheet(
                         value = query,
                         onValueChange = onQueryChange,
                         singleLine = true,
-                        textStyle = SpotTheme.typography.bodySmall300.copy(
+                        textStyle = SpotTheme.typography.h5.copy(
                             fontSize = 14.sp
                         ),
                         placeholder = {
                             Text(
                                 text = "OO시, OO구, OO동",
-                                style = SpotTheme.typography.bodySmall300.copy(fontSize = 14.sp),
+                                style = SpotTheme.typography.h5.copy(fontSize = 14.sp),
                                 color = SpotTheme.colors.gray400
                             )
                         },
@@ -263,7 +263,7 @@ fun PreferLocationBottomSheet(
                         Text(
                             text = "검색 결과가 없습니다.",
                             color = SpotTheme.colors.gray400,
-                            style = SpotTheme.typography.bodySmall300,
+                            style = SpotTheme.typography.small_300,
                             modifier = Modifier.padding(top = 14.dp),
                         )
                     }
@@ -293,7 +293,7 @@ private fun SelectedChips(
         items.forEach { name ->
             AssistChip(
                 onClick = { /* no-op */ },
-                label = { Text(name, style = SpotTheme.typography.bodySmall300.copy(fontSize = 14.sp)) },
+                label = { Text(name, style = SpotTheme.typography.small_300.copy(fontSize = 14.sp)) },
                 trailingIcon = {
                     Icon(
                         painter = painterResource(R.drawable.dismiss),
