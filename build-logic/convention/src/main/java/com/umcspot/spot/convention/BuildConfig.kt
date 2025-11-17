@@ -9,7 +9,7 @@ internal fun Project.configureBuildConfig(
 ) {
     val properties = gradleLocalProperties(rootDir, providers)
 
-    val baseUrl = properties.getProperty("BASE_URL") ?: "https://api-spot.site/"
+    val baseUrl = properties.getProperty("BASE_URL") ?: ""
     val kakaoNativeKey = properties.getProperty("KAKAO_NATIVE_KEY") ?: ""
     val naverClientId = properties.getProperty("NAVER_CLIENT_ID") ?: ""
     val naverClientSecret = properties.getProperty("NAVER_CLIENT_SECRET") ?: ""
