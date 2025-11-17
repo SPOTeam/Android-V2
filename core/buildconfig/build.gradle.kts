@@ -10,6 +10,7 @@ android {
 
     defaultConfig {
         buildConfigField("String", "BASE_URL", "\"https://api-spot.site/\"")
+        buildConfigField("String", "KAKAO_NATIVE_KEY", "\"7878cb24cec56458df067991de5e7786\"")
     }
 
 }

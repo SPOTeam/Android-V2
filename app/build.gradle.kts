@@ -7,13 +7,14 @@ plugins {
 android {
     namespace = "com.umcspot.spot"
 
-//    signingConfigs {
-//        getByName("debug") {
-//            keyAlias = "androiddebugkey"
-//            keyPassword = "android"
-//            storeFile = file("debug.keystore")
-//        }
-//    }
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("key/SpotKey")
+            storePassword = "spotspot"
+            keyAlias = "spotkey0"
+            keyPassword = "spotspot"
+        }
+    }
 
     buildTypes {
         debug {
@@ -53,4 +54,8 @@ dependencies {
     implementation(projects.data.board)
     implementation(projects.data.user)
     implementation(projects.data.login)
+
+    implementation(libs.kakao.common)
+    implementation(libs.kakao.login)
+    implementation(libs.kakao.auth)
 }
