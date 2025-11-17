@@ -1,6 +1,5 @@
 package com.umcspot.spot.designsystem.theme
 
-
 import android.app.Activity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -12,8 +11,11 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
+// SpotColors/SpotDayColors는 기존 정의 사용
 private val LocalSpotColors =
     staticCompositionLocalOf<SpotColors> { error("No colors provided") }
+
+// 여기서 SpotTypography는 우리가 아래 Typography.kt에서 정의한 타입을 사용
 private val LocalSpotTypography =
     staticCompositionLocalOf<SpotTypography> { error("No typography provided") }
 
@@ -35,8 +37,10 @@ fun ProvideSpotColorsAndTypography(
     typography: SpotTypography,
     content: @Composable () -> Unit
 ) {
+    // copy()/update() 패턴으로 CompositionLocal 내 객체의 참조 안정성 유지
     val provideColors = remember { colors.copy() }
     provideColors.update(colors)
+
     val provideTypography = remember { typography.copy() }
     provideTypography.update(typography)
 
@@ -53,6 +57,7 @@ fun SpotTheme(
     content: @Composable () -> Unit
 ) {
     val colors = SpotDayColors()
+    // 디폴트 타이포 세트 팩토리 (아래 Typography.kt에서 제공)
     val typography = SpotTypography()
 
     val view = LocalView.current
@@ -63,8 +68,11 @@ fun SpotTheme(
             WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = true
         }
     }
+
     ProvideSpotColorsAndTypography(colors, typography) {
         MaterialTheme(
+            // M3 컴포넌트도 네 타이포 맵핑을 쓰도록 연결
+            typography = AppTypography,
             content = content
         )
     }

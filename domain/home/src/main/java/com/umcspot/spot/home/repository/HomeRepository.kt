@@ -1,8 +1,8 @@
 package com.umcspot.spot.home.repository
 
-import com.umcspot.spot.home.model.Dummy
-import com.umcspot.spot.home.model.DummyResult
+import com.umcspot.spot.home.model.Home
+import com.umcspot.spot.home.model.HomeResult
 
 interface HomeRepository {
-    suspend fun getDummies(request: Dummy): Result<DummyResult>
+    suspend fun getHomeData(request : Home): Result<HomeResult>
 }

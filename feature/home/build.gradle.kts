@@ -7,4 +7,5 @@ android {
 
 dependencies {
     implementation(projects.domain.home)
+    implementation(projects.core.designsystem)
 }

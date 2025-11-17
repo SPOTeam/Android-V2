@@ -7,4 +7,7 @@ android {
 }
 dependencies {
     implementation(projects.domain.home)
+    implementation(projects.domain.weather)
+    implementation(projects.domain.study)
+    implementation(projects.core.model)
 }

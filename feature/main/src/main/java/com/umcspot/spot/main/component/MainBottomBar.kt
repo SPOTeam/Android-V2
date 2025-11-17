@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
@@ -21,11 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.umcspot.spot.designsystem.theme.B400
+import com.umcspot.spot.designsystem.theme.Black
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.designsystem.theme.black
-import com.umcspot.spot.designsystem.theme.success300
 import com.umcspot.spot.main.MainNavTab
 import com.umcspot.spot.ui.extension.noRippleClickable
 import com.umcspot.spot.ui.extension.screenHeightDp
@@ -36,7 +39,7 @@ fun MainBottomBar(
     visible: Boolean,
     tabs: ImmutableList<MainNavTab>,
     currentTab: MainNavTab?,
-    onTabSelected: (MainNavTab) -> Unit
+    onTabSelected: (MainNavTab) -> Unit,
 ) {
     AnimatedVisibility(
         visible = visible,
@@ -80,8 +83,8 @@ fun RowScope.MainBottomBarItem(
     selected: Boolean,
     onClick: () -> Unit
 ) {
-    val bottomItemColor = if (selected) success300 else black
-    val bottomTextStyle = if (selected) SpotTheme.typography.body4 else SpotTheme.typography.body6
+    val bottomItemColor = if (selected) B400 else Black
+    val bottomTextStyle = if (selected) SpotTheme.typography.regular_400 else SpotTheme.typography.regular_400
 
     Column(
         modifier = modifier
