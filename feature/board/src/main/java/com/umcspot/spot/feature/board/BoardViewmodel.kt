@@ -33,16 +33,13 @@ class BoardViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val tagDeferred = async { boardRepository.getTagBoardData(selected) }
-                val rankedDeferred = async { boardRepository.getRankedBoardData() }
                 val labeledDeferred = async { boardRepository.getLabeledBoardData() }
 
                 val tagBoards = tagDeferred.await().getOrThrow()
-                val rankedBoards = rankedDeferred.await().getOrThrow()
                 val labeledBoards = labeledDeferred.await().getOrThrow()
 
                 BoardPayload(
                     tagBoards = tagBoards,
-                    rankedBoards = rankedBoards,
                     labeledBoards = labeledBoards,
                     selected = selected
                 )
@@ -83,11 +80,5 @@ class BoardViewModel @Inject constructor(
                     // 필요 시 에러 처리(토스트/스낵바 등). 최소한 선택값은 유지됨.
                 }
         }
-    }
-
-    /** 전체 새로고침이 필요할 때 */
-    fun refreshAll() {
-        val sel = (uiState.value.user as? UiState.Success<BoardPayload>)?.data?.selected ?: return
-        load(sel)
     }
 }

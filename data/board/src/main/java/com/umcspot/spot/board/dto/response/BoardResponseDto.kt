@@ -7,26 +7,6 @@ import kotlinx.serialization.Serializable
 
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
-data class RankedBoardResponseDto(
-    @SerialName("boardItems")
-    val boardItems : List<RankedBoardItem>
-)
-
-@SuppressLint("UnsafeOptInUsageError")
-@Serializable
-data class RankedBoardItem (
-    @SerialName("id")
-    val id : Int,
-
-    @SerialName("title")
-    val title : String,
-
-    @SerialName("count")
-    val count : Int
-)
-
-@SuppressLint("UnsafeOptInUsageError")
-@Serializable
 data class LabeledBoardResponseDto(
     @SerialName("boardItems")
     val boardItems : List<LabeledBoardItem>
@@ -43,6 +23,9 @@ data class LabeledBoardItem (
 
     @SerialName("title")
     val title : String,
+
+    @SerialName("content")
+    val content : String,
 
     @SerialName("count")
     val count : Int

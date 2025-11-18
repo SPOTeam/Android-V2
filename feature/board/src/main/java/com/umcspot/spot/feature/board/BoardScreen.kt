@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,41 +17,60 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.effect.dropShadow.dropShadow
 import com.umcspot.spot.designsystem.shapes.SpotShapes
+import com.umcspot.spot.designsystem.theme.B100
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.Black
+import com.umcspot.spot.designsystem.theme.G200
 import com.umcspot.spot.designsystem.theme.G300
+import com.umcspot.spot.designsystem.theme.G500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.domain.board.model.LabeledBoardResult
 import com.umcspot.spot.domain.board.model.LabeledBoardResultList
-import com.umcspot.spot.domain.board.model.RankedBoardResult
-import com.umcspot.spot.domain.board.model.RankedBoardResultList
+import com.umcspot.spot.model.ImageRef
 import com.umcspot.spot.model.SortType
 import com.umcspot.spot.model.korean
+import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
 import com.umcspot.spot.ui.state.UiState
+import kotlin.math.cos
+import kotlin.math.sin
 
 @Composable
 fun BoardScreen(
@@ -96,14 +116,14 @@ fun BoardScreen(
                 item {
                     SectionHeader(
                         title = "스터디 파트너들의 이야기",
-                        onMoreClick = {  }
+                        onMoreClick = { }
                     )
                 }
 
                 item {
                     LabeledCardList(
                         items = payload.labeledBoards, // ← payload에서 가져오기
-                        onItemClick = {  }
+                        onItemClick = { }
                     )
                 }
 
@@ -119,12 +139,14 @@ fun BoardScreen(
                             text = "Best 인기글",
                             style = SpotTheme.typography.h3
                         )
+
                         Image(
                             painter = painterResource(R.drawable.fire),
                             contentDescription = null,
                             modifier = Modifier
                                 .size(28.dp)
                         )
+
                         Spacer(Modifier.weight(1f))
                         BoardTabs(
                             selected = payload.selected, // ← payload에서 가져오기
@@ -135,9 +157,9 @@ fun BoardScreen(
 
                 /* 실시간 인기글 카드 (탭 영향 받는 랭크 리스트: tagBoards) */
                 item {
-                    RankCardList(
+                    SortedCardList(
                         items = payload.tagBoards, // ← payload에서 가져오기
-                        onItemClick = {  }
+                        onItemClick = { }
                     )
                 }
             }
@@ -153,12 +175,12 @@ private fun BoardTabChip(
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    val bg = if (selected) SpotTheme.colors.B500.copy(alpha = 0.12f) else Color.Transparent
-    val fg = if (selected) SpotTheme.colors.B500 else Color(0xFF666B73)
+    val bg = if (selected) SpotTheme.colors.B100 else Color.Transparent
+    val fg = if (selected) SpotTheme.colors.B500 else SpotTheme.colors.G500
 
     Box(
         modifier = Modifier
-            .clip(SpotShapes.Round)
+            .clip(SpotShapes.Hard)
             .background(bg)
             .clickable(onClick = onClick)
             .padding(horizontal = 10.dp, vertical = 4.dp),
@@ -177,21 +199,39 @@ private fun BoardTabs(
     selected: SortType,
     onSelect: (SortType) -> Unit
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(
+        modifier = Modifier.height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.spacedBy(screenWidthDp(7.dp))
+    ) {
         BoardTabChip(
             text = "실시간",
             selected = selected == SortType.LIVE,
             onClick = { onSelect(SortType.LIVE) }
         )
+
         VerticalDivider(
             modifier = Modifier
-                .fillMaxHeight()
+                .padding(vertical = screenHeightDp(5.dp))
+                .fillMaxHeight(),
+            color = SpotTheme.colors.G300,
+            thickness = 1.dp
         )
+
+
         BoardTabChip(
             text = "추천순",
             selected = selected == SortType.RECOMMEND,
             onClick = { onSelect(SortType.RECOMMEND) }
         )
+
+        VerticalDivider(
+            modifier = Modifier
+                .padding(vertical = screenHeightDp(5.dp))
+                .fillMaxHeight(),
+            color = SpotTheme.colors.G300,
+            thickness = 1.dp
+        )
+
         BoardTabChip(
             text = "댓글순",
             selected = selected == SortType.COMMENTS,
@@ -209,7 +249,7 @@ private fun SectionHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 2.dp),
+            .padding(top = screenHeightDp(2.dp)),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -227,35 +267,6 @@ private fun SectionHeader(
     }
 }
 
-/** 랭크 카드 리스트 */
-@Composable
-private fun RankCardList(
-    items: RankedBoardResultList,
-    onItemClick: (RankedBoardResult) -> Unit
-) {
-    val borderStroke = BorderStroke(1.dp, SpotTheme.colors.G300)
-
-    Surface(
-        shape = SpotShapes.Soft,
-        color = Color.Transparent,
-        tonalElevation = 0.dp,
-        shadowElevation = 0.dp,
-        border = borderStroke,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(vertical = 6.dp)) {
-            items.boardList.forEachIndexed { index, item ->
-                RankRow(
-                    rank = index + 1,
-                    title = item.title,
-                    count = item.count,
-                    onClick = { onItemClick(item) },
-                    modifier = Modifier
-                )
-            }
-        }
-    }
-}
 
 /** 라벨이 있는 리스트 */
 @Composable
@@ -263,7 +274,7 @@ private fun LabeledCardList(
     items: LabeledBoardResultList,
     onItemClick: (LabeledBoardResult) -> Unit
 ) {
-    val borderStroke = BorderStroke(1.dp, SpotTheme.colors.G300)
+    val borderStroke = BorderStroke(1.dp, SpotTheme.colors.G200)
 
     Surface(
         shape = SpotShapes.Soft,
@@ -299,7 +310,7 @@ private fun LabeledCardList(
                     )
                     // 카운트
                     Text(
-                        text = "(${cap(item.count)})",
+                        text = "( ${cap(item.count)} )",
                         style = SpotTheme.typography.medium_500,
                         color = SpotTheme.colors.B500
                     )
@@ -309,42 +320,79 @@ private fun LabeledCardList(
     }
 }
 
-/** 999+ 포맷 */
-private fun cap(n: Int): String = if (n >= 1000) "999+" else n.toString()
-
-/* ---------- 랭크 행 ---------- */
 @Composable
-private fun RankRow(
-    rank: Int,
-    title: String,
-    count: Int,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
+private fun SortedCardList(
+    items: LabeledBoardResultList,
+    onItemClick: (LabeledBoardResult) -> Unit
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
+    val borderStroke = BorderStroke(1.dp, SpotTheme.colors.G200)
+
+    Column(
+        modifier = Modifier
+            .padding(vertical = 6.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
-            text = rank.toString().padStart(2, '0'),
-            style = SpotTheme.typography.medium_500,
-            color = SpotTheme.colors.B500,
-            modifier = Modifier.width(28.dp)
-        )
-        Text(
-            text = title,
-            style = SpotTheme.typography.medium_500,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
-        )
-        Text(
-            text = "(${cap(count)})",
-            style = SpotTheme.typography.medium_500,
-            color = SpotTheme.colors.B500
-        )
+        items.boardList.forEach { item ->
+            Surface(
+                shape = SpotShapes.Soft,
+                color = Color.Transparent,
+                tonalElevation = 0.dp,
+                shadowElevation = 0.dp,
+                border = borderStroke,
+                modifier = Modifier
+                    .fillMaxWidth()
+
+            ) {
+                Column(
+                    modifier = Modifier
+                        .clickable { onItemClick(item) }
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                ) {
+                    // 제목
+                    Text(
+                        text = item.title,
+                        style = SpotTheme.typography.medium_500,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+
+                    // 내용
+                    Text(
+                        text = item.content,
+                        style = SpotTheme.typography.regular_400,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // 왼쪽 라벨
+                        Text(
+                            text = item.label.korean,
+                            style = SpotTheme.typography.medium_500,
+                            color = SpotTheme.colors.B500,
+                            modifier = Modifier.widthIn(min = 56.dp)
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        // 카운트
+                        Text(
+                            text = "( ${cap(item.count)} )",
+                            style = SpotTheme.typography.medium_500,
+                            color = SpotTheme.colors.B500
+                        )
+                    }
+                }
+            }
+        }
     }
 }
+
+/** 999+ 포맷 */
+private fun cap(n: Int): String = if (n >= 1000) "999+" else n.toString()
