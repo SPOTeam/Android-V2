@@ -52,7 +52,7 @@ object NetworkModule {
         buildConfigProvider: BuildConfigFieldProvider
     ): Retrofit =
         Retrofit.Builder()
-            .baseUrl(/*buildConfigProvider.get().baseUrl*/"https://api-spot.site/")
+            .baseUrl(buildConfigProvider.get().baseUrl)
             .client(client)
             .addConverterFactory(converterFactory)
             .build()

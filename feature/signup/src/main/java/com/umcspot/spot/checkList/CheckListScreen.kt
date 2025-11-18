@@ -20,17 +20,18 @@ import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.button.TextButtonM
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.StudyTheme
+import com.umcspot.spot.signup.SignUpViewModel
 
 @Composable
 fun CheckListScreen(
     contentPadding: PaddingValues,
     onNextClick: () -> Unit,
+    signUpViewModel: SignUpViewModel = hiltViewModel(),
     viewmodel: CheckListViewModel = hiltViewModel()
 ) {
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
 
-    // ✅ VM의 선택 상태 구독
     val theme by viewmodel.themes.collectAsStateWithLifecycle()
 
     Column(
@@ -57,11 +58,12 @@ fun CheckListScreen(
 
         Spacer(Modifier.weight(1f))
 
-        // ✅ 다음 버튼: 선택이 있어야 활성화
+
         TextButton(
             text = "다음",
-            enabled = theme != null,
+            enabled = theme.isNotEmpty(),
             onClick = {
+                signUpViewModel.saveNameIfChanged()
                 viewmodel.submitThemes()
                 onNextClick()
             }
@@ -84,15 +86,15 @@ fun ActivityThemeSection(
             StudyTheme.entries.forEach { theme ->
                 val iconRes = when (theme) {
                     StudyTheme.LANGUAGE   -> painterResource(R.drawable.language)
-                    StudyTheme.LICENSE    -> painterResource(R.drawable.license)
-                    StudyTheme.EMPLOYMENT -> painterResource(R.drawable.employment)
-                    StudyTheme.DISCUSSION  -> painterResource(R.drawable.discussion)
-                    StudyTheme.NEWS       -> painterResource(R.drawable.news)
-                    StudyTheme.SELFSTUDY  -> painterResource(R.drawable.self_study)
+                    StudyTheme.CERTIFICATION    -> painterResource(R.drawable.license)
+                    StudyTheme.CAREER -> painterResource(R.drawable.employment)
+                    StudyTheme.DEBATE  -> painterResource(R.drawable.discussion)
+                    StudyTheme.CURRENT_AFFAIRS       -> painterResource(R.drawable.news)
+                    StudyTheme.SELF_STUDY  -> painterResource(R.drawable.self_study)
                     StudyTheme.PROJECT    -> painterResource(R.drawable.project)
-                    StudyTheme.CONTEST    -> painterResource(R.drawable.contest)
-                    StudyTheme.MAJOR      -> painterResource(R.drawable.major)
-                    StudyTheme.ETC        -> painterResource(R.drawable.resource_else)
+                    StudyTheme.COMPETITION    -> painterResource(R.drawable.contest)
+                    StudyTheme.MAJOR_CAREER     -> painterResource(R.drawable.major)
+                    StudyTheme.OTHER        -> painterResource(R.drawable.resource_else)
                 }
 
                 MultiButton(

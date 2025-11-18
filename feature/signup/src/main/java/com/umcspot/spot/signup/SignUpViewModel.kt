@@ -1,5 +1,6 @@
 package com.umcspot.spot.signup
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umcspot.spot.ui.state.UiState
@@ -17,8 +18,11 @@ class SignUpViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    data class SignupUiState(val user: UiState<String> = UiState.Empty)
-
+    data class SignupUiState(
+        val user: UiState<String> = UiState.Empty,
+        val originalName: String? = null,  // 서버에서 가져온 원래 이름
+        val currentName: String? = null    // 현재 수정 중인 이름
+    )
     private val _name = MutableStateFlow(SignupUiState())
     val name: StateFlow<SignupUiState> = _name.asStateFlow()
 
@@ -30,18 +34,58 @@ class SignUpViewModel @Inject constructor(
 
             val newState = result.fold(
                 onSuccess = { userResult ->
-                    UiState.Success(userResult.name)  // ✅ 성공 시 이름 문자열 전달
+                    UiState.Success(userResult.name)
                 },
                 onFailure = { e ->
-                    UiState.Failure(e.message ?: e.toString())  // ✅ 실패 시 에러 메시지
+                    UiState.Failure(e.message ?: e.toString())
                 }
             )
 
-            _name.update { it.copy(user = newState) }
+            _name.update {
+                it.copy(
+                    user = newState,
+                    originalName = (newState as? UiState.Success)?.data,
+                    currentName = (newState as? UiState.Success)?.data
+                )
+            }
+        }
+    }
+    fun setName(newName: String) {
+        _name.update {
+            it.copy(
+                user = UiState.Success(newName),
+                currentName = newName
+            )
         }
     }
 
-    fun setName(newName: String) {
-        _name.update { it.copy(user = UiState.Success(newName)) } // 사용하는 상태 구조에 맞게 반영
+    fun saveNameIfChanged() {
+        val (original, current) = getNamePair()
+
+        if (current.isNullOrBlank() || current == original) return
+
+        viewModelScope.launch {
+            userRepository.setUserName(current)
+                .onSuccess {
+                    Log.d("ChangeName", "이름 변경 성공")
+                    // 서버에도 저장됐으니, 로컬 state도 맞춰주기
+                    _name.update {
+                        it.copy(
+                            user = UiState.Success(current),
+                            originalName = current,
+                            currentName = current
+                        )
+                    }
+                }
+                .onFailure { e ->
+                    Log.e("ChangeName", "이름 변경 실패", e)
+                }
+        }
+    }
+
+
+    fun getNamePair(): Pair<String?, String?> {
+        Log.d("NamePair", "${_name.value.originalName} ::: ${_name.value.currentName}")
+        return _name.value.originalName to _name.value.currentName
     }
 }

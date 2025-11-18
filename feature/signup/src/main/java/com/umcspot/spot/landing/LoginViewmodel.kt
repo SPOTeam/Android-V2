@@ -37,12 +37,11 @@ class LandingViewModel @Inject constructor(
     private val _events = MutableSharedFlow<LoginEvent>()
     val events = _events.asSharedFlow()
 
-    /** 카카오/네이버 공용 시작 함수 */
     fun startSocialLogin(
         type: SocialLoginType,
-        activity: Activity,   // ← Activity를 받기
+        activity: Activity,
     ) = viewModelScope.launch {
-        lastSocialLoginType = type   // 🔹 어떤 소셜인지 기억해 둠
+        lastSocialLoginType = type
 
         if(type == SocialLoginType.KAKAO) {
             try {
@@ -73,7 +72,6 @@ class LandingViewModel @Inject constructor(
         } else if (type == SocialLoginType.NAVER) {
             val nidOAuthCallback = object : NidOAuthCallback {
                 override fun onSuccess() {
-                    // 네이버 SDK 내부에서 로그인 성공
                     val accessToken = NidOAuth.getAccessToken()
 
                     if (accessToken.isNullOrBlank()) {
@@ -90,8 +88,8 @@ class LandingViewModel @Inject constructor(
                     viewModelScope.launch {
                         runCatching {
                             loginRepository.finishSocialLogin(
-                                type = lastSocialLoginType!!,   // NAVER
-                                accessToken = accessToken       // 네이버 access token
+                                type = lastSocialLoginType!!,
+                                accessToken = accessToken
                             )
                         }.onSuccess {
                             _events.emit(LoginEvent.LoginSucceeded)
@@ -111,7 +109,6 @@ class LandingViewModel @Inject constructor(
             }
 
             try {
-                // context: @ApplicationContext 주입받은 Context
                 NidOAuth.requestLogin(activity, nidOAuthCallback)
             } catch (e: Exception) {
                 Log.e(TAG, "네이버 로그인 요청 중 예외", e)

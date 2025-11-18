@@ -271,7 +271,7 @@ fun EditableNameRow(
                     },
                     singleLine = true,
                     shape = SpotShapes.Hard,
-                    textStyle = SpotTheme.typography.bodySmall400.copy(fontSize = 20.sp),
+                    textStyle = SpotTheme.typography.bodySmall400,
                     placeholder = { Text("이름을 입력하세요", style = SpotTheme.typography.bodySmall400) },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {

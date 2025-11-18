@@ -68,11 +68,13 @@ fun MainNavHost(
 
         signupGraph(
             contentPadding = contentPadding,
+            navController = navigator.navController,
             onNextClick = { navigator.navController.navigateToCheckList() }
         )
 
         checkListGraph(
             contentPadding = contentPadding,
+            navController = navigator.navController,
             onNextClick = { navigator.navController.navigateToSaving() }
         )
 

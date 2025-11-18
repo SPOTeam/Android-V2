@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,12 +43,11 @@ fun SavingScreen(
     autoProgress: Boolean = true,
     autoDurationMs: Int = 1800,
     blockBackPress: Boolean = true,
-    onFinished: () -> Unit,      // ⬅️ 끝나면 호출
+    onFinished: () -> Unit,
 ) {
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
 
-    // 뒤로가기 방지 (원하면 끄기 가능)
     BackHandler(enabled = blockBackPress) { /* no-op: 뒤로가기 무시 */ }
 
     val internal = remember { Animatable(0f) }
@@ -61,7 +61,7 @@ fun SavingScreen(
                 animationSpec = tween(durationMillis = autoDurationMs, easing = LinearEasing)
             )
             isDone = true
-            delay(3000)          // 3초 대기
+            delay(3000)
             onFinished()
         }
     }
@@ -72,7 +72,6 @@ fun SavingScreen(
             .background(SpotTheme.colors.white)
             .padding(top = topPad, bottom = bottomPad, start = 16.dp, end = 16.dp)
     ) {
-        // 중앙 컨텐츠
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -85,7 +84,7 @@ fun SavingScreen(
                 modifier = Modifier.size(40.dp)
             )
             Spacer(Modifier.height(16.dp))
-            androidx.compose.material3.Text(
+            Text(
                 text = "당신의 스터디 파트너 \n 스팟, SPOT",
                 style = SpotTheme.typography.bodyMedium500.copy(fontSize = 20.sp),
                 color = SpotTheme.colors.B500,
@@ -93,7 +92,6 @@ fun SavingScreen(
             )
         }
 
-        // 하단 진행 영역
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -102,7 +100,7 @@ fun SavingScreen(
                 .padding(bottom = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            androidx.compose.material3.Text(
+            Text(
                 text = if (isDone) "등록 완료!" else "내 정보 저장 중..",
                 style = SpotTheme.typography.bodySmall400.copy(fontSize = 13.sp),
                 color = SpotTheme.colors.B500

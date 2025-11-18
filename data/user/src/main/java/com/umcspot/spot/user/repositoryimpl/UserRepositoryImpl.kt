@@ -20,13 +20,23 @@ class UserRepositoryImpl @Inject constructor(
             UserResult(name = "123")
         }
 
-    override suspend fun setUserTheme(theme: List<StudyTheme>): Result<UserTheme> =
+    override suspend fun setUserName(name: String): Result<Unit> =
+        runCatching {
+            val response = userService.setUserName(name.toRequestDto())
+
+            if (!response.isSuccess) {
+                throw IllegalStateException("API 실패: code=${response.code}, msg=${response.message}")
+            }
+        }
+
+
+    override suspend fun setUserTheme(theme: List<StudyTheme>): Result<Unit> =
         runCatching {
             val response = userService.setUserTheme(theme.toRequestDto())
-            response.result.toDomain()
+//            response.result.toDomain()
         }.recoverCatching {
             UserTheme(
-                userThemes = listOf(StudyTheme.DISCUSSION, StudyTheme.SELFSTUDY)
+                userThemes = listOf(StudyTheme.MAJOR_CAREER, StudyTheme.SELF_STUDY)
             )
         }
 }
