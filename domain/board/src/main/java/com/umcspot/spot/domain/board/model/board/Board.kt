@@ -1,4 +1,4 @@
-package com.umcspot.spot.domain.board.model
+package com.umcspot.spot.domain.board.model.board
 
 import com.umcspot.spot.model.SortType
 

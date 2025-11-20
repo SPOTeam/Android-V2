@@ -1,6 +1,7 @@
 package com.umcspot.spot.board.service
 
 import com.umcspot.spot.board.dto.response.LabeledBoardResponseDto
+import com.umcspot.spot.board.dto.response.PostResponseDto
 import com.umcspot.spot.model.SortType
 import com.umcspot.spot.network.model.BaseResponse
 import retrofit2.http.GET
@@ -15,5 +16,9 @@ interface BoardService {
     @GET("/api/posts/hot") // BEST 인기글 조회
     suspend fun getLabeledBoardInfo(
     ): BaseResponse<LabeledBoardResponseDto>
+
+    @GET("/api/posts/hot") // BEST 인기글 조회
+    suspend fun getPosts(
+    ): BaseResponse<PostResponseDto>
 
 }

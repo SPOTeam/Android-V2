@@ -18,9 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
@@ -29,30 +28,17 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.effect.dropShadow.dropShadow
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B100
 import com.umcspot.spot.designsystem.theme.B500
@@ -61,21 +47,20 @@ import com.umcspot.spot.designsystem.theme.G200
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.G500
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.domain.board.model.LabeledBoardResult
-import com.umcspot.spot.domain.board.model.LabeledBoardResultList
-import com.umcspot.spot.model.ImageRef
+import com.umcspot.spot.domain.board.model.board.LabeledBoardResult
+import com.umcspot.spot.domain.board.model.board.LabeledBoardResultList
 import com.umcspot.spot.model.SortType
 import com.umcspot.spot.model.korean
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 import com.umcspot.spot.ui.state.UiState
-import kotlin.math.cos
-import kotlin.math.sin
+import kotlinx.coroutines.launch
 
 @Composable
 fun BoardScreen(
     viewmodel: BoardViewModel = hiltViewModel(),
-    contentPadding: PaddingValues = PaddingValues(0.dp)
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    onMoveToBoardList : () -> Unit,
 ) {
     val state by viewmodel.uiState.collectAsStateWithLifecycle()
 
@@ -98,7 +83,7 @@ fun BoardScreen(
             Text(text = "에러: ${state.msg}", color = Color.Red)
         }
 
-        UiState.Empty -> {
+        is UiState.Empty -> {
             Text(text = "데이터가 없습니다.")
         }
 
@@ -116,7 +101,7 @@ fun BoardScreen(
                 item {
                     SectionHeader(
                         title = "스터디 파트너들의 이야기",
-                        onMoreClick = { }
+                        onMoveToBoardList = onMoveToBoardList
                     )
                 }
 
@@ -244,7 +229,7 @@ private fun BoardTabs(
 @Composable
 private fun SectionHeader(
     title: String,
-    onMoreClick: () -> Unit
+    onMoveToBoardList: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -257,11 +242,11 @@ private fun SectionHeader(
             style = SpotTheme.typography.medium_500,
             modifier = Modifier.weight(1f)
         )
-        IconButton(onClick = onMoreClick, modifier = Modifier.size(20.dp)) {
+        IconButton(onClick = onMoveToBoardList, modifier = Modifier.size(20.dp)) {
             Icon(
                 painter = painterResource(R.drawable.arrow_right),
                 contentDescription = "더보기",
-                tint = SpotTheme.colors.Black
+                tint = SpotTheme.colors.Black,
             )
         }
     }

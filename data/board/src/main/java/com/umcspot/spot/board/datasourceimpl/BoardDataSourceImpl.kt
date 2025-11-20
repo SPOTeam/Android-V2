@@ -2,6 +2,7 @@ package com.umcspot.spot.board.datasourceimpl
 
 import com.umcspot.spot.board.datasource.BoardDataSource
 import com.umcspot.spot.board.dto.response.LabeledBoardResponseDto
+import com.umcspot.spot.board.dto.response.PostResponseDto
 import com.umcspot.spot.board.service.BoardService
 import com.umcspot.spot.model.SortType
 import com.umcspot.spot.network.model.BaseResponse
@@ -19,4 +20,9 @@ class BoardDataSourceImpl @Inject constructor(
     override suspend fun geLabeledBoardInfo(
     ): BaseResponse<LabeledBoardResponseDto> =
         boardService.getLabeledBoardInfo()
+
+    override suspend fun getPosts(
+    ): BaseResponse<PostResponseDto> =
+        boardService.getPosts()
+
 }

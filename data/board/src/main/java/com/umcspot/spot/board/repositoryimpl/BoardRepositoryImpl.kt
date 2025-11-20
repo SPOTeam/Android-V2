@@ -2,7 +2,8 @@ package com.umcspot.spot.board.repositoryimpl
 
 import com.umcspot.spot.board.mapper.toDomainList
 import com.umcspot.spot.board.service.BoardService
-import com.umcspot.spot.domain.board.model.LabeledBoardResultList
+import com.umcspot.spot.domain.board.model.board.LabeledBoardResultList
+import com.umcspot.spot.domain.board.model.post.PostResultList
 import com.umcspot.spot.domain.board.repository.BoardRepository
 import com.umcspot.spot.model.SortType
 import javax.inject.Inject
@@ -29,4 +30,16 @@ class BoardRepositoryImpl @Inject constructor(
 
     private fun labeledListDummies(count: Int = 5): LabeledBoardResultList =
         LabeledBoardResultList(LabeledBoardResultList.getLabeledBoardDummies(count))
+
+
+    override suspend fun getPosts(): Result<PostResultList> =
+        runCatching {
+            val res = boardService.getPosts()
+            res.data.toDomainList()
+        }.recoverCatching {
+            postDummies()
+        }
+
+    private fun postDummies(): PostResultList =
+        PostResultList(PostResultList.getPostDummies())
 }

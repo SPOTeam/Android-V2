@@ -27,6 +27,7 @@ import com.umcspot.spot.designsystem.component.FloatingMultipleButton
 import com.umcspot.spot.designsystem.component.FloatingToUpButton
 import com.umcspot.spot.designsystem.component.appBar.AppBarHome
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
+import com.umcspot.spot.feature.board.navigation.BoardList
 import com.umcspot.spot.main.component.MainBottomBar
 import com.umcspot.spot.study.recruiting.navigation.Recruiting
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
@@ -51,6 +52,7 @@ fun MainScreen(
                             dest?.hasRoute(Alert::class) == true -> "알림"
                             dest?.hasRoute(AppliedAlert::class) == true -> "신청한 알림"
                             dest?.hasRoute(RecruitingFilter::class) == true -> "모집중인 스터디"
+                            dest?.hasRoute(BoardList::class) == true -> "스터디 파트너들의 이야기"
                             else -> ""
                         }
                     BackTopBar(

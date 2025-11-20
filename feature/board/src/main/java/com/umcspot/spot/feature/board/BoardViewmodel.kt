@@ -24,6 +24,9 @@ class BoardViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(BoardUiState())
     val uiState: StateFlow<BoardUiState> = _uiState.asStateFlow()
 
+    private val _selected = MutableStateFlow<List<String>>(emptyList())
+    val selected = _selected.asStateFlow()
+
     /** 최초/재로딩: HomeViewModel.getDummies() 스타일 */
     fun load(selected: SortType) {
         // 1) 로딩으로 전환
@@ -34,14 +37,18 @@ class BoardViewModel @Inject constructor(
             runCatching {
                 val tagDeferred = async { boardRepository.getTagBoardData(selected) }
                 val labeledDeferred = async { boardRepository.getLabeledBoardData() }
+                val postsDeferred = async { boardRepository.getPosts() }
+
 
                 val tagBoards = tagDeferred.await().getOrThrow()
                 val labeledBoards = labeledDeferred.await().getOrThrow()
+                val posts = postsDeferred.await().getOrThrow()
 
                 BoardPayload(
                     tagBoards = tagBoards,
                     labeledBoards = labeledBoards,
-                    selected = selected
+                    selected = selected,
+                    posts = posts
                 )
             }.onSuccess { payload ->
                 _uiState.update { it.copy(user = UiState.Success(payload)) }

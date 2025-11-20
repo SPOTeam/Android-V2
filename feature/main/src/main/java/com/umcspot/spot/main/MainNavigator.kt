@@ -12,7 +12,9 @@ import androidx.navigation.navOptions
 import com.umcspot.spot.alert.navigation.Alert
 import com.umcspot.spot.alert.navigation.AppliedAlert
 import com.umcspot.spot.category.navigation.navigateToCategory
+import com.umcspot.spot.feature.board.BoardListScreen
 import com.umcspot.spot.feature.board.navigation.Board
+import com.umcspot.spot.feature.board.navigation.BoardList
 import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.navigateToJJim
 import com.umcspot.spot.landing.Landing
@@ -72,16 +74,20 @@ class MainNavigator(
 
     /** 상단 뒤로가기 TopBar 노출 조건 */
     @Composable
-    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, RecruitingFilter::class)
+    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, RecruitingFilter::class,
+        BoardList::class
+     )
 
     /** 스크롤-투-탑 FAB 노출 조건 */
     @Composable
     fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class,
-        PreferLocation::class, )
+        PreferLocation::class, BoardList::class
+    )
 
     /** 멀티 FAB(게시판 등) 노출 조건 */
     @Composable
-    fun showMultipleFab(): Boolean = inAnyGraph(Board::class)
+    fun showMultipleFab(): Boolean = inAnyGraph(Board::class, BoardList::class
+    )
 
     @Composable
     fun showBottomBar() : Boolean {

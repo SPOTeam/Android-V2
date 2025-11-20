@@ -49,44 +49,50 @@ fun Preview_DS100_Y() {
 @Preview(name = "Round", showBackground = true)
 @Composable
 fun Preview_DS200() {
-    Box(
-        modifier = Modifier.padding(10.dp)
-    ) {
-        DS200(
-            width = 200.dp,
-            height = 100.dp,
-            shape = SpotShapes.Round,
-            brush = GrayGradient
-        )
+    SpotTheme {
+        Box(
+            modifier = Modifier.padding(10.dp)
+        ) {
+            DS200(
+                width = 200.dp,
+                height = 100.dp,
+                shape = SpotShapes.Round,
+                brush = GrayGradient
+            )
+        }
     }
 }
 
 @Preview(name = "SoftLeft", showBackground = true)
 @Composable
 fun Preview_DS300() {
-    Box(
-        modifier = Modifier.padding(10.dp)
-    ) {
-        DS300(
-            width = 200.dp,
-            height = 100.dp,
-            shape = SpotShapes.SoftLeft,
-            backgroundColor = R500
-        )
+    SpotTheme {
+        Box(
+            modifier = Modifier.padding(10.dp)
+        ) {
+            DS300(
+                width = 200.dp,
+                height = 100.dp,
+                shape = SpotShapes.SoftLeft,
+                backgroundColor = R500
+            )
+        }
     }
 }
 
 @Preview(name = "RoundRight", showBackground = true)
 @Composable
 fun Preview_DS400() {
-    Box(
-        modifier = Modifier.padding(10.dp)
-    ) {
-        DS400(
-            width = 200.dp,
-            height = 100.dp,
-            shape = SpotShapes.RoundRight,
-            backgroundColor = G100
-        )
+    SpotTheme {
+        Box(
+            modifier = Modifier.padding(10.dp)
+        ) {
+            DS400(
+                width = 200.dp,
+                height = 100.dp,
+                shape = SpotShapes.RoundRight,
+                backgroundColor = G100
+            )
+        }
     }
 }

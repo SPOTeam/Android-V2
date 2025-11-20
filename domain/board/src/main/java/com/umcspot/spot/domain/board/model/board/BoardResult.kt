@@ -1,7 +1,6 @@
-package com.umcspot.spot.domain.board.model
+package com.umcspot.spot.domain.board.model.board
 
 import com.umcspot.spot.model.BoardType
-import com.umcspot.spot.model.SortType
 
 data class LabeledBoardResultList(
     val boardList: List<LabeledBoardResult>
