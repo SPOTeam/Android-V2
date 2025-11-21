@@ -28,8 +28,11 @@ import com.umcspot.spot.designsystem.component.FloatingMultipleButton
 import com.umcspot.spot.designsystem.component.FloatingToUpButton
 import com.umcspot.spot.designsystem.component.appBar.AppBarHome
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
+import com.umcspot.spot.designsystem.component.modal.RejectDialog
 import com.umcspot.spot.feature.board.navigation.Board
 import com.umcspot.spot.feature.board.navigation.BoardList
+import com.umcspot.spot.feature.board.navigation.Posting
+import com.umcspot.spot.feature.board.navigation.navigateToPosting
 import com.umcspot.spot.main.component.MainBottomBar
 import com.umcspot.spot.mypage.navigation.navigateToMypage
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
@@ -43,7 +46,8 @@ fun MainScreen(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val dest = backStackEntry?.destination
     var scrollToTop by remember { mutableStateOf<(() -> Unit)?>(null) }
-    var multipleFabHandler by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    var showExitPostingDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -56,11 +60,18 @@ fun MainScreen(
                             dest?.hasRoute(AppliedAlert::class) == true -> "신청한 알림"
                             dest?.hasRoute(RecruitingFilter::class) == true -> "모집중인 스터디"
                             dest?.hasRoute(BoardList::class) == true -> "스터디 파트너들의 이야기"
+                            dest?.hasRoute(Posting::class) == true -> "글쓰기"
                             else -> ""
                         }
                     BackTopBar(
                         title = title,
-                        onBackClick = { navController.popBackStack() },
+                        onBackClick = {
+                            if (dest?.hasRoute(Posting::class) == true) {
+                                showExitPostingDialog = true
+                            } else {
+                                navController.popBackStack()
+                            }
+                        },
                         modifier = Modifier
                             .statusBarsPadding()
                     )
@@ -84,8 +95,10 @@ fun MainScreen(
                 showMultiple = navigator.showMultipleFab(),
                 onClickMultiple = {
                     when {
-                        dest?.hasRoute(Board::class) == true -> navigator.navController.navigateToMypage()
-                        dest?.hasRoute(BoardList::class) == true -> navigator.navController.navigateToMypage()
+                        dest?.hasRoute(Board::class) == true -> navigator.navController.navigateToPosting()
+                        dest?.hasRoute(BoardList::class) == true -> navigator.navController.navigateToPosting()
+
+
                     }
                 },
                 spacing = 12.dp, // floatingButton 사이 간격
@@ -112,8 +125,27 @@ fun MainScreen(
                 .consumeWindowInsets(innerPadding),
             contentPadding =  innerPadding,
             onRegisterScrollToTop = { handler -> scrollToTop = handler },
+            onBackRequest = { showExitPostingDialog = true }   // ← 핵심
         )
     }
+
+    RejectDialog(
+        visible = showExitPostingDialog,
+        modalTitle = "나가시겠어요?",
+        modalDes = "지금 나가면, 쓰던 글은 저장되지 않아요.",
+        buttonOKText = "네",
+        buttonNOText = "아니요",
+        onClick = {
+            showExitPostingDialog = false
+            navController.popBackStack()
+        },
+        onCancel = {
+            showExitPostingDialog = false
+        },
+        onDismiss = {
+            showExitPostingDialog = false
+        },
+    )
 }
 
 @Composable

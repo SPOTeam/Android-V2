@@ -16,6 +16,7 @@ import com.umcspot.spot.feature.board.navigation.boardGraph
 import com.umcspot.spot.feature.board.navigation.boardListGraph
 import com.umcspot.spot.feature.board.navigation.navigateToBoard
 import com.umcspot.spot.feature.board.navigation.navigateToBoardList
+import com.umcspot.spot.feature.board.navigation.postingGraph
 import com.umcspot.spot.home.navigation.homeGraph
 import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.jjimGraph
@@ -36,8 +37,8 @@ fun MainNavHost(
     navigator: MainNavigator,
     modifier: Modifier = Modifier,
     contentPadding : PaddingValues = PaddingValues(0.dp),
-    onRegisterScrollToTop: ((() -> Unit)?) -> Unit, // ✅ 추가
-
+    onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
+    onBackRequest: () -> Unit,
 ) {
     NavHost(
         enterTransition = { EnterTransition.None },
@@ -57,7 +58,6 @@ fun MainNavHost(
             ) },
             onNaverClick = { navigator.navController.navigateToHome(
                 navOptions {
-                    // Landing을 백스택에서 제거
                     popUpTo(Landing) { inclusive = true }
                     launchSingleTop = true
                     restoreState = true
@@ -105,13 +105,22 @@ fun MainNavHost(
 
         boardGraph(
             contentPadding = contentPadding,
+            navController = navigator.navController,
             onMoveToBoardList = { navigator.navController.navigateToBoardList() },
         )
 
         boardListGraph(
             contentPadding = contentPadding,
+            navController = navigator.navController,
             onRegisterScrollToTop = onRegisterScrollToTop
         )
+
+        postingGraph(
+            contentPadding = contentPadding,
+            navController = navigator.navController,
+            onBackRequest = onBackRequest
+        )
+
 
         alertGraph(
             contentPadding = contentPadding,

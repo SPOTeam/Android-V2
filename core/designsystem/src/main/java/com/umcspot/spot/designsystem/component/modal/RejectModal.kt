@@ -29,7 +29,8 @@ import com.umcspot.spot.designsystem.theme.White
 fun RejectModal(
     modalTitle : String,
     modalDes : String,
-    buttonText : String,
+    buttonOKText : String,
+    buttonNOText : String,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     onCancel:() -> Unit= {}
@@ -71,14 +72,14 @@ fun RejectModal(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     TextButtonM(
-                        text = buttonText,
+                        text = buttonOKText,
                         onClick = onClick,
                         state = TextButtonState.R500State,
                         modifier = Modifier.weight(1f)
                     )
 
                     TextButtonM(
-                        text = "취소",
+                        text = buttonNOText,
                         onClick = onCancel,
                         state = TextButtonState.G500State,
                         modifier = Modifier.weight(1f)
@@ -94,7 +95,8 @@ fun RejectDialog(
     visible: Boolean,
     modalTitle : String,
     modalDes : String,
-    buttonText : String,
+    buttonOKText : String,
+    buttonNOText : String,
     onDismiss: () -> Unit,
     onClick: () -> Unit,
     onCancel: () -> Unit
@@ -104,7 +106,8 @@ fun RejectDialog(
         RejectModal(
             modalTitle = modalTitle,
             modalDes = modalDes,
-            buttonText = buttonText,
+            buttonOKText = buttonOKText,
+            buttonNOText = buttonNOText,
             onClick = onClick,
             onCancel = onCancel
         )
@@ -119,7 +122,8 @@ fun ReDialog_Preview() {
             visible = true,
             modalTitle = "불참하시겠습니까?",
             modalDes = "신청했던 스터디를 참여 취소하면\n다시 결정을 번복할 수 없어요.",
-            buttonText = "불참",
+            buttonOKText = "불참",
+            buttonNOText = "아니요",
             onDismiss = {},
             onClick = {},
             onCancel = {}

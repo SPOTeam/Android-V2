@@ -7,38 +7,36 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
-import androidx.navigation.Navigator
 import androidx.navigation.compose.composable
-import com.umcspot.spot.feature.board.BoardListScreen
-import com.umcspot.spot.feature.board.BoardScreen
 import com.umcspot.spot.feature.board.BoardViewModel
+import com.umcspot.spot.feature.board.PostingScreen
 import com.umcspot.spot.navigation.Route
 import kotlinx.serialization.Serializable
 
 
-fun NavController.navigateToBoardList(navOptions: NavOptions? = null) {
-    navigate(BoardList, navOptions)
+fun NavController.navigateToPosting(navOptions: NavOptions? = null) {
+    navigate(Posting, navOptions)
 }
 
-fun NavGraphBuilder.boardListGraph(
+fun NavGraphBuilder.postingGraph(
     contentPadding : PaddingValues,
     navController: NavHostController,
-    onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
+    onBackRequest: () -> Unit,
 ) {
-    composable<BoardList> { backStackEntry ->
+    composable<Posting> { backStackEntry ->
         val parentEntry = remember(backStackEntry) {
             // 🔹 NavHost 루트 그래프 기준으로 ViewModel 스코프
             navController.getBackStackEntry(navController.graph.id)
         }
         val boardViewModel: BoardViewModel = hiltViewModel(parentEntry)
 
-        BoardListScreen(
+        PostingScreen(
             contentPadding = contentPadding,
-            viewmodel = boardViewModel,
-            onRegisterScrollToTop = onRegisterScrollToTop
+            viewModel = boardViewModel,
+            onBackRequest = onBackRequest
         )
     }
 }
 
 @Serializable
-data object BoardList : Route
+data object Posting : Route
