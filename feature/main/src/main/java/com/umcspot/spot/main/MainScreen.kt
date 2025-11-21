@@ -3,6 +3,7 @@ package com.umcspot.spot.main
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -27,9 +28,10 @@ import com.umcspot.spot.designsystem.component.FloatingMultipleButton
 import com.umcspot.spot.designsystem.component.FloatingToUpButton
 import com.umcspot.spot.designsystem.component.appBar.AppBarHome
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
+import com.umcspot.spot.feature.board.navigation.Board
 import com.umcspot.spot.feature.board.navigation.BoardList
 import com.umcspot.spot.main.component.MainBottomBar
-import com.umcspot.spot.study.recruiting.navigation.Recruiting
+import com.umcspot.spot.mypage.navigation.navigateToMypage
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import kotlinx.collections.immutable.toImmutableList
 
@@ -41,6 +43,7 @@ fun MainScreen(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val dest = backStackEntry?.destination
     var scrollToTop by remember { mutableStateOf<(() -> Unit)?>(null) }
+    var multipleFabHandler by remember { mutableStateOf<(() -> Unit)?>(null) }
 
     Scaffold(
         topBar = {
@@ -79,8 +82,12 @@ fun MainScreen(
                 onClickToTop = { scrollToTop?.invoke() },
 
                 showMultiple = navigator.showMultipleFab(),
-                onClickMultiple = { /* TODO */ },
-
+                onClickMultiple = {
+                    when {
+                        dest?.hasRoute(Board::class) == true -> navigator.navController.navigateToMypage()
+                        dest?.hasRoute(BoardList::class) == true -> navigator.navController.navigateToMypage()
+                    }
+                },
                 spacing = 12.dp, // floatingButton 사이 간격
             )
         },
@@ -104,7 +111,7 @@ fun MainScreen(
                 .fillMaxSize()
                 .consumeWindowInsets(innerPadding),
             contentPadding =  innerPadding,
-            onRegisterScrollToTop = { handler -> scrollToTop = handler }
+            onRegisterScrollToTop = { handler -> scrollToTop = handler },
         )
     }
 }
@@ -120,15 +127,15 @@ private fun FabStack(
     Box(
         modifier = Modifier
     ) {
-        androidx.compose.foundation.layout.Column(
+        Column(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(spacing),
             modifier = Modifier.align(Alignment.BottomEnd)
         ) {
-            androidx.compose.animation.AnimatedVisibility(visible = showToTop) {
+            if (showToTop) {
                 FloatingToUpButton(onClick = onClickToTop)
             }
-            androidx.compose.animation.AnimatedVisibility(visible = showMultiple) {
+            if (showMultiple) {
                 FloatingMultipleButton(onClick = onClickMultiple)
             }
         }
