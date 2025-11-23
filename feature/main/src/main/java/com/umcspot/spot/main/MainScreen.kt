@@ -44,16 +44,15 @@ fun MainScreen(
     Scaffold(
         topBar = {
             if (!navigator.isInLanding()) {
-                if (navigator.showBackTopBar()) {
-                    // 라우트에 따라 타이틀 분기(선택)
-                    val title =
-                        when {
-                            dest?.hasRoute(Alert::class) == true -> "알림"
-                            dest?.hasRoute(AppliedAlert::class) == true -> "신청한 알림"
-                            dest?.hasRoute(RecruitingFilter::class) == true -> "모집중인 스터디"
-                            dest?.hasRoute(RegisterStudy::class) == true -> "스터디 만들기"
-                            else -> ""
-                        }
+                if (dest?.hasRoute(RegisterStudy::class) == true) {
+                }
+                else if (navigator.showBackTopBar()) {
+                    val title = when {
+                        dest?.hasRoute(Alert::class) == true -> "알림"
+                        dest?.hasRoute(AppliedAlert::class) == true -> "신청한 알림"
+                        dest?.hasRoute(RecruitingFilter::class) == true -> "모집중인 스터디"
+                        else -> ""
+                    }
                     BackTopBar(
                         title = title,
                         onBackClick = { navController.popBackStack() },
@@ -79,7 +78,7 @@ fun MainScreen(
                 showMultiple = navigator.showMultipleFab(),
                 onClickMultiple = { /* TODO */ },
 
-                spacing = 12.dp, // floatingButton 사이 간격
+                spacing = 12.dp, 
             )
         },
         bottomBar = {
