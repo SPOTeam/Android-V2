@@ -1,6 +1,5 @@
 package com.umcspot.spot.study.preferLocation
 
-import PreferLocationBottomSheet
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.bottomsheet.LocationBottomSheet
 import com.umcspot.spot.designsystem.component.empty.EmptyAlertWithButton
 import com.umcspot.spot.designsystem.component.study.StudyListItem
 import com.umcspot.spot.designsystem.shapes.SpotShapes
@@ -152,8 +152,7 @@ fun PreferLocationStudyScreen(
     }
 
     // 지역 선택 바텀시트
-    PreferLocationBottomSheet(
-        contentPadding = contentPadding,
+    LocationBottomSheet(
         visible = showSheet,
         query = query,
         onQueryChange = { viewmodel.searchLocation(it) },
