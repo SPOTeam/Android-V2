@@ -1,9 +1,12 @@
 package com.umcspot.spot.designsystem.component.modal
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
@@ -43,49 +46,64 @@ fun AcceptModal(
             containerColor = SpotTheme.colors.white
         )
     ) {
-        Column(
-            modifier = Modifier.padding(15.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Box(
+            modifier = Modifier.fillMaxWidth().padding(15.dp)
         ) {
             Image(
-                painter = painterResource(R.drawable.success_default),
-                colorFilter = ColorFilter.tint(B500),
+                painter = painterResource(R.drawable.dismiss),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(56.dp)
+                    .size(25.dp)
+                    .align(Alignment.TopEnd)
+                    .clickable(
+                        onClick = {onCancel}
+                    )
             )
 
-            // 텍스트 + 통계
             Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically),
+                modifier = Modifier.padding(top = 25.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = modalTitle,
-                    style = SpotTheme.typography.medium_500,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = modalDes,
-                    style = SpotTheme.typography.medium_500
+                Image(
+                    painter = painterResource(R.drawable.success_default),
+                    colorFilter = ColorFilter.tint(B500),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(40.dp)
                 )
 
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TextButtonM(
-                        text = buttonText,
-                        onClick = onClick,
-                        state = TextButtonState.B400State,
-                        modifier = Modifier.weight(1f)
+                // 텍스트 + 통계
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = modalTitle,
+                        style = SpotTheme.typography.medium_500,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = modalDes,
+                        style = SpotTheme.typography.medium_500
                     )
 
-                    TextButtonM(
-                        text = "취소",
-                        onClick = onCancel,
-                        state = TextButtonState.G500State,
-                        modifier = Modifier.weight(1f)
-                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TextButtonM(
+                            text = buttonText,
+                            onClick = onClick,
+                            state = TextButtonState.B400State,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        TextButtonM(
+                            text = "취소",
+                            onClick = onCancel,
+                            state = TextButtonState.G500State,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
             }
         }
