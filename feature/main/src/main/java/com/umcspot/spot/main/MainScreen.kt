@@ -29,12 +29,11 @@ import com.umcspot.spot.designsystem.component.FloatingToUpButton
 import com.umcspot.spot.designsystem.component.appBar.AppBarHome
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.component.modal.RejectDialog
-import com.umcspot.spot.feature.board.navigation.Board
-import com.umcspot.spot.feature.board.navigation.BoardList
-import com.umcspot.spot.feature.board.navigation.Posting
-import com.umcspot.spot.feature.board.navigation.navigateToPosting
+import com.umcspot.spot.feature.board.main.navigation.Board
+import com.umcspot.spot.feature.board.main.navigation.navigation.BoardList
+import com.umcspot.spot.feature.board.main.navigation.navigation.Posting
+import com.umcspot.spot.feature.board.main.navigation.navigation.navigateToPosting
 import com.umcspot.spot.main.component.MainBottomBar
-import com.umcspot.spot.mypage.navigation.navigateToMypage
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import kotlinx.collections.immutable.toImmutableList
 

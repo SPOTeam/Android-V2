@@ -1,4 +1,4 @@
-package com.umcspot.spot.feature.board
+package com.umcspot.spot.feature.board.posting
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -19,13 +19,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -47,14 +44,14 @@ import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G200
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.feature.board.BoardViewModel
 import com.umcspot.spot.model.BoardType
 import com.umcspot.spot.model.korean
-import kotlinx.coroutines.launch
 
 @Composable
 fun PostingScreen(
     contentPadding: PaddingValues,
-    viewModel: BoardViewModel= hiltViewModel(),
+    viewModel: BoardViewModel = hiltViewModel(),
     onBackRequest: () -> Unit,
 ) {
     val topPad = contentPadding.calculateTopPadding()

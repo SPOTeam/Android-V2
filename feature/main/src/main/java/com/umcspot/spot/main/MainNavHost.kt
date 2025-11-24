@@ -12,11 +12,11 @@ import com.umcspot.spot.alert.navigation.alertGraph
 import com.umcspot.spot.alert.navigation.appliedAlertGraph
 import com.umcspot.spot.alert.navigation.navigateToAppliedAlert
 import com.umcspot.spot.category.navigation.categoryGraph
-import com.umcspot.spot.feature.board.navigation.boardGraph
-import com.umcspot.spot.feature.board.navigation.boardListGraph
-import com.umcspot.spot.feature.board.navigation.navigateToBoard
-import com.umcspot.spot.feature.board.navigation.navigateToBoardList
-import com.umcspot.spot.feature.board.navigation.postingGraph
+import com.umcspot.spot.feature.board.main.navigation.boardGraph
+import com.umcspot.spot.feature.board.main.navigation.navigation.boardListGraph
+import com.umcspot.spot.feature.board.main.navigation.navigateToBoard
+import com.umcspot.spot.feature.board.main.navigation.navigation.navigateToBoardList
+import com.umcspot.spot.feature.board.main.navigation.navigation.postingGraph
 import com.umcspot.spot.home.navigation.homeGraph
 import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.jjimGraph

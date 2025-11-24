@@ -1,4 +1,4 @@
-package com.umcspot.spot.feature.board
+package com.umcspot.spot.feature.board.main
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
@@ -28,7 +27,6 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,12 +47,12 @@ import com.umcspot.spot.designsystem.theme.G500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.domain.board.model.board.LabeledBoardResult
 import com.umcspot.spot.domain.board.model.board.LabeledBoardResultList
+import com.umcspot.spot.feature.board.BoardViewModel
 import com.umcspot.spot.model.SortType
 import com.umcspot.spot.model.korean
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 import com.umcspot.spot.ui.state.UiState
-import kotlinx.coroutines.launch
 
 @Composable
 fun BoardScreen(

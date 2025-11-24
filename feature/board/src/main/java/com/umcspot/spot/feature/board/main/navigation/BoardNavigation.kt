@@ -1,4 +1,4 @@
-package com.umcspot.spot.feature.board.navigation
+package com.umcspot.spot.feature.board.main.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.remember
@@ -8,7 +8,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.umcspot.spot.feature.board.BoardScreen
+import com.umcspot.spot.feature.board.main.BoardScreen
 import com.umcspot.spot.feature.board.BoardViewModel
 import com.umcspot.spot.navigation.Route
 import kotlinx.serialization.Serializable

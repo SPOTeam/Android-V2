@@ -1,4 +1,4 @@
-package com.umcspot.spot.feature.board
+package com.umcspot.spot.feature.board.boardList
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -38,6 +38,7 @@ import com.umcspot.spot.designsystem.component.post.PostListItem
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.domain.board.model.post.PostResultList
+import com.umcspot.spot.feature.board.BoardViewModel
 import com.umcspot.spot.model.BoardType
 import com.umcspot.spot.model.SortType
 import com.umcspot.spot.model.korean
