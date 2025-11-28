@@ -249,15 +249,15 @@ fun ActivityThemeSection(
             StudyTheme.entries.forEach { theme ->
                 val iconRes = when (theme) {
                     StudyTheme.LANGUAGE -> painterResource(R.drawable.language)
-                    StudyTheme.LICENSE -> painterResource(R.drawable.license)
-                    StudyTheme.EMPLOYMENT -> painterResource(R.drawable.employment)
-                    StudyTheme.DISCUSSION -> painterResource(R.drawable.discussion)
-                    StudyTheme.NEWS -> painterResource(R.drawable.news)
-                    StudyTheme.SELFSTUDY -> painterResource(R.drawable.self_study)
+                    StudyTheme.CERTIFICATION -> painterResource(R.drawable.license)
+                    StudyTheme.CAREER -> painterResource(R.drawable.employment)
+                    StudyTheme.DEBATE -> painterResource(R.drawable.discussion)
+                    StudyTheme.CURRENT_AFFAIRS -> painterResource(R.drawable.news)
+                    StudyTheme.SELF_STUDY -> painterResource(R.drawable.self_study)
                     StudyTheme.PROJECT -> painterResource(R.drawable.project)
-                    StudyTheme.CONTEST -> painterResource(R.drawable.contest)
-                    StudyTheme.MAJOR -> painterResource(R.drawable.major)
-                    StudyTheme.ETC -> painterResource(R.drawable.resource_else)
+                    StudyTheme.COMPETITION -> painterResource(R.drawable.contest)
+                    StudyTheme.MAJOR_CAREER -> painterResource(R.drawable.major)
+                    StudyTheme.OTHER -> painterResource(R.drawable.resource_else)
                 }
 
                 MultiButton(

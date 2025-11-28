@@ -13,4 +13,11 @@ dependencies {
 
     implementation(libs.naver.oauth)
     implementation(libs.androidx.browser) // jdk 17
+
+    implementation(libs.kakao.login)
+    implementation(libs.kakao.auth)
+    implementation(libs.kakao.common)
+
+    implementation(libs.naver.oauth)
+//    implementation(libs.naver.jdk)
 }

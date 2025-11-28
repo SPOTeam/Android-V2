@@ -19,9 +19,6 @@ import kotlin.getValue
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    private val landingViewModel : LandingViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -36,17 +33,5 @@ class MainActivity : ComponentActivity() {
                 MainScreen()
             }
         }
-
-        intent?.data?.let { uri ->
-            Log.d("DeepLink", "onCreate uri = $uri")
-            landingViewModel.onSocialDeepLink(uri)
-        }
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        val uri = intent.data ?: return
-        Log.d("DeepLink", "onNewIntent uri = $uri")
-        landingViewModel.onSocialDeepLink(uri)
     }
 }

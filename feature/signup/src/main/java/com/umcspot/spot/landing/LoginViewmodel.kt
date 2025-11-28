@@ -1,5 +1,7 @@
 package com.umcspot.spot.landing
 
+import android.app.Activity
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -7,6 +9,9 @@ import android.util.Log
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kakao.sdk.user.UserApiClient
+import com.navercorp.nid.NidOAuth
+import com.navercorp.nid.oauth.util.NidOAuthCallback
 import com.umcspot.spot.model.SocialLoginType
 import com.umcspot.spot.token.repository.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,42 +37,86 @@ class LandingViewModel @Inject constructor(
     private val _events = MutableSharedFlow<LoginEvent>()
     val events = _events.asSharedFlow()
 
-    /** 카카오/네이버 공용 시작 함수 */
-    fun startSocialLogin(type: SocialLoginType) = viewModelScope.launch {
-        lastSocialLoginType = type   // 🔹 어떤 소셜인지 기억해 둠
+    fun startSocialLogin(
+        type: SocialLoginType,
+        activity: Activity,
+    ) = viewModelScope.launch {
+        lastSocialLoginType = type
 
-        try {
-            val res = loginRepository.getRedirectUrl(type)
-            val url = res.getOrNull()
-
-            if (res.isSuccess && !url.isNullOrBlank()) {
-
-                // Custom Tabs 오픈
-                CustomTabsIntent.Builder().build().apply {
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                }.launchUrl(context, Uri.parse(url))
+        if(type == SocialLoginType.KAKAO) {
+            try {
+                UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
+                    if (error != null) {
+                        Log.e(TAG, "로그인 실패", error)
+                    } else if (token != null) {
+                        Log.i(TAG, "로그인 성공 ${token.accessToken}")
+                        viewModelScope.launch {
+                            runCatching {
+                                // 보통은 accessToken만 넘김
+                                loginRepository.finishSocialLogin(
+                                    type = lastSocialLoginType!!,
+                                    accessToken = token.accessToken
+                                )
+                            }.onSuccess {
+                                _events.emit(LoginEvent.LoginSucceeded)
+                            }.onFailure { e ->
+                                Log.e(TAG, "서버 로그인 실패", e)
+                                _events.emit(LoginEvent.ShowError("서버 로그인 실패: ${e.message}"))
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
 
             }
-        } catch (e: Exception) {
+        } else if (type == SocialLoginType.NAVER) {
+            val nidOAuthCallback = object : NidOAuthCallback {
+                override fun onSuccess() {
+                    val accessToken = NidOAuth.getAccessToken()
 
-        }
-    }
+                    if (accessToken.isNullOrBlank()) {
+                        Log.e(TAG, "네이버 로그인 성공했지만 accessToken이 null/blank")
+                        viewModelScope.launch {
+                            _events.emit(LoginEvent.ShowError("네이버 로그인 토큰을 가져오지 못했습니다."))
+                        }
+                        return
+                    }
 
-    fun onSocialDeepLink(uri: Uri) = viewModelScope.launch {
-        val code = uri.getQueryParameter("code")
+                    Log.i(TAG, "네이버 로그인 성공 accessToken = $accessToken")
 
-        if (!code.isNullOrBlank()) {
-            val tokenResponse = loginRepository.getCallBackToken(lastSocialLoginType!!, code)
-            tokenResponse.onSuccess { tokens ->
+                    // 카카오와 동일하게 서버 로그인 처리
+                    viewModelScope.launch {
+                        runCatching {
+                            loginRepository.finishSocialLogin(
+                                type = lastSocialLoginType!!,
+                                accessToken = accessToken
+                            )
+                        }.onSuccess {
+                            _events.emit(LoginEvent.LoginSucceeded)
+                        }.onFailure { e ->
+                            Log.e(TAG, "네이버 서버 로그인 실패", e)
+                            _events.emit(LoginEvent.ShowError("서버 로그인 실패: ${e.message}"))
+                        }
+                    }
+                }
 
-                Log.d("AccessToken" , tokens.accessToken)
-                Log.d("RefreshToken" , tokens.refreshToken)
-            }.onFailure {
-
+                override fun onFailure(errorCode: String, errorDesc: String) {
+                    Log.e(TAG, "네이버 로그인 실패: $errorCode, $errorDesc")
+                    viewModelScope.launch {
+                        _events.emit(LoginEvent.ShowError("네이버 로그인 실패: $errorDesc"))
+                    }
+                }
             }
 
-        } else {
-
+            try {
+                NidOAuth.requestLogin(activity, nidOAuthCallback)
+            } catch (e: Exception) {
+                Log.e(TAG, "네이버 로그인 요청 중 예외", e)
+                viewModelScope.launch {
+                    _events.emit(LoginEvent.ShowError("네이버 로그인 오류: ${e.message}"))
+                }
+            }
         }
     }
 }
+

@@ -7,11 +7,6 @@ plugins {
 
 android {
     namespace = "com.umcspot.spot.buildconfig"
-
-    defaultConfig {
-        buildConfigField("String", "BASE_URL", "\"https://api-spot.site/\"")
-    }
-
 }
 
 

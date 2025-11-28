@@ -17,16 +17,17 @@ class UserRepositoryImpl @Inject constructor(
             val userName = userService.getUser()
             userName.result.toDomain()
         }.recoverCatching {
-            UserResult(name = "추연우")
+            UserResult(name = "123")
         }
 
-    override suspend fun setUserTheme(theme: List<StudyTheme>): Result<UserTheme> =
+    override suspend fun setUserName(name: String): Result<Unit> =
         runCatching {
-            val response = userService.setUserTheme(theme.toRequestDto())
-            response.result.toDomain()
-        }.recoverCatching {
-            UserTheme(
-                userThemes = listOf(StudyTheme.DISCUSSION, StudyTheme.SELFSTUDY)
-            )
+            userService.setUserName(name.toRequestDto())
+        }
+
+
+    override suspend fun setUserTheme(theme: List<StudyTheme>): Result<Unit> =
+        runCatching {
+            userService.setUserTheme(theme.toRequestDto())
         }
 }

@@ -7,12 +7,11 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface LoginService {
-    @GET("/api/oauth/redirect-url/{type}")
-    suspend fun getRedirectUrl(@Path("type") type: String): BaseResponse<String>
 
-    @GET("/api/oauth/callback/{type}")
+    @GET("/api/oauth/client/{type}")
     suspend fun getCallBackToken(
         @Path("type") type : String,
-        @Query("code") code : String
+        @Query("accessToken") accessToken : String
     ) : BaseResponse<TokenResponseDto>
+
 }

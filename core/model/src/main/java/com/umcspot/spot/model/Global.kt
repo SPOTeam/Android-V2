@@ -48,15 +48,15 @@ enum class StudyTheme(
     val title: String
 ) {
     LANGUAGE("어학"),
-    LICENSE("자격증"),
-    EMPLOYMENT("취업"),
-    DISCUSSION("토론"),
-    NEWS("시사 / 뉴스"),
-    SELFSTUDY("자율 학습"),
+    CERTIFICATION("자격증"),
+    CAREER("취업"),
+    DEBATE("토론"),
+    CURRENT_AFFAIRS("시사 / 뉴스"),
+    SELF_STUDY("자율 학습"),
     PROJECT("프로젝트"),
-    CONTEST("공모전"),
-    MAJOR("전공 / 진로 학습"),
-    ETC("기타")
+    COMPETITION("공모전"),
+    MAJOR_CAREER("전공 / 진로 학습"),
+    OTHER("기타")
 }
 
 enum class SocialLoginType(
