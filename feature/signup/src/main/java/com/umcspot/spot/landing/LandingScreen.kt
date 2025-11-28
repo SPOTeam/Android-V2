@@ -15,8 +15,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -27,15 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.component.KakaoStartButton
-import com.umcspot.spot.designsystem.component.NaverStartButton
+import com.umcspot.spot.designsystem.component.button.KakaoStartButton
+import com.umcspot.spot.designsystem.component.button.NaverStartButton
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.SocialLoginType
 
-/**
- * 1) Route: 상태/이벤트 처리 + UI 호출
- */
 @Composable
 fun LandingScreen(
     onLoginSuccess: () -> Unit,
@@ -89,7 +84,8 @@ fun LandingScreenContent(
                 Image(
                     painter = painterResource(R.drawable.spot_logo),
                     contentDescription = "SPOT 로고",
-                    modifier = Modifier.size(33.dp),
+                    modifier = Modifier
+                        .size(33.dp),
                     contentScale = ContentScale.Fit
                 )
                 Spacer(Modifier.height(52.dp))
@@ -98,7 +94,7 @@ fun LandingScreenContent(
                     textAlign = TextAlign.Center,
                     lineHeight = 45.sp,
                     color = SpotTheme.colors.B500,
-                    style = SpotTheme.typography.bodySmall400
+                    style = SpotTheme.typography.small_400
                 )
             }
 
