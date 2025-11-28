@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,8 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -26,7 +25,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -39,12 +37,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.button.TextToggleButton
 import com.umcspot.spot.designsystem.component.study.section.ActivityThemeSection
-import com.umcspot.spot.designsystem.component.study.section.ActivityTypeSection
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun RecruitingStudyFilterScreen(
@@ -52,16 +51,15 @@ fun RecruitingStudyFilterScreen(
     onAcceptFilterClick: () -> Unit,
     vm: RecruitingStudyFilterViewModel = hiltViewModel(),
 ) {
-    val activityType by vm.activity.collectAsStateWithLifecycle()
-    val fee by vm.fee.collectAsStateWithLifecycle()
-    val theme by vm.theme.collectAsStateWithLifecycle()
-    val acceptEnabled by vm.notNull.collectAsStateWithLifecycle()
 
+    val activities by vm.activities.collectAsStateWithLifecycle()
+    val fees by vm.fees.collectAsStateWithLifecycle()
+    val themes by vm.themes.collectAsStateWithLifecycle()
+    val acceptEnabled by vm.notNull.collectAsStateWithLifecycle()
 
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
 
-    // 적용 이벤트 수신
     LaunchedEffect(Unit) {
         vm.events.collect { ev ->
             when (ev) {
@@ -73,13 +71,13 @@ fun RecruitingStudyFilterScreen(
     RecruitingStudyFilterScreenContent(
         modifier = Modifier
             .padding(top = topPad, bottom = bottomPad),
-        activityType = activityType,
-        fee = fee,
-        theme = theme,
+        selectedActivities = activities,
+        selectedFees = fees,
+        selectedThemes = themes,
         buttonEnabled = acceptEnabled,
-        onSetActivity = vm::setActivity,
-        onSetFee = vm::setFee,
-        onSetTheme = vm::setTheme,
+        onToggleActivity = vm::toggleActivity,
+        onToggleFee = vm::toggleFee,
+        onToggleTheme = vm::toggleTheme,
         onReset = vm::reset,
         onApply = vm::apply
     )
@@ -87,13 +85,13 @@ fun RecruitingStudyFilterScreen(
 
 @Composable
 fun RecruitingStudyFilterScreenContent(
-    activityType: ActivityType?,                 // ✅ 단일 값 (nullable)
-    fee: FeeRange?,                         // ✅ 단일 값 (nullable)
-    theme: StudyTheme?,                     // ✅ 단일 값 (nullable)
+    selectedActivities: ImmutableList<ActivityType>,
+    selectedFees: ImmutableList<FeeRange>,
+    selectedThemes: ImmutableList<StudyTheme>,
     buttonEnabled: Boolean,
-    onSetActivity: (ActivityType) -> Unit,  // ✅ set* 로직 (같은 값 다시 누르면 해제는 VM이 처리)
-    onSetFee: (FeeRange?) -> Unit,
-    onSetTheme: (StudyTheme) -> Unit,
+    onToggleActivity: (ActivityType) -> Unit,
+    onToggleFee: (FeeRange) -> Unit,
+    onToggleTheme: (StudyTheme) -> Unit,
     onReset: () -> Unit,
     onApply: () -> Unit,
     modifier: Modifier = Modifier
@@ -106,7 +104,7 @@ fun RecruitingStudyFilterScreenContent(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()) // ✅ 스크롤
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
         ) {
             Text(
@@ -115,22 +113,23 @@ fun RecruitingStudyFilterScreenContent(
                 color = SpotTheme.colors.black
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(screenHeightDp(10.dp)))
 
-            ActivityTypeSection(
-                activityType = activityType,
-                onSelect = onSetActivity
+
+            ActivityTypeMultiSection(
+                selectedTypes = selectedActivities,
+                onToggle = onToggleActivity
             )
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(screenHeightDp(30.dp)))
 
 
             ActivityFeeSection(
-                activityFee = fee,
-                onSelect = onSetFee
+                selectedFees = selectedFees,
+                onToggle = onToggleFee
             )
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(screenHeightDp(30.dp)))
 
             Text(
                 text = "스터디 테마",
@@ -140,19 +139,19 @@ fun RecruitingStudyFilterScreenContent(
 
             Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
 
-
             ActivityThemeSection(
-                activityTheme = theme,
-                onSelect = onSetTheme
+                selectedThemes = selectedThemes,
+                onSelect = onToggleTheme,
+                maxSelection = 10
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
 
             ResetFilterText(
                 onClick = onReset
             )
 
-            Spacer(Modifier.height(80.dp))
+            Spacer(Modifier.height(screenHeightDp(80.dp)))
         }
 
         Box(
@@ -161,9 +160,8 @@ fun RecruitingStudyFilterScreenContent(
                 .fillMaxWidth()
                 .navigationBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 12.dp)
-                .zIndex(1f) // 항상 앞
+                .zIndex(1f)
         ) {
-
             TextButton(
                 text = "검색 결과 보기",
                 enabled = buttonEnabled,
@@ -174,9 +172,29 @@ fun RecruitingStudyFilterScreenContent(
 }
 
 @Composable
+fun ActivityTypeMultiSection(
+    selectedTypes: ImmutableList<ActivityType>,
+    onToggle: (ActivityType) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        ActivityType.entries.forEach { type ->
+            TextToggleButton(
+                modifier = Modifier.weight(1f),
+                text = type.label,
+                checked = selectedTypes.contains(type),
+                onClick = { onToggle(type) }
+            )
+        }
+    }
+}
+
+@Composable
 fun ActivityFeeSection(
-    activityFee: FeeRange?,
-    onSelect: (FeeRange) -> Unit             // 누르면 VM의 setActivity 호출
+    selectedFees: ImmutableList<FeeRange>,
+    onToggle: (FeeRange) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -198,14 +216,13 @@ fun ActivityFeeSection(
                 TextToggleButton(
                     text = fee.label,
                     width = 71.dp,
-                    checked = activityFee == fee,
-                    onClick = { onSelect(fee) },
+                    checked = selectedFees.contains(fee),
+                    onClick = { onToggle(fee) },
                 )
             }
         }
     }
 }
-
 
 @Composable
 fun ResetFilterText(
@@ -223,10 +240,9 @@ fun ResetFilterText(
             .semantics { role = Role.Button }
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = null,          // 리플 없애려면 유지, 리플 원하면 제거
+                indication = null,
                 onClick = onClick
             )
-            .padding(vertical = 4.dp)      // 터치 여유
+            .padding(vertical = 4.dp)
     )
 }
-

@@ -90,13 +90,18 @@ timber = "5.0.1"
 coil = "2.7.0"
 lottie = "6.4.1"
 jsoup = "1.17.2"
-kakao-login = "2.19.0"
+kakao = "2.23.0"
 process-pheonix = "3.0.0"
 preference = "1.2.1"
 collapsing-toolbar = "2.3.5"
 runtimeAndroid = "1.7.8"
 flexibleBottomSheet = "0.1.5"
 annotationJvm = "1.9.1"
+
+# naver login
+browser = "1.8.0"
+naver-oauth = "5.11.0"
+datastoreCore = "1.1.7"
 
 [plugins]
 # Gradle Plugins
@@ -251,7 +256,11 @@ coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }
 lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
 jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
-kakao-login = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao-login" }
+kakao-login = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao" }
+kakao-auth = { group = "com.kakao.sdk", name = "v2-auth", version.ref = "kakao" }
+kakao-common = { group = "com.kakao.sdk", name = "v2-all", version.ref = "kakao" }
+
+
 process-phoenix = { module = "com.jakewharton:process-phoenix", version.ref = "process-pheonix" }
 collapsing-toolbar = { group = "me.onebone", name = "toolbar-compose", version.ref = "collapsing-toolbar" }
 androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime-android", version.ref = "runtimeAndroid" }
@@ -259,6 +268,12 @@ flexible-bottomsheet = { group = "com.github.skydoves", name = "flexible-bottoms
 
 #CalendarLibrary
 kizitonwose-calendar-compose = { module = "com.kizitonwose.calendar:compose", version.ref = "kizitonwose-calendar" }
+
+#naver login
+naver-oauth = { module = "com.navercorp.nid:oauth", version.ref = "naver-oauth" }
+naver-jdk = { module = "com.navercorp.nid:oauth-jdk8", version.ref = "naver-oauth" }
+androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
+datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastoreCore" }
 
 [bundles]
 coil = ["coil", "coil-svg", "coil-gif"]

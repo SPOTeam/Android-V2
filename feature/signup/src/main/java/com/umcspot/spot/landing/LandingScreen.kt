@@ -1,5 +1,6 @@
 package com.umcspot.spot.landing
 
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,24 +15,61 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.KakaoStartButton
 import com.umcspot.spot.designsystem.component.button.NaverStartButton
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.model.SocialLoginType
 
 @Composable
 fun LandingScreen(
-    onKakaoClick : () -> Unit,
-    onNaverClick : () -> Unit
+    onLoginSuccess: () -> Unit,
+    viewModel: LandingViewModel = hiltViewModel(),
+) {
+    val activity = LocalContext.current as? Activity
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { ev ->
+            when (ev) {
+                is LandingViewModel.LoginEvent.LoginSucceeded -> {
+                    onLoginSuccess()
+                }
+                is LandingViewModel.LoginEvent.ShowError -> {
+                }
+            }
+        }
+    }
+
+    LandingScreenContent(
+        onKakaoClick = {
+            activity?.let { act ->
+                viewModel.startSocialLogin(SocialLoginType.KAKAO, act)
+            }
+        },
+        onNaverClick = {
+            activity?.let { act ->
+                viewModel.startSocialLogin(SocialLoginType.NAVER, act)
+            }
+        },
+    )
+}
+
+@Composable
+fun LandingScreenContent(
+    onKakaoClick: () -> Unit,
+    onNaverClick: () -> Unit,
 ) {
     Surface(
         modifier = Modifier
@@ -46,7 +84,6 @@ fun LandingScreen(
                 .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 상단 여백 + 중앙 컨텐츠
             Spacer(Modifier.height(48.dp))
 
             Column(
@@ -73,19 +110,14 @@ fun LandingScreen(
                 )
             }
 
-            // 하단 액션 버튼들
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 60.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                KakaoStartButton(
-                    onClick = onKakaoClick
-                )
-                NaverStartButton(
-                    onClick = onNaverClick
-                )
+                KakaoStartButton(onClick = onKakaoClick)
+                NaverStartButton(onClick = onNaverClick)
             }
         }
     }
@@ -93,9 +125,9 @@ fun LandingScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun LandingScreenPreview() {
+private fun LandingScreenPreview() {
     SpotTheme {
-        LandingScreen(
+        LandingScreenContent(
             onKakaoClick = {},
             onNaverClick = {}
         )

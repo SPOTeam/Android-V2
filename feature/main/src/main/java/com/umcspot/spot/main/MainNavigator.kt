@@ -15,14 +15,19 @@ import com.umcspot.spot.alert.navigation.AppliedAlert
 import com.umcspot.spot.alert.navigation.navigateToAlert
 import com.umcspot.spot.alert.navigation.navigateToAppliedAlert
 import com.umcspot.spot.category.navigation.navigateToCategory
+import com.umcspot.spot.checkList.navigation.CheckList
+import com.umcspot.spot.checkList.navigation.navigateToCheckList
 import com.umcspot.spot.feature.board.navigation.Board
 import com.umcspot.spot.feature.board.navigation.navigateToBoard
 import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.navigateToJJim
-import com.umcspot.spot.landing.Landing
+import com.umcspot.spot.landing.navigation.Landing
+import com.umcspot.spot.landing.navigation.Saving
 import com.umcspot.spot.mypage.navigation.navigateToMypage
-import com.umcspot.spot.study.recruiting.navigation.Recruiting
+import com.umcspot.spot.signup.navigation.SignUp
+import com.umcspot.spot.signup.navigation.navigateToSignUp
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
+import com.umcspot.spot.study.recruiting.navigation.Recruiting
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocation
 import com.umcspot.spot.study.preferLocation.navigation.navigateToPreferLocationStudy
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
@@ -76,21 +81,15 @@ class MainNavigator(
     }
 
     @Composable
-    fun isInLanding(): Boolean = inAnyGraph(Landing::class)
+    fun isInLanding(): Boolean = inAnyGraph(Landing::class, Saving::class)
 
-    /** 상단 뒤로가기 TopBar 노출 조건 */
     @Composable
-    fun showBackTopBar(): Boolean =
-        inAnyGraph(Alert::class, AppliedAlert::class, RecruitingFilter::class, RegisterStudy::class)
+    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, RecruitingFilter::class,
+        SignUp::class, CheckList::class,RegisterStudy::class)
 
-    /** 스크롤-투-탑 FAB 노출 조건 */
     @Composable
-    fun showToTopFab(): Boolean = inAnyGraph(
-        Alert::class, AppliedAlert::class, Recruiting::class,
-        PreferLocation::class,
-    )
+    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class,PreferLocation::class)
 
-    /** 멀티 FAB(게시판 등) 노출 조건 */
     @Composable
     fun showMultipleFab(): Boolean = inAnyGraph(Board::class)
 
@@ -110,13 +109,20 @@ class MainNavigator(
         return hierarchy.any { h -> graphs.any { k -> h.hasRoute(k) } }
     }
 
-
     fun navigateUp() {
         navController.navigateUp()
     }
 
     fun popBackStack() {
         navController.popBackStack()
+    }
+
+    fun navigateToSignUp(navOptions: NavOptions? = null) {
+        navController.navigateToSignUp(navOptions)
+    }
+
+    fun navigateToCheckList(navOptions: NavOptions? = null) {
+        navController.navigateToCheckList(navOptions)
     }
 
     fun navigateToHome(navOptions: NavOptions? = null) {

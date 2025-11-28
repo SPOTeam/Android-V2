@@ -34,7 +34,7 @@ import com.umcspot.spot.designsystem.theme.*
  * @param borderColor    테두리 색
  */
 @Composable
-fun GaugeBar(
+fun GageBar(
     value: Float,
     modifier: Modifier = Modifier,
     height: Dp = 12.dp,
@@ -77,7 +77,7 @@ fun GaugeBar(
 @Composable
 fun Preview_GaugeBar_15() {
     Column(modifier = Modifier.padding(16.dp)) {
-        GaugeBar(
+        GageBar(
             value = 0.15f, // 퍼센트 조절 가능
             height = 12.dp,
             trackColor = SpotTheme.colors.G100,
@@ -90,7 +90,7 @@ fun Preview_GaugeBar_15() {
 @Composable
 fun Preview_GaugeBar_75() {
     Column(modifier = Modifier.padding(16.dp)) {
-        GaugeBar(
+        GageBar(
             value = 0.75f, // 퍼센트 조절 가능
             height = 12.dp,
             trackColor = SpotTheme.colors.G100,

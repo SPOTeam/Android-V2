@@ -176,7 +176,6 @@ fun StateCardActive(
     borderWidth: Dp = 1.dp,
     modifier: Modifier = Modifier
 ) = ShapeBox(
-
     shape = shape,
     color = color,
     borderWidth = borderWidth,

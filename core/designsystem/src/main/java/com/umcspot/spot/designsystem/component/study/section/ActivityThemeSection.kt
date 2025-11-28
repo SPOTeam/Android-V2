@@ -2,65 +2,60 @@ package com.umcspot.spot.designsystem.component.study.section
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.button.MultiButton
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
-import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.component.button.MultiButton
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun ActivityThemeSection(
-    activityTheme: StudyTheme?,
-    onSelect: (StudyTheme) -> Unit
+    selectedTheme: StudyTheme?,
+    onSelect: (StudyTheme) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(screenWidthDp(14.dp)),
-            verticalArrangement = Arrangement.spacedBy(screenHeightDp(16.dp))
-        ) {
-            StudyTheme.entries.forEach { theme ->
-                val iconRes = when (theme) {
-                    StudyTheme.LANGUAGE -> painterResource(R.drawable.language)
-                    StudyTheme.LICENSE -> painterResource(R.drawable.license)
-                    StudyTheme.EMPLOYMENT -> painterResource(R.drawable.employment)
-                    StudyTheme.DISCUSSION -> painterResource(R.drawable.discussion)
-                    StudyTheme.NEWS -> painterResource(R.drawable.news)
-                    StudyTheme.SELFSTUDY -> painterResource(R.drawable.self_study)
-                    StudyTheme.PROJECT -> painterResource(R.drawable.project)
-                    StudyTheme.CONTEST -> painterResource(R.drawable.contest)
-                    StudyTheme.MAJOR -> painterResource(R.drawable.major)
-                    StudyTheme.ETC -> painterResource(R.drawable.resource_else)
-                }
-
-                MultiButton(
-                    text = theme.title,
-                    painter = iconRes,
-                    checked = activityTheme == theme,
-                    onClick = { onSelect(theme) },
-                )
-            }
-        }
-    }
+    BaseActivityThemeSection(
+        modifier = modifier,
+        isThemeSelected = { it == selectedTheme }, 
+        isThemeEnabled = { true },                 
+        onSelect = onSelect
+    )
 }
 
 @Composable
 fun ActivityThemeSection(
     selectedThemes: ImmutableList<StudyTheme>,
     onSelect: (StudyTheme) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    maxSelection: Int = 3
+) {
+    val isMaxSelected = selectedThemes.size >= maxSelection
+
+    BaseActivityThemeSection(
+        modifier = modifier,
+        isThemeSelected = { selectedThemes.contains(it) },
+        
+        isThemeEnabled = { theme -> !isMaxSelected || selectedThemes.contains(theme) },
+        onSelect = onSelect
+    )
+}
+
+@Composable
+private fun BaseActivityThemeSection(
+    modifier: Modifier,
+    isThemeSelected: (StudyTheme) -> Boolean,
+    isThemeEnabled: (StudyTheme) -> Boolean,
+    onSelect: (StudyTheme) -> Unit
 ) {
     val themesInRows = StudyTheme.entries.chunked(2)
-    val isMaxSelected = selectedThemes.size >= 3
 
     Column(
         modifier = modifier,
@@ -72,31 +67,34 @@ fun ActivityThemeSection(
                 horizontalArrangement = Arrangement.spacedBy(screenWidthDp(14.dp))
             ) {
                 themesInRow.forEach { theme ->
-                    val iconRes = getIconForTheme(theme)
-                    val isChecked = selectedThemes.contains(theme)
-
                     MultiButton(
+                        modifier = Modifier.weight(1f),
                         text = theme.title,
-                        painter = iconRes,
-                        checked = isChecked,
-                        enabled = !isMaxSelected || isChecked,
+                        painter = getIconForTheme(theme),
+                        checked = isThemeSelected(theme),
+                        enabled = isThemeEnabled(theme),
                         onClick = { onSelect(theme) },
                     )
+                }
+
+                if (themesInRow.size < 2) {
+                    Spacer(modifier = Modifier.weight(1f))
                 }
             }
         }
     }
 }
+
 @Composable
 private fun getIconForTheme(theme: StudyTheme) = when (theme) {
     StudyTheme.LANGUAGE -> painterResource(R.drawable.language)
-    StudyTheme.LICENSE -> painterResource(R.drawable.license)
-    StudyTheme.EMPLOYMENT -> painterResource(R.drawable.employment)
-    StudyTheme.DISCUSSION -> painterResource(R.drawable.discussion)
-    StudyTheme.NEWS -> painterResource(R.drawable.news)
-    StudyTheme.SELFSTUDY -> painterResource(R.drawable.self_study)
+    StudyTheme.CERTIFICATION -> painterResource(R.drawable.license)
+    StudyTheme.CAREER -> painterResource(R.drawable.employment)
+    StudyTheme.DEBATE -> painterResource(R.drawable.discussion)
+    StudyTheme.CURRENT_AFFAIRS -> painterResource(R.drawable.news)
+    StudyTheme.SELF_STUDY -> painterResource(R.drawable.self_study)
     StudyTheme.PROJECT -> painterResource(R.drawable.project)
-    StudyTheme.CONTEST -> painterResource(R.drawable.contest)
-    StudyTheme.MAJOR -> painterResource(R.drawable.major)
-    StudyTheme.ETC -> painterResource(R.drawable.resource_else)
+    StudyTheme.COMPETITION -> painterResource(R.drawable.contest)
+    StudyTheme.MAJOR_CAREER -> painterResource(R.drawable.major)
+    StudyTheme.OTHER -> painterResource(R.drawable.resource_else)
 }

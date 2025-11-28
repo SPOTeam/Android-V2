@@ -15,7 +15,7 @@ class BoardRepositoryImpl @Inject constructor(
     override suspend fun getTagBoardData(sortType: SortType): Result<RankedBoardResultList> =
         runCatching {
             val res = boardService.getTagBoardInfo(sortType)
-            res.data.toDomainList()
+            res.result.toDomainList()
         }.recoverCatching {
             rankedListDummies(sortType)   // 태그 보드도 랭크 리스트 형태로 더미 복구
         }
@@ -23,7 +23,7 @@ class BoardRepositoryImpl @Inject constructor(
     override suspend fun getRankedBoardData(): Result<RankedBoardResultList> =
         runCatching {
             val res = boardService.getRankedBoardInfo()
-            res.data.toDomainList()
+            res.result.toDomainList()
         }.recoverCatching {
             rankedListDummies()
         }
@@ -31,7 +31,7 @@ class BoardRepositoryImpl @Inject constructor(
     override suspend fun getLabeledBoardData(): Result<LabeledBoardResultList> =
         runCatching {
             val res = boardService.getLabeledBoardInfo()
-            res.data.toDomainList()
+            res.result.toDomainList()
         }.recoverCatching {
             labeledListDummies()
         }
