@@ -2,20 +2,26 @@ package com.umcspot.spot.landing
 
 import android.app.Activity
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -26,99 +32,113 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.KakaoStartButton
 import com.umcspot.spot.designsystem.component.button.NaverStartButton
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.SocialLoginType
+import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun LandingScreen(
+fun LandingRoute(
     onLoginSuccess: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: LandingViewModel = hiltViewModel(),
 ) {
-    val activity = LocalContext.current as? Activity
+    val context = LocalContext.current
+    val activity = context as? Activity
 
-    LaunchedEffect(Unit) {
-        viewModel.events.collect { ev ->
-            when (ev) {
-                is LandingViewModel.LoginEvent.LoginSucceeded -> {
-                    onLoginSuccess()
-                }
-                is LandingViewModel.LoginEvent.ShowError -> {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(viewModel.sideEffect) {
+        viewModel.sideEffect.collectLatest { effect ->
+            when (effect) {
+                is LandingSideEffect.NavigateToHome -> onLoginSuccess()
+                is LandingSideEffect.ShowSnackBar -> {
+                    snackbarHostState.showSnackbar(effect.message)
                 }
             }
         }
     }
 
-    LandingScreenContent(
-        onKakaoClick = {
-            activity?.let { act ->
-                viewModel.startSocialLogin(SocialLoginType.KAKAO, act)
+    Scaffold(
+        modifier = modifier,
+        containerColor = SpotTheme.colors.white,
+        contentWindowInsets = WindowInsets.systemBars,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { innerPadding ->
+        LandingScreen(
+            contentPadding = innerPadding,
+            isLoading = uiState.isLoading,
+            onKakaoClick = {
+                if (!uiState.isLoading) {
+                    activity?.let { act ->
+                        viewModel.startSocialLogin(SocialLoginType.KAKAO, act)
+                    }
+                }
+            },
+            onNaverClick = {
+                if (!uiState.isLoading) {
+                    activity?.let { act ->
+                        viewModel.startSocialLogin(SocialLoginType.NAVER, act)
+                    }
+                }
             }
-        },
-        onNaverClick = {
-            activity?.let { act ->
-                viewModel.startSocialLogin(SocialLoginType.NAVER, act)
-            }
-        },
-    )
+        )
+    }
 }
 
 @Composable
-fun LandingScreenContent(
+fun LandingScreen(
+    contentPadding: PaddingValues,
+    isLoading: Boolean,
     onKakaoClick: () -> Unit,
     onNaverClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = Modifier
+    Column(
+        modifier = modifier
             .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding(),
-        color = SpotTheme.colors.white
+            .background(SpotTheme.colors.white)
+            .padding(contentPadding)
+            .padding(horizontal = screenWidthDp(17.dp)),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .weight(1f)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Spacer(Modifier.height(48.dp))
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.spot_logo),
-                    contentDescription = "SPOT 로고",
-                    modifier = Modifier
-                        .size(33.dp),
-                    contentScale = ContentScale.Fit
-                )
-                Spacer(Modifier.height(52.dp))
-                Text(
-                    text = "당신의 스터디 파트너\n스팟, SPOT",
-                    textAlign = TextAlign.Center,
-                    lineHeight = 45.sp,
-                    color = SpotTheme.colors.B500,
-                    style = SpotTheme.typography.small_400
-                )
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 60.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                KakaoStartButton(onClick = onKakaoClick)
-                NaverStartButton(onClick = onNaverClick)
-            }
+            Image(
+                painter = painterResource(R.drawable.spot_logo),
+                contentDescription = "SPOT 로고",
+                modifier = Modifier.size(screenWidthDp(33.dp)),
+                contentScale = ContentScale.Fit
+            )
+            Spacer(Modifier.height(screenHeightDp(52.dp)))
+            Text(
+                text = "당신의 스터디 파트너\n스팟, SPOT",
+                style = SpotTheme.typography.h2,
+                textAlign = TextAlign.Center,
+                color = SpotTheme.colors.B500,
+            )
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = screenHeightDp(63.dp)),
+            verticalArrangement = Arrangement.spacedBy(screenHeightDp(10.dp))
+        ) {
+            KakaoStartButton(onClick = onKakaoClick)
+            NaverStartButton(onClick = onNaverClick)
         }
     }
 }
@@ -127,7 +147,9 @@ fun LandingScreenContent(
 @Composable
 private fun LandingScreenPreview() {
     SpotTheme {
-        LandingScreenContent(
+        LandingScreen(
+            contentPadding = PaddingValues(),
+            isLoading = false,
             onKakaoClick = {},
             onNaverClick = {}
         )
