@@ -179,9 +179,9 @@ enum class TextButtonSize(
 
 @Composable
 fun TextButtonSize.textStyle(): TextStyle = when (this) {
-    TextButtonSize.XL, TextButtonSize.L -> SpotTheme.typography.header03
-    TextButtonSize.M -> SpotTheme.typography.header04
-    TextButtonSize.S, TextButtonSize.XS -> SpotTheme.typography.header05
+    TextButtonSize.XL, TextButtonSize.L -> SpotTheme.typography.h3
+    TextButtonSize.M -> SpotTheme.typography.h4
+    TextButtonSize.S, TextButtonSize.XS -> SpotTheme.typography.h5
 }
 
 @Composable

@@ -50,7 +50,7 @@ fun EmptyAlert(
         Spacer(Modifier.height(12.dp))
         Text(
             text = alertTitle,
-            style = SpotTheme.typography.header05,
+            style = SpotTheme.typography.h5,
             fontSize = 30.sp,
             color = SpotTheme.colors.B500,
             textAlign = TextAlign.Center
@@ -58,7 +58,7 @@ fun EmptyAlert(
         Spacer(Modifier.height(15.dp))
         Text(
             text = alertDes,
-            style = SpotTheme.typography.header05,
+            style = SpotTheme.typography.h5,
             color = SpotTheme.colors.G400,
             fontSize = 25.sp,
             textAlign = TextAlign.Center

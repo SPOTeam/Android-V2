@@ -33,6 +33,7 @@ import com.umcspot.spot.designsystem.component.button.TextButtonM
 import com.umcspot.spot.designsystem.component.button.TextButtonS
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.ui.extension.screenHeightDp
 
 @Composable
 fun PrivacyConsentDialog(
@@ -59,7 +60,7 @@ fun PrivacyConsentDialog(
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.Top
                 ) {
-                    Spacer(Modifier.weight(1f))               // 왼쪽 공간 채우기
+                    Spacer(Modifier.weight(1f))               
 
                     IconButton(
                         onClick = onDismiss,
@@ -67,7 +68,7 @@ fun PrivacyConsentDialog(
                             .size(16.dp)
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.dismiss), // 없으면 Icons.Default.Close
+                            painter = painterResource(R.drawable.dismiss), 
                             contentDescription = "닫기",
                             modifier = Modifier.size(16.dp)
                         )
@@ -80,13 +81,12 @@ fun PrivacyConsentDialog(
                 ) {
                     Text(
                         text = "개인정보 이용 및 활용 동의",
-                        style = SpotTheme.typography.bodyMedium500.copy(fontSize = 20.sp),
+                        style = SpotTheme.typography.h2,
                         color = SpotTheme.colors.black,
                     )
                 }
 
-                Spacer(Modifier.height(30.dp))
-
+                Spacer(Modifier.height(screenHeightDp(20.dp)))
 
                 Surface(
                     shape = SpotShapes.Hard,
@@ -94,7 +94,7 @@ fun PrivacyConsentDialog(
                     color = SpotTheme.colors.white,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 160.dp, max = 380.dp), // 스크롤 높이 제한
+                        .heightIn(min = 160.dp, max = 380.dp), 
                 ) {
                     val scroll = rememberScrollState()
                     Column(
@@ -102,14 +102,14 @@ fun PrivacyConsentDialog(
                             .padding(16.dp)
                             .verticalScroll(scroll)
                     ) {
-                        // 제1조
+                        
                         Text(
                             text = "제1조 (개인정보 수집 및 이용 목적)",
-                            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 14.sp),
+                            style = SpotTheme.typography.regular_500,
                             color = SpotTheme.colors.black
                         )
                         Spacer(Modifier.height(6.dp))
-                        val bullet = SpotTheme.typography.bodySmall400.copy(fontSize = 13.sp)
+                        val bullet = SpotTheme.typography.small_500
                         NumberedLine(1, "회원 가입 및 관리: 본인 확인, 회원 서비스 제공", bullet)
                         NumberedLine(2, "서비스 제공 및 운영: 커뮤니티 기능 제공, 맞춤형 콘텐츠 추천", bullet)
                         NumberedLine(3, "고객지원: 문의사항 응대 및 서비스 개선", bullet)
@@ -117,10 +117,10 @@ fun PrivacyConsentDialog(
 
                         Spacer(Modifier.height(12.dp))
 
-                        // 제2조
+                        
                         Text(
                             text = "제2조 (수집하는 개인정보 항목)",
-                            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 14.sp),
+                            style = SpotTheme.typography.regular_500,
                             color = SpotTheme.colors.black
                         )
                         Spacer(Modifier.height(6.dp))
@@ -133,7 +133,7 @@ fun PrivacyConsentDialog(
 
                 Spacer(Modifier.height(16.dp))
 
-                // 동의 버튼
+                
                 TextButtonM(
                     text = "동의",
                     onClick = onAgree
@@ -168,7 +168,7 @@ fun UniqueConsentDialog(
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.Top
                 ) {
-                    Spacer(Modifier.weight(1f))               // 왼쪽 공간 채우기
+                    Spacer(Modifier.weight(1f))               
 
                     IconButton(
                         onClick = onDismiss,
@@ -176,7 +176,7 @@ fun UniqueConsentDialog(
                             .size(16.dp)
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.dismiss), // 없으면 Icons.Default.Close
+                            painter = painterResource(R.drawable.dismiss), 
                             contentDescription = "닫기",
                             modifier = Modifier.size(16.dp)
                         )
@@ -189,12 +189,12 @@ fun UniqueConsentDialog(
                 ) {
                     Text(
                         text = "고유식별정보 처리 동의",
-                        style = SpotTheme.typography.bodyMedium500.copy(fontSize = 20.sp),
+                        style = SpotTheme.typography.h2,
                         color = SpotTheme.colors.black,
                     )
                 }
 
-                Spacer(Modifier.height(30.dp))
+                Spacer(Modifier.height(screenHeightDp(20.dp)))
 
 
                 Surface(
@@ -203,7 +203,7 @@ fun UniqueConsentDialog(
                     color = SpotTheme.colors.white,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 160.dp, max = 380.dp), // 스크롤 높이 제한
+                        .heightIn(min = 160.dp, max = 380.dp), 
                 ) {
                     val scroll = rememberScrollState()
                     Column(
@@ -211,14 +211,14 @@ fun UniqueConsentDialog(
                             .padding(16.dp)
                             .verticalScroll(scroll)
                     ) {
-                        // 제1조
+                        
                         Text(
                             text = "제1조 (개인정보 수집 및 이용 목적)",
-                            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 14.sp),
+                            style = SpotTheme.typography.regular_500,
                             color = SpotTheme.colors.black
                         )
                         Spacer(Modifier.height(6.dp))
-                        val bullet = SpotTheme.typography.bodySmall400.copy(fontSize = 13.sp)
+                        val bullet = SpotTheme.typography.small_500
                         NumberedLine(1, "회원 가입 및 관리: 본인 확인, 회원 서비스 제공", bullet)
                         NumberedLine(2, "서비스 제공 및 운영: 커뮤니티 기능 제공, 맞춤형 콘텐츠 추천", bullet)
                         NumberedLine(3, "고객지원: 문의사항 응대 및 서비스 개선", bullet)
@@ -226,10 +226,10 @@ fun UniqueConsentDialog(
 
                         Spacer(Modifier.height(12.dp))
 
-                        // 제2조
+                        
                         Text(
                             text = "제2조 (수집하는 개인정보 항목)",
-                            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 14.sp),
+                            style = SpotTheme.typography.regular_500,
                             color = SpotTheme.colors.black
                         )
                         Spacer(Modifier.height(6.dp))
@@ -242,7 +242,7 @@ fun UniqueConsentDialog(
 
                 Spacer(Modifier.height(16.dp))
 
-                // 동의 버튼
+                
                 TextButtonM(
                     text = "동의",
                     onClick = onAgree

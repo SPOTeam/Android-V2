@@ -1,4 +1,4 @@
-package com.umcspot.spot.designsystem.component
+package com.umcspot.spot.designsystem.component.button
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.sp
 import com.umcspot.spot.designsystem.theme.*
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.SpotTypography
 
 // ===== 공통 베이스 버튼 =====
 @Composable
@@ -67,7 +66,7 @@ private fun SocialSignButton(
             // 텍스트: 항상 가운데 정렬
             Text(
                 text = text,
-                style = SpotTheme.typography.bodyMedium600,
+                style = SpotTheme.typography.h4,
                 fontSize = 18.sp,
                 modifier = Modifier.align(Alignment.Center)
             )

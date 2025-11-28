@@ -1,6 +1,7 @@
 package com.umcspot.spot.home.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -21,8 +22,8 @@ fun NavGraphBuilder.homeGraph(
 ) {
     composable<Home> {
         HomeScreen(
-            onQuickMenuClick = onQuickMenuClick, // ⬅️ 여기서 콜백 주입
-            contentPadding = contentPadding
+            contentPadding = contentPadding,
+            onQuickMenuClick = onQuickMenuClick
         )
     }
 }

@@ -1,8 +1,5 @@
 package com.umcspot.spot.study.recruiting
 
-import android.util.Log
-import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -11,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,8 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -29,7 +25,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -39,30 +34,32 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.component.button.MultiButton
 import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.button.TextToggleButton
+import com.umcspot.spot.designsystem.component.study.section.ActivityThemeSection
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.StudyTheme
+import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun RecruitingStudyFilterScreen(
-    contentPadding : PaddingValues,
+    contentPadding: PaddingValues,
     onAcceptFilterClick: () -> Unit,
     vm: RecruitingStudyFilterViewModel = hiltViewModel(),
 ) {
-    val activityType by vm.activity.collectAsStateWithLifecycle()
-    val fee by vm.fee.collectAsStateWithLifecycle()
-    val theme by vm.theme.collectAsStateWithLifecycle()
+
+    val activities by vm.activities.collectAsStateWithLifecycle()
+    val fees by vm.fees.collectAsStateWithLifecycle()
+    val themes by vm.themes.collectAsStateWithLifecycle()
     val acceptEnabled by vm.notNull.collectAsStateWithLifecycle()
 
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
 
-    // 적용 이벤트 수신
     LaunchedEffect(Unit) {
         vm.events.collect { ev ->
             when (ev) {
@@ -74,13 +71,13 @@ fun RecruitingStudyFilterScreen(
     RecruitingStudyFilterScreenContent(
         modifier = Modifier
             .padding(top = topPad, bottom = bottomPad),
-        activityType = activityType,
-        fee = fee,
-        theme = theme,
+        selectedActivities = activities,
+        selectedFees = fees,
+        selectedThemes = themes,
         buttonEnabled = acceptEnabled,
-        onSetActivity = vm::setActivity,
-        onSetFee = vm::setFee,
-        onSetTheme = vm::setTheme,
+        onToggleActivity = vm::toggleActivity,
+        onToggleFee = vm::toggleFee,
+        onToggleTheme = vm::toggleTheme,
         onReset = vm::reset,
         onApply = vm::apply
     )
@@ -88,13 +85,13 @@ fun RecruitingStudyFilterScreen(
 
 @Composable
 fun RecruitingStudyFilterScreenContent(
-    activityType: ActivityType?,                 // ✅ 단일 값 (nullable)
-    fee: FeeRange?,                         // ✅ 단일 값 (nullable)
-    theme: StudyTheme?,                     // ✅ 단일 값 (nullable)
-    buttonEnabled : Boolean,
-    onSetActivity: (ActivityType) -> Unit,  // ✅ set* 로직 (같은 값 다시 누르면 해제는 VM이 처리)
-    onSetFee: (FeeRange?) -> Unit,
-    onSetTheme: (StudyTheme) -> Unit,
+    selectedActivities: ImmutableList<ActivityType>,
+    selectedFees: ImmutableList<FeeRange>,
+    selectedThemes: ImmutableList<StudyTheme>,
+    buttonEnabled: Boolean,
+    onToggleActivity: (ActivityType) -> Unit,
+    onToggleFee: (FeeRange) -> Unit,
+    onToggleTheme: (StudyTheme) -> Unit,
     onReset: () -> Unit,
     onApply: () -> Unit,
     modifier: Modifier = Modifier
@@ -107,36 +104,54 @@ fun RecruitingStudyFilterScreenContent(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()) // ✅ 스크롤
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
         ) {
-            ActivityTypeSection(
-                activityType = activityType,
-                onSelect = onSetActivity
+            Text(
+                text = "활동",
+                style = SpotTheme.typography.medium_500.copy(fontSize = 15.sp),
+                color = SpotTheme.colors.black
             )
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(screenHeightDp(10.dp)))
+
+
+            ActivityTypeMultiSection(
+                selectedTypes = selectedActivities,
+                onToggle = onToggleActivity
+            )
+
+            Spacer(modifier = Modifier.height(screenHeightDp(30.dp)))
 
 
             ActivityFeeSection(
-                activityFee = fee,
-                onSelect = onSetFee
+                selectedFees = selectedFees,
+                onToggle = onToggleFee
             )
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(screenHeightDp(30.dp)))
+
+            Text(
+                text = "스터디 테마",
+                style = SpotTheme.typography.h5,
+                color = SpotTheme.colors.black
+            )
+
+            Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
 
             ActivityThemeSection(
-                activityTheme = theme,
-                onSelect = onSetTheme
+                selectedThemes = selectedThemes,
+                onSelect = onToggleTheme,
+                maxSelection = 10
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
 
             ResetFilterText(
                 onClick = onReset
             )
 
-            Spacer(Modifier.height(80.dp))
+            Spacer(Modifier.height(screenHeightDp(80.dp)))
         }
 
         Box(
@@ -145,9 +160,8 @@ fun RecruitingStudyFilterScreenContent(
                 .fillMaxWidth()
                 .navigationBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 12.dp)
-                .zIndex(1f) // 항상 앞
+                .zIndex(1f)
         ) {
-
             TextButton(
                 text = "검색 결과 보기",
                 enabled = buttonEnabled,
@@ -158,45 +172,29 @@ fun RecruitingStudyFilterScreenContent(
 }
 
 @Composable
-fun ActivityTypeSection(
-    activityType: ActivityType?,
-    onSelect: (ActivityType) -> Unit
+fun ActivityTypeMultiSection(
+    selectedTypes: ImmutableList<ActivityType>,
+    onToggle: (ActivityType) -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .wrapContentSize()
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Text(
-            text = "활동",
-            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 15.sp),
-            color = SpotTheme.colors.black
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            items(ActivityType.entries) { type ->
-                val iconRes = when (type) {
-                    ActivityType.ONLINE -> painterResource( R.drawable.online)
-                    ActivityType.OFFLINE -> painterResource(R.drawable.offline)
-                }
-
-                MultiButton(
-                    text = type.label,
-                    painter = iconRes,
-                    width = 140.dp,
-                    checked = activityType == type,
-                    onClick = { onSelect(type) },
-                )
-            }
+        ActivityType.entries.forEach { type ->
+            TextToggleButton(
+                modifier = Modifier.weight(1f),
+                text = type.label,
+                checked = selectedTypes.contains(type),
+                onClick = { onToggle(type) }
+            )
         }
     }
 }
 
 @Composable
 fun ActivityFeeSection(
-    activityFee: FeeRange?,
-    onSelect: (FeeRange) -> Unit             // 누르면 VM의 setActivity 호출
+    selectedFees: ImmutableList<FeeRange>,
+    onToggle: (FeeRange) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -205,7 +203,7 @@ fun ActivityFeeSection(
     ) {
         Text(
             text = "활동비",
-            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 15.sp),
+            style = SpotTheme.typography.medium_500.copy(fontSize = 15.sp),
             color = SpotTheme.colors.black
         )
         Spacer(modifier = Modifier.height(10.dp))
@@ -213,59 +211,13 @@ fun ActivityFeeSection(
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
-        ){
+        ) {
             FeeRange.entries.forEach { fee ->
                 TextToggleButton(
                     text = fee.label,
                     width = 71.dp,
-                    checked = activityFee == fee,
-                    onClick = { onSelect(fee) },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun ActivityThemeSection(
-    activityTheme: StudyTheme?,
-    onSelect : (StudyTheme) -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Text(
-            text = "스터디 테마",
-            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 15.sp),
-            color = SpotTheme.colors.black
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ){
-            StudyTheme.entries.forEach { theme ->
-                val iconRes = when (theme) {
-                    StudyTheme.LANGUAGE -> painterResource(R.drawable.language)
-                    StudyTheme.CERTIFICATION -> painterResource(R.drawable.license)
-                    StudyTheme.CAREER -> painterResource(R.drawable.employment)
-                    StudyTheme.DEBATE -> painterResource(R.drawable.discussion)
-                    StudyTheme.CURRENT_AFFAIRS -> painterResource(R.drawable.news)
-                    StudyTheme.SELF_STUDY -> painterResource(R.drawable.self_study)
-                    StudyTheme.PROJECT -> painterResource(R.drawable.project)
-                    StudyTheme.COMPETITION -> painterResource(R.drawable.contest)
-                    StudyTheme.MAJOR_CAREER -> painterResource(R.drawable.major)
-                    StudyTheme.OTHER -> painterResource(R.drawable.resource_else)
-                }
-
-                MultiButton(
-                    text = theme.title,
-                    painter = iconRes,
-                    checked = activityTheme == theme,
-                    width = 156.dp,
-                    onClick = { onSelect(theme) },
+                    checked = selectedFees.contains(fee),
+                    onClick = { onToggle(fee) },
                 )
             }
         }
@@ -280,7 +232,7 @@ fun ResetFilterText(
     Text(
         text = "필터 초기화",
         color = SpotTheme.colors.gray400,
-        style = SpotTheme.typography.bodySmall400.copy(
+        style = SpotTheme.typography.small_400.copy(
             fontSize = 13.sp,
             textDecoration = TextDecoration.Underline
         ),
@@ -288,10 +240,9 @@ fun ResetFilterText(
             .semantics { role = Role.Button }
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = null,          // 리플 없애려면 유지, 리플 원하면 제거
+                indication = null,
                 onClick = onClick
             )
-            .padding(vertical = 4.dp)      // 터치 여유
+            .padding(vertical = 4.dp)
     )
 }
-

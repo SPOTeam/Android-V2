@@ -146,7 +146,7 @@ private fun RecruitingStudyScreenContent(
         // 타이틀
         Text(
             text = "모집중 스터디",
-            style = SpotTheme.typography.bodySmall400.copy(fontSize = 20.sp)
+            style = SpotTheme.typography.small_400.copy(fontSize = 20.sp)
         )
 
         Spacer(Modifier.height(8.dp))
@@ -204,7 +204,7 @@ fun HeaderRow(
     ) {
         Text(
             text = "%02d건".format(size),
-            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 12.sp),
+            style = SpotTheme.typography.medium_500.copy(fontSize = 12.sp),
             color = SpotTheme.colors.gray500
         )
 
@@ -218,7 +218,7 @@ fun HeaderRow(
                 Text(
                     text = sortType.label,
                     color = SpotTheme.colors.black,
-                    style = SpotTheme.typography.bodyMedium500.copy(fontSize = 12.sp)
+                    style = SpotTheme.typography.medium_500.copy(fontSize = 12.sp)
                 )
                 Spacer(Modifier.width(5.dp))
                 Icon(
@@ -271,7 +271,7 @@ fun SortTypeBottomSheet(
                     headlineContent = {
                         Text(
                             text = option.label,
-                            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 15.sp)
+                            style = SpotTheme.typography.medium_500.copy(fontSize = 15.sp)
                         )
                     },
                     trailingContent = {

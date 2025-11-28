@@ -35,6 +35,8 @@ import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.GageBar
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
 import kotlinx.coroutines.delay
 
 @Composable
@@ -81,12 +83,12 @@ fun SavingScreen(
             Image(
                 painter = painterResource(R.drawable.spot_logo),
                 contentDescription = null,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(screenWidthDp(40.dp))
             )
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(screenHeightDp(16.dp)))
             Text(
                 text = "당신의 스터디 파트너 \n 스팟, SPOT",
-                style = SpotTheme.typography.bodyMedium500.copy(fontSize = 20.sp),
+                style = SpotTheme.typography.h2,
                 color = SpotTheme.colors.B500,
                 textAlign = TextAlign.Center
             )
@@ -97,15 +99,15 @@ fun SavingScreen(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .navigationBarsPadding()
-                .padding(bottom = 8.dp),
+                .padding(bottom = screenHeightDp(8.dp)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = if (isDone) "등록 완료!" else "내 정보 저장 중..",
-                style = SpotTheme.typography.bodySmall400.copy(fontSize = 13.sp),
+                style = SpotTheme.typography.h4,
                 color = SpotTheme.colors.B500
             )
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(screenHeightDp(8.dp)))
             GageBar(
                 value = internal.value,
             )

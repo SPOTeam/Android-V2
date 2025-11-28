@@ -61,6 +61,7 @@ import com.umcspot.spot.designsystem.theme.B100
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.state.UiState
 
 
@@ -75,11 +76,9 @@ fun SignUpScreen(
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
 
-    // ✅ 동의 체크 상태 (초기 false 권장)
     var privacyChecked by rememberSaveable { mutableStateOf(false) }
     var uniqueChecked by rememberSaveable { mutableStateOf(false) }
 
-    // ✅ 모달 표시 상태
     var showPrivacyDialog by rememberSaveable { mutableStateOf(false) }
     var showUniqueDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -114,23 +113,21 @@ fun SignUpScreen(
                     ) { focusManager.clearFocus(force = true) }
             ) {
 
-                Spacer(Modifier.height(70.dp))
+                Spacer(Modifier.height(screenHeightDp(68.dp)))
                 Text(
                     text = "스팟에서는 안전한 스터디 매칭을 위해\n실명 활동제를 도입하고 있어요.",
-                    style = SpotTheme.typography.bodyMedium500.copy(fontSize = 16.sp),
+                    style = SpotTheme.typography.h3,
                     color = SpotTheme.colors.B500
                 )
 
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(screenHeightDp(33.dp)))
 
-                // 이름 섹션
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
                         .padding(horizontal = 4.dp, vertical = 8.dp)
                 ) {
-
                     EditableNameRow(
                         name = state.data,
                         onNameChange = { viewmodel.setName(it) }
@@ -140,16 +137,18 @@ fun SignUpScreen(
                 Spacer(Modifier.weight(1f))
 
 
-
-                // ✅ 항목 클릭 시 모달만 연다 (체크는 모달의 동의에서 처리)
                 AgreementConfirm(
                     privacyChecked = privacyChecked,
                     uniqueChecked = uniqueChecked,
-                    onOpenPrivacyDialog = { if (privacyChecked) privacyChecked = false else showPrivacyDialog = true },
-                    onOpenUniqueDialog = { if (uniqueChecked) uniqueChecked = false else showUniqueDialog = true },
+                    onOpenPrivacyDialog = {
+                        if (privacyChecked) privacyChecked = false else showPrivacyDialog = true
+                    },
+                    onOpenUniqueDialog = {
+                        if (uniqueChecked) uniqueChecked = false else showUniqueDialog = true
+                    },
                 )
 
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(screenHeightDp(24.dp)))
 
                 TextButton(
                     text = "다음",
@@ -158,7 +157,6 @@ fun SignUpScreen(
                 )
             }
 
-            // ✅ 모달들
             PrivacyConsentDialog(
                 open = showPrivacyDialog,
                 onAgree = {
@@ -190,16 +188,17 @@ fun AgreementConfirm(
     Column {
         Text(
             text = "약관 동의",
-            style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp)
+            style = SpotTheme.typography.h3
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(screenHeightDp(7.dp)))
 
         ConsentItem(
             title = "개인정보 이용 및 활용 동의",
             checked = privacyChecked,
             onClick = onOpenPrivacyDialog
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(screenHeightDp(4.dp)))
+
         ConsentItem(
             title = "고유식별정보 처리 동의",
             checked = uniqueChecked,
@@ -241,41 +240,40 @@ fun EditableNameRow(
 
                 OutlinedTextField(
                     colors = outlinedTextFieldColors(
-                        focusedBorderColor = SpotTheme.colors.B500,      // 포커스 시 테두리
-                        unfocusedBorderColor = Color.Transparent,               // 비활성 테두리
-                        focusedLabelColor = SpotTheme.colors.B500,       // 포커스 시 라벨
-                        unfocusedLabelColor = Color.Transparent,                // 비활성 라벨
-                        cursorColor = SpotTheme.colors.B500,             // 커서 색상
-                        focusedTextColor = SpotTheme.colors.black,       // 포커스 시 텍스트
+                        focusedBorderColor = SpotTheme.colors.B500,
+                        unfocusedBorderColor = Color.Transparent,
+                        focusedLabelColor = SpotTheme.colors.B500,
+                        unfocusedLabelColor = Color.Transparent,
+                        cursorColor = SpotTheme.colors.B500,
+                        focusedTextColor = SpotTheme.colors.black,
                         unfocusedTextColor = SpotTheme.colors.black,
-                        focusedContainerColor = SpotTheme.colors.white,  // 내부 배경색
+                        focusedContainerColor = SpotTheme.colors.white,
                         unfocusedContainerColor = SpotTheme.colors.white
                     ),
                     value = draft,
                     onValueChange = { new ->
                         when {
                             new.length <= 15 -> {
-                                // 15자 이하면 그대로 반영
                                 draft = new
                             }
-                            // 15자 초과: 기존보다 늘어난 타이핑이라면 끝 글자만 교체
+
                             new.length > draft.length -> {
-                                val last = new.last()              // 마지막에 입력된 글자(간단 버전)
-                                draft = draft.take(14) + last      // 14 + 새 글자 = 15자 유지
+                                val last = new.last()
+                                draft = draft.take(14) + last
                             }
+
                             else -> {
-                                // 그 외(중간 수정/붙여넣기 등)는 안전하게 15자 컷
                                 draft = new.take(15)
                             }
                         }
                     },
                     singleLine = true,
                     shape = SpotShapes.Hard,
-                    textStyle = SpotTheme.typography.bodySmall400,
-                    placeholder = { Text("이름을 입력하세요", style = SpotTheme.typography.bodySmall400) },
+                    textStyle = SpotTheme.typography.h2,
+                    placeholder = { Text("이름을 입력하세요", style = SpotTheme.typography.h2) },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
-                        // IME Done도 포커스 아웃과 동일 처리
+
                         focusManager.clearFocus(force = true)
                     }),
                     modifier = Modifier
@@ -296,12 +294,12 @@ fun EditableNameRow(
                         }
                 )
             }
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(screenHeightDp(8.dp)))
+
             Text(
                 text = "공백 포함 15자까지 입력 가능해요.",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 12.sp, color = SpotTheme.colors.B500
-                ),
+                style = SpotTheme.typography.regular_500,
+                color = SpotTheme.colors.B500,
                 modifier = Modifier.padding(start = 10.dp)
             )
         } else {
@@ -313,7 +311,7 @@ fun EditableNameRow(
             ) {
                 Text(
                     text = name,
-                    style = SpotTheme.typography.bodySmall400.copy(fontSize = 20.sp)
+                    style = SpotTheme.typography.h2
                 )
 
                 MultiButton(
@@ -330,9 +328,8 @@ fun EditableNameRow(
             Spacer(Modifier.height(8.dp))
             Text(
                 text = "실명이 맞나요? 이름을 확인해주세요.",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 12.sp
-                ),
+                style = SpotTheme.typography.regular_500,
+                color = SpotTheme.colors.gray400
             )
         }
     }
@@ -346,7 +343,7 @@ private fun ConsentItem(
 ) {
     val border = if (checked) SpotTheme.colors.B500 else SpotTheme.colors.G300
     val checkTint = if (checked) SpotTheme.colors.B500 else SpotTheme.colors.black
-    val background = if(checked) SpotTheme.colors.B100 else SpotTheme.colors.white
+    val background = if (checked) SpotTheme.colors.B100 else SpotTheme.colors.white
 
     Surface(
         shape = SpotShapes.Soft,
@@ -372,7 +369,7 @@ private fun ConsentItem(
         ) {
             Text(
                 text = title,
-                style = SpotTheme.typography.bodySmall400.copy(fontSize = 14.sp),
+                style = SpotTheme.typography.regular_500,
                 color = SpotTheme.colors.black,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

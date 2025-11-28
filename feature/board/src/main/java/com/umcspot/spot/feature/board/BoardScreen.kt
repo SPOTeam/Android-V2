@@ -172,7 +172,7 @@ private fun BoardTabChip(
     ) {
         Text(
             text = text,
-            style = SpotTheme.typography.bodySmall500.copy(fontSize = 13.sp),
+            style = SpotTheme.typography.small_500.copy(fontSize = 13.sp),
             color = fg
         )
     }
@@ -216,7 +216,7 @@ private fun SectionHeader(
     ) {
         Text(
             text = title,
-            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 18.sp),
+            style = SpotTheme.typography.medium_500.copy(fontSize = 18.sp),
             modifier = Modifier.weight(1f)
         )
         IconButton(onClick = onMoreClick, modifier = Modifier.size(28.dp)) {
@@ -287,14 +287,14 @@ private fun LabeledCardList(
                     // 왼쪽 라벨
                     Text(
                         text = item.label.korean,
-                        style = SpotTheme.typography.bodySmall500.copy(fontSize = 14.sp),
+                        style = SpotTheme.typography.small_500.copy(fontSize = 14.sp),
                         color = SpotTheme.colors.B500,
                         modifier = Modifier.widthIn(min = 56.dp)
                     )
                     // 제목
                     Text(
                         text = item.title,
-                        style = SpotTheme.typography.bodyMedium500.copy(fontSize = 14.sp),
+                        style = SpotTheme.typography.medium_500.copy(fontSize = 14.sp),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
@@ -302,7 +302,7 @@ private fun LabeledCardList(
                     // 카운트
                     Text(
                         text = "(${cap(item.count)})",
-                        style = SpotTheme.typography.bodySmall500.copy(fontSize = 14.sp),
+                        style = SpotTheme.typography.small_500.copy(fontSize = 14.sp),
                         color = SpotTheme.colors.B500
                     )
                 }
@@ -332,20 +332,20 @@ private fun RankRow(
     ) {
         Text(
             text = rank.toString().padStart(2, '0'),
-            style = SpotTheme.typography.bodySmall500.copy(fontSize = 14.sp),
+            style = SpotTheme.typography.small_500.copy(fontSize = 14.sp),
             color = SpotTheme.colors.B500,
             modifier = Modifier.width(28.dp)
         )
         Text(
             text = title,
-            style = SpotTheme.typography.bodyMedium500.copy(fontSize = 14.sp),
+            style = SpotTheme.typography.medium_500.copy(fontSize = 14.sp),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)
         )
         Text(
             text = "(${cap(count)})",
-            style = SpotTheme.typography.bodySmall500.copy(fontSize = 14.sp),
+            style = SpotTheme.typography.small_500.copy(fontSize = 14.sp),
             color = SpotTheme.colors.B500
         )
     }

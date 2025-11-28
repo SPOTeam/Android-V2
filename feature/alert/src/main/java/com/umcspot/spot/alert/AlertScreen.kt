@@ -177,13 +177,13 @@ fun EnrollStudyCard(
             Column {
                 Text(
                     text = "신청 스터디",
-                    style = SpotTheme.typography.bodyMedium600,
+                    style = SpotTheme.typography.medium_500,
                     fontSize = 20.sp
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = "신청 스터디의 수락 알림입니다.\n클릭하여 스터디 참여를 확인해주세요.",
-                    style = SpotTheme.typography.bodyMedium500,
+                    style = SpotTheme.typography.medium_500,
                     fontSize = 15.sp,
                     lineHeight = 22.sp,
                     color = SpotTheme.colors.Black
@@ -242,7 +242,7 @@ fun PopularPostAlert(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "실시간 인기글",
-                        style = SpotTheme.typography.bodyMedium500,
+                        style = SpotTheme.typography.medium_500,
                         maxLines = 1,
                         fontSize = 15.sp,
                         overflow = TextOverflow.Ellipsis
@@ -250,7 +250,7 @@ fun PopularPostAlert(
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text = data.title,
-                        style = SpotTheme.typography.bodyMedium500,
+                        style = SpotTheme.typography.medium_500,
                         color = SpotTheme.colors.Black,
                         maxLines = 1,
                         fontSize = 15.sp,
@@ -323,7 +323,7 @@ fun StudyNotiAlert(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = primary,
-                        style = SpotTheme.typography.bodyMedium500,
+                        style = SpotTheme.typography.medium_500,
                         fontSize = 15.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -331,7 +331,7 @@ fun StudyNotiAlert(
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text = secondary,
-                        style = SpotTheme.typography.bodyMedium500,
+                        style = SpotTheme.typography.medium_500,
                         fontSize = 15.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -356,7 +356,7 @@ fun NewBadge(
         Text(
             text = "N",
             color = SpotTheme.colors.white,
-            style = SpotTheme.typography.bodyMedium500,
+            style = SpotTheme.typography.medium_500,
             fontSize = 16.sp,
             modifier = Modifier.align(Alignment.Center)
         )
