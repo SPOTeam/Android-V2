@@ -13,7 +13,7 @@ fun NavController.navigateToLanding(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.landingGraph(
-    onLoginSuccess : () -> Unit
+    onLoginSuccess: () -> Unit
 ) {
     composable<Landing> {
         LandingRoute(
