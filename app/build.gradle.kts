@@ -56,13 +56,13 @@ dependencies {
     implementation(projects.data.study)
     implementation(projects.data.alert)
     implementation(projects.data.board)
-//    implementation(projects.data.user)
-//    implementation(projects.data.login)
+    implementation(projects.data.user)
+    implementation(projects.data.login)
 
-//    implementation(libs.kakao.common)
-//    implementation(libs.kakao.login)
-//    implementation(libs.kakao.auth)
-//
-//    implementation(libs.naver.oauth)
+    implementation(libs.kakao.common)
+    implementation(libs.kakao.login)
+    implementation(libs.kakao.auth)
+
+    implementation(libs.naver.oauth)
 //    implementation(libs.naver.jdk)
 }

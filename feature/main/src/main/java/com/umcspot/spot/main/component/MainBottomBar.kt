@@ -84,6 +84,7 @@ fun RowScope.MainBottomBarItem(
     onClick: () -> Unit
 ) {
     val bottomItemColor = if (selected) B400 else Black
+    val bottomTextStyle = if (selected) SpotTheme.typography.regular_400 else SpotTheme.typography.regular_400
 
     Column(
         modifier = modifier
@@ -100,7 +101,7 @@ fun RowScope.MainBottomBarItem(
         Text(
             text = stringResource(tab.contentDescription),
             fontSize = 14.sp,
-            style = SpotTheme.typography.regular_400,
+            style = bottomTextStyle,
             color = bottomItemColor
         )
     }

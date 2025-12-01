@@ -13,7 +13,7 @@ class AlertRepositoryImpl @Inject constructor(
     override suspend fun getAlerts(): Result<AlertResult> =
         runCatching {
             val response = studyService.getAlerts()
-            response.data.toDomainList()
+            response.result.toDomainList()
         }.recoverCatching {
             getAlertDummies()
         }
@@ -24,7 +24,7 @@ class AlertRepositoryImpl @Inject constructor(
     override suspend fun getAppliedAlerts(): Result<AppliedAlertResult> =
         runCatching {
             val response = studyService.getAppliedAlerts()
-            response.data.toDomainList()
+            response.result.toDomainList()
         }.recoverCatching {
             getAppliedAlertDummies()
         }

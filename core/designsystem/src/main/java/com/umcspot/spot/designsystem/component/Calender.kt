@@ -103,7 +103,7 @@ fun SpotMonthCalendar(
 
             Text(
                 text = "${currentYm.year}년 ${currentYm.monthValue}월",
-                style = SpotTheme.typography.medium_500,
+                style = SpotTheme.typography.small_500,
                 fontSize = 26.sp,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
@@ -152,7 +152,7 @@ private fun WeekdayRow() {
         labels.forEachIndexed { idx, label ->
             Text(
                 text = label,
-                style = SpotTheme.typography.medium_500,
+                style = SpotTheme.typography.small_500,
                 fontSize = 16.sp,
                 // ✅ 일요일 컬럼은 헤더도 B500
                 color = if (idx == 6) SpotTheme.colors.B500 else SpotTheme.colors.black,
@@ -193,7 +193,7 @@ private fun DayCellStyled(
             onClick = onClick
         )
 
-        val dateTextStyle = SpotTheme.typography.medium_500
+        val dateTextStyle = SpotTheme.typography.small_500.copy(fontSize = 18.sp)
         val measurer = rememberTextMeasurer()
         val density = LocalDensity.current
         val textHeightDp = remember(day.date.dayOfMonth) {

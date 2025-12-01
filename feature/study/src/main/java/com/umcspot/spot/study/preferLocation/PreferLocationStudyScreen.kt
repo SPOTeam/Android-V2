@@ -1,6 +1,5 @@
 package com.umcspot.spot.study.preferLocation
 
-import PreferLocationBottomSheet
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.bottomsheet.LocationBottomSheet
 import com.umcspot.spot.designsystem.component.empty.EmptyAlertWithButton
 import com.umcspot.spot.designsystem.component.study.StudyListItem
 import com.umcspot.spot.designsystem.shapes.SpotShapes
@@ -108,7 +108,7 @@ fun PreferLocationStudyScreen(
         // 타이틀
         Text(
             text = "내 지역 스터디",
-            style = SpotTheme.typography.small_400
+            style = SpotTheme.typography.small_400.copy(fontSize = 20.sp)
         )
 
         Spacer(Modifier.height(8.dp))
@@ -152,8 +152,7 @@ fun PreferLocationStudyScreen(
     }
 
     // 지역 선택 바텀시트
-    PreferLocationBottomSheet(
-        contentPadding = contentPadding,
+    LocationBottomSheet(
         visible = showSheet,
         query = query,
         onQueryChange = { viewmodel.searchLocation(it) },
@@ -204,7 +203,7 @@ private fun HeaderRow(
     ) {
         Text(
             text = "%02d건".format(size),
-            style = SpotTheme.typography.medium_500,
+            style = SpotTheme.typography.medium_500.copy(fontSize = 12.sp),
             color = SpotTheme.colors.gray500
         )
 
@@ -218,7 +217,7 @@ private fun HeaderRow(
                 Text(
                     text = sortType.label,
                     color = SpotTheme.colors.black,
-                    style = SpotTheme.typography.medium_500
+                    style = SpotTheme.typography.medium_500.copy(fontSize = 12.sp)
                 )
                 Spacer(Modifier.width(5.dp))
                 Icon(
@@ -305,7 +304,7 @@ private fun SelectedLocationTabs(
                 ) {
                     Text(
                         text = name,
-                        style = SpotTheme.typography.medium_500,
+                        style = SpotTheme.typography.medium_500.copy(fontSize = 14.sp),
                         modifier = Modifier.padding(horizontal = horizPad, vertical = 10.dp)
                     )
                 }

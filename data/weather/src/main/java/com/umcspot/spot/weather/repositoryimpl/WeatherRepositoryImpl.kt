@@ -14,7 +14,7 @@ class WeatherRepositoryImpl @Inject constructor(
     override suspend fun getWeather(request: Weather): Result<WeatherResult> =
         runCatching {
             val response = weatherService.getWeather(request.toData())
-            response.data.toDomain()
+            response.result.toDomain()
         }.recoverCatching {
             // API 미연결/예외 시 더미로 복구
             WeatherResult.dummyFrom()

@@ -167,7 +167,7 @@ fun preview() {
                 Spacer(Modifier.height(6.dp))
                 Text(
                     text = "내 지역",
-                    style = SpotTheme.typography.medium_500,
+                    style = SpotTheme.typography.small_500,
                     fontSize = 14.sp,
                     color = Black,
                     maxLines = 1

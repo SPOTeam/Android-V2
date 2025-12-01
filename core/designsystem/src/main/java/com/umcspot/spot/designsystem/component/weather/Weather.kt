@@ -99,7 +99,7 @@ fun WeatherCard(
                     }
                     Text(
                         text = message,
-                        style = SpotTheme.typography.medium_500,
+                        style = SpotTheme.typography.small_500,
                         fontSize = 14.sp,
                         color = SpotTheme.colors.white
                     )

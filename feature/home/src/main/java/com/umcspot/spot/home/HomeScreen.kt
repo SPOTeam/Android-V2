@@ -224,7 +224,7 @@ fun PopularPostNow(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = title,
-                    style = SpotTheme.typography.medium_500,
+                    style = SpotTheme.typography.medium_500.copy(fontSize = 16.sp),
                     color = Black
                 )
                 Spacer(Modifier.width(4.dp))
@@ -238,7 +238,7 @@ fun PopularPostNow(
             }
             Text(
                 text = subtitle,
-                style = SpotTheme.typography.medium_500,
+                style = SpotTheme.typography.small_500.copy(fontSize = 14.sp),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.clickable(onClick = onContentClick),
@@ -278,7 +278,7 @@ fun PopularStudyNow(
         ) {
             Text(
                 text = title,
-                style = SpotTheme.typography.medium_500,
+                style = SpotTheme.typography.medium_500.copy(fontSize = 18.sp),
                 modifier = Modifier.weight(1f)
             )
 
@@ -328,7 +328,7 @@ fun RecommendStudyNow(
         ) {
             Text(
                 text = title,
-                style = SpotTheme.typography.medium_500,
+                style = SpotTheme.typography.medium_500.copy(fontSize = 18.sp),
                 modifier = Modifier.weight(1f)
             )
             IconButton(onClick = onRefreshClick, modifier = Modifier.size(18.dp)) {

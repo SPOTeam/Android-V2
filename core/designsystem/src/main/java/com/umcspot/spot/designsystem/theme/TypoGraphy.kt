@@ -136,101 +136,101 @@ class SpotTypography internal constructor(
 @Composable
 fun SpotTypography(): SpotTypography {
 
-    val bodyLetterSpacing = (-0.022).em
+    val bodyLetterSpacing = (-0.022).em 
 
     return SpotTypography(
 
         h1 = SpotTextStyle(
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.SemiBold,      
             fontSize = 24.sp,
             lineHeight = (24 * 1.5).sp,
-            letterSpacing = bodyLetterSpacing
+            letterSpacing = bodyLetterSpacing      
         ),
 
         h2 = SpotTextStyle(
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.SemiBold,      
             fontSize = 20.sp,
             lineHeight = (20 * 1.5).sp,
-            letterSpacing = bodyLetterSpacing
+            letterSpacing = bodyLetterSpacing      
         ),
 
         h3 = SpotTextStyle(
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.SemiBold,      
             fontSize = 18.sp,
             lineHeight = (18 * 1.5).sp,
-            letterSpacing = bodyLetterSpacing
+            letterSpacing = bodyLetterSpacing      
         ),
 
         h4 = SpotTextStyle(
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.SemiBold,      
             fontSize = 16.sp,
             lineHeight = (16 * 1.5).sp,
-            letterSpacing = bodyLetterSpacing
+            letterSpacing = bodyLetterSpacing      
         ),
 
         h5 = SpotTextStyle(
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.SemiBold,      
             fontSize = 14.sp,
             lineHeight = (14 * 1.5).sp,
-            letterSpacing = bodyLetterSpacing
+            letterSpacing = bodyLetterSpacing      
         ),
-
+        
         large_500 = SpotTextStyle(
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.Medium, 
             fontSize = 16.sp,
-            lineHeight = (16 * 1.5).sp,
+            lineHeight = (16 * 1.5).sp, 
             letterSpacing = bodyLetterSpacing
         ),
 
         large_400 = SpotTextStyle(
-            fontWeight = FontWeight.Normal,
+            fontWeight = FontWeight.Normal, 
             fontSize = 16.sp,
-            lineHeight = (16 * 1.5).sp,
+            lineHeight = (16 * 1.5).sp, 
             letterSpacing = bodyLetterSpacing
         ),
 
         medium_500 = SpotTextStyle(
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.Medium, 
             fontSize = 14.sp,
-            lineHeight = (14 * 1.5).sp,
+            lineHeight = (14 * 1.5).sp, 
             letterSpacing = bodyLetterSpacing
         ),
         medium_400 = SpotTextStyle(
-            fontWeight = FontWeight.Normal,
+            fontWeight = FontWeight.Normal, 
             fontSize = 14.sp,
-            lineHeight = (14 * 1.5).sp,
+            lineHeight = (14 * 1.5).sp, 
             letterSpacing = bodyLetterSpacing
         ),
 
         regular_500 = SpotTextStyle(
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.Medium, 
             fontSize = 12.sp,
-            lineHeight = (12 * 1.5).sp,
+            lineHeight = (12 * 1.5).sp, 
             letterSpacing = bodyLetterSpacing
         ),
         regular_400 = SpotTextStyle(
-            fontWeight = FontWeight.Normal,
+            fontWeight = FontWeight.Normal, 
             fontSize = 12.sp,
-            lineHeight = (12 * 1.5).sp,
+            lineHeight = (12 * 1.5).sp, 
             letterSpacing = bodyLetterSpacing
         ),
 
         small_500 = SpotTextStyle(
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.Medium, 
             fontSize = 10.sp,
-            lineHeight = (10 * 1.5).sp,
+            lineHeight = (10 * 1.5).sp, 
             letterSpacing = bodyLetterSpacing
         ),
         small_400 = SpotTextStyle(
-            fontWeight = FontWeight.Normal,
+            fontWeight = FontWeight.Normal, 
             fontSize = 10.sp,
-            lineHeight = (10 * 1.5).sp,
+            lineHeight = (10 * 1.5).sp, 
             letterSpacing = bodyLetterSpacing
         ),
         small_300 = SpotTextStyle(
-            fontWeight = FontWeight.Light,
+            fontWeight = FontWeight.Light, 
             fontSize = 10.sp,
-            lineHeight = (10 * 1.5).sp,
+            lineHeight = (10 * 1.5).sp, 
             letterSpacing = bodyLetterSpacing
         )
     )
@@ -242,27 +242,27 @@ private fun DefaultSpotTypography() = SpotTypography()
 val AppTypography: Typography
     @Composable
     get() = Typography(
-
+        
         displayLarge = DefaultSpotTypography().h1,
         displayMedium = DefaultSpotTypography().h2,
         displaySmall = DefaultSpotTypography().h3,
 
-
+        
         headlineLarge = DefaultSpotTypography().h4,
         headlineMedium = DefaultSpotTypography().h5,
-        headlineSmall = DefaultSpotTypography().large_500,
+        headlineSmall = DefaultSpotTypography().large_500, 
 
-
+        
         titleLarge = DefaultSpotTypography().large_500,
         titleMedium = DefaultSpotTypography().medium_500,
         titleSmall = DefaultSpotTypography().regular_500,
 
-
+        
         bodyLarge = DefaultSpotTypography().large_400,
         bodyMedium = DefaultSpotTypography().medium_400,
         bodySmall = DefaultSpotTypography().regular_400,
 
-
+        
         labelLarge = DefaultSpotTypography().regular_500,
         labelMedium = DefaultSpotTypography().small_500,
         labelSmall = DefaultSpotTypography().small_400

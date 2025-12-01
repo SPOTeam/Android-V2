@@ -1,5 +1,6 @@
 package com.umcspot.spot.study.recruiting
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +58,7 @@ import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.study.recruiting.RecruitingStudyViewModel
+import timber.log.Timber
 
 @Composable
 fun RecruitingStudyScreen(
@@ -70,7 +72,6 @@ fun RecruitingStudyScreen(
     val sort by viewmodel.sortType.collectAsStateWithLifecycle()
 
     var showSortSheet by remember { mutableStateOf(false) }
-
 
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -145,7 +146,7 @@ private fun RecruitingStudyScreenContent(
         // 타이틀
         Text(
             text = "모집중 스터디",
-            style = SpotTheme.typography.small_400
+            style = SpotTheme.typography.small_400.copy(fontSize = 20.sp)
         )
 
         Spacer(Modifier.height(8.dp))
@@ -203,7 +204,7 @@ fun HeaderRow(
     ) {
         Text(
             text = "%02d건".format(size),
-            style = SpotTheme.typography.medium_500,
+            style = SpotTheme.typography.medium_500.copy(fontSize = 12.sp),
             color = SpotTheme.colors.gray500
         )
 
@@ -217,7 +218,7 @@ fun HeaderRow(
                 Text(
                     text = sortType.label,
                     color = SpotTheme.colors.black,
-                    style = SpotTheme.typography.medium_500
+                    style = SpotTheme.typography.medium_500.copy(fontSize = 12.sp)
                 )
                 Spacer(Modifier.width(5.dp))
                 Icon(
@@ -270,7 +271,7 @@ fun SortTypeBottomSheet(
                     headlineContent = {
                         Text(
                             text = option.label,
-                            style = SpotTheme.typography.medium_500
+                            style = SpotTheme.typography.medium_500.copy(fontSize = 15.sp)
                         )
                     },
                     trailingContent = {

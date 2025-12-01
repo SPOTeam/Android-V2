@@ -8,6 +8,8 @@ plugins {
 android {
     namespace = "com.umcspot.spot.buildconfig"
 }
+
+
 dependencies {
     implementation(projects.core.common)
 }

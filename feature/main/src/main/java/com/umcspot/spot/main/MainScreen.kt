@@ -3,7 +3,6 @@ package com.umcspot.spot.main
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -24,17 +23,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.umcspot.spot.alert.navigation.Alert
 import com.umcspot.spot.alert.navigation.AppliedAlert
 import com.umcspot.spot.alert.navigation.navigateToAlert
+import com.umcspot.spot.checkList.navigation.CheckList
 import com.umcspot.spot.designsystem.component.FloatingMultipleButton
 import com.umcspot.spot.designsystem.component.FloatingToUpButton
 import com.umcspot.spot.designsystem.component.appBar.AppBarHome
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
-import com.umcspot.spot.designsystem.component.modal.RejectDialog
-import com.umcspot.spot.feature.board.main.navigation.Board
-import com.umcspot.spot.feature.board.main.navigation.navigation.BoardList
-import com.umcspot.spot.feature.board.main.navigation.navigation.Posting
-import com.umcspot.spot.feature.board.main.navigation.navigation.navigateToPosting
 import com.umcspot.spot.main.component.MainBottomBar
+import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
+import com.umcspot.spot.study.register.navigation.RegisterStudy
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
@@ -46,33 +43,24 @@ fun MainScreen(
     val dest = backStackEntry?.destination
     var scrollToTop by remember { mutableStateOf<(() -> Unit)?>(null) }
 
-    var showExitPostingDialog by remember { mutableStateOf(false) }
-
     Scaffold(
         topBar = {
             if (!navigator.isInLanding()) {
-                if (navigator.showBackTopBar()) {
-                    // 라우트에 따라 타이틀 분기(선택)
-                    val title =
-                        when {
-                            dest?.hasRoute(Alert::class) == true -> "알림"
-                            dest?.hasRoute(AppliedAlert::class) == true -> "신청한 알림"
-                            dest?.hasRoute(RecruitingFilter::class) == true -> "모집중인 스터디"
-                            dest?.hasRoute(BoardList::class) == true -> "스터디 파트너들의 이야기"
-                            dest?.hasRoute(Posting::class) == true -> "글쓰기"
-                            else -> ""
-                        }
+                if (dest?.hasRoute(RegisterStudy::class) == true) {
+                }
+                else if (navigator.showBackTopBar()) {
+                    val title = when {
+                        dest?.hasRoute(Alert::class) == true -> "알림"
+                        dest?.hasRoute(AppliedAlert::class) == true -> "신청한 알림"
+                        dest?.hasRoute(RecruitingFilter::class) == true -> "모집중인 스터디"
+                        dest?.hasRoute(SignUp::class) == true -> "회원가입"
+                        dest?.hasRoute(CheckList::class) == true -> "체크리스트"
+                        else -> ""
+                    }
                     BackTopBar(
                         title = title,
-                        onBackClick = {
-                            if (dest?.hasRoute(Posting::class) == true) {
-                                showExitPostingDialog = true
-                            } else {
-                                navController.popBackStack()
-                            }
-                        },
-                        modifier = Modifier
-                            .statusBarsPadding()
+                        onBackClick = { navController.popBackStack() },
+                        modifier = Modifier.statusBarsPadding()
                     )
                 } else {
                     AppBarHome(
@@ -90,17 +78,9 @@ fun MainScreen(
             FabStack(
                 showToTop = navigator.showToTopFab(),
                 onClickToTop = { scrollToTop?.invoke() },
-
                 showMultiple = navigator.showMultipleFab(),
-                onClickMultiple = {
-                    when {
-                        dest?.hasRoute(Board::class) == true -> navigator.navController.navigateToPosting()
-                        dest?.hasRoute(BoardList::class) == true -> navigator.navController.navigateToPosting()
-
-
-                    }
-                },
-                spacing = 12.dp, // floatingButton 사이 간격
+                onClickMultiple = { /* TODO */ },
+                spacing = 12.dp,
             )
         },
         bottomBar = {
@@ -123,28 +103,9 @@ fun MainScreen(
                 .fillMaxSize()
                 .consumeWindowInsets(innerPadding),
             contentPadding =  innerPadding,
-            onRegisterScrollToTop = { handler -> scrollToTop = handler },
-            onBackRequest = { showExitPostingDialog = true }   // ← 핵심
+            onRegisterScrollToTop = { handler -> scrollToTop = handler }
         )
     }
-
-    RejectDialog(
-        visible = showExitPostingDialog,
-        modalTitle = "나가시겠어요?",
-        modalDes = "지금 나가면, 쓰던 글은 저장되지 않아요.",
-        buttonOKText = "네",
-        buttonNOText = "아니요",
-        onClick = {
-            showExitPostingDialog = false
-            navController.popBackStack()
-        },
-        onCancel = {
-            showExitPostingDialog = false
-        },
-        onDismiss = {
-            showExitPostingDialog = false
-        },
-    )
 }
 
 @Composable
@@ -158,15 +119,15 @@ private fun FabStack(
     Box(
         modifier = Modifier
     ) {
-        Column(
+        androidx.compose.foundation.layout.Column(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(spacing),
             modifier = Modifier.align(Alignment.BottomEnd)
         ) {
-            if (showToTop) {
+            androidx.compose.animation.AnimatedVisibility(visible = showToTop) {
                 FloatingToUpButton(onClick = onClickToTop)
             }
-            if (showMultiple) {
+            androidx.compose.animation.AnimatedVisibility(visible = showMultiple) {
                 FloatingMultipleButton(onClick = onClickMultiple)
             }
         }

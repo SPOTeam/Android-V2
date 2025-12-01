@@ -1,13 +1,9 @@
 package com.umcspot.spot.designsystem.component.modal
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
@@ -33,8 +29,7 @@ import com.umcspot.spot.designsystem.theme.White
 fun RejectModal(
     modalTitle : String,
     modalDes : String,
-    buttonOKText : String,
-    buttonNOText : String,
+    buttonText : String,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     onCancel:() -> Unit= {}
@@ -46,76 +41,60 @@ fun RejectModal(
             containerColor = SpotTheme.colors.white
         )
     ) {
-        Box(
-            modifier = Modifier.fillMaxWidth().padding(15.dp)
+        Column(
+            modifier = Modifier.padding(15.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(R.drawable.dismiss),
+                painter = painterResource(R.drawable.emoji_sad),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(25.dp)
-                    .align(Alignment.TopEnd)
-                    .clickable(
-                        onClick = {onCancel}
-                    )
+                    .size(56.dp)
             )
 
+            // 텍스트 + 통계
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top =  25.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+                verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = painterResource(R.drawable.emoji_sad),
-                    contentDescription = null,
-                    modifier = Modifier.size(40.dp)
+                Text(
+                    text = modalTitle,
+                    style = SpotTheme.typography.medium_500.copy(fontSize = 16.sp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = modalDes,
+                    style = SpotTheme.typography.small_500.copy(fontSize = 12.sp)
                 )
 
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = modalTitle,
-                        style = SpotTheme.typography.medium_500,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = modalDes,
-                        style = SpotTheme.typography.medium_500
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextButtonM(
+                        text = buttonText,
+                        onClick = onClick,
+                        state = TextButtonState.R500State,
+                        modifier = Modifier.weight(1f)
                     )
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        TextButtonM(
-                            text = buttonOKText,
-                            onClick = onClick,
-                            state = TextButtonState.R500State,
-                            modifier = Modifier.weight(1f)
-                        )
-                        TextButtonM(
-                            text = buttonNOText,
-                            onClick = onCancel,
-                            state = TextButtonState.G500State,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
+                    TextButtonM(
+                        text = "취소",
+                        onClick = onCancel,
+                        state = TextButtonState.G500State,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
         }
     }
 }
 
-
 @Composable
 fun RejectDialog(
     visible: Boolean,
     modalTitle : String,
     modalDes : String,
-    buttonOKText : String,
-    buttonNOText : String,
+    buttonText : String,
     onDismiss: () -> Unit,
     onClick: () -> Unit,
     onCancel: () -> Unit
@@ -125,8 +104,7 @@ fun RejectDialog(
         RejectModal(
             modalTitle = modalTitle,
             modalDes = modalDes,
-            buttonOKText = buttonOKText,
-            buttonNOText = buttonNOText,
+            buttonText = buttonText,
             onClick = onClick,
             onCancel = onCancel
         )
@@ -141,8 +119,7 @@ fun ReDialog_Preview() {
             visible = true,
             modalTitle = "불참하시겠습니까?",
             modalDes = "신청했던 스터디를 참여 취소하면\n다시 결정을 번복할 수 없어요.",
-            buttonOKText = "불참",
-            buttonNOText = "아니요",
+            buttonText = "불참",
             onDismiss = {},
             onClick = {},
             onCancel = {}

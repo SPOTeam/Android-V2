@@ -58,13 +58,13 @@ fun StudyListItem(
             ) {
                 Text(
                     text = item.title,
-                    style = SpotTheme.typography.medium_500,
+                    style = SpotTheme.typography.medium_500.copy(fontSize = 16.sp),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = item.goal,
-                    style = SpotTheme.typography.medium_500,
+                    style = SpotTheme.typography.small_500.copy(fontSize = 14.sp),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -110,7 +110,7 @@ private fun Stat(
             modifier = Modifier.size(14.dp)
         )
 
-        Text(text = display, style = SpotTheme.typography.medium_500)
+        Text(text = display, style = SpotTheme.typography.small_500.copy(fontSize = 12.sp))
     }
 }
 
