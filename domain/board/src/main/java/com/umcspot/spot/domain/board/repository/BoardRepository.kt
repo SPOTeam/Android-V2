@@ -1,15 +1,16 @@
 package com.umcspot.spot.domain.board.repository
 
-import com.umcspot.spot.domain.board.model.board.LabeledBoardResultList
+import com.umcspot.spot.domain.board.model.board.BestPostResultList
+import com.umcspot.spot.domain.board.model.board.RecentPostResultList
 import com.umcspot.spot.domain.board.model.post.PostResultList
+import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.SortType
 
 interface BoardRepository {
 
-    suspend fun getLabeledBoardData(): Result<LabeledBoardResultList>
+    suspend fun getRecentBoard(): Result<RecentPostResultList>
 
-    suspend fun getTagBoardData(sortType : SortType): Result<LabeledBoardResultList>
+    suspend fun getBestBoard(sortBy: SortType): Result<BestPostResultList>
 
-    suspend fun getPosts(): Result<PostResultList>
-
+    suspend fun getFilteredPosts(cursor : Int? = null, postType: PostType? = null, size : Int): Result<PostResultList>
 }

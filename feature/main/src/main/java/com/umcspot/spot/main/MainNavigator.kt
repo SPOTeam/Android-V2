@@ -17,19 +17,21 @@ import com.umcspot.spot.alert.navigation.navigateToAppliedAlert
 import com.umcspot.spot.category.navigation.navigateToCategory
 import com.umcspot.spot.checkList.navigation.CheckList
 import com.umcspot.spot.checkList.navigation.navigateToCheckList
-import com.umcspot.spot.feature.board.navigation.Board
-import com.umcspot.spot.feature.board.navigation.navigateToBoard
+import com.umcspot.spot.feature.board.boardList.navigation.BoardList
+import com.umcspot.spot.feature.board.main.navigation.Board
+import com.umcspot.spot.feature.board.main.navigation.navigateToBoard
 import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.navigateToJJim
 import com.umcspot.spot.landing.navigation.Landing
 import com.umcspot.spot.landing.navigation.Saving
 import com.umcspot.spot.mypage.navigation.navigateToMypage
+import com.umcspot.spot.post.posting.navigation.Posting
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.signup.navigation.navigateToSignUp
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
-import com.umcspot.spot.study.recruiting.navigation.Recruiting
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocation
 import com.umcspot.spot.study.preferLocation.navigation.navigateToPreferLocationStudy
+import com.umcspot.spot.study.recruiting.navigation.Recruiting
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudy
 import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudyFilter
@@ -85,13 +87,13 @@ class MainNavigator(
 
     @Composable
     fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, RecruitingFilter::class,
-        SignUp::class, CheckList::class,RegisterStudy::class)
+        SignUp::class, CheckList::class,RegisterStudy::class, Posting::class)
 
     @Composable
-    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class,PreferLocation::class)
+    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class,PreferLocation::class, BoardList::class)
 
     @Composable
-    fun showMultipleFab(): Boolean = inAnyGraph(Board::class)
+    fun showMultipleFab(): Boolean = inAnyGraph(BoardList::class)
 
     @Composable
     fun showBottomBar(): Boolean {

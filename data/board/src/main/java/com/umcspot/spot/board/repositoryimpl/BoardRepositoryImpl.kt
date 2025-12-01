@@ -1,50 +1,63 @@
 package com.umcspot.spot.board.repositoryimpl
 
+import android.util.Log
 import com.umcspot.spot.board.mapper.toDomainList
 import com.umcspot.spot.board.service.BoardService
-import com.umcspot.spot.domain.board.model.LabeledBoardResultList
-import com.umcspot.spot.domain.board.model.RankedBoardResultList
+import com.umcspot.spot.domain.board.model.board.BestPostResultList
+import com.umcspot.spot.domain.board.model.board.RecentPostResultList
+import com.umcspot.spot.domain.board.model.post.PostResultList
 import com.umcspot.spot.domain.board.repository.BoardRepository
+import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.SortType
 import javax.inject.Inject
 
 class BoardRepositoryImpl @Inject constructor(
     private val boardService: BoardService
 ) : BoardRepository {
-
-    override suspend fun getTagBoardData(sortType: SortType): Result<RankedBoardResultList> =
+    override suspend fun getRecentBoard(): Result<RecentPostResultList> =
         runCatching {
-            val res = boardService.getTagBoardInfo(sortType)
-            res.result.toDomainList()
-        }.recoverCatching {
-            rankedListDummies(sortType)   // 태그 보드도 랭크 리스트 형태로 더미 복구
+            val res = boardService.getRecentBoard()
+            Log.d("BoardRepository", "getRecentBoard res = $res")
+            val domain = res.result.toDomainList()
+            Log.d("BoardRepository", "getRecentBoard mapped = $domain")
+            domain
+        }.onFailure { e ->
+            Log.e("BoardRepository", "getRecentBoard failed", e)
+        }.recoverCatching { e ->
+            Log.w("BoardRepository", "getRecentBoard using dummy because: ${e.message}")
+            recentPostDummies(3)
         }
 
-    override suspend fun getRankedBoardData(): Result<RankedBoardResultList> =
+    override suspend fun getBestBoard(
+        sortBy: SortType
+    ): Result<BestPostResultList> =
         runCatching {
-            val res = boardService.getRankedBoardInfo()
+            val res = boardService.getBestBoard(sortBy)
             res.result.toDomainList()
         }.recoverCatching {
-            rankedListDummies()
+            bestPostDummies()
         }
 
-    override suspend fun getLabeledBoardData(): Result<LabeledBoardResultList> =
+    override suspend fun getFilteredPosts(
+        cursor: Int?,
+        postType: PostType?,
+        size: Int
+    ): Result<PostResultList> =
         runCatching {
-            val res = boardService.getLabeledBoardInfo()
+            val res = boardService.getFilteredPosts(cursor = cursor, postType = postType, size = size )
             res.result.toDomainList()
         }.recoverCatching {
-            labeledListDummies()
+            postDummies()
         }
 
     /** ---- DUMMY HELPERS ---- */
 
-    private fun rankedListDummies(sortType : SortType, count: Int = 5): RankedBoardResultList =
-        RankedBoardResultList(RankedBoardResultList.getRankedBoardDummies(sortType, count))
+    private fun recentPostDummies(count: Int = 5): RecentPostResultList =
+        RecentPostResultList(RecentPostResultList.getRecentPostDummies(count))
 
-    private fun rankedListDummies(count: Int = 5): RankedBoardResultList =
-        RankedBoardResultList(RankedBoardResultList.getRankedBoardDummies(count))
+    private fun bestPostDummies(count: Int = 5): BestPostResultList =
+        BestPostResultList(BestPostResultList.getBestPostDummies(count))
 
-
-    private fun labeledListDummies(count: Int = 5): LabeledBoardResultList =
-        LabeledBoardResultList(LabeledBoardResultList.getLabeledBoardDummies(count))
+    private fun postDummies(): PostResultList =
+        PostResultList(PostResultList.getPostDummies())
 }

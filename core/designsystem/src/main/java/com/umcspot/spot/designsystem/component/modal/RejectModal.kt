@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.component.button.TextButtonM
@@ -29,7 +30,8 @@ import com.umcspot.spot.designsystem.theme.White
 fun RejectModal(
     modalTitle : String,
     modalDes : String,
-    buttonText : String,
+    okButtonText : String,
+    noButtonText : String,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     onCancel:() -> Unit= {}
@@ -71,14 +73,14 @@ fun RejectModal(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     TextButtonM(
-                        text = buttonText,
+                        text = okButtonText,
                         onClick = onClick,
                         state = TextButtonState.R500State,
                         modifier = Modifier.weight(1f)
                     )
 
                     TextButtonM(
-                        text = "취소",
+                        text = noButtonText,
                         onClick = onCancel,
                         state = TextButtonState.G500State,
                         modifier = Modifier.weight(1f)
@@ -94,17 +96,19 @@ fun RejectDialog(
     visible: Boolean,
     modalTitle : String,
     modalDes : String,
-    buttonText : String,
+    okButtonText : String,
+    noButtonText : String,
     onDismiss: () -> Unit,
     onClick: () -> Unit,
     onCancel: () -> Unit
 ) {
     if (!visible) return
-    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+    Dialog(onDismissRequest = onDismiss) {
         RejectModal(
             modalTitle = modalTitle,
             modalDes = modalDes,
-            buttonText = buttonText,
+            okButtonText = okButtonText,
+            noButtonText = noButtonText,
             onClick = onClick,
             onCancel = onCancel
         )
@@ -119,7 +123,8 @@ fun ReDialog_Preview() {
             visible = true,
             modalTitle = "불참하시겠습니까?",
             modalDes = "신청했던 스터디를 참여 취소하면\n다시 결정을 번복할 수 없어요.",
-            buttonText = "불참",
+            okButtonText = "불참",
+            noButtonText = "아니요",
             onDismiss = {},
             onClick = {},
             onCancel = {}

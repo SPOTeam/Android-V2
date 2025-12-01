@@ -1,7 +1,9 @@
 package com.umcspot.spot.feature.board
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.umcspot.spot.domain.board.model.post.PostResult
 import com.umcspot.spot.domain.board.repository.BoardRepository
 import com.umcspot.spot.model.SortType
 import com.umcspot.spot.ui.state.UiState
@@ -27,27 +29,34 @@ class BoardViewModel @Inject constructor(
     private val _selected = MutableStateFlow<List<String>>(emptyList())
     val selected = _selected.asStateFlow()
 
+    private val _selectedPost = MutableStateFlow<PostResult?>(null)
+    val selectedPost: StateFlow<PostResult?> = _selectedPost.asStateFlow()
+
     /** 최초/재로딩: HomeViewModel.getDummies() 스타일 */
-    fun load(selected: SortType) {
+    fun load(sortBy: SortType) {
         // 1) 로딩으로 전환
         _uiState.update { it.copy(user = UiState.Loading) }
 
         // 2) 실제 호출
         viewModelScope.launch {
             runCatching {
-                val tagDeferred = async { boardRepository.getTagBoardData(selected) }
-                val labeledDeferred = async { boardRepository.getLabeledBoardData() }
-                val postsDeferred = async { boardRepository.getPosts() }
+                val recentPosts = async { boardRepository.getRecentBoard() }
+                val bestPosts = async { boardRepository.getBestBoard(sortBy) }
+                val filteredPosts = async { boardRepository.getFilteredPosts(size = 10) }
 
+                val recents = recentPosts.await().getOrThrow()
+                val bests = bestPosts.await().getOrThrow()
+                val posts = filteredPosts.await().getOrThrow()
 
-                val tagBoards = tagDeferred.await().getOrThrow()
-                val labeledBoards = labeledDeferred.await().getOrThrow()
-                val posts = postsDeferred.await().getOrThrow()
+                Log.d("BoardRepositoryImpl", "getRecentBoard: $recents")
+                Log.d("BoardRepositoryImpl", "getBestBoard: $bests")
+                Log.d("BoardRepositoryImpl", "getPostsBoard: $posts")
+
 
                 BoardPayload(
-                    tagBoards = tagBoards,
-                    labeledBoards = labeledBoards,
-                    selected = selected,
+                    recentBoards = recents,
+                    bestBoards = bests,
+                    selected = sortBy,
                     posts = posts
                 )
             }.onSuccess { payload ->
@@ -72,13 +81,13 @@ class BoardViewModel @Inject constructor(
             _uiState.update { it.copy(user = UiState.Success(cur.copy(selected = type))) }
 
             // 2) 새 정렬(랜덤 순서 포함)로 tagBoards 가져와서 반영+
-            runCatching { boardRepository.getTagBoardData(type).getOrThrow() }
+            runCatching { boardRepository.getBestBoard(type).getOrThrow() }
                 .onSuccess { newTagBoards ->
                     _uiState.update {
                         it.copy(user = UiState.Success(
                             cur.copy(
                                 selected = type,
-                                tagBoards = newTagBoards
+                                bestBoards = newTagBoards
                             )
                         ))
                     }
@@ -87,5 +96,9 @@ class BoardViewModel @Inject constructor(
                     // 필요 시 에러 처리(토스트/스낵바 등). 최소한 선택값은 유지됨.
                 }
         }
+    }
+
+    fun setPostInfo(post : PostResult){
+        _selectedPost.value = post
     }
 }

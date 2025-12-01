@@ -42,6 +42,7 @@ dependencies {
     implementation(projects.feature.mypage)
     implementation(projects.feature.study)
     implementation(projects.feature.signup)
+    implementation(projects.feature.post)
 
     implementation(projects.core.ui)
     implementation(projects.core.network)

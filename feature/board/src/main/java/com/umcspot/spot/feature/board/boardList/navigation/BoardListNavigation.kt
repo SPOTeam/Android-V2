@@ -1,4 +1,4 @@
-package com.umcspot.spot.feature.board.main.navigation.navigation
+package com.umcspot.spot.feature.board.boardList.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.remember
@@ -22,6 +22,7 @@ fun NavGraphBuilder.boardListGraph(
     contentPadding : PaddingValues,
     navController: NavHostController,
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
+    onPostClick : () -> Unit
 ) {
     composable<BoardList> { backStackEntry ->
         val parentEntry = remember(backStackEntry) {
@@ -33,7 +34,8 @@ fun NavGraphBuilder.boardListGraph(
         BoardListScreen(
             contentPadding = contentPadding,
             viewmodel = boardViewModel,
-            onRegisterScrollToTop = onRegisterScrollToTop
+            onRegisterScrollToTop = onRegisterScrollToTop,
+            onPostClicked = onPostClick
         )
     }
 }

@@ -1,11 +1,9 @@
 package com.umcspot.spot.board.dto.response
 
 import android.annotation.SuppressLint
-import com.umcspot.spot.model.BoardType
+import com.umcspot.spot.model.PostType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.time.LocalDate
-import java.time.LocalTime
 
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
@@ -18,16 +16,16 @@ data class PostResponseDto(
 @Serializable
 data class PostItem (
     @SerialName("id")
-    val id: Int,
-
-    @SerialName("label")
-    val label: BoardType,
+    val postId: Long,
 
     @SerialName("title")
     val title: String,
 
     @SerialName("content")
     val content : String,
+
+    @SerialName("label")
+    val label: PostType,
 
     @SerialName("likeNum")
     val likeNum: Int,

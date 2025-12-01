@@ -1,4 +1,4 @@
-package com.umcspot.spot.feature.board.posting
+package com.umcspot.spot.post.posting
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -45,7 +45,7 @@ import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G200
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.feature.board.BoardViewModel
-import com.umcspot.spot.model.BoardType
+import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.korean
 
 @Composable
@@ -60,7 +60,7 @@ fun PostingScreen(
     var title by rememberSaveable { mutableStateOf("") }
     var body by rememberSaveable { mutableStateOf("") }
 
-    var selectedBoardType by rememberSaveable { mutableStateOf(BoardType.FREETALK) }
+    var selectedBoardType by rememberSaveable { mutableStateOf(PostType.FREE_TALK) }
 
     val isSubmitEnabled = title.isNotBlank() && body.isNotBlank()
 
@@ -168,9 +168,9 @@ fun PostingScreen(
 
 @Composable
 private fun BottomToolsRow(
-    selectedBoardType: BoardType,
+    selectedBoardType: PostType,
     onClickAddPhoto: () -> Unit,
-    onSelectedBoardType: (BoardType) -> Unit,
+    onSelectedBoardType: (PostType) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -208,8 +208,8 @@ private fun BottomToolsRow(
 
 @Composable
 fun BoardCategorySelector(
-    selected: BoardType,
-    onSelected: (BoardType) -> Unit,
+    selected: PostType,
+    onSelected: (PostType) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -264,7 +264,7 @@ fun BoardCategorySelector(
                         y = 0.dp
                     )
                 ) {
-                    BoardType.entries.forEach { type ->
+                    PostType.entries.forEach { type ->
                         DropdownMenuItem(
                             text = {
                                 Text(

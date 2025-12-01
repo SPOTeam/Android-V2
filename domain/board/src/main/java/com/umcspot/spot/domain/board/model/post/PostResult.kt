@@ -1,11 +1,9 @@
 package com.umcspot.spot.domain.board.model.post
 
-import com.umcspot.spot.model.BoardType
+import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.toSpotForm
-import java.sql.Date
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.ZoneId
 
 data class PostResultList(
     val postList: List<PostResult>
@@ -21,8 +19,8 @@ data class PostResultList(
 
 
 data class PostResult(
-    val id: Int,
-    val label: BoardType,
+    val postId: Long,
+    val label: PostType,
     val title: String,
     val content : String,
     val likeNum: Int,
@@ -33,7 +31,7 @@ data class PostResult(
 ) {
     companion object {
         internal fun dummyPost(index: Int, total: Int): PostResult {
-            val labels = BoardType.values()
+            val labels = PostType.values()
             val label = labels.random()
             val title = "Lorem ipsum dolor sit amet consectetur Lorem ipsum dolor sit amet consectetur Lorem ipsum dolor sit amet consectetur"
 
@@ -47,7 +45,7 @@ data class PostResult(
             ).toSpotForm()
 
             return PostResult(
-                id = index,
+                postId = index.toLong(),
                 label = label,
                 title = title,
                 content = title,

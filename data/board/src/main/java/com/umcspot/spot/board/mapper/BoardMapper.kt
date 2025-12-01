@@ -1,32 +1,50 @@
 package com.umcspot.spot.board.mapper
 
-import com.umcspot.spot.board.dto.response.LabeledBoardItem
-import com.umcspot.spot.board.dto.response.LabeledBoardResponseDto
+import com.umcspot.spot.board.dto.response.BestBoardItem
+import com.umcspot.spot.board.dto.response.BestBoardResponseDto
 import com.umcspot.spot.board.dto.response.PostItem
 import com.umcspot.spot.board.dto.response.PostResponseDto
-import com.umcspot.spot.domain.board.model.board.LabeledBoardResult
-import com.umcspot.spot.domain.board.model.board.LabeledBoardResultList
+import com.umcspot.spot.board.dto.response.RecentBoardItem
+import com.umcspot.spot.board.dto.response.RecentBoardResponseDto
+import com.umcspot.spot.domain.board.model.board.BestPostResult
+import com.umcspot.spot.domain.board.model.board.BestPostResultList
+import com.umcspot.spot.domain.board.model.board.RecentPostResult
+import com.umcspot.spot.domain.board.model.board.RecentPostResultList
 import com.umcspot.spot.domain.board.model.post.PostResult
 import com.umcspot.spot.domain.board.model.post.PostResultList
 
-fun LabeledBoardItem.toDomain() : LabeledBoardResult =
-    LabeledBoardResult (
-        id = this.id,
-        label = this.label,
+fun RecentBoardItem.toDomain() : RecentPostResult =
+    RecentPostResult (
+        postId = this.postId,
+        postType = this.postType,
         title = this.title,
-        content = this.content,
-        count = this.count
+        commentCount = this.commentCount
     )
 
 
-fun LabeledBoardResponseDto.toDomainList(): LabeledBoardResultList =
-    LabeledBoardResultList(
-        boardList = this.boardItems.map(LabeledBoardItem::toDomain)
+fun RecentBoardResponseDto.toDomainList(): RecentPostResultList =
+    RecentPostResultList(
+        recentPosts = this.recentPosts.map(RecentBoardItem::toDomain)
+    )
+
+fun BestBoardItem.toDomain() : BestPostResult =
+    BestPostResult (
+        postId = this.postId,
+        postType = this.postType,
+        title = this.title,
+        content = this.content,
+        commentCount = this.commentCount
+    )
+
+
+fun BestBoardResponseDto.toDomainList(): BestPostResultList =
+    BestPostResultList(
+        hotPosts = this.hotPosts.map(BestBoardItem::toDomain)
     )
 
 fun PostItem.toDomain() : PostResult =
     PostResult (
-        id = this.id,
+        postId = this.postId,
         label = this.label,
         title = this.title,
         content = this.content,

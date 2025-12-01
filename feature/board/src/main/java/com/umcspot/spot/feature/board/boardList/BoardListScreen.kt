@@ -37,9 +37,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.component.post.PostListItem
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.domain.board.model.post.PostResult
 import com.umcspot.spot.domain.board.model.post.PostResultList
 import com.umcspot.spot.feature.board.BoardViewModel
-import com.umcspot.spot.model.BoardType
+import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.SortType
 import com.umcspot.spot.model.korean
 import com.umcspot.spot.ui.state.UiState
@@ -50,6 +51,7 @@ fun BoardListScreen(
     viewmodel : BoardViewModel = hiltViewModel(),
     contentPadding: PaddingValues,
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
+    onPostClicked: () -> Unit
 ) {
     val state by viewmodel.uiState.collectAsStateWithLifecycle()
     val selected by viewmodel.selected.collectAsStateWithLifecycle()
@@ -62,7 +64,7 @@ fun BoardListScreen(
 
     // ✅ 탭을 BoardType 전부 + "전체" 로 구성
     val tabs = remember {
-        listOf("전체") + BoardType.values().map { it.korean }
+        listOf("전체") + PostType.values().map { it.korean }
     }
     var selectedTab by remember { mutableStateOf(0) } // 0 = 전체
 
@@ -76,7 +78,7 @@ fun BoardListScreen(
 
     LaunchedEffect(state.user) {
         if (state.user is UiState.Empty) {
-            viewmodel.load(SortType.LIVE)
+            viewmodel.load(SortType.RECENT)
         }
     }
 
@@ -108,8 +110,8 @@ fun BoardListScreen(
                 )
 
                 // ✅ 선택된 탭에 따라 필터링
-                val selectedType: BoardType? = if (selectedTab == 0) null
-                else BoardType.values()[selectedTab - 1]
+                val selectedType: PostType? = if (selectedTab == 0) null
+                else PostType.values()[selectedTab - 1]
 
                 val filtered = remember(selectedTab, state.data.posts.postList) {
                     if (selectedType == null) state.data.posts.postList
@@ -118,7 +120,11 @@ fun BoardListScreen(
 
                 BoardListScreenContent(
                     listState = listState,
-                    itemList = PostResultList(postList = filtered) // 그대로 래핑해서 전달
+                    itemList = PostResultList(postList = filtered),
+                    onPostClicked = {
+                        viewmodel.setPostInfo(it)
+                        onPostClicked()
+                    }
                 )
             }
         }
@@ -129,6 +135,7 @@ fun BoardListScreen(
 fun BoardListScreenContent(
     listState : LazyListState,
     itemList : PostResultList,
+    onPostClicked : (PostResult) -> Unit
 ) {
     LazyColumn(
         state = listState,
@@ -138,11 +145,11 @@ fun BoardListScreenContent(
     ) {
         items(
             items = itemList.postList,
-            key = { it.id }
+            key = { it.postId }
         ) { item ->
             PostListItem(
                 item = item,
-                onClick = { }
+                onClick = {onPostClicked}
             )
         }
     }

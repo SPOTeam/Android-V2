@@ -26,15 +26,13 @@ import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.G400
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.domain.board.model.post.PostResult
-import com.umcspot.spot.model.BoardType
-import com.umcspot.spot.model.toSpotForm
-import java.time.LocalDate
-import java.time.LocalTime
+import com.umcspot.spot.model.PostType
 
 @Composable
 fun PostListItem(
     item: PostResult,
     modifier: Modifier = Modifier,
+    likeChecked : Boolean = false,
     onClick: () -> Unit = {},
 ) {
     Column(modifier = modifier.padding(10.dp)
@@ -64,7 +62,7 @@ fun PostListItem(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Stat(
-                        iconRes = R.drawable.thumb_up, count2 = item.likeNum
+                        iconRes = R.drawable.thumb_up, count2 = item.likeNum, likeChecked = likeChecked
                     )
                     Stat(
                         iconRes = R.drawable.comment, count2 = item.commentNum
@@ -104,7 +102,8 @@ fun PostListItem(
 private fun Stat(
     @DrawableRes iconRes: Int,
     count1: Int = 0,
-    count2: Int
+    count2: Int,
+    likeChecked: Boolean= false
 ) {
     fun cap(n: Int) = if (n >= 1000) "999+" else n.toString()
     val display = if (count1 != 0) "${cap(count1)}/${cap(count2)}" else cap(count2)
@@ -113,7 +112,7 @@ private fun Stat(
         Icon(
             painter = painterResource(iconRes),
             contentDescription = null,
-            tint = Color.Unspecified,
+            tint = if(likeChecked) SpotTheme.colors.B500 else Color.Unspecified,
             modifier = Modifier.size(14.dp)
         )
 
@@ -129,8 +128,8 @@ private fun PostListItemPreview() {
     SpotTheme{
         PostListItem(
             item = PostResult(
-                id = 1,
-                label = BoardType.FREETALK,
+                postId  = 1,
+                label = PostType.FREE_TALK,
                 title = "Sample Study",
                 content = "Sample Goal",
                 likeNum = 1000,
