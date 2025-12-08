@@ -59,6 +59,8 @@ dependencies {
     implementation(projects.data.board)
     implementation(projects.data.user)
     implementation(projects.data.login)
+    implementation(projects.data.post)
+
 
     implementation(libs.kakao.common)
     implementation(libs.kakao.login)

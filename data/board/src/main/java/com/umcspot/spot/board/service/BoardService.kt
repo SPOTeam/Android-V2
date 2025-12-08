@@ -22,7 +22,7 @@ interface BoardService {
 
     @GET("/api/posts") // 전체 글 조회
     suspend fun getFilteredPosts(
-        @Query("cursor") cursor: Int?,
+        @Query("cursor") cursor: Long?,
         @Query("postType") postType: PostType?,
         @Query("size") size: Int,
     ): BaseResponse<PostResponseDto>

@@ -44,7 +44,7 @@ import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G200
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.feature.board.BoardViewModel
+import com.umcspot.spot.feature.board.main.BoardViewModel
 import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.korean
 

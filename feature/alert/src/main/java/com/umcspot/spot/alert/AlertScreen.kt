@@ -231,7 +231,7 @@ fun PopularPostAlert(
                 ShapeImageBox(
                     painter = painterResource(R.drawable.fire),
                     shape = SpotShapes.Soft,
-                    size = 55.dp,
+                    modifier = Modifier.size(55.dp),
                     backgroundColor = SpotTheme.colors.white,
                     borderWidth = 0.5.dp,
                     borderColor = SpotTheme.colors.G300,
@@ -423,11 +423,10 @@ fun rememberImageRefPainter(
 ): Painter {
     val context = LocalContext.current
     return when (ref) {
-        is ImageRef.LocalName -> {
+        is ImageRef.Name -> {
             val id = context.resources.getIdentifier(ref.name, "drawable", context.packageName)
             painterResource(id.takeIf { it != 0 } ?: fallback)
         }
-        is ImageRef.LocalPath -> rememberAsyncImagePainter(model = File(ref.path))
         is ImageRef.Url -> rememberAsyncImagePainter(model = ref.url)
         ImageRef.None -> painterResource(fallback)
     }

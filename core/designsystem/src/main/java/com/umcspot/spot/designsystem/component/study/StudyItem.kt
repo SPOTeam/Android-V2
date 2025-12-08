@@ -124,7 +124,7 @@ fun StudyThumbnail(
     val context = LocalContext.current
 
     when (val img = imageRef) {
-        is ImageRef.LocalName -> {
+        is ImageRef.Name -> {
             val id = context.resources.getIdentifier(img.name, "drawable", context.packageName)
             val safeId = if (id != 0) id else placeholder
             Image(
@@ -145,16 +145,6 @@ fun StudyThumbnail(
         ImageRef.None, null -> {
             Image(
                 painter = painterResource(placeholder),
-                contentDescription = null,
-                modifier = modifier
-            )
-        }
-
-        is ImageRef.LocalPath -> {
-            val id = ctx.resources.getIdentifier(img.path, "drawable", ctx.packageName)
-            val safeId = if (id != 0) id else placeholder
-            Image(
-                painter = painterResource(safeId),
                 contentDescription = null,
                 modifier = modifier
             )

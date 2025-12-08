@@ -15,7 +15,7 @@ interface BoardDataSource {
     ): BaseResponse<BestBoardResponseDto>
 
     suspend fun getFilteredPosts(
-        cursor : Int,
+        cursor : Long,
         postType: PostType,
         size : Int
     ): BaseResponse<PostResponseDto>

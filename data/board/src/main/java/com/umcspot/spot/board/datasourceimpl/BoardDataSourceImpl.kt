@@ -23,7 +23,7 @@ class BoardDataSourceImpl @Inject constructor(
         boardService.getBestBoard(sortBy)
 
     override suspend fun getFilteredPosts(
-        cursor : Int,
+        cursor : Long,
         postType: PostType,
         size : Int
     ): BaseResponse<PostResponseDto> =

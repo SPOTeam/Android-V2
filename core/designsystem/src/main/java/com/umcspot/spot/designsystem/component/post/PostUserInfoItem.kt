@@ -28,7 +28,7 @@ import com.umcspot.spot.model.PostType
 
 data class UserInfo(
     val userName : String = "추연우",
-    val userImg : ImageRef = ImageRef.LocalPath("R.drawable.spot_logo"),
+    val userImg : ImageRef = ImageRef.Name("R.drawable.spot_logo"),
     val date : String = "25.11.11",
     val time : String = "11:11"
 )

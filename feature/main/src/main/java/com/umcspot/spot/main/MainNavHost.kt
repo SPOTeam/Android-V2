@@ -126,7 +126,9 @@ fun MainNavHost(
             contentPadding = contentPadding,
             navController = navigator.navController,
             onRegisterScrollToTop = onRegisterScrollToTop,
-            onPostClick = { navigator.navController.navigateToPostContent() }
+            onPostClick = { postId ->
+                navigator.navController.navigateToPostContent(postId)
+            }
         )
 
         postingGraph(

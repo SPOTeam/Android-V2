@@ -10,8 +10,9 @@ import com.umcspot.spot.domain.board.model.board.BestPostResult
 import com.umcspot.spot.domain.board.model.board.BestPostResultList
 import com.umcspot.spot.domain.board.model.board.RecentPostResult
 import com.umcspot.spot.domain.board.model.board.RecentPostResultList
-import com.umcspot.spot.domain.board.model.post.PostResult
-import com.umcspot.spot.domain.board.model.post.PostResultList
+import com.umcspot.spot.domain.board.model.postList.PostResult
+import com.umcspot.spot.domain.board.model.postList.PostResultList
+import com.umcspot.spot.model.formatCreatedAt
 
 fun RecentBoardItem.toDomain() : RecentPostResult =
     RecentPostResult (
@@ -42,21 +43,24 @@ fun BestBoardResponseDto.toDomainList(): BestPostResultList =
         hotPosts = this.hotPosts.map(BestBoardItem::toDomain)
     )
 
-fun PostItem.toDomain() : PostResult =
-    PostResult (
-        postId = this.postId,
-        label = this.label,
-        title = this.title,
-        content = this.content,
-        likeNum = this.likeNum,
-        commentNum = this.commentNum,
-        viewNum = this.viewNum,
-        date = this.date,
-        time = this.time
-    )
-
 
 fun PostResponseDto.toDomainList(): PostResultList =
     PostResultList(
-        postList = this.postItems.map(PostItem::toDomain)
+        posts = this.posts.map(PostItem::toDomain),
+        hasNext = this.hasNext,
+        nextCursor = this.nextCursor
+    )
+
+
+fun PostItem.toDomain() : PostResult =
+    PostResult (
+        postId = this.postId,
+        postType = this.postType,
+        title = this.title,
+        content = this.content,
+        likeNum = this.stats.likeCount,
+        commentNum = this.stats.commentCount,
+        viewNum = this.stats.viewCount,
+        createdAt = this.createdAt.formatCreatedAt(),
+        isLiked = this.isLiked
     )

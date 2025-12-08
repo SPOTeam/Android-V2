@@ -20,6 +20,7 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,37 +38,31 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.component.post.PostListItem
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.domain.board.model.post.PostResult
-import com.umcspot.spot.domain.board.model.post.PostResultList
-import com.umcspot.spot.feature.board.BoardViewModel
+import com.umcspot.spot.domain.board.model.postList.PostResult
 import com.umcspot.spot.model.PostType
-import com.umcspot.spot.model.SortType
 import com.umcspot.spot.model.korean
 import com.umcspot.spot.ui.state.UiState
 import kotlinx.coroutines.launch
 
 @Composable
 fun BoardListScreen(
-    viewmodel : BoardViewModel = hiltViewModel(),
+    viewmodel : BoardListViewModel = hiltViewModel(),
     contentPadding: PaddingValues,
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
-    onPostClicked: () -> Unit
+    onPostClicked: (Long) -> Unit
 ) {
     val state by viewmodel.uiState.collectAsStateWithLifecycle()
-    val selected by viewmodel.selected.collectAsStateWithLifecycle()
-
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
 
-    // ✅ 탭을 BoardType 전부 + "전체" 로 구성
-    val tabs = remember {
-        listOf("전체") + PostType.values().map { it.korean }
+    // 탭: null = 전체, 나머지는 PostType
+    val tabItems = remember {
+        listOf<PostType?>(null) + PostType.values().toList()
     }
     var selectedTab by remember { mutableStateOf(0) } // 0 = 전체
-
 
     // 상단으로 스크롤 요청 핸들링
     LaunchedEffect(Unit) {
@@ -76,65 +71,110 @@ fun BoardListScreen(
         }
     }
 
-    LaunchedEffect(state.user) {
-        if (state.user is UiState.Empty) {
-            viewmodel.load(SortType.RECENT)
+    // 최초 진입 시 로딩
+    LaunchedEffect(state.data) {
+        if (state.data is UiState.Empty) {
+            viewmodel.load() // 전체
         }
     }
 
-    when (val state = state.user) {
-        is UiState.Loading -> {
-            Text(text = "로딩 중...", color = Color.Gray)
+    val ui = state.data
+    val itemList: List<PostResult> = when (ui) {
+        is UiState.Success -> ui.data.posts
+        else -> emptyList()
+    }
+
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val totalItems = layoutInfo.totalItemsCount
+            val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+
+            totalItems > 0 && lastVisibleItemIndex >= totalItems - 3
         }
+    }
 
-        is UiState.Failure -> {
-            Text(text = "에러: ${state.msg}", color = Color.Red)
+    LaunchedEffect(shouldLoadMore.value) {
+        if (shouldLoadMore.value) {
+            val successData = (ui as? UiState.Success)?.data
+            if (successData?.hasNext == true) {
+                viewmodel.loadNextPage()
+            }
         }
+    }
 
-        is UiState.Empty -> {
-            Text(text = "데이터가 없습니다.")
-        }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(SpotTheme.colors.white)
+            .padding(top = topPad, bottom = bottomPad),
+    ) {
+        SelectedLocationTabs(
+            tabs = tabItems.map { it?.korean ?: "전체" },
+            selectedIndex = selectedTab,
+            onTabSelected = { index ->
+                selectedTab = index
+                val selectedType = tabItems[index]
+                // 탭에 맞는 PostType으로 재로딩
+                viewmodel.load(selectedType)
 
-        is UiState.Success -> {
-            Column (
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(SpotTheme.colors.white)
-                    .padding(top = topPad, bottom = bottomPad),
+                scope.launch { listState.scrollToItem(0) }
+            }
+        )
 
-            ) {
-                SelectedLocationTabs(
-                    tabs = tabs,
-                    selectedIndex = selectedTab,
-                    onTabSelected = { selectedTab = it }
-                )
-
-                // ✅ 선택된 탭에 따라 필터링
-                val selectedType: PostType? = if (selectedTab == 0) null
-                else PostType.values()[selectedTab - 1]
-
-                val filtered = remember(selectedTab, state.data.posts.postList) {
-                    if (selectedType == null) state.data.posts.postList
-                    else state.data.posts.postList.filter { it.label == selectedType }
+        // 리스트 화면은 항상 출력
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            BoardListScreenContent(
+                listState = listState,
+                itemList = itemList,
+                onPostClicked = {
+                    viewmodel.setPostInfo(it)
+                    onPostClicked(it.postId)
                 }
+            )
 
-                BoardListScreenContent(
-                    listState = listState,
-                    itemList = PostResultList(postList = filtered),
-                    onPostClicked = {
-                        viewmodel.setPostInfo(it)
-                        onPostClicked()
-                    }
-                )
+            // 상태별 오버레이
+            when (ui) {
+                is UiState.Loading -> {
+                    Text(
+                        text = "로딩 중...",
+                        color = Color.Gray,
+                        modifier = Modifier
+                            .align(androidx.compose.ui.Alignment.Center)
+                    )
+                }
+                is UiState.Failure -> {
+                    Text(
+                        text = "에러: ${ui.msg}",
+                        color = Color.Red,
+                        modifier = Modifier
+                            .align(androidx.compose.ui.Alignment.Center)
+                    )
+                }
+                is UiState.Empty -> {
+                    Text(
+                        text = "데이터가 없습니다.",
+                        color = Color.Gray,
+                        modifier = Modifier
+                            .align(androidx.compose.ui.Alignment.Center)
+                    )
+                }
+                is UiState.Success -> {
+                    // 아무 것도 안 그려도 됨 (리스트만 보여줌)
+                }
             }
         }
     }
 }
 
+
 @Composable
 fun BoardListScreenContent(
     listState : LazyListState,
-    itemList : PostResultList,
+    itemList : List<PostResult>,
     onPostClicked : (PostResult) -> Unit
 ) {
     LazyColumn(
@@ -144,12 +184,12 @@ fun BoardListScreenContent(
             .fillMaxSize(),
     ) {
         items(
-            items = itemList.postList,
+            items = itemList,
             key = { it.postId }
         ) { item ->
             PostListItem(
                 item = item,
-                onClick = {onPostClicked}
+                onClick = { onPostClicked(item) }
             )
         }
     }

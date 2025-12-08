@@ -5,7 +5,7 @@ import com.umcspot.spot.board.mapper.toDomainList
 import com.umcspot.spot.board.service.BoardService
 import com.umcspot.spot.domain.board.model.board.BestPostResultList
 import com.umcspot.spot.domain.board.model.board.RecentPostResultList
-import com.umcspot.spot.domain.board.model.post.PostResultList
+import com.umcspot.spot.domain.board.model.postList.PostResultList
 import com.umcspot.spot.domain.board.repository.BoardRepository
 import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.SortType
@@ -39,13 +39,15 @@ class BoardRepositoryImpl @Inject constructor(
         }
 
     override suspend fun getFilteredPosts(
-        cursor: Int?,
+        cursor: Long?,
         postType: PostType?,
         size: Int
     ): Result<PostResultList> =
         runCatching {
             val res = boardService.getFilteredPosts(cursor = cursor, postType = postType, size = size )
             res.result.toDomainList()
+        }.onFailure { e ->
+            Log.e("BoardRepository", "getFilteredBoardList failed", e)
         }.recoverCatching {
             postDummies()
         }
@@ -59,5 +61,5 @@ class BoardRepositoryImpl @Inject constructor(
         BestPostResultList(BestPostResultList.getBestPostDummies(count))
 
     private fun postDummies(): PostResultList =
-        PostResultList(PostResultList.getPostDummies())
+        PostResultList(PostResultList.getPostDummies(), hasNext = false, nextCursor = null)
 }

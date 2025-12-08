@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -26,9 +27,9 @@ import com.umcspot.spot.designsystem.R
 
 object SpotShapes {
 
-    val HardDp : Dp = 9.dp
-    val SoftDp : Dp = 12.dp
-    val RoundDp : Dp = 16.dp
+    val HardDp : Dp = 6.dp
+    val SoftDp : Dp = 10.dp
+    val RoundDp : Dp = 14.dp
 
 
     // ===== Shape 정의 (모서리) =====
@@ -83,10 +84,10 @@ fun ShapeImageWithBadge(
         contentAlignment = Alignment.Center
     ) {
         ShapeImageBox(
+            modifier = Modifier.size(size),
             painter = painter,
             contentDescription = contentDescription,
             shape = shape,
-            size = size,
             borderWidth = borderWidth,
             padding = padding,
             borderColor = borderColor,
@@ -110,7 +111,6 @@ fun ShapeImageBox(
     painter: Painter,
     contentDescription: String? = null,
     shape: Shape,
-    size: Dp = 20.dp,
     modifier: Modifier = Modifier,
     borderWidth: Dp = 0.dp,
     padding: Dp = 5.dp,
@@ -121,7 +121,6 @@ fun ShapeImageBox(
 ) {
     Box(
         modifier = modifier
-            .size(size)
             .clip(shape)
             .background(backgroundColor)
             .then(
@@ -139,6 +138,7 @@ fun ShapeImageBox(
             contentScale = contentScale,
             modifier = Modifier
                 .fillMaxSize()
+                .wrapContentHeight()
                 .padding(padding)
         )
         content()

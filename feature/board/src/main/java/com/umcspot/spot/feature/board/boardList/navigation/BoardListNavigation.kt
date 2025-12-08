@@ -9,7 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.umcspot.spot.feature.board.boardList.BoardListScreen
-import com.umcspot.spot.feature.board.BoardViewModel
+import com.umcspot.spot.feature.board.boardList.BoardListViewModel
 import com.umcspot.spot.navigation.Route
 import kotlinx.serialization.Serializable
 
@@ -22,20 +22,24 @@ fun NavGraphBuilder.boardListGraph(
     contentPadding : PaddingValues,
     navController: NavHostController,
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
-    onPostClick : () -> Unit
+    onPostClick : (Long) -> Unit
 ) {
-    composable<BoardList> { backStackEntry ->
+
+
+    composable<BoardList> {backStackEntry ->
         val parentEntry = remember(backStackEntry) {
             // 🔹 NavHost 루트 그래프 기준으로 ViewModel 스코프
             navController.getBackStackEntry(navController.graph.id)
         }
-        val boardViewModel: BoardViewModel = hiltViewModel(parentEntry)
+        val boardListViewModel: BoardListViewModel = hiltViewModel(parentEntry)
 
         BoardListScreen(
             contentPadding = contentPadding,
-            viewmodel = boardViewModel,
             onRegisterScrollToTop = onRegisterScrollToTop,
-            onPostClicked = onPostClick
+            viewmodel = boardListViewModel,
+            onPostClicked = { postId ->
+                onPostClick(postId)
+            }
         )
     }
 }

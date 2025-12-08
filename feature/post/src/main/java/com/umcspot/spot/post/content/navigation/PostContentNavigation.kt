@@ -6,33 +6,38 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import com.umcspot.spot.feature.board.BoardViewModel
+import androidx.navigation.navArgument
+import com.umcspot.spot.feature.board.boardList.BoardListViewModel
+import com.umcspot.spot.feature.board.main.BoardViewModel
 import com.umcspot.spot.navigation.Route
 import com.umcspot.spot.post.content.PostContentScreen
 import kotlinx.serialization.Serializable
 
 
-fun NavController.navigateToPostContent(navOptions: NavOptions? = null) {
-    navigate(PostContent, navOptions)
+fun NavController.navigateToPostContent(postId: Long) {
+    navigate("post/$postId")
 }
 
 fun NavGraphBuilder.postContentGraph(
     contentPadding : PaddingValues,
     navController : NavController
 ) {
-    composable<PostContent> {backStackEntry ->
-        val parentEntry = remember(backStackEntry) {
-            // 🔹 NavHost 루트 그래프 기준으로 ViewModel 스코프
-            navController.getBackStackEntry(navController.graph.id)
-        }
-        val boardViewModel: BoardViewModel = hiltViewModel(parentEntry)
+    composable(
+        route = POST_CONTENT_ROUTE,
+        arguments = listOf(
+            navArgument("postId") { type = NavType.LongType }
+        )
+    ) { backStackEntry ->
+        val postId = backStackEntry.arguments?.getLong("postId") ?: return@composable
+
         PostContentScreen(
             contentPadding = contentPadding,
-            boardViewModel = boardViewModel
+            postId = postId
         )
     }
 }
 
 @Serializable
-data object PostContent : Route
+const val POST_CONTENT_ROUTE = "post/{postId}"

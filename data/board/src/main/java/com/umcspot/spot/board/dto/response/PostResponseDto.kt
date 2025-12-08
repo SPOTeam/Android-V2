@@ -8,14 +8,18 @@ import kotlinx.serialization.Serializable
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class PostResponseDto(
-    @SerialName("postItems")
-    val postItems : List<PostItem>
+    @SerialName("posts")
+    val posts : List<PostItem>,
+    @SerialName("hasNext")
+    val hasNext : Boolean,
+    @SerialName("nextCursor")
+    val nextCursor : Long,
 )
 
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class PostItem (
-    @SerialName("id")
+    @SerialName("postId")
     val postId: Long,
 
     @SerialName("title")
@@ -24,21 +28,29 @@ data class PostItem (
     @SerialName("content")
     val content : String,
 
-    @SerialName("label")
-    val label: PostType,
+    @SerialName("postType")
+    val postType : PostType,
 
-    @SerialName("likeNum")
-    val likeNum: Int,
+    @SerialName("imageUrl")
+    val imageUrl : String,
 
-    @SerialName("commentNum")
-    val commentNum: Int,
+    @SerialName("stats")
+    val stats : Stats,
 
-    @SerialName("viewNum")
-    val viewNum: Int,
+    @SerialName("createdAt")
+    val createdAt : String,
 
-    @SerialName("date")
-    val date: String,
+    @SerialName("isLiked")
+    val isLiked : Boolean,
+)
 
-    @SerialName("time")
-    val time : String
+@SuppressLint("UnsafeOptInUsageError")
+@Serializable
+data class Stats (
+    @SerialName("likeCount")
+    val likeCount : Long,
+    @SerialName("viewCount")
+    val viewCount : Long,
+    @SerialName("commentCount")
+    val commentCount : Long,
 )

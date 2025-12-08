@@ -1,9 +1,9 @@
-package com.umcspot.spot.feature.board
+package com.umcspot.spot.feature.board.main
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.umcspot.spot.domain.board.model.post.PostResult
+import com.umcspot.spot.domain.board.model.postList.PostResult
 import com.umcspot.spot.domain.board.repository.BoardRepository
 import com.umcspot.spot.model.SortType
 import com.umcspot.spot.ui.state.UiState
@@ -42,22 +42,18 @@ class BoardViewModel @Inject constructor(
             runCatching {
                 val recentPosts = async { boardRepository.getRecentBoard() }
                 val bestPosts = async { boardRepository.getBestBoard(sortBy) }
-                val filteredPosts = async { boardRepository.getFilteredPosts(size = 10) }
 
                 val recents = recentPosts.await().getOrThrow()
                 val bests = bestPosts.await().getOrThrow()
-                val posts = filteredPosts.await().getOrThrow()
 
                 Log.d("BoardRepositoryImpl", "getRecentBoard: $recents")
                 Log.d("BoardRepositoryImpl", "getBestBoard: $bests")
-                Log.d("BoardRepositoryImpl", "getPostsBoard: $posts")
 
 
                 BoardPayload(
                     recentBoards = recents,
                     bestBoards = bests,
                     selected = sortBy,
-                    posts = posts
                 )
             }.onSuccess { payload ->
                 _uiState.update { it.copy(user = UiState.Success(payload)) }

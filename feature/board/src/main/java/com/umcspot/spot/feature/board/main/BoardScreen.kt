@@ -17,11 +17,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
@@ -30,7 +28,6 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,7 +37,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -51,12 +47,12 @@ import com.umcspot.spot.designsystem.theme.B100
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G200
 import com.umcspot.spot.designsystem.theme.G300
-import com.umcspot.spot.designsystem.theme.G500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.domain.board.model.board.BestPostResult
 import com.umcspot.spot.domain.board.model.board.BestPostResultList
 import com.umcspot.spot.domain.board.model.board.RecentPostResult
 import com.umcspot.spot.domain.board.model.board.RecentPostResultList
+import com.umcspot.spot.feature.board.main.BoardViewModel
 import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.SortType
 import com.umcspot.spot.model.korean
