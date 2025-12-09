@@ -45,7 +45,7 @@ fun PrivacyConsentDialog(
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
-            shape = SpotShapes.Hard,
+            shape = SpotShapes.Round,
             tonalElevation = 2.dp,
             color = SpotTheme.colors.white
         ) {
@@ -89,7 +89,7 @@ fun PrivacyConsentDialog(
                 Spacer(Modifier.height(screenHeightDp(20.dp)))
 
                 Surface(
-                    shape = SpotShapes.Hard,
+                    shape = SpotShapes.Soft,
                     border = BorderStroke(1.dp, SpotTheme.colors.gray300),
                     color = SpotTheme.colors.white,
                     modifier = Modifier
@@ -136,6 +136,7 @@ fun PrivacyConsentDialog(
                 
                 TextButtonM(
                     text = "동의",
+                    shape = SpotShapes.Soft,
                     onClick = onAgree
                 )
             }
@@ -153,7 +154,7 @@ fun UniqueConsentDialog(
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
-            shape = SpotShapes.Hard,
+            shape = SpotShapes.Round,
             tonalElevation = 2.dp,
             color = SpotTheme.colors.white
         ) {
@@ -198,7 +199,7 @@ fun UniqueConsentDialog(
 
 
                 Surface(
-                    shape = SpotShapes.Hard,
+                    shape = SpotShapes.Soft,
                     border = BorderStroke(1.dp, SpotTheme.colors.gray300),
                     color = SpotTheme.colors.white,
                     modifier = Modifier
@@ -245,6 +246,7 @@ fun UniqueConsentDialog(
                 
                 TextButtonM(
                     text = "동의",
+                    shape = SpotShapes.Soft,
                     onClick = onAgree
                 )
             }

@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.study.section.ActivityThemeSection
+import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.signup.SignUpViewModel
 
@@ -56,6 +57,7 @@ fun CheckListScreen(
 
         TextButton(
             text = "다음",
+            shape = SpotShapes.Soft,
             enabled = themes.isNotEmpty(),
             onClick = {
                 signUpViewModel.saveNameIfChanged()

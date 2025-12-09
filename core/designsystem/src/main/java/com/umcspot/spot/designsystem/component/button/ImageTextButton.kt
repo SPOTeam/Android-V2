@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
@@ -32,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.shapes.ShapeBox
+import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B100
 import com.umcspot.spot.designsystem.theme.B200
 import com.umcspot.spot.designsystem.theme.B400
@@ -95,6 +97,7 @@ fun MultiButton(
     text: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    shape : Shape = SpotShapes.Hard,
     state: MultiButtonState = MultiButtonState.XOUTLINEState,
     checked: Boolean = false,
     onClick: (newChecked: Boolean) -> Unit,
@@ -124,7 +127,7 @@ fun MultiButton(
             }
     ) {
         ShapeBox(
-            shape = RoundedCornerShape(10.dp),
+            shape = shape,
             color = colors.bg,
             borderWidth = 0.dp,
             borderColor = null,

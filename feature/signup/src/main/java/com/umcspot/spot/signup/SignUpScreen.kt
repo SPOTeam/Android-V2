@@ -49,6 +49,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -152,6 +153,7 @@ fun SignUpScreen(
 
                 TextButton(
                     text = "다음",
+                    shape = SpotShapes.Soft,
                     enabled = privacyChecked && uniqueChecked,
                     onClick = onNextClick
                 )
@@ -346,13 +348,12 @@ private fun ConsentItem(
     val background = if (checked) SpotTheme.colors.B100 else SpotTheme.colors.white
 
     Surface(
-        shape = SpotShapes.Soft,
+        shape = SpotShapes.Hard,
         color = background,
         border = BorderStroke(1.dp, border),
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 52.dp)
-            .clip(RoundedCornerShape(12.dp))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = LocalIndication.current,

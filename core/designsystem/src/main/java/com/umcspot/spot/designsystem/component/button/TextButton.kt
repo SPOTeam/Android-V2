@@ -185,14 +185,11 @@ fun TextButtonSize.textStyle(): TextStyle = when (this) {
 }
 
 @Composable
-fun TextButtonSize.shape(): Shape = SpotShapes.Hard
-
-
-@Composable
 fun TextButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    shape : Shape = SpotShapes.Hard,
     size: TextButtonSize = TextButtonSize.M,
     width: Dp = Unspecified,
     enabled: Boolean = true,
@@ -219,7 +216,7 @@ fun TextButton(
     ) {
         // 배경/보더
         ShapeBox(
-            shape = size.shape(),
+            shape = shape,
             color = colors.bg,
             borderWidth = 0.5.dp,
             borderColor = colors.border,
@@ -251,6 +248,7 @@ fun TextButtonXL(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    shape : Shape = SpotShapes.Soft,
     width: Dp = 200.dp,
     enabled: Boolean = true,
     checked : Boolean = false,
@@ -259,6 +257,7 @@ fun TextButtonXL(
     text = text,
     onClick = onClick,
     modifier = modifier,
+    shape = shape,
     size = TextButtonSize.XL,
     width = width,
     enabled = enabled,
@@ -271,6 +270,7 @@ fun TextButtonL(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    shape : Shape = SpotShapes.Soft,
     width: Dp = 180.dp,
     enabled: Boolean = true,
     checked : Boolean = false,
@@ -279,6 +279,7 @@ fun TextButtonL(
     text = text,
     onClick = onClick,
     modifier = modifier,
+    shape = shape,
     size = TextButtonSize.L,
     width = width,
     enabled = enabled,
@@ -292,6 +293,7 @@ fun TextButtonM(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     width: Dp = 160.dp,
+    shape : Shape = SpotShapes.Soft,
     enabled: Boolean = true,
     checked : Boolean = false,
     state: TextButtonState = TextButtonState.B400State,
@@ -300,6 +302,7 @@ fun TextButtonM(
     onClick = onClick,
     modifier = modifier,
     size = TextButtonSize.M,
+    shape = shape,
     width = width,
     enabled = enabled,
     checked = checked,
@@ -312,6 +315,7 @@ fun TextButtonS(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     width: Dp = 140.dp,
+    shape : Shape = SpotShapes.Soft,
     enabled: Boolean = true,
     checked : Boolean = false,
     state: TextButtonState = TextButtonState.B400State,
@@ -320,6 +324,7 @@ fun TextButtonS(
     onClick = onClick,
     modifier = modifier,
     size = TextButtonSize.S,
+    shape = shape,
     width = width,
     enabled = enabled,
     checked = checked,
@@ -331,6 +336,7 @@ fun TextButtonXS(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    shape : Shape = SpotShapes.Soft,
     width: Dp = 70.dp,
     enabled: Boolean = true,
     checked : Boolean = false,
@@ -340,6 +346,7 @@ fun TextButtonXS(
     onClick = onClick,
     modifier = modifier,
     size = TextButtonSize.XS,
+    shape = shape,
     width = width,
     enabled = enabled,
     checked = checked,
@@ -351,6 +358,7 @@ fun TextToggleButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    shape : Shape = SpotShapes.Soft,
     width: Dp = 126.dp,
     enabled: Boolean = true,
     checked : Boolean = false,
@@ -360,6 +368,7 @@ fun TextToggleButton(
     onClick = onClick,
     modifier = modifier,
     size = TextButtonSize.XS,
+    shape = shape,
     width = width,
     enabled = enabled,
     checked = checked,
