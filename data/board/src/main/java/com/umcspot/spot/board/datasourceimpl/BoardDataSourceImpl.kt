@@ -2,12 +2,13 @@ package com.umcspot.spot.board.datasourceimpl
 
 import com.umcspot.spot.board.datasource.BoardDataSource
 import com.umcspot.spot.board.dto.response.BestBoardResponseDto
-import com.umcspot.spot.board.dto.response.PostResponseDto
+import com.umcspot.spot.board.dto.response.PostListResponseDto
 import com.umcspot.spot.board.dto.response.RecentBoardResponseDto
 import com.umcspot.spot.board.service.BoardService
 import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.SortType
 import com.umcspot.spot.network.model.BaseResponse
+import com.umcspot.spot.network.model.NullResultResponse
 import javax.inject.Inject
 
 class BoardDataSourceImpl @Inject constructor(
@@ -26,7 +27,11 @@ class BoardDataSourceImpl @Inject constructor(
         cursor : Long,
         postType: PostType,
         size : Int
-    ): BaseResponse<PostResponseDto> =
+    ): BaseResponse<PostListResponseDto> =
         boardService.getFilteredPosts(cursor, postType, size)
+
+    override suspend fun postPostLike(postId: Long): NullResultResponse = boardService.postPostLike(postId)
+
+    override suspend fun deletePostLike(postId: Long): NullResultResponse = boardService.deletePostLike(postId)
 
 }

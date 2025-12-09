@@ -1,4 +1,4 @@
-package com.umcspot.spot.feature.board
+package com.umcspot.spot.feature.board.main
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -62,7 +63,8 @@ import com.umcspot.spot.ui.state.UiState
 fun BoardScreen(
     viewmodel: BoardViewModel = hiltViewModel(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    onMoveToBoardList: () -> Unit
+    onMoveToBoardList: () -> Unit,
+    onMoveToPostContent : (Long) -> Unit
 ) {
     val state by viewmodel.uiState.collectAsStateWithLifecycle()
 
@@ -111,7 +113,7 @@ fun BoardScreen(
                 item {
                     RecentCardList(
                         items = payload.recentBoards, // ← payload에서 가져오기
-                        onItemClick = { }
+                        onItemClick = { onMoveToPostContent(it.postId) }
                     )
                 }
 
@@ -169,7 +171,7 @@ fun BoardScreen(
                 item {
                     BestCardList(
                         items = payload.bestBoards, // ← payload에서 가져오기
-                        onItemClick = { }
+                        onItemClick = { onMoveToPostContent(it.postId) }
                     )
                 }
             }
@@ -209,7 +211,7 @@ private fun BoardTabs(
     onSelect: (SortType) -> Unit
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.height(IntrinsicSize.Min)
     ) {
         BoardTabChip(
@@ -223,7 +225,7 @@ private fun BoardTabs(
             thickness = 1.dp,
             modifier = Modifier
                 .fillMaxHeight()
-                .padding(vertical = 2.dp)
+                .padding(vertical = 4.dp)
         )
 
         BoardTabChip(
@@ -237,7 +239,7 @@ private fun BoardTabs(
             thickness = 1.dp,
             modifier = Modifier
                 .fillMaxHeight()
-                .padding(vertical = 2.dp)
+                .padding(vertical = 4.dp)
         )
 
         BoardTabChip(
@@ -397,6 +399,8 @@ private fun BestRow(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
+
+        Spacer(Modifier.height(4.dp))
 
         Row(
             modifier = Modifier

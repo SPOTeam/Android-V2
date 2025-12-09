@@ -1,16 +1,35 @@
 package com.umcspot.spot.post.content
 
-import ProfileImage
-import android.R
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -18,8 +37,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.rememberAsyncImagePainter
-import com.umcspot.spot.designsystem.shapes.ShapeImageBox
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.umcspot.spot.designsystem.component.post.CommentUserInfo
+import com.umcspot.spot.designsystem.component.post.CountView
+import com.umcspot.spot.designsystem.component.post.UserInfo
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
@@ -40,6 +62,9 @@ fun PostContentScreen(
 
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
+
+    val scrollState = rememberScrollState()
+
 
     // 🔥 postId가 바뀔 때마다 로딩
     LaunchedEffect(postId) {
@@ -78,29 +103,79 @@ fun PostContentScreen(
             }
 
             is UiState.Success -> {
-                PostContentDetailScreen(
+                val listState = rememberLazyListState()
+                val post = state.data
+
+                LazyColumn(
+                    state = listState,
                     modifier = Modifier.fillMaxSize(),
-                    post = state.data       // 🔥 실제 PostDetailResult 전달
-                )
+                ) {
+                    // 1) 상세 상단(작성자/제목/이미지/본문/카운트)
+                    item(key = "post_header") {
+                        PostContentDetailScreen(
+                            post = post,
+                            onLikeClick = { postViewModel.toggleLike() }
+                        )
+                    }
+
+                    // 2) 구분선
+                    item(key = "divider") {
+                        Spacer(Modifier.height(8.dp))
+                        HorizontalDivider(
+                            modifier = Modifier.fillMaxWidth(),
+                            thickness = 1.dp,
+                            color = SpotTheme.colors.gray200
+                        )
+                        Spacer(Modifier.height(8.dp))
+                    }
+
+                    // 3) 댓글 목록
+                    items(
+                        items = post.comments,
+                        key = { it.commentId },
+
+                    ) { comment ->
+                        CommentItem(
+                            comment = comment,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 17.dp)
+                        )
+                        Spacer(Modifier.height(13.dp))
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 17.dp),
+                            thickness = 1.dp,
+                            color = SpotTheme.colors.gray200
+                        )
+                        Spacer(Modifier.height(13.dp))
+                    }
+                }
             }
         }
     }
 }
 
-
 @Composable
 fun PostContentDetailScreen(
     modifier : Modifier = Modifier,
     post: PostDetailResult,
+    onLikeClick : () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier
+            .wrapContentSize()
+            .padding(horizontal = 17.dp)
+            .padding(bottom = 13.dp),
+        verticalArrangement = Arrangement.Top
     ) {
         UserInfo(
             postWriterName = post.nickname,
             postWriterImage = post.profileImageUrl,
             postWriteAt = post.createdAt
         )
+        Spacer(Modifier.height(12.dp))
 
         PostDetailScreen(
             post.postType,
@@ -108,40 +183,14 @@ fun PostContentDetailScreen(
             post.imageUrl,
             post.content,
         )
-    }
-}
 
-@Composable
-fun UserInfo(
-    modifier : Modifier = Modifier,
-    postWriterName : String,
-    postWriterImage : ImageRef,
-    postWriteAt : String,
-) {
-    Row(
-        modifier = Modifier
-            .wrapContentSize()
-    ) {
-        ProfileImage(
-            imageRef = postWriterImage,
-            modifier = Modifier.size(44.dp)
+        Spacer(Modifier.height(20.dp))
+
+        CountView(
+            item = post,
+            onLikeClick = { onLikeClick() }
         )
-        Spacer(Modifier.width(10.dp))
-        Column (
 
-        ) {
-            Text(
-                text = postWriterName,
-                style = SpotTheme.typography.medium_400
-            )
-            
-            Spacer(Modifier.height(4.dp))
-
-            Text(
-                text = postWriteAt,
-                style = SpotTheme.typography.regular_400
-            )
-        }
     }
 }
 
@@ -154,33 +203,11 @@ fun PostDetailScreen(
 ) {
     val context = LocalContext.current
 
-    // 🔥 ImageRef → Painter
-    val painter: Painter? = when (image) {
-        ImageRef.None -> null
-
-        is ImageRef.Name -> {
-            val resId = remember(image.name) {
-                context.resources.getIdentifier(
-                    image.name,
-                    "drawable",
-                    context.packageName
-                )
-            }
-            if (resId != 0) painterResource(id = resId) else null
-        }
-
-        is ImageRef.Url -> {
-            rememberAsyncImagePainter(model = image.url)
-        }
-    }
-
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+        modifier = Modifier.wrapContentSize()
     ) {
         Text(
-            text = "#${postType.korean}",      // 태그 느낌
+            text = "# ${postType.korean}",
             style = SpotTheme.typography.small_500,
             color = SpotTheme.colors.B500
         )
@@ -194,17 +221,44 @@ fun PostDetailScreen(
             softWrap = true,
         )
 
-        // 🔥 여기 이미지 하나
-        if (painter != null) {
-            Spacer(Modifier.height(12.dp))
-            ShapeImageBox(
-                painter = painter,
-                shape = SpotShapes.Hard,
-                modifier = Modifier.wrapContentHeight(),
-                borderWidth = 0.dp,
-                padding = 0.dp,
-                contentScale = ContentScale.FillWidth
-            )
+        when (image) {
+            ImageRef.None -> Unit
+
+            is ImageRef.Url -> {
+                Spacer(Modifier.height(12.dp))
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(image.url)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(SpotShapes.Hard)
+                )
+            }
+
+            is ImageRef.Name -> {
+                val resId = remember(image.name) {
+                    context.resources.getIdentifier(
+                        image.name,
+                        "drawable",
+                        context.packageName
+                    )
+                }
+                if (resId != 0) {
+                    Spacer(Modifier.height(12.dp))
+                    Image(
+                        painter = painterResource(id = resId),
+                        contentDescription = null,
+                        contentScale = ContentScale.FillWidth,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(SpotShapes.Hard)
+                    )
+                }
+            }
         }
 
         Spacer(Modifier.height(12.dp))
@@ -216,13 +270,82 @@ fun PostDetailScreen(
     }
 }
 
+@Composable
+private fun CommentItem(
+    comment: CommentResult,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        CommentUserInfo(
+            commentWriterName = comment.nickname,
+            commentWriterImage = comment.profileImageUrl
+        )
+
+        Spacer(Modifier.height(7.dp))
+
+        Text(
+            text = comment.content,
+            style = SpotTheme.typography.medium_400,
+            color = SpotTheme.colors.black
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
-fun UserInfoPreview() {
+private fun preview() {
+    val listState = rememberLazyListState()
+    val dummyComments = List(5) { idx -> CommentResult.dummyComment(idx, 10) }
+
     SpotTheme {
-        PostContentDetailScreen(
-            post = PostDetailResult.dummyPostDetail(123456, 5)
-        )
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            // 1) 상세 섹션
+            item(key = "post_header") {
+                PostContentDetailScreen(
+                    post = PostDetailResult.dummyPostDetail(123456, 5),
+                    onLikeClick = {},
+                )
+            }
+
+            // 2) 구분선
+            item(key = "divider") {
+                Spacer(Modifier.height(8.dp))
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    thickness = 1.dp,
+                    color = SpotTheme.colors.gray200
+                )
+                Spacer(Modifier.height(8.dp))
+            }
+
+            items(
+                items = dummyComments,
+                key = { it.commentId }
+            ) { comment ->
+                CommentItem(
+                    comment = comment,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 17.dp)
+                )
+                Spacer(Modifier.height(13.dp))
+                HorizontalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 17.dp),
+                    thickness = 1.dp,
+                    color = SpotTheme.colors.gray200
+                )
+                Spacer(Modifier.height(13.dp))
+
+            }
+        }
     }
 }
 

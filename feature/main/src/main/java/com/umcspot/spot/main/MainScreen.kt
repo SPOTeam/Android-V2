@@ -32,6 +32,7 @@ import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.component.modal.RejectDialog
 import com.umcspot.spot.feature.board.boardList.navigation.BoardList
 import com.umcspot.spot.main.component.MainBottomBar
+import com.umcspot.spot.post.content.navigation.POST_CONTENT_ROUTE
 import com.umcspot.spot.post.posting.navigation.Posting
 import com.umcspot.spot.post.posting.navigation.navigateToPosting
 import com.umcspot.spot.signup.navigation.SignUp
@@ -63,6 +64,8 @@ fun MainScreen(
                         dest?.hasRoute(SignUp::class) == true -> "회원가입"
                         dest?.hasRoute(CheckList::class) == true -> "체크리스트"
                         dest?.hasRoute(Posting::class) == true -> "글쓰기"
+                        dest?.hasRoute(BoardList::class) == true -> "스터디 파트너들의 이야기"
+                        dest?.routeMatches(POST_CONTENT_ROUTE) == true -> "스터디 파트너들의 이야기"
                         else -> ""
                     }
                     BackTopBar(

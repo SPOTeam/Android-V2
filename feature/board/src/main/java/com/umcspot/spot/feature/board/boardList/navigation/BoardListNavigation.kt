@@ -24,8 +24,6 @@ fun NavGraphBuilder.boardListGraph(
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
     onPostClick : (Long) -> Unit
 ) {
-
-
     composable<BoardList> {backStackEntry ->
         val parentEntry = remember(backStackEntry) {
             // 🔹 NavHost 루트 그래프 기준으로 ViewModel 스코프
@@ -37,9 +35,7 @@ fun NavGraphBuilder.boardListGraph(
             contentPadding = contentPadding,
             onRegisterScrollToTop = onRegisterScrollToTop,
             viewmodel = boardListViewModel,
-            onPostClicked = { postId ->
-                onPostClick(postId)
-            }
+            onPostClicked = { onPostClick(it) }
         )
     }
 }

@@ -23,14 +23,22 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+
 @HiltViewModel
 class BoardListViewModel @Inject constructor(
     private val boardRepository: BoardRepository
 ) : ViewModel() {
 
+    data class ScrollPosition(
+        val index: Int = 0,
+        val offset: Int = 0
+    )
     data class BoardUiState(
         val data: UiState<PostResultList> = UiState.Empty
     )
+
+    var scrollPosition: ScrollPosition = ScrollPosition()
 
     private val _uiState = MutableStateFlow(BoardUiState())
     val uiState: StateFlow<BoardUiState> = _uiState.asStateFlow()
@@ -44,6 +52,8 @@ class BoardListViewModel @Inject constructor(
 
     private var currentPostType: PostType? = null
     private var isLoadingMore: Boolean = false
+
+    private val inFlightLikes = mutableSetOf<Long>()
 
     /** 최초/재로딩: postType 없이 전체 불러오기 or 특정 타입만 */
     fun load(postType: PostType? = null) {
@@ -114,8 +124,75 @@ class BoardListViewModel @Inject constructor(
         _selectedPost.value = post
     }
 
-    /** 상세 화면 등에 사용할 선택된 게시글 저장 */
     fun getPostInfo() : PostResult? {
         return _selectedPost.value
+    }
+
+    fun toggleLike(postResult: PostResult) {
+        val current = (_uiState.value.data as? UiState.Success)?.data ?: return
+        val target = current.posts.firstOrNull { it.postId == postResult.postId } ?: return
+
+        val id = postResult.postId
+        if (!inFlightLikes.add(id)) return // 이미 진행 중이면 무시
+
+        val wasLiked = target.isLiked
+        val nowLiked = !wasLiked
+        val delta: Long = if (nowLiked) +1L else -1L
+
+        // 1) 로컬 즉시 반영
+        applyLocalLike(id, nowLiked, delta)
+
+        // 2) 네트워크
+        viewModelScope.launch {
+            try {
+                val result = if (nowLiked) {
+                    boardRepository.postPostLike(id)      // Result<Unit>
+                } else {
+                    boardRepository.deletePostLike(id)    // Result<Unit>
+                }
+
+                result.onFailure {
+                    // 실패 시 롤백
+                    applyLocalLike(id, wasLiked, -delta)
+                }
+            } finally {
+                inFlightLikes.remove(id) // 반드시 해제
+            }
+        }
+    }
+
+    /** 리스트/선택된 포스트 둘 다 업데이트 */
+    private fun applyLocalLike(postId: Long, liked: Boolean, delta: Long) {
+        // 리스트 갱신
+        _uiState.update { state ->
+            val success = state.data as? UiState.Success ?: return@update state
+            val list = success.data
+            val updatedPosts = list.posts.map { p ->
+                if (p.postId == postId) {
+                    p.copy(
+                        isLiked = liked,
+                        likeNum = (p.likeNum + delta).coerceAtLeast(0L) // ← Long 기준
+                    )
+                } else p
+            }
+            state.copy(data = UiState.Success(list.copy(posts = updatedPosts)))
+        }
+        // 상세 선택 포스트도 갱신
+        _selectedPost.update { p ->
+            if (p?.postId == postId) {
+                p.copy(
+                    isLiked = liked,
+                    likeNum = (p.likeNum + delta).coerceAtLeast(0L)
+                )
+            } else p
+        }
+    }
+
+    fun saveScrollPosition(index: Int, offset: Int) {
+        scrollPosition = ScrollPosition(index, offset)
+    }
+
+    fun resetScrollPosition() {
+        scrollPosition = ScrollPosition()
     }
 }

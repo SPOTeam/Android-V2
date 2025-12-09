@@ -13,4 +13,8 @@ interface BoardRepository {
     suspend fun getBestBoard(sortBy: SortType): Result<BestPostResultList>
 
     suspend fun getFilteredPosts(cursor : Long? = null, postType: PostType? = null, size : Int): Result<PostResultList>
+
+    suspend fun postPostLike(postId : Long) : Result<Unit>
+
+    suspend fun deletePostLike(postId : Long) : Result<Unit>
 }

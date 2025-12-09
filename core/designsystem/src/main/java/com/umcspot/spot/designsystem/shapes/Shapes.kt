@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -137,8 +138,7 @@ fun ShapeImageBox(
             contentDescription = contentDescription,
             contentScale = contentScale,
             modifier = Modifier
-                .fillMaxSize()
-                .wrapContentHeight()
+                .wrapContentSize()
                 .padding(padding)
         )
         content()

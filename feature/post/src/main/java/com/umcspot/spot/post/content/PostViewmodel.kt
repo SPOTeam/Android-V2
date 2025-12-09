@@ -32,12 +32,14 @@ class PostViewModel @Inject constructor(
     private val _likeSelected = MutableStateFlow(false)
     val likeSelected: StateFlow<Boolean> = _likeSelected.asStateFlow()
 
+    private val inFlightLikes = mutableSetOf<Long>()
+
+
     fun load(postId : Long) {
         _uiState.update { it.copy(data = UiState.Loading) }
 
         viewModelScope.launch {
             runCatching {
-                // cursor 는 처음엔 null, size 는 원하는 만큼
                 postRepository.getPostDetail(
                     postId = postId
                 ).getOrThrow()
@@ -48,6 +50,49 @@ class PostViewModel @Inject constructor(
                 Log.e("PostViewModel", "load error", e)
                 _uiState.update { it.copy(data = UiState.Empty) }
             }
+        }
+    }
+
+    fun toggleLike() {
+        val current = (_uiState.value.data as? UiState.Success)?.data ?: return
+        val id = current.postId
+        if (!inFlightLikes.add(id)) return
+
+        val wasLiked = current.isLiked
+        val nowLiked = !wasLiked
+        val delta: Long = if (nowLiked) 1L else -1L
+
+        applyLocalLike(nowLiked, delta)
+
+        viewModelScope.launch {
+            try {
+                val result = if (nowLiked) {
+                    postRepository.postPostLike(id)
+                } else {
+                    postRepository.deletePostLike(id)
+                }
+
+                result.onFailure {
+                    // 실패 시 롤백
+                    applyLocalLike(wasLiked, -delta)
+                }
+            } finally {
+                inFlightLikes.remove(id)
+            }
+        }
+    }
+
+    /** 단건 상태만 갱신 */
+    private fun applyLocalLike(liked: Boolean, delta: Long) {
+        _uiState.update { state ->
+            val success = state.data as? UiState.Success ?: return@update state
+            val cur = success.data
+            val updated = cur.copy(
+                isLiked = liked,
+                likeCount = (cur.likeCount + delta).coerceAtLeast(0L)
+            )
+            _likeSelected.value = liked
+            state.copy(data = UiState.Success(updated))
         }
     }
 }

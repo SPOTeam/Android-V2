@@ -8,7 +8,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.umcspot.spot.feature.board.BoardScreen
+import com.umcspot.spot.feature.board.main.BoardScreen
 import com.umcspot.spot.feature.board.main.BoardViewModel
 import com.umcspot.spot.navigation.Route
 import kotlinx.serialization.Serializable
@@ -22,6 +22,7 @@ fun NavGraphBuilder.boardGraph(
     contentPadding : PaddingValues,
     navController: NavHostController,
     onMoveToBoardList : () -> Unit,
+    onMoveToPostContent : (Long) -> Unit
 ) {
     composable<Board> { backStackEntry ->
         val parentEntry = remember(backStackEntry) {
@@ -34,6 +35,7 @@ fun NavGraphBuilder.boardGraph(
             contentPadding = contentPadding,
             viewmodel = boardViewModel,
             onMoveToBoardList = onMoveToBoardList,
+            onMoveToPostContent = {onMoveToPostContent(it)}
         )
     }
 

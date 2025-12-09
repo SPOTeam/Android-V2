@@ -1,3 +1,5 @@
+package com.umcspot.spot.designsystem.component
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -11,6 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ImageRef
 
@@ -22,7 +25,7 @@ fun ProfileImage(
     val context = LocalContext.current
 
     val painter: Painter? = when (imageRef) {
-        ImageRef.None -> null
+        ImageRef.None -> painterResource(R.drawable.spot_logo)
 
         is ImageRef.Name -> {
             // drawable 이름 → resId 로 변환
@@ -54,7 +57,7 @@ fun ProfileImage(
 
 @Preview(showBackground = false)
 @Composable
-fun preview() {
+private fun preview() {
     SpotTheme {
         ProfileImage(
             imageRef = ImageRef.Name("sample"),

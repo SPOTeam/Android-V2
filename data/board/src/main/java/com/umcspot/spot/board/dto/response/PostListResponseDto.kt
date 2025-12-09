@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
-data class PostResponseDto(
+data class PostListResponseDto(
     @SerialName("posts")
     val posts : List<PostItem>,
     @SerialName("hasNext")
@@ -30,9 +30,6 @@ data class PostItem (
 
     @SerialName("postType")
     val postType : PostType,
-
-    @SerialName("imageUrl")
-    val imageUrl : String,
 
     @SerialName("stats")
     val stats : Stats,

@@ -3,7 +3,7 @@ package com.umcspot.spot.board.mapper
 import com.umcspot.spot.board.dto.response.BestBoardItem
 import com.umcspot.spot.board.dto.response.BestBoardResponseDto
 import com.umcspot.spot.board.dto.response.PostItem
-import com.umcspot.spot.board.dto.response.PostResponseDto
+import com.umcspot.spot.board.dto.response.PostListResponseDto
 import com.umcspot.spot.board.dto.response.RecentBoardItem
 import com.umcspot.spot.board.dto.response.RecentBoardResponseDto
 import com.umcspot.spot.domain.board.model.board.BestPostResult
@@ -44,7 +44,7 @@ fun BestBoardResponseDto.toDomainList(): BestPostResultList =
     )
 
 
-fun PostResponseDto.toDomainList(): PostResultList =
+fun PostListResponseDto.toDomainList(): PostResultList =
     PostResultList(
         posts = this.posts.map(PostItem::toDomain),
         hasNext = this.hasNext,

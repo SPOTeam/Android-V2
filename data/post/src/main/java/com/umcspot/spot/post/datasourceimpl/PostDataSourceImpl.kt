@@ -1,6 +1,7 @@
 package com.umcspot.spot.post.datasourceimpl
 
 import com.umcspot.spot.network.model.BaseResponse
+import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.post.datasource.PostDataSource
 import com.umcspot.spot.post.dto.response.PostDetailResponseDto
 import com.umcspot.spot.post.service.PostService
@@ -11,4 +12,8 @@ class PostDataSourceImpl @Inject constructor(
 ) : PostDataSource {
     override suspend fun getPostDetail(postId : Long): BaseResponse<PostDetailResponseDto> =
         postService.getPostDetail(postId)
+
+    override suspend fun postPostLike(postId: Long): NullResultResponse = postService.postPostLike(postId)
+
+    override suspend fun deletePostLike(postId: Long): NullResultResponse = postService.deletePostLike(postId)
 }

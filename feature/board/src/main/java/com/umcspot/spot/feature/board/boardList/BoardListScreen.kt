@@ -13,19 +13,24 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
@@ -34,6 +39,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.component.post.PostListItem
 import com.umcspot.spot.designsystem.theme.B500
@@ -42,6 +50,8 @@ import com.umcspot.spot.domain.board.model.postList.PostResult
 import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.korean
 import com.umcspot.spot.ui.state.UiState
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @Composable
@@ -58,20 +68,36 @@ fun BoardListScreen(
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
 
-    // 탭: null = 전체, 나머지는 PostType
     val tabItems = remember {
         listOf<PostType?>(null) + PostType.values().toList()
     }
-    var selectedTab by remember { mutableStateOf(0) } // 0 = 전체
 
-    // 상단으로 스크롤 요청 핸들링
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner, selectedTab) {
+        val lifecycle = lifecycleOwner.lifecycle
+
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                val selectedType = tabItems[selectedTab]
+                viewmodel.selectType(selectedType)
+            }
+        }
+
+        lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycle.removeObserver(observer)
+        }
+    }
+
     LaunchedEffect(Unit) {
         onRegisterScrollToTop {
             scope.launch { listState.animateScrollToItem(0) }
         }
     }
 
-    // 최초 진입 시 로딩
     LaunchedEffect(state.data) {
         if (state.data is UiState.Empty) {
             viewmodel.load() // 전체
@@ -82,6 +108,25 @@ fun BoardListScreen(
     val itemList: List<PostResult> = when (ui) {
         is UiState.Success -> ui.data.posts
         else -> emptyList()
+    }
+
+    LaunchedEffect(ui is UiState.Success) {
+        if (ui is UiState.Success) {
+            // 1) 먼저 ViewModel에 저장된 위치로 복원
+            val pos = viewmodel.scrollPosition
+            if (pos.index != 0 || pos.offset != 0) {
+                listState.scrollToItem(pos.index, pos.offset)
+            }
+
+            // 2) 그 다음부터 스크롤 변화를 ViewModel에 저장
+            snapshotFlow {
+                listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset
+            }
+                .distinctUntilChanged()
+                .collectLatest { (index, offset) ->
+                    viewmodel.saveScrollPosition(index, offset)
+                }
+        }
     }
 
     val shouldLoadMore = remember {
@@ -115,9 +160,7 @@ fun BoardListScreen(
             onTabSelected = { index ->
                 selectedTab = index
                 val selectedType = tabItems[index]
-                // 탭에 맞는 PostType으로 재로딩
-                viewmodel.load(selectedType)
-
+                viewmodel.selectType(selectedType)
                 scope.launch { listState.scrollToItem(0) }
             }
         )
@@ -130,6 +173,9 @@ fun BoardListScreen(
             BoardListScreenContent(
                 listState = listState,
                 itemList = itemList,
+                onLikeClick = {
+                    viewmodel.toggleLike(it)
+                },
                 onPostClicked = {
                     viewmodel.setPostInfo(it)
                     onPostClicked(it.postId)
@@ -175,12 +221,13 @@ fun BoardListScreen(
 fun BoardListScreenContent(
     listState : LazyListState,
     itemList : List<PostResult>,
+    onLikeClick : (PostResult) -> Unit,
     onPostClicked : (PostResult) -> Unit
 ) {
     LazyColumn(
         state = listState,
         modifier = Modifier
-            .padding(horizontal = 12.dp)
+            .padding(horizontal = 17.dp)
             .fillMaxSize(),
     ) {
         items(
@@ -189,7 +236,14 @@ fun BoardListScreenContent(
         ) { item ->
             PostListItem(
                 item = item,
+                onLikeClick = { onLikeClick(item) },
                 onClick = { onPostClicked(item) }
+            )
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                thickness = 1.dp,
+                color = SpotTheme.colors.gray200
             )
         }
     }

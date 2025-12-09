@@ -29,7 +29,7 @@ data class PostResult(
 
 ) {
     companion object {
-        internal fun dummyPost(index: Int, total: Int): PostResult {
+        fun dummyPost(index: Int, total: Int): PostResult {
             val labels = PostType.values()
             val postType = labels.random()
             val title = "Lorem ipsum dolor sit amet consectetur Lorem ipsum dolor sit amet consectetur Lorem ipsum dolor sit amet consectetur"

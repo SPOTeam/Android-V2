@@ -9,6 +9,7 @@ import com.umcspot.spot.domain.board.model.postList.PostResultList
 import com.umcspot.spot.domain.board.repository.BoardRepository
 import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.SortType
+import com.umcspot.spot.network.model.NullResultResponse
 import javax.inject.Inject
 
 class BoardRepositoryImpl @Inject constructor(
@@ -16,15 +17,10 @@ class BoardRepositoryImpl @Inject constructor(
 ) : BoardRepository {
     override suspend fun getRecentBoard(): Result<RecentPostResultList> =
         runCatching {
-            val res = boardService.getRecentBoard()
-            Log.d("BoardRepository", "getRecentBoard res = $res")
-            val domain = res.result.toDomainList()
-            Log.d("BoardRepository", "getRecentBoard mapped = $domain")
-            domain
+            boardService.getRecentBoard().result.toDomainList()
         }.onFailure { e ->
             Log.e("BoardRepository", "getRecentBoard failed", e)
         }.recoverCatching { e ->
-            Log.w("BoardRepository", "getRecentBoard using dummy because: ${e.message}")
             recentPostDummies(3)
         }
 
@@ -32,8 +28,9 @@ class BoardRepositoryImpl @Inject constructor(
         sortBy: SortType
     ): Result<BestPostResultList> =
         runCatching {
-            val res = boardService.getBestBoard(sortBy)
-            res.result.toDomainList()
+            boardService.getBestBoard(sortBy).result.toDomainList()
+        }.onFailure { e ->
+            Log.e("BoardRepository", "getBestBoard failed", e)
         }.recoverCatching {
             bestPostDummies()
         }
@@ -44,13 +41,24 @@ class BoardRepositoryImpl @Inject constructor(
         size: Int
     ): Result<PostResultList> =
         runCatching {
-            val res = boardService.getFilteredPosts(cursor = cursor, postType = postType, size = size )
-            res.result.toDomainList()
+            boardService.getFilteredPosts(cursor = cursor, postType = postType, size = size ).result.toDomainList()
         }.onFailure { e ->
             Log.e("BoardRepository", "getFilteredBoardList failed", e)
         }.recoverCatching {
             postDummies()
         }
+
+    override suspend fun postPostLike(postId: Long): Result<Unit> =
+        runCatching {
+            boardService.postPostLike(postId)
+        }
+
+
+    override suspend fun deletePostLike(postId: Long): Result<Unit> =
+        runCatching {
+            boardService.deletePostLike(postId)
+        }
+
 
     /** ---- DUMMY HELPERS ---- */
 

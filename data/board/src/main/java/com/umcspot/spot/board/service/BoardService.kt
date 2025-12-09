@@ -1,12 +1,17 @@
 package com.umcspot.spot.board.service
 
 import com.umcspot.spot.board.dto.response.BestBoardResponseDto
-import com.umcspot.spot.board.dto.response.PostResponseDto
+import com.umcspot.spot.board.dto.response.PostListResponseDto
 import com.umcspot.spot.board.dto.response.RecentBoardResponseDto
 import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.SortType
 import com.umcspot.spot.network.model.BaseResponse
+import com.umcspot.spot.network.model.NullResultResponse
+import kotlinx.serialization.Polymorphic
+import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface BoardService {
@@ -25,5 +30,15 @@ interface BoardService {
         @Query("cursor") cursor: Long?,
         @Query("postType") postType: PostType?,
         @Query("size") size: Int,
-    ): BaseResponse<PostResponseDto>
+    ): BaseResponse<PostListResponseDto>
+
+    @POST("/api/posts/{postId}/like")
+    suspend fun postPostLike(
+        @Path("postId") postId: Long
+    ): NullResultResponse
+
+    @DELETE("/api/posts/{postId}/unlike")
+    suspend fun deletePostLike(
+        @Path("postId") postId: Long
+    ): NullResultResponse
 }

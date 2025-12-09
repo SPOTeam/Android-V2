@@ -24,6 +24,18 @@ class PostRepositoryImpl @Inject constructor(
             getPostDetailDummy()
         }
 
+    override suspend fun postPostLike(postId: Long): Result<Unit> =
+        runCatching {
+            postService.postPostLike(postId)
+        }
+
+
+    override suspend fun deletePostLike(postId: Long): Result<Unit> =
+        runCatching {
+            postService.deletePostLike(postId)
+        }
+
+
     fun getPostDetailDummy(): PostDetailResult {
         return PostDetailResult.dummyPostDetail(5, 5)
     }

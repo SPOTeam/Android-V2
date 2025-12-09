@@ -9,6 +9,7 @@ data class PostDetailResult(
     val content : String,
     val imageUrl: ImageRef,
     val postType: PostType,
+    val isLiked : Boolean,
 
     val writerId : Long,
     val nickname : String,
@@ -35,6 +36,7 @@ data class PostDetailResult(
                 content = content,
                 imageUrl = ImageRef.Name("sample"),        // ✅ 로컬 리소스
                 postType = postType,
+                isLiked = index % 2 == 1,
 
                 writerId = 0,
                 nickname = "nickname",

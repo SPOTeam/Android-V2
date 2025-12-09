@@ -120,15 +120,14 @@ fun MainNavHost(
             contentPadding = contentPadding,
             navController = navigator.navController,
             onMoveToBoardList = { navigator.navController.navigateToBoardList() },
+            onMoveToPostContent = { navigator.navController.navigateToPostContent(it) }
         )
 
         boardListGraph(
             contentPadding = contentPadding,
             navController = navigator.navController,
             onRegisterScrollToTop = onRegisterScrollToTop,
-            onPostClick = { postId ->
-                navigator.navController.navigateToPostContent(postId)
-            }
+            onPostClick = { navigator.navController.navigateToPostContent(it) }
         )
 
         postingGraph(

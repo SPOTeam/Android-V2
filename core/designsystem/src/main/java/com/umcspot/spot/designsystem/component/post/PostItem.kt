@@ -1,13 +1,16 @@
 package com.umcspot.spot.designsystem.component.post
 
+import android.R.attr.onClick
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,11 +33,12 @@ import com.umcspot.spot.model.korean
 fun PostListItem(
     item: PostResult,
     modifier: Modifier = Modifier,
-    likeChecked: Boolean = false,
+    onLikeClick: (PostResult) -> Unit = {},
     onClick: (PostResult) -> Unit = {},
 ) {
     Column(
-        modifier = modifier.padding(10.dp)
+        modifier = modifier
+            .padding(10.dp)
             .clickable(onClick = { onClick(item) })
     ) {
         Row(
@@ -57,6 +61,7 @@ fun PostListItem(
                 color = SpotTheme.colors.B500
             )
         }
+
         Text(
             text = item.content,
             style = SpotTheme.typography.regular_400,
@@ -64,52 +69,13 @@ fun PostListItem(
             overflow = TextOverflow.Ellipsis
         )
 
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Stat(
-                iconRes = R.drawable.thumb_up, count2 = item.likeNum, likeChecked = likeChecked
-            )
-            Stat(
-                iconRes = R.drawable.comment, count2 = item.commentNum
-            )
-            Stat(
-                iconRes = R.drawable.eye, count2 = item.viewNum
-            )
+        Row {
+            CountView(item = item, onLikeClick = onLikeClick)
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(Modifier.weight(1f))
 
-            Text(
-                text = item.createdAt,
-                style = SpotTheme.typography.small_400,
-                color = SpotTheme.colors.G400,
-            )
-
+            Text(item.createdAt, style = SpotTheme.typography.small_400, color = SpotTheme.colors.G400)
         }
-    }
-}
-
-
-@Composable
-private fun Stat(
-    @DrawableRes iconRes: Int,
-    count1: Long = 0,
-    count2: Long,
-    likeChecked: Boolean = false
-) {
-    fun cap(n: Long) = if (n >= 1000) "999+" else n.toString()
-    val display = if (count1.toInt() != 0) "${cap(count1)}/${cap(count2)}" else cap(count2)
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        Icon(
-            painter = painterResource(iconRes),
-            contentDescription = null,
-            tint = if (likeChecked) SpotTheme.colors.B500 else Color.Unspecified,
-            modifier = Modifier.size(14.dp)
-        )
-
-        Text(text = display, style = SpotTheme.typography.small_400, color = SpotTheme.colors.B500)
     }
 }
 

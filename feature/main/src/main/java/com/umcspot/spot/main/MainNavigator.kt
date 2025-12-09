@@ -25,6 +25,7 @@ import com.umcspot.spot.jjim.navigation.navigateToJJim
 import com.umcspot.spot.landing.navigation.Landing
 import com.umcspot.spot.landing.navigation.Saving
 import com.umcspot.spot.mypage.navigation.navigateToMypage
+import com.umcspot.spot.post.content.navigation.POST_CONTENT_ROUTE
 import com.umcspot.spot.post.posting.navigation.Posting
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.signup.navigation.navigateToSignUp
@@ -75,7 +76,6 @@ class MainNavigator(
             MainNavTab.MYPAGE -> navController.navigateToMypage(navOptions)
         }
     }
-
     @Composable
     private fun inAnyGraph(vararg graphs: KClass<*>): Boolean {
         val dest = currentDestination ?: return false
@@ -83,11 +83,17 @@ class MainNavigator(
     }
 
     @Composable
+    private fun inAnyGraphRoutes(vararg routes: String): Boolean {
+        val dest = currentDestination ?: return false
+        return dest.hierarchy.any { h -> routes.any { r -> h.routeMatches(r) } }
+    }
+
+    @Composable
     fun isInLanding(): Boolean = inAnyGraph(Landing::class, Saving::class)
 
     @Composable
     fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, RecruitingFilter::class,
-        SignUp::class, CheckList::class,RegisterStudy::class, Posting::class)
+        SignUp::class, CheckList::class,RegisterStudy::class, Posting::class, BoardList::class) || inAnyGraphRoutes(POST_CONTENT_ROUTE)
 
     @Composable
     fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class,PreferLocation::class, BoardList::class)
@@ -173,4 +179,11 @@ fun rememberMainNavigator(
     navController: NavHostController = rememberNavController()
 ): MainNavigator = remember(navController) {
     MainNavigator(navController)
+}
+
+fun NavDestination.routeMatches(pattern: String): Boolean {
+    val actual = route ?: return false
+    return if (pattern.contains("{")) {
+        actual.startsWith(pattern.substringBefore("{"))
+    } else actual == pattern
 }

@@ -18,10 +18,13 @@ data class PostDetailResponseDto(
     val content : String,
 
     @SerialName("imageUrl")
-    val imageUrl : String,
+    val imageUrl : String?,
 
     @SerialName("postType")
     val postType : PostType,
+
+    @SerialName("isLiked")
+    val isLiked : Boolean,
 
     @SerialName("writer")
     val writer : Writer,
@@ -49,7 +52,7 @@ data class Writer (
     val nickname : String,
 
     @SerialName("profileImageUrl")
-    val profileImageUrl : String
+    val profileImageUrl : String?
 )
 
 @SuppressLint("UnsafeOptInUsageError")

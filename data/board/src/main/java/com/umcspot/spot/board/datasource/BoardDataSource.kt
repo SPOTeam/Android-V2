@@ -1,11 +1,12 @@
 package com.umcspot.spot.board.datasource
 
 import com.umcspot.spot.board.dto.response.BestBoardResponseDto
-import com.umcspot.spot.board.dto.response.PostResponseDto
+import com.umcspot.spot.board.dto.response.PostListResponseDto
 import com.umcspot.spot.board.dto.response.RecentBoardResponseDto
 import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.SortType
 import com.umcspot.spot.network.model.BaseResponse
+import com.umcspot.spot.network.model.NullResultResponse
 
 
 interface BoardDataSource {
@@ -18,6 +19,10 @@ interface BoardDataSource {
         cursor : Long,
         postType: PostType,
         size : Int
-    ): BaseResponse<PostResponseDto>
+    ): BaseResponse<PostListResponseDto>
+
+    suspend fun postPostLike(postId : Long) : NullResultResponse
+
+    suspend fun deletePostLike(postId : Long) : NullResultResponse
 
 }
