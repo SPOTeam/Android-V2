@@ -1,4 +1,4 @@
-package com.umcspot.spot.landing
+package com.umcspot.spot.signup.landing
 
 data class LandingState(
     val isLoading: Boolean = false,

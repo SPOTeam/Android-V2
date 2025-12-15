@@ -1,4 +1,4 @@
-package com.umcspot.spot.landing
+package com.umcspot.spot.signup.landing
 
 import android.app.Activity
 import androidx.compose.foundation.Image
@@ -28,9 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.R
@@ -45,7 +43,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LandingRoute(
-    onLoginSuccess: () -> Unit,
+    navigateToSignUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LandingViewModel = hiltViewModel(),
 ) {
@@ -54,14 +52,14 @@ fun LandingRoute(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(viewModel.sideEffect) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
-                is LandingSideEffect.NavigateToHome -> onLoginSuccess()
+                is LandingSideEffect.NavigateToHome -> navigateToSignUp()
                 is LandingSideEffect.ShowSnackBar -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackBarHostState.showSnackbar(effect.message)
                 }
             }
         }
@@ -71,7 +69,7 @@ fun LandingRoute(
         modifier = modifier,
         containerColor = SpotTheme.colors.white,
         contentWindowInsets = WindowInsets.systemBars,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
     ) { innerPadding ->
         LandingScreen(
             contentPadding = innerPadding,
@@ -140,18 +138,5 @@ fun LandingScreen(
             KakaoStartButton(onClick = onKakaoClick)
             NaverStartButton(onClick = onNaverClick)
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LandingScreenPreview() {
-    SpotTheme {
-        LandingScreen(
-            contentPadding = PaddingValues(),
-            isLoading = false,
-            onKakaoClick = {},
-            onNaverClick = {}
-        )
     }
 }
