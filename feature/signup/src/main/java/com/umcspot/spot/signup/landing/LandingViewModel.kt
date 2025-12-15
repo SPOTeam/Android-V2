@@ -1,4 +1,4 @@
-package com.umcspot.spot.landing
+package com.umcspot.spot.signup.landing
 
 import android.app.Activity
 import android.content.ContentValues.TAG
