@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.umcspot.spot.designsystem.theme.*
+import com.umcspot.spot.ui.extension.screenHeightDp
 
 /**
  * 게이지 바 (Progress / Gauge)
@@ -37,18 +38,20 @@ import com.umcspot.spot.designsystem.theme.*
 fun GageBar(
     value: Float,
     modifier: Modifier = Modifier,
-    height: Dp = 12.dp,
+    height: Dp = screenHeightDp(10.dp),
     trackColor: Color = SpotTheme.colors.G100,
     fillColor: Color = SpotTheme.colors.B500,
-    shape: Shape = RoundedCornerShape(50), // 높이에 관계없이 pill
+    shape: Shape = RoundedCornerShape(6.dp),
     animate: Boolean = true,
     borderWidth: Dp = 0.dp,
     borderColor: Color = Color.Transparent
 ) {
     val clamped = value.coerceIn(0f, 1f)
-    val animated by animateFloatAsState(targetValue = if (animate) clamped else clamped, label = "gauge")
+    val animated by animateFloatAsState(
+        targetValue = if (animate) clamped else clamped,
+        label = "gauge"
+    )
 
-    // 트랙
     Box(
         modifier = modifier
             .fillMaxWidth()
