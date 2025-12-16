@@ -28,7 +28,6 @@ fun ProfileImage(
         ImageRef.None -> painterResource(R.drawable.spot_logo)
 
         is ImageRef.Name -> {
-            // drawable 이름 → resId 로 변환
             val resId = remember(imageRef.name) {
                 context.resources.getIdentifier(
                     imageRef.name,
@@ -40,9 +39,12 @@ fun ProfileImage(
         }
 
         is ImageRef.Url -> {
-            // 원격 URL
             rememberAsyncImagePainter(model = imageRef.url)
         }
+
+        is ImageRef.LocalUri ->
+            rememberAsyncImagePainter(model = imageRef.uri)
+
     }
 
     if (painter != null) {

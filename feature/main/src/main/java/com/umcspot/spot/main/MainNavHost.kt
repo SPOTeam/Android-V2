@@ -1,5 +1,6 @@
 package com.umcspot.spot.main
 
+import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,6 +25,7 @@ import com.umcspot.spot.model.QuickMenuType
 import com.umcspot.spot.mypage.navigation.mypageGraph
 import com.umcspot.spot.post.content.navigation.navigateToPostContent
 import com.umcspot.spot.post.content.navigation.postContentGraph
+import com.umcspot.spot.post.posting.navigation.navigateToPostingEdit
 import com.umcspot.spot.post.posting.navigation.postingGraph
 import com.umcspot.spot.signup.navigation.signupGraph
 import com.umcspot.spot.study.my.navigation.myStudyGraph
@@ -132,13 +134,17 @@ fun MainNavHost(
 
         postingGraph(
             contentPadding = contentPadding,
-//            navController = navigator.navController,
-            onBackRequest = onBackRequest
+            onBackRequest = onBackRequest,
+            onSubmitSuccess = {navigator.navController.popBackStack()}
         )
 
         postContentGraph(
             contentPadding = contentPadding,
-            navController = navigator.navController
+            onDeleteClick = {
+                val popped = navigator.navController.popBackStack()
+                Log.d("NAV", "popBackStack popped=$popped")
+            },
+            onEditClick = { navigator.navController.navigateToPostingEdit(it) }
         )
 
         alertGraph(

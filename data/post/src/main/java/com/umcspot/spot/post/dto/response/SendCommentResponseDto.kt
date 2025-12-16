@@ -6,7 +6,8 @@ import kotlinx.serialization.Serializable
 
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
-data class FinishPostResponseDto (
-    @SerialName("postId")
-    val postId : Long,
+data class SendCommentResponseDto(
+
+    @SerialName("commentId")
+    val commentId : Long
 )

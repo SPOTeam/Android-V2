@@ -7,11 +7,13 @@ import com.umcspot.spot.feature.board.boardList.BoardListViewModel.BoardUiState
 import com.umcspot.spot.model.ImageRef
 import com.umcspot.spot.model.PostType
 import com.umcspot.spot.post.model.postDetail.PostDetailResult
+import com.umcspot.spot.post.model.postDetail.SendComment
 import com.umcspot.spot.post.repository.PostRepository
 import com.umcspot.spot.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -35,7 +37,7 @@ class PostViewModel @Inject constructor(
     private val inFlightLikes = mutableSetOf<Long>()
 
 
-    fun load(postId : Long) {
+    fun load(postId: Long) {
         _uiState.update { it.copy(data = UiState.Loading) }
 
         viewModelScope.launch {
@@ -82,7 +84,6 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    /** 단건 상태만 갱신 */
     private fun applyLocalLike(liked: Boolean, delta: Long) {
         _uiState.update { state ->
             val success = state.data as? UiState.Success ?: return@update state
@@ -95,4 +96,45 @@ class PostViewModel @Inject constructor(
             state.copy(data = UiState.Success(updated))
         }
     }
+
+    fun sendComment(comment: String) {
+        val text = comment.trim()
+        if (text.isBlank()) return
+
+        val current = (_uiState.value.data as? UiState.Success)?.data ?: return
+        val postId = current.postId
+
+        val body = SendComment(
+            content = text
+        )
+
+        viewModelScope.launch {
+            runCatching {
+                postRepository.sendComment(postId = postId, content = body)
+            }.onSuccess {
+                load(postId)
+            }.onFailure { e ->
+                Log.e("PostViewModel", "sendComment error", e)
+            }
+        }
+    }
+
+    fun deletePost() {
+        val current = (_uiState.value.data as? UiState.Success)?.data ?: return
+        val postId = current.postId
+
+        viewModelScope.launch {
+            runCatching {
+                postRepository.deletePost(postId = postId)
+            }.onSuccess { result ->
+                result.onSuccess {
+                }.onFailure { e ->
+                    Log.e("PostViewModel", "deletePost failure", e)
+                }
+            }.onFailure { e ->
+                Log.e("PostViewModel", "deletePost error", e)
+            }
+        }
+    }
+
 }

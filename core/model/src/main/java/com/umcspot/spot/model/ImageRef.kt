@@ -1,9 +1,13 @@
 package com.umcspot.spot.model
 
+import com.sun.jndi.toolkit.url.Uri
+
 sealed interface ImageRef {
     data object None : ImageRef
     data class Name(val name: String) : ImageRef
     data class Url(val url: String) : ImageRef
+    data class LocalUri(val uri: String) : ImageRef
+
 }
 
 fun String?.toImageRef(): ImageRef {

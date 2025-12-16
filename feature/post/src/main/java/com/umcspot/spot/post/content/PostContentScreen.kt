@@ -1,8 +1,9 @@
 package com.umcspot.spot.post.content
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,26 +13,35 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,11 +49,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import coil.request.ImageRequest.*
+import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.comment.CommentField
+import com.umcspot.spot.designsystem.component.modal.RejectDialog
 import com.umcspot.spot.designsystem.component.post.CommentUserInfo
 import com.umcspot.spot.designsystem.component.post.CountView
 import com.umcspot.spot.designsystem.component.post.UserInfo
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B500
+import com.umcspot.spot.designsystem.theme.R500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ImageRef
 import com.umcspot.spot.model.PostType
@@ -51,74 +66,103 @@ import com.umcspot.spot.model.korean
 import com.umcspot.spot.post.model.postDetail.CommentResult
 import com.umcspot.spot.post.model.postDetail.PostDetailResult
 import com.umcspot.spot.ui.state.UiState
+import kotlinx.coroutines.delay
 
 @Composable
 fun PostContentScreen(
     contentPadding: PaddingValues,
     postId: Long,
+    onDeleteClick: () -> Unit,
+    onEditClick:(Long) -> Unit,
     postViewModel: PostViewModel = hiltViewModel(),
+
 ) {
     val uiState by postViewModel.uiState.collectAsStateWithLifecycle()
+    var showBackRequestDialog by remember { mutableStateOf(false) }
+
 
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
 
-    val scrollState = rememberScrollState()
+    var commentText by rememberSaveable { mutableStateOf("") }
 
+    val listState = rememberSaveable(postId, saver = LazyListState.Saver) {
+        LazyListState()
+    }
 
-    // 🔥 postId가 바뀔 때마다 로딩
+    var isCommentFocused by remember { mutableStateOf(false) }
+
     LaunchedEffect(postId) {
         postViewModel.load(postId)
+        commentText = ""
     }
+
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val noRipple = remember { MutableInteractionSource() }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(SpotTheme.colors.white)
             .padding(top = topPad, bottom = bottomPad)
+            .imePadding()
+            .clickable(interactionSource = noRipple, indication = null) {
+                focusManager.clearFocus()
+                keyboardController?.hide()
+            }
     ) {
         when (val state = uiState.data) {
             is UiState.Loading -> {
-                Text(
-                    text = "로딩 중...",
-                    color = Color.Gray,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                Text("로딩 중...", color = Color.Gray, modifier = Modifier.align(Alignment.Center))
             }
 
             is UiState.Failure -> {
                 Text(
-                    text = "에러: ${state.msg}",
+                    "에러: ${state.msg}",
                     color = Color.Red,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
 
             is UiState.Empty -> {
-                Text(
-                    text = "데이터가 없습니다.",
-                    color = Color.Gray,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                Text("데이터가 없습니다.", color = Color.Gray, modifier = Modifier.align(Alignment.Center))
             }
 
             is UiState.Success -> {
-                val listState = rememberLazyListState()
                 val post = state.data
+                val commentBarHeight = 44.dp
+
+                LaunchedEffect(isCommentFocused, post.comments.size) {
+                    if (isCommentFocused) {
+                        val lastIndex = 2 + post.comments.size - 1
+                        val target = lastIndex.coerceAtLeast(0)
+
+                        delay(300)
+
+                        listState.animateScrollToItem(target)
+                    }
+                }
 
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = commentBarHeight + 8.dp)
                 ) {
-                    // 1) 상세 상단(작성자/제목/이미지/본문/카운트)
                     item(key = "post_header") {
                         PostContentDetailScreen(
                             post = post,
-                            onLikeClick = { postViewModel.toggleLike() }
+                            onLikeClick = { postViewModel.toggleLike() },
+                            onEditClick = {
+                                onEditClick(post.postId)
+                            },
+                            onDeleteClick = {
+                                showBackRequestDialog = true
+                            },
+                            onReportClick = { }
                         )
                     }
 
-                    // 2) 구분선
                     item(key = "divider") {
                         Spacer(Modifier.height(8.dp))
                         HorizontalDivider(
@@ -129,11 +173,9 @@ fun PostContentScreen(
                         Spacer(Modifier.height(8.dp))
                     }
 
-                    // 3) 댓글 목록
                     items(
                         items = post.comments,
                         key = { it.commentId },
-
                     ) { comment ->
                         CommentItem(
                             comment = comment,
@@ -152,17 +194,57 @@ fun PostContentScreen(
                         Spacer(Modifier.height(13.dp))
                     }
                 }
+
+                CommentField(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(horizontal = 17.dp)
+                        .padding(bottom = 8.dp),
+                    canWrite = true,
+                    comment = commentText,
+                    onCommentChange = { commentText = it },
+                    onSendComment = { text ->
+                        postViewModel.sendComment(text)
+                    },
+                    onFocusChanged = { focused -> isCommentFocused = focused }
+                )
+
+                RejectDialog(
+                    visible = showBackRequestDialog,
+                    modalTitle = "삭제하시겠어요?",
+                    modalDes = "삭제하면, 해당 게시글은 복구할 수 없어요",
+                    okButtonText = "네",
+                    noButtonText = "아니요",
+                    onDismiss = {
+                        showBackRequestDialog = false
+                    },
+                    onClick = {
+                        showBackRequestDialog = false
+                        postViewModel.deletePost()
+                        onDeleteClick()
+                    },
+                    onCancel = {
+                        showBackRequestDialog = false
+                    }
+                )
             }
         }
     }
 }
 
+
 @Composable
 fun PostContentDetailScreen(
-    modifier : Modifier = Modifier,
+    modifier: Modifier = Modifier,
     post: PostDetailResult,
-    onLikeClick : () -> Unit,
+    onLikeClick: () -> Unit,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onReportClick: () -> Unit
 ) {
+    var menuExpanded by remember { mutableStateOf(false) }
+
+
     Column(
         modifier = modifier
             .wrapContentSize()
@@ -170,11 +252,42 @@ fun PostContentDetailScreen(
             .padding(bottom = 13.dp),
         verticalArrangement = Arrangement.Top
     ) {
-        UserInfo(
-            postWriterName = post.nickname,
-            postWriterImage = post.profileImageUrl,
-            postWriteAt = post.createdAt
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            UserInfo(
+                postWriterName = post.nickname,
+                postWriterImage = post.profileImageUrl,
+                postWriteAt = post.createdAt
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(33.dp)
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.meetball),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(30.dp)
+                        .clickable { menuExpanded = true }
+                )
+
+                // 팝업 메뉴
+                EditDeleteMenu(
+                    isOwner = post.isOwner,
+                    expanded = menuExpanded,
+                    onDismiss = { menuExpanded = false },
+                    onEdit = { onEditClick() },
+                    onDelete = { onDeleteClick() },
+                    onReport = { onReportClick() }
+                )
+            }
+        }
+
         Spacer(Modifier.height(12.dp))
 
         PostDetailScreen(
@@ -220,14 +333,13 @@ fun PostDetailScreen(
             maxLines = Int.MAX_VALUE,
             softWrap = true,
         )
-
         when (image) {
             ImageRef.None -> Unit
 
             is ImageRef.Url -> {
                 Spacer(Modifier.height(12.dp))
                 AsyncImage(
-                    model = ImageRequest.Builder(context)
+                    model = Builder(context)
                         .data(image.url)
                         .crossfade(true)
                         .build(),
@@ -259,6 +371,21 @@ fun PostDetailScreen(
                     )
                 }
             }
+
+            is ImageRef.LocalUri -> {
+                Spacer(Modifier.height(12.dp))
+                AsyncImage(
+                    model = Builder(context)
+                        .data(image.uri)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(SpotShapes.Hard)
+                )
+            }
         }
 
         Spacer(Modifier.height(12.dp))
@@ -287,10 +414,88 @@ private fun CommentItem(
         Spacer(Modifier.height(7.dp))
 
         Text(
-            text = comment.content,
+            text = comment.content.toString(),
             style = SpotTheme.typography.medium_400,
             color = SpotTheme.colors.black
         )
+    }
+}
+
+@Composable
+fun EditDeleteMenu(
+    isOwner: Boolean,
+    expanded: Boolean,
+    onDismiss: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    onReport: () -> Unit
+) {
+
+    DropdownMenu(
+        modifier = Modifier
+            .background(SpotTheme.colors.white),
+        shape = SpotShapes.Soft,
+        expanded = expanded,
+        onDismissRequest = onDismiss,
+    ) {
+        if (isOwner) {
+            DropdownMenuItem(
+                modifier = Modifier
+                    .height(30.dp)
+                    .wrapContentWidth(),
+                text = {
+                    Text(
+                        text = "편집하기",
+                        style = SpotTheme.typography.regular_500,
+                        color = SpotTheme.colors.black
+                    )
+                },
+                onClick = {
+                    onDismiss()
+                    onEdit()
+                }
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                thickness = 1.dp,
+                color = SpotTheme.colors.gray200
+            )
+
+            DropdownMenuItem(
+                modifier = Modifier
+                    .height(30.dp)
+                    .wrapContentWidth(),
+                text = {
+                    Text(
+                        text = "삭제하기",
+                        style = SpotTheme.typography.regular_500,
+                        color = SpotTheme.colors.R500
+                    )
+                },
+                onClick = {
+                    onDismiss()
+                    onDelete()
+                }
+            )
+        } else {
+            DropdownMenuItem(
+                modifier = Modifier
+                    .height(30.dp)
+                    .wrapContentWidth(),
+                text = {
+                    Text(
+                        text = "신고하기",
+                        style = SpotTheme.typography.regular_500,
+                        color = SpotTheme.colors.R500
+                    )
+                },
+                onClick = {
+                    onDismiss()
+                    onReport()
+                }
+            )
+        }
     }
 }
 
@@ -310,6 +515,9 @@ private fun preview() {
                 PostContentDetailScreen(
                     post = PostDetailResult.dummyPostDetail(123456, 5),
                     onLikeClick = {},
+                    onEditClick = {},
+                    onDeleteClick = {},
+                    onReportClick = {}
                 )
             }
 

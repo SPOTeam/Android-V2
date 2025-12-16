@@ -10,6 +10,7 @@ data class PostDetailResult(
     val imageUrl: ImageRef,
     val postType: PostType,
     val isLiked : Boolean,
+    val isOwner : Boolean,
 
     val writerId : Long,
     val nickname : String,
@@ -34,9 +35,10 @@ data class PostDetailResult(
                 postId = index.toLong(),
                 title = title,
                 content = content,
-                imageUrl = ImageRef.Name("sample"),        // ✅ 로컬 리소스
+                imageUrl = ImageRef.Name("sample"),
                 postType = postType,
                 isLiked = index % 2 == 1,
+                isOwner = index % 2 == 0,
 
                 writerId = 0,
                 nickname = "nickname",
@@ -56,7 +58,7 @@ data class PostDetailResult(
 
 data class CommentResult (
     val commentId : Long,
-    val content : String,
+    val content : String?,
     val writerId : Long,
     val nickname : String,
     val profileImageUrl : ImageRef,

@@ -8,4 +8,5 @@ android {
 dependencies {
     implementation(projects.domain.post)
     implementation(projects.core.model)
+    implementation(projects.core.network)
 }

@@ -149,6 +149,17 @@ fun StudyThumbnail(
                 modifier = modifier
             )
         }
+
+        is ImageRef.LocalUri -> {
+            AsyncImage(
+                model = img.uri,
+                contentDescription = null,
+                placeholder = painterResource(placeholder),
+                error = painterResource(placeholder),
+                modifier = modifier
+            )
+
+        }
     }
 }
 

@@ -428,7 +428,8 @@ fun rememberImageRefPainter(
             painterResource(id.takeIf { it != 0 } ?: fallback)
         }
         is ImageRef.Url -> rememberAsyncImagePainter(model = ref.url)
-        ImageRef.None -> painterResource(fallback)
+        is ImageRef.None -> painterResource(fallback)
+        is ImageRef.LocalUri -> rememberAsyncImagePainter(model = ref.uri)
     }
 }
 

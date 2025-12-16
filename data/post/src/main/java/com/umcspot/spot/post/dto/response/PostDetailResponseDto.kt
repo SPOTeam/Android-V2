@@ -26,6 +26,9 @@ data class PostDetailResponseDto(
     @SerialName("isLiked")
     val isLiked : Boolean,
 
+    @SerialName("isOwner")
+    val isOwner : Boolean,
+
     @SerialName("writer")
     val writer : Writer,
 
@@ -73,7 +76,7 @@ data class CommentResponse (
     val commentId : Long,
 
     @SerialName("content")
-    val content : String,
+    val content : String?,
 
     @SerialName("writer")
     val writer : Writer,

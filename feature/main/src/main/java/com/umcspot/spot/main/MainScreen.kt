@@ -34,7 +34,7 @@ import com.umcspot.spot.feature.board.boardList.navigation.BoardList
 import com.umcspot.spot.main.component.MainBottomBar
 import com.umcspot.spot.post.content.navigation.POST_CONTENT_ROUTE
 import com.umcspot.spot.post.posting.navigation.Posting
-import com.umcspot.spot.post.posting.navigation.navigateToPosting
+import com.umcspot.spot.post.posting.navigation.navigateToPostingNew
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import com.umcspot.spot.study.register.navigation.RegisterStudy
@@ -99,7 +99,7 @@ fun MainScreen(
                 onClickMultiple = {
                     when {
                         dest?.hasRoute(BoardList::class) == true -> {
-                            navigator.navController.navigateToPosting()
+                            navigator.navController.navigateToPostingNew()
                         }
 
                     }
