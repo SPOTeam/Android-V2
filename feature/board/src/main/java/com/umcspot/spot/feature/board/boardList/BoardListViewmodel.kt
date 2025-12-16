@@ -1,10 +1,3 @@
-// API 시그니처
-// suspend fun getFilteredPosts(
-//     cursor: Int? = null,
-//     postType: PostType? = null,
-//     size: Int
-// ): Result<PostResultList>
-
 package com.umcspot.spot.feature.board.boardList
 
 import android.util.Log

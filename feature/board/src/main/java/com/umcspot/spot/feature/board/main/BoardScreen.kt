@@ -68,11 +68,9 @@ fun BoardScreen(
 ) {
     val state by viewmodel.uiState.collectAsStateWithLifecycle()
 
-    // 최초 진입 시 한 번 로드
-    LaunchedEffect(state.user) {
-        if (state.user is UiState.Empty) {
-            viewmodel.load(SortType.RECENT)
-        }
+
+    LaunchedEffect(Unit) {
+        viewmodel.load(SortType.RECENT)
     }
 
     val topPad = contentPadding.calculateTopPadding()
