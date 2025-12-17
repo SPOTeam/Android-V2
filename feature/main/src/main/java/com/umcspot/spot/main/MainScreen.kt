@@ -23,12 +23,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.umcspot.spot.alert.navigation.Alert
 import com.umcspot.spot.alert.navigation.AppliedAlert
 import com.umcspot.spot.alert.navigation.navigateToAlert
-import com.umcspot.spot.checkList.navigation.CheckList
 import com.umcspot.spot.designsystem.component.FloatingMultipleButton
 import com.umcspot.spot.designsystem.component.FloatingToUpButton
 import com.umcspot.spot.designsystem.component.appBar.AppBarHome
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.main.component.MainBottomBar
+import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import com.umcspot.spot.study.register.navigation.RegisterStudy

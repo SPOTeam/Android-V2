@@ -15,16 +15,17 @@ import com.umcspot.spot.alert.navigation.AppliedAlert
 import com.umcspot.spot.alert.navigation.navigateToAlert
 import com.umcspot.spot.alert.navigation.navigateToAppliedAlert
 import com.umcspot.spot.category.navigation.navigateToCategory
-import com.umcspot.spot.checkList.navigation.CheckList
-import com.umcspot.spot.checkList.navigation.navigateToCheckList
 import com.umcspot.spot.feature.board.navigation.Board
 import com.umcspot.spot.feature.board.navigation.navigateToBoard
 import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.navigateToJJim
-import com.umcspot.spot.landing.navigation.Landing
-import com.umcspot.spot.landing.navigation.Saving
 import com.umcspot.spot.mypage.navigation.navigateToMypage
+import com.umcspot.spot.signup.navigation.CheckList
+import com.umcspot.spot.signup.navigation.Landing
+import com.umcspot.spot.signup.navigation.Saving
 import com.umcspot.spot.signup.navigation.SignUp
+import com.umcspot.spot.signup.navigation.navigateToCheckList
+import com.umcspot.spot.signup.navigation.navigateToSaving
 import com.umcspot.spot.signup.navigation.navigateToSignUp
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
 import com.umcspot.spot.study.recruiting.navigation.Recruiting
@@ -123,6 +124,10 @@ class MainNavigator(
 
     fun navigateToCheckList(navOptions: NavOptions? = null) {
         navController.navigateToCheckList(navOptions)
+    }
+
+    fun navigateToSaving(navOptions: NavOptions? = null) {
+        navController.navigateToSaving(navOptions)
     }
 
     fun navigateToHome(navOptions: NavOptions? = null) {

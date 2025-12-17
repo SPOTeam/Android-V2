@@ -11,13 +11,9 @@ import androidx.navigation.navOptions
 import com.umcspot.spot.alert.navigation.alertGraph
 import com.umcspot.spot.alert.navigation.appliedAlertGraph
 import com.umcspot.spot.category.navigation.categoryGraph
-import com.umcspot.spot.checkList.navigation.checkListGraph
 import com.umcspot.spot.feature.board.navigation.boardGraph
 import com.umcspot.spot.home.navigation.homeGraph
 import com.umcspot.spot.jjim.navigation.jjimGraph
-import com.umcspot.spot.landing.navigation.landingGraph
-import com.umcspot.spot.landing.navigation.navigateToSaving
-import com.umcspot.spot.landing.navigation.savingGraph
 import com.umcspot.spot.model.QuickMenuType
 import com.umcspot.spot.mypage.navigation.mypageGraph
 import com.umcspot.spot.signup.navigation.signupGraph
@@ -48,29 +44,13 @@ fun MainNavHost(
         popEnterTransition = { EnterTransition.None },
         popExitTransition = { ExitTransition.None },
     ) {
-        landingGraph(
-            onLoginSuccess = {
-                navigator.navigateToSignUp(clearStackNavOptions)
-            }
-        )
 
         signupGraph(
+            navigateToSignUp = { navigator.navigateToSignUp() },
+            navigateToCheckList = { navigator.navigateToCheckList() },
+            navigateToSaving = { navigator.navigateToSaving() },
+            navigateToHome = { navigator.navigateToHome() },
             contentPadding = contentPadding,
-            navController = navigator.navController,
-            onNextClick = { navigator.navigateToCheckList() }
-        )
-
-        checkListGraph(
-            contentPadding = contentPadding,
-            navController = navigator.navController,
-            onNextClick = { navigator.navController.navigateToSaving() }
-        )
-
-        savingGraph(
-            contentPadding = contentPadding,
-            onFinished = {
-                navigator.navigateToHome(clearStackNavOptions)
-            }
         )
 
         homeGraph(

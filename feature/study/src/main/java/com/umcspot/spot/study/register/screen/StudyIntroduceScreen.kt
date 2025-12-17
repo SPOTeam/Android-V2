@@ -136,14 +136,14 @@ fun StudyIntroduceScreen(
         ) {
             if (isImageSelected) {
                 Image(
-                    painter = painterResource(id = R.drawable.image),
+                    painter = painterResource(id = R.drawable.license),
                     contentDescription = "Selected Study Image",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
             } else {
                 Icon(
-                    painter = painterResource(id = R.drawable.image),
+                    painter = painterResource(id = R.drawable.license),
                     contentDescription = "Upload Image",
                     tint = SpotTheme.colors.G400,
                     modifier = Modifier.size(screenWidthDp(24.dp))
