@@ -46,12 +46,16 @@ fun PrivacyConsentDialog(
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = SpotShapes.Round,
+            shape = RoundedCornerShape(14.dp),
             tonalElevation = 2.dp,
             color = SpotTheme.colors.white
         ) {
             Column(
                 modifier = Modifier
-                    .padding(20.dp)
+                    .padding(
+                        vertical = screenHeightDp(17.dp),
+                        horizontal = screenWidthDp(17.dp)
+                    )
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -60,17 +64,17 @@ fun PrivacyConsentDialog(
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.Top
                 ) {
-                    Spacer(Modifier.weight(1f))               
+                    Spacer(Modifier.weight(1f))
 
                     IconButton(
                         onClick = onDismiss,
                         modifier = Modifier
-                            .size(16.dp)
+                            .size(20.dp)
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.dismiss), 
+                            painter = painterResource(R.drawable.dismiss),
                             contentDescription = "닫기",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }
@@ -94,49 +98,59 @@ fun PrivacyConsentDialog(
                     color = SpotTheme.colors.white,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 160.dp, max = 380.dp), 
                 ) {
                     val scroll = rememberScrollState()
                     Column(
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(
+                                vertical = screenHeightDp(10.dp),
+                                horizontal = screenWidthDp(10.dp)
+                            )
                             .verticalScroll(scroll)
                     ) {
-                        
+
                         Text(
                             text = "제1조 (개인정보 수집 및 이용 목적)",
                             style = SpotTheme.typography.regular_500,
                             color = SpotTheme.colors.black
                         )
-                        Spacer(Modifier.height(6.dp))
+                        Spacer(Modifier.height(screenHeightDp(4.dp)))
                         val bullet = SpotTheme.typography.small_500
+                        Text(
+                            text = "SPOT은 이용자의 개인정보를 다음 목적을 위해\n수집 및 이용합니다.",
+                            style = bullet,
+                            modifier = Modifier.padding(start = screenWidthDp(34.dp))
+                        )
                         NumberedLine(1, "회원 가입 및 관리: 본인 확인, 회원 서비스 제공", bullet)
-                        NumberedLine(2, "서비스 제공 및 운영: 커뮤니티 기능 제공, 맞춤형 콘텐츠 추천", bullet)
+                        NumberedLine(2, "서비스 제공 및 운영: 커뮤니티 기능 제공, 맞춤형 \n콘텐츠 추천", bullet)
                         NumberedLine(3, "고객지원: 문의사항 응대 및 서비스 개선", bullet)
                         NumberedLine(4, "서비스 개선 및 분석: 이용 통계 분석, 부정 이용 방지", bullet)
 
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(screenHeightDp(7.dp)))
 
-                        
+
                         Text(
                             text = "제2조 (수집하는 개인정보 항목)",
                             style = SpotTheme.typography.regular_500,
                             color = SpotTheme.colors.black
                         )
-                        Spacer(Modifier.height(6.dp))
-                        BulletLine("필수항목: 이름, 이메일, 생년월일, 성별", bullet)
-                        BulletLine("자동 수집 항목: 접속 로그, 서비스 이용 기록, 기기 정보 등", bullet)
+                        Spacer(Modifier.height(screenHeightDp(4.dp)))
 
-                        Spacer(Modifier.height(8.dp))
+                        NumberedLine(1, "필수항목: 이름, 이메일, 생년월일, 성별", bullet)
+                        NumberedLine(2, "자동 수집 항목: 접속 로그, 서비스 이용 기록, 기기", bullet)
+
                     }
                 }
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(screenHeightDp(20.dp)))
 
-                
-                TextButtonM(
-                    text = "동의",
-                    shape = SpotShapes.Soft,
+
+                SpotActivationButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = screenWidthDp(51.dp)),
+                    buttonText = "동의",
+                    isEnabled = true,
                     onClick = onAgree
                 )
             }
@@ -160,7 +174,10 @@ fun UniqueConsentDialog(
         ) {
             Column(
                 modifier = Modifier
-                    .padding(20.dp)
+                    .padding(
+                        vertical = screenHeightDp(17.dp),
+                        horizontal = screenWidthDp(17.dp)
+                    )
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -169,17 +186,17 @@ fun UniqueConsentDialog(
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.Top
                 ) {
-                    Spacer(Modifier.weight(1f))               
+                    Spacer(Modifier.weight(1f))
 
                     IconButton(
                         onClick = onDismiss,
                         modifier = Modifier
-                            .size(16.dp)
+                            .size(20.dp)
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.dismiss), 
+                            painter = painterResource(R.drawable.dismiss),
                             contentDescription = "닫기",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }
@@ -197,56 +214,65 @@ fun UniqueConsentDialog(
 
                 Spacer(Modifier.height(screenHeightDp(20.dp)))
 
-
                 Surface(
                     shape = SpotShapes.Soft,
                     border = BorderStroke(1.dp, SpotTheme.colors.gray300),
                     color = SpotTheme.colors.white,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 160.dp, max = 380.dp), 
                 ) {
                     val scroll = rememberScrollState()
                     Column(
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(
+                                vertical = screenHeightDp(10.dp),
+                                horizontal = screenWidthDp(10.dp)
+                            )
                             .verticalScroll(scroll)
                     ) {
-                        
+
                         Text(
                             text = "제1조 (개인정보 수집 및 이용 목적)",
                             style = SpotTheme.typography.regular_500,
                             color = SpotTheme.colors.black
                         )
-                        Spacer(Modifier.height(6.dp))
+                        Spacer(Modifier.height(screenHeightDp(4.dp)))
                         val bullet = SpotTheme.typography.small_500
+                        Text(
+                            text = "SPOT은 이용자의 개인정보를 다음 목적을 위해\n수집 및 이용합니다.",
+                            style = bullet,
+                            modifier = Modifier.padding(start = screenWidthDp(34.dp))
+                        )
                         NumberedLine(1, "회원 가입 및 관리: 본인 확인, 회원 서비스 제공", bullet)
-                        NumberedLine(2, "서비스 제공 및 운영: 커뮤니티 기능 제공, 맞춤형 콘텐츠 추천", bullet)
+                        NumberedLine(2, "서비스 제공 및 운영: 커뮤니티 기능 제공, 맞춤형 \n콘텐츠 추천", bullet)
                         NumberedLine(3, "고객지원: 문의사항 응대 및 서비스 개선", bullet)
                         NumberedLine(4, "서비스 개선 및 분석: 이용 통계 분석, 부정 이용 방지", bullet)
 
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(screenHeightDp(7.dp)))
 
-                        
+
                         Text(
                             text = "제2조 (수집하는 개인정보 항목)",
                             style = SpotTheme.typography.regular_500,
                             color = SpotTheme.colors.black
                         )
-                        Spacer(Modifier.height(6.dp))
-                        BulletLine("필수항목: 이름, 이메일, 생년월일, 성별", bullet)
-                        BulletLine("자동 수집 항목: 접속 로그, 서비스 이용 기록, 기기 정보 등", bullet)
+                        Spacer(Modifier.height(screenHeightDp(4.dp)))
 
-                        Spacer(Modifier.height(8.dp))
+                        NumberedLine(1, "필수항목: 이름, 이메일, 생년월일, 성별", bullet)
+                        NumberedLine(2, "자동 수집 항목: 접속 로그, 서비스 이용 기록, 기기", bullet)
+
                     }
                 }
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(screenHeightDp(20.dp)))
 
-                
-                TextButtonM(
-                    text = "동의",
-                    shape = SpotShapes.Soft,
+
+                SpotActivationButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = screenWidthDp(51.dp)),
+                    buttonText = "동의",
+                    isEnabled = true,
                     onClick = onAgree
                 )
             }
@@ -255,19 +281,18 @@ fun UniqueConsentDialog(
 }
 
 @Composable
-private fun NumberedLine(n: Int, text: String, style: androidx.compose.ui.text.TextStyle) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-        Text("$n.", style = style, color = SpotTheme.colors.black)
-        Spacer(Modifier.width(6.dp))
-        Text(text, style = style, color = SpotTheme.colors.black)
-    }
-}
-
-@Composable
-private fun BulletLine(text: String, style: androidx.compose.ui.text.TextStyle) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-        Text("•", style = style, color = SpotTheme.colors.black)
-        Spacer(Modifier.width(6.dp))
-        Text(text, style = style, color = SpotTheme.colors.black)
+private fun NumberedLine(
+    number: Int,
+    text: String,
+    style: TextStyle
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = screenWidthDp(34.dp)),
+        verticalAlignment = Alignment.Top
+    ) {
+        Text(text = "$number. ", style = style)
+        Text(text = text, style = style)
     }
 }

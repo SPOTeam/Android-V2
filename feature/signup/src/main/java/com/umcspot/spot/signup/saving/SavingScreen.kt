@@ -1,5 +1,4 @@
-package com.umcspot.spot.landing
-
+package com.umcspot.spot.signup.saving
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
@@ -30,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.GageBar
 import com.umcspot.spot.designsystem.theme.B500
@@ -40,40 +38,56 @@ import com.umcspot.spot.ui.extension.screenWidthDp
 import kotlinx.coroutines.delay
 
 @Composable
+fun SavingRoute(
+    contentPadding: PaddingValues,
+    navigateToHome: () -> Unit,
+    autoDurationMs: Int = 1800,
+    blockBackPress: Boolean = true
+) {
+    BackHandler(enabled = blockBackPress) { }
+
+    val progressAnim = remember { Animatable(0f) }
+    var isDone by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        progressAnim.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = autoDurationMs, easing = LinearEasing)
+        )
+        isDone = true
+        delay(3000)
+        navigateToHome()
+    }
+
+    SavingScreen(
+        contentPadding = contentPadding,
+        progress = progressAnim.value,
+        isDone = isDone
+    )
+}
+
+
+@Composable
 fun SavingScreen(
     contentPadding: PaddingValues,
-    autoProgress: Boolean = true,
-    autoDurationMs: Int = 1800,
-    blockBackPress: Boolean = true,
-    onFinished: () -> Unit,
+    progress: Float,
+    isDone: Boolean
 ) {
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
-
-    BackHandler(enabled = blockBackPress) { /* no-op: 뒤로가기 무시 */ }
-
-    val internal = remember { Animatable(0f) }
-    var isDone by remember { mutableStateOf(false) }
-
-    LaunchedEffect(autoProgress) {
-        if (autoProgress) {
-            internal.snapTo(0f)
-            internal.animateTo(
-                targetValue = 1f,
-                animationSpec = tween(durationMillis = autoDurationMs, easing = LinearEasing)
-            )
-            isDone = true
-            delay(3000)
-            onFinished()
-        }
-    }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(SpotTheme.colors.white)
-            .padding(top = topPad, bottom = bottomPad, start = 16.dp, end = 16.dp)
+            .padding(
+                top = topPad,
+                bottom = bottomPad,
+                start = screenWidthDp(17.dp),
+                end = screenWidthDp(17.dp)
+            )
     ) {
+
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -94,6 +108,7 @@ fun SavingScreen(
             )
         }
 
+
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -103,13 +118,14 @@ fun SavingScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if (isDone) "등록 완료!" else "내 정보 저장 중..",
+                text = if (isDone) "등록 완료 !" else "내 정보 저장 중..",
                 style = SpotTheme.typography.h4,
                 color = SpotTheme.colors.B500
             )
-            Spacer(Modifier.height(screenHeightDp(8.dp)))
+            Spacer(Modifier.height(screenHeightDp(12.dp)))
+
             GageBar(
-                value = internal.value,
+                value = progress,
             )
         }
     }
