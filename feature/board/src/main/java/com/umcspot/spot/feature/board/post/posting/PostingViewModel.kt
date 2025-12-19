@@ -1,4 +1,4 @@
-package com.umcspot.spot.post.posting
+package com.umcspot.spot.feature.board.post.posting
 
 import android.util.Log
 import androidx.hilt.navigation.compose.hiltViewModel

@@ -16,4 +16,5 @@ dependencies {
     implementation(projects.domain.alert)
     implementation(projects.domain.board)
     implementation(projects.domain.post)
+    implementation(libs.lottie.compose)
 }

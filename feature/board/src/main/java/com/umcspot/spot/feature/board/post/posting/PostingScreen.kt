@@ -1,4 +1,4 @@
-package com.umcspot.spot.post.posting
+package com.umcspot.spot.feature.board.post.posting
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler
@@ -26,15 +26,12 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +47,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.TextButton
-import com.umcspot.spot.designsystem.component.modal.RejectDialog
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G200
@@ -158,7 +154,7 @@ fun PostingScreen(
                 onValueChange = postingViewModel::onBodyChange,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f), // 위는 내용, 아래는 고정 영역
+                    .weight(1f),
                 textStyle = SpotTheme.typography.medium_400,
                 decorationBox = { innerTextField ->
                     if (body.isEmpty()) {
@@ -176,7 +172,7 @@ fun PostingScreen(
                 ImageRef.None -> null
                 is ImageRef.LocalUri -> (image as ImageRef.LocalUri).uri
                 is ImageRef.Url -> (image as ImageRef.Url).url
-                is ImageRef.Name -> (image as ImageRef.Name).name // 필요하면 리소스 변환해서 써도 됨
+                is ImageRef.Name -> (image as ImageRef.Name).name
             }
 
             if (previewModel != null) {

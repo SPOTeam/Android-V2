@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.Spinner
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B100
 import com.umcspot.spot.designsystem.theme.B500
@@ -78,7 +79,7 @@ fun BoardScreen(
 
     when (val state = state.user) {
         is UiState.Loading -> {
-            Text(text = "로딩 중...", color = Color.Gray)
+            Spinner()
         }
 
         is UiState.Failure -> {

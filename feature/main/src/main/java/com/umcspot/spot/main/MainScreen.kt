@@ -3,6 +3,7 @@ package com.umcspot.spot.main
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -23,7 +24,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.umcspot.spot.alert.navigation.Alert
 import com.umcspot.spot.alert.navigation.AppliedAlert
 import com.umcspot.spot.alert.navigation.navigateToAlert
-import com.umcspot.spot.checkList.navigation.CheckList
 import com.umcspot.spot.designsystem.component.FloatingMultipleButton
 import com.umcspot.spot.designsystem.component.FloatingToUpButton
 import com.umcspot.spot.designsystem.component.appBar.AppBarHome
@@ -31,9 +31,10 @@ import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.component.modal.RejectDialog
 import com.umcspot.spot.feature.board.boardList.navigation.BoardList
 import com.umcspot.spot.main.component.MainBottomBar
-import com.umcspot.spot.post.content.navigation.POST_CONTENT_ROUTE
-import com.umcspot.spot.post.posting.navigation.Posting
-import com.umcspot.spot.post.posting.navigation.navigateToPostingNew
+import com.umcspot.spot.feature.board.post.content.navigation.POST_CONTENT_ROUTE
+import com.umcspot.spot.feature.board.post.posting.navigation.Posting
+import com.umcspot.spot.feature.board.post.posting.navigation.navigateToPostingNew
+import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import com.umcspot.spot.study.register.navigation.RegisterStudy

@@ -16,7 +16,6 @@ dependencies {
     implementation(projects.feature.study)
 
     implementation(projects.feature.board)
-    implementation(projects.feature.post)
 
     implementation(projects.feature.alert)
 

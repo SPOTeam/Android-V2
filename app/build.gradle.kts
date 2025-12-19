@@ -42,7 +42,6 @@ dependencies {
     implementation(projects.feature.mypage)
     implementation(projects.feature.study)
     implementation(projects.feature.signup)
-    implementation(projects.feature.post)
 
     implementation(projects.core.ui)
     implementation(projects.core.network)
@@ -60,7 +59,6 @@ dependencies {
     implementation(projects.data.user)
     implementation(projects.data.login)
     implementation(projects.data.post)
-
 
     implementation(libs.kakao.common)
     implementation(libs.kakao.login)

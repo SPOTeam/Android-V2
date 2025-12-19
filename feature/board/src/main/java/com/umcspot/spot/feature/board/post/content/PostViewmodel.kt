@@ -1,4 +1,4 @@
-package com.umcspot.spot.post.content
+package com.umcspot.spot.feature.board.post.content
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
