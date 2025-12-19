@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -126,7 +127,7 @@ fun BoardScreen(
                 ) {
                     Text(text = "Best 인기글", style = SpotTheme.typography.h3)
 
-                    Box { // 그림지 넣기 위함
+                    Box { // 그림자 넣기 위함
                         Image(
                             painter = painterResource(R.drawable.fire),
                             contentDescription = null,
@@ -271,7 +272,6 @@ private fun SectionHeader(
         modifier = Modifier
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = title,
@@ -279,9 +279,11 @@ private fun SectionHeader(
             modifier = Modifier.wrapContentSize()
         )
 
+        Spacer(Modifier.weight(1f))
+
         Box(
             modifier = Modifier
-                .width(screenWidthDp(56.dp))
+                .wrapContentWidth()
                 .height(screenHeightDp(24.dp))
                 .clip(SpotShapes.Hard)
                 .clickable(onClick = onMoreClick)
@@ -295,8 +297,12 @@ private fun SectionHeader(
                 painter = painterResource(R.drawable.arrow_right),
                 contentDescription = "더보기",
                 tint = SpotTheme.colors.black,
+                modifier = Modifier
+                    .size(screenWidthDp(14.dp))
             )
         }
+
+        Spacer(Modifier.width(screenWidthDp(4.dp)))
     }
 }
 
