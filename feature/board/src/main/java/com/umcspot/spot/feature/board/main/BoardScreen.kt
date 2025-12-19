@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,13 +39,13 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.component.Spinner
+import com.umcspot.spot.designsystem.component.SpotSpinner
+import com.umcspot.spot.designsystem.shapes.ShapeBox
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B100
 import com.umcspot.spot.designsystem.theme.B500
@@ -54,10 +56,12 @@ import com.umcspot.spot.domain.board.model.board.BestPostResult
 import com.umcspot.spot.domain.board.model.board.BestPostResultList
 import com.umcspot.spot.domain.board.model.board.RecentPostResult
 import com.umcspot.spot.domain.board.model.board.RecentPostResultList
-import com.umcspot.spot.feature.board.main.BoardViewModel
 import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.SortType
+import com.umcspot.spot.model.cap
 import com.umcspot.spot.model.korean
+import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
 import com.umcspot.spot.ui.state.UiState
 
 @Composable
@@ -65,115 +69,125 @@ fun BoardScreen(
     viewmodel: BoardViewModel = hiltViewModel(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onMoveToBoardList: () -> Unit,
-    onMoveToPostContent : (Long) -> Unit
+    onMoveToPostContent: (Long) -> Unit
 ) {
     val state by viewmodel.uiState.collectAsStateWithLifecycle()
 
+    val topPad = contentPadding.calculateTopPadding()
+    val bottomPad = contentPadding.calculateBottomPadding()
+
+    val ui = state.user
+    val isLoading = ui is UiState.Loading
+
+    val payload = (ui as? UiState.Success<BoardPayload>)?.data
+
+    val recentBoards = payload?.recentBoards ?: RecentPostResultList(recentPosts = emptyList())
+    val bestBoards = payload?.bestBoards ?: BestPostResultList(hotPosts = emptyList())
+    val selected = payload?.selected ?: SortType.RECENT
 
     LaunchedEffect(Unit) {
         viewmodel.load(SortType.RECENT)
     }
 
-    val topPad = contentPadding.calculateTopPadding()
-    val bottomPad = contentPadding.calculateBottomPadding()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(top = topPad, bottom = bottomPad)
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = screenWidthDp(17.dp))
+                .padding(top = screenHeightDp(18.dp)),
+            contentPadding = PaddingValues(bottom = screenHeightDp(24.dp))
+        ) {
+            item {
+                SectionHeader(
+                    title = "스터디 파트너들의 이야기",
+                    onMoreClick = { onMoveToBoardList() }
+                )
+                Spacer(modifier = Modifier.height(screenHeightDp(12.dp)))
+            }
+            item {
+                RecentCardList(
+                    isLoading = isLoading,
+                    items = recentBoards,
+                    onItemClick = { onMoveToPostContent(it.postId) }
+                )
 
-    when (val state = state.user) {
-        is UiState.Loading -> {
-            Spinner()
-        }
+                Spacer(modifier = Modifier.height(screenHeightDp(30.dp)))
+            }
 
-        is UiState.Failure -> {
-            Text(text = "에러: ${state.msg}", color = Color.Red)
-        }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "Best 인기글", style = SpotTheme.typography.h3)
 
-        UiState.Empty -> {
-            Text(text = "데이터가 없습니다.")
-        }
-
-        is UiState.Success -> {
-            val payload = state.data
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.White)
-                    .padding(top = topPad, start = 14.dp, end = 14.dp, bottom = bottomPad),
-                verticalArrangement = Arrangement.spacedBy(18.dp),
-                contentPadding = PaddingValues(bottom = 24.dp)
-            ) {
-
-                /* 스터디 파트너들의 이야기 (라벨 리스트) */
-                item {
-                    SectionHeader(
-                        title = "스터디 파트너들의 이야기",
-                        onMoreClick = { onMoveToBoardList() }
-                    )
-                }
-
-                item {
-                    RecentCardList(
-                        items = payload.recentBoards, // ← payload에서 가져오기
-                        onItemClick = { onMoveToPostContent(it.postId) }
-                    )
-                }
-
-
-                /* 🔥 + 탭(우측정렬) */
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Best 인기글",
-                            style = SpotTheme.typography.h3
+                    Box { // 그림지 넣기 위함
+                        Image(
+                            painter = painterResource(R.drawable.fire),
+                            contentDescription = null,
+                            colorFilter = ColorFilter.tint(
+                                SpotTheme.colors.black.copy(alpha = 0.25f)
+                            ),
+                            modifier = Modifier
+                                .size(screenWidthDp(22.dp))
+                                .graphicsLayer {
+                                    translationY = 1.dp.toPx()
+                                    renderEffect = BlurEffect(12f, 12f)
+                                    clip = false
+                                }
                         )
-                        Box {
-                            Image(
-                                painter = painterResource(R.drawable.fire),
-                                contentDescription = null,
-                                colorFilter = ColorFilter.tint(
-                                    SpotTheme.colors.black.copy(alpha = 0.25f) // 연한 검은색/회색
-                                ),
-                                modifier = Modifier
-                                    .size(22.dp)
-                                    .graphicsLayer {
-                                        // 살짝 아래로 내리기 (드롭 쉐도우 느낌)
-                                        translationY = 1.dp.toPx()
-                                        // translationX = 0.5.dp.toPx()  // 살짝 오른쪽으로도 옮기고 싶으면
-
-                                        // Blur + Glow 느낌
-                                        renderEffect = BlurEffect(12f, 12f)
-
-                                        // shadowElevation은 안 써도 됨 (우리는 renderEffect로만 처리)
-                                        clip = false
-                                    }
-                            )
-
-                            // 2) 실제 불꽃 아이콘 (앞에)
-                            Image(
-                                painter = painterResource(R.drawable.fire),
-                                contentDescription = null,
-                                modifier = Modifier.size(22.dp)
-                            )
-                        }
-
-                        Spacer(Modifier.weight(1f))
-                        BoardTabs(
-                            selected = payload.selected, // ← payload에서 가져오기
-                            onSelect = viewmodel::selectSort // viewModel에 이 함수가 있어야 함
+                        Image(
+                            painter = painterResource(R.drawable.fire),
+                            contentDescription = null,
+                            modifier = Modifier.size(screenWidthDp(22.dp))
                         )
                     }
+
+                    Spacer(Modifier.weight(1f))
+
+                    BoardTabs(
+                        selected = selected,
+                        onSelect = viewmodel::selectSort
+                    )
                 }
 
-                /* 실시간 인기글 카드 (탭 영향 받는 랭크 리스트: tagBoards) */
-                item {
+                Spacer(Modifier.height(screenHeightDp(12.dp)))
+            }
+
+            item {
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(screenHeightDp(326.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        SpotSpinner()
+                    }
+                } else {
                     BestCardList(
-                        items = payload.bestBoards, // ← payload에서 가져오기
+                        items = bestBoards,
                         onItemClick = { onMoveToPostContent(it.postId) }
                     )
                 }
             }
+        }
+
+        when (ui) {
+            is UiState.Failure -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = "에러: ${ui.msg}", color = Color.Red)
+            }
+
+            is UiState.Empty -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = "데이터가 없습니다.", color = Color.Gray)
+            }
+
+            else -> Unit
         }
     }
 }
@@ -193,7 +207,7 @@ private fun BoardTabChip(
             .clip(SpotShapes.Hard)
             .background(bg)
             .clickable(onClick = onClick)
-            .padding(horizontal = 6.dp, vertical = 4.dp),
+            .padding(horizontal = screenWidthDp(6.dp), vertical = screenHeightDp(4.dp)),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -210,8 +224,9 @@ private fun BoardTabs(
     onSelect: (SortType) -> Unit
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.height(IntrinsicSize.Min)
+        modifier = Modifier.wrapContentSize(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(screenWidthDp(7.dp)),
     ) {
         BoardTabChip(
             text = "실시간",
@@ -223,8 +238,7 @@ private fun BoardTabs(
             color = SpotTheme.colors.G300,
             thickness = 1.dp,
             modifier = Modifier
-                .fillMaxHeight()
-                .padding(vertical = 4.dp)
+                .height(screenHeightDp(14.dp))
         )
 
         BoardTabChip(
@@ -237,8 +251,7 @@ private fun BoardTabs(
             color = SpotTheme.colors.G300,
             thickness = 1.dp,
             modifier = Modifier
-                .fillMaxHeight()
-                .padding(vertical = 4.dp)
+                .height(screenHeightDp(14.dp))
         )
 
         BoardTabChip(
@@ -249,7 +262,6 @@ private fun BoardTabs(
     }
 }
 
-/** 공통 섹션 헤더 (제목 + >) */
 @Composable
 private fun SectionHeader(
     title: String,
@@ -257,118 +269,137 @@ private fun SectionHeader(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 2.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = title,
-            style = SpotTheme.typography.medium_500.copy(fontSize = 18.sp),
-            modifier = Modifier.weight(1f)
+            style = SpotTheme.typography.h3,
+            modifier = Modifier.wrapContentSize()
         )
-        IconButton(onClick = onMoreClick, modifier = Modifier.size(28.dp)) {
+
+        Box(
+            modifier = Modifier
+                .width(screenWidthDp(56.dp))
+                .height(screenHeightDp(24.dp))
+                .clip(SpotShapes.Hard)
+                .clickable(onClick = onMoreClick)
+                .padding(
+                    horizontal = screenWidthDp(5.dp),
+                    vertical = screenHeightDp(2.dp)
+                ),
+            contentAlignment = Alignment.CenterStart
+        ) {
             Icon(
                 painter = painterResource(R.drawable.arrow_right),
                 contentDescription = "더보기",
-                tint = SpotTheme.colors.B500
+                tint = SpotTheme.colors.black,
             )
         }
     }
 }
 
-/** 랭크 카드 리스트 */
 @Composable
 private fun BestCardList(
     items: BestPostResultList,
     onItemClick: (BestPostResult) -> Unit
 ) {
-    val borderStroke = BorderStroke(1.dp, SpotTheme.colors.G200)
-
     items.hotPosts.forEachIndexed { index, item ->
-        Surface(
-            shape = SpotShapes.Soft,
-            color = Color.Transparent,
-            tonalElevation = 0.dp,
-            shadowElevation = 0.dp,
-            border = borderStroke,
+        ShapeBox(
+            shape = SpotShapes.Round,
+            color = SpotTheme.colors.white,
+            borderWidth = 1.dp,
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(vertical = 6.dp)
+                .clip(SpotShapes.Round)
+                .clickable{ onItemClick(item) },
+            borderColor = SpotTheme.colors.G200,
         ) {
-            Column(
-            ) {
-                BestRow(
-                    title = item.title,
-                    count = item.commentCount,
-                    content = item.content,
-                    postType = item.postType,
-                    onClick = { onItemClick(item) },
-                    modifier = Modifier
-                )
-            }
+            BestRow(
+                title = item.title,
+                count = item.commentCount,
+                content = item.content,
+                postType = item.postType,
+                modifier = Modifier
+            )
         }
+
+        if(index != items.hotPosts.lastIndex)
+            Spacer(Modifier.height(screenHeightDp(10.dp)))
     }
 }
 
-/** 라벨이 있는 리스트 */
 @Composable
 private fun RecentCardList(
+    isLoading : Boolean,
     items: RecentPostResultList,
     onItemClick: (RecentPostResult) -> Unit
 ) {
-    val borderStroke = BorderStroke(1.dp, SpotTheme.colors.G200)
-
-    Surface(
+    ShapeBox(
         shape = SpotShapes.Soft,
-        color = Color.Transparent,
-        tonalElevation = 0.dp,
-        shadowElevation = 0.dp,
-        border = borderStroke,
+        color = SpotTheme.colors.white,
+        borderWidth = 1.dp,
+        borderColor = SpotTheme.colors.G200,
         modifier = Modifier
+            .fillMaxWidth()
+            .clip(SpotShapes.Soft)
+            .height(screenHeightDp(162.dp))
     ) {
-        Column(
-            modifier = Modifier.padding(vertical = 6.dp)
-        ) {
-            items.recentPosts.forEach { item ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onItemClick(item) }
-                        .padding(horizontal = 12.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // 왼쪽 라벨
-                    Text(
-                        text = item.postType.korean,
-                        style = SpotTheme.typography.small_500.copy(fontSize = 14.sp),
-                        color = SpotTheme.colors.B500,
-                        modifier = Modifier.widthIn(min = 56.dp)
-                    )
-                    // 제목
-                    Text(
-                        text = item.title,
-                        style = SpotTheme.typography.medium_500.copy(fontSize = 14.sp),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
-                    )
-                    // 카운트
-                    Text(
-                        text = "(${cap(item.commentCount)})",
-                        style = SpotTheme.typography.small_500.copy(fontSize = 14.sp),
-                        color = SpotTheme.colors.B500
-                    )
+        if(isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                SpotSpinner()
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(screenWidthDp(7.dp)),
+                verticalArrangement = Arrangement.spacedBy(screenHeightDp(7.dp))
+            ) {
+                items.recentPosts.forEach { item ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onItemClick(item) }
+                            .padding(horizontal = screenWidthDp(7.dp), vertical = screenHeightDp(3.dp)),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(screenWidthDp(7.dp))
+                    ) {
+                        // 왼쪽 라벨
+                        Text(
+                            text = item.postType.korean,
+                            style = SpotTheme.typography.regular_500,
+                            color = SpotTheme.colors.B500,
+                            modifier = Modifier.widthIn(min = screenWidthDp(41.dp))
+                        )
+                        // 제목
+                        Text(
+                            text = item.title,
+                            style = SpotTheme.typography.regular_400,
+                            color = SpotTheme.colors.black,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                        // 카운트
+                        Text(
+                            text = "( ${cap(item.commentCount)} )",
+                            style = SpotTheme.typography.small_400,
+                            color = SpotTheme.colors.B500
+                        )
+                    }
                 }
             }
         }
     }
 }
 
-/** 999+ 포맷 */
-private fun cap(n: Int): String = if (n >= 1000) "999+" else n.toString()
-
-/* ---------- 랭크 행 ---------- */
 @Composable
 private fun BestRow(
     title: String,
@@ -376,13 +407,14 @@ private fun BestRow(
     postType: PostType,
     content: String,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+            .padding(
+                horizontal = screenWidthDp(13.dp),
+                vertical = screenHeightDp(8.dp)
+            ),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
@@ -392,6 +424,9 @@ private fun BestRow(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
+
+        Spacer(Modifier.height(screenHeightDp(3.dp)))
+
         Text(
             text = content,
             style = SpotTheme.typography.regular_400,
@@ -399,7 +434,7 @@ private fun BestRow(
             overflow = TextOverflow.Ellipsis,
         )
 
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(screenHeightDp(7.dp)))
 
         Row(
             modifier = Modifier
