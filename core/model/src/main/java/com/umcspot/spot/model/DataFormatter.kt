@@ -22,3 +22,5 @@ fun String.formatCreatedAt(): String {
         this
     }
 }
+
+fun cap(n: Int): String = if (n >= 1000) "999+" else n.toString()

@@ -18,23 +18,22 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.airbnb.lottie.compose.rememberLottieDynamicProperties
 import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.ui.extension.screenWidthDp
 
 @Composable
-fun Spinner(
+fun SpotSpinner(
     modifier: Modifier = Modifier,
-    size: Dp = 28.dp,
+    size: Dp = 24.dp,
     speed: Float = 1f,
     isPlaying: Boolean = true,
     iterations: Int = LottieConstants.IterateForever,
     strokeColor: Color? = null,
     contentDescription: String? = "로딩 중"
 ) {
-    // res/raw/spinner.lottie
     val composition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(R.raw.spinner)
     )
 
-    // 색상 오버라이드: 로티 내 "Stroke 1"에 적용
     val dynamicProps = if (strokeColor != null) {
         rememberLottieDynamicProperties(
             rememberLottieDynamicProperty(
@@ -54,7 +53,7 @@ fun Spinner(
         speed = speed,
         dynamicProperties = dynamicProps,
         modifier = modifier
-            .size(size)
+            .size(screenWidthDp(size))
             .semantics {
                 if (contentDescription != null) this.contentDescription = contentDescription
             }
