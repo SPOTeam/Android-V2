@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.umcspot.spot.designsystem.component.ProfileImage
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ImageRef
+import com.umcspot.spot.ui.extension.screenWidthDp
 
 @Composable
 fun CommentUserInfo(
@@ -32,9 +33,9 @@ fun CommentUserInfo(
     ) {
         ProfileImage(
             imageRef = commentWriterImage,
-            modifier = Modifier.size(33.dp)
+            modifier = Modifier.size(screenWidthDp(33.dp))
         )
-        Spacer(Modifier.width(7.dp))
+        Spacer(Modifier.width(screenWidthDp(7.dp)))
 
         Text(
             text = commentWriterName,

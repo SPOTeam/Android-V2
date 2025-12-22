@@ -47,8 +47,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import coil.request.ImageRequest.*
+import coil.request.ImageRequest.Builder
 import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.SpotSpinner
 import com.umcspot.spot.designsystem.component.comment.CommentField
 import com.umcspot.spot.designsystem.component.modal.RejectDialog
 import com.umcspot.spot.designsystem.component.post.CommentUserInfo
@@ -63,6 +64,8 @@ import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.korean
 import com.umcspot.spot.post.model.postDetail.CommentResult
 import com.umcspot.spot.post.model.postDetail.PostDetailResult
+import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
 import com.umcspot.spot.ui.state.UiState
 import kotlinx.coroutines.delay
 
@@ -112,7 +115,12 @@ fun PostContentScreen(
     ) {
         when (val state = uiState.data) {
             is UiState.Loading -> {
-                Text("로딩 중...", color = Color.Gray, modifier = Modifier.align(Alignment.Center))
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    SpotSpinner(size = screenWidthDp(30.dp))
+                }
             }
 
             is UiState.Failure -> {
@@ -129,7 +137,7 @@ fun PostContentScreen(
 
             is UiState.Success -> {
                 val post = state.data
-                val commentBarHeight = 44.dp
+                val commentBarHeight = screenHeightDp(44.dp)
 
                 LaunchedEffect(isCommentFocused, post.comments.size) {
                     if (isCommentFocused) {
@@ -145,7 +153,7 @@ fun PostContentScreen(
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = commentBarHeight + 8.dp)
+                    contentPadding = PaddingValues(bottom = commentBarHeight + screenHeightDp(8.dp))
                 ) {
                     item(key = "post_header") {
                         PostContentDetailScreen(
@@ -162,13 +170,13 @@ fun PostContentScreen(
                     }
 
                     item(key = "divider") {
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(screenHeightDp(8.dp)))
                         HorizontalDivider(
                             modifier = Modifier.fillMaxWidth(),
                             thickness = 1.dp,
                             color = SpotTheme.colors.gray200
                         )
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(screenHeightDp(8.dp)))
                     }
 
                     items(
@@ -179,25 +187,25 @@ fun PostContentScreen(
                             comment = comment,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 17.dp)
+                                .padding(horizontal = screenWidthDp(17.dp))
                         )
-                        Spacer(Modifier.height(13.dp))
+                        Spacer(Modifier.height(screenHeightDp(13.dp)))
                         HorizontalDivider(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 17.dp),
+                                .padding(horizontal = screenWidthDp(17.dp)),
                             thickness = 1.dp,
                             color = SpotTheme.colors.gray200
                         )
-                        Spacer(Modifier.height(13.dp))
+                        Spacer(Modifier.height(screenHeightDp(13.dp)))
                     }
                 }
 
                 CommentField(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(horizontal = 17.dp)
-                        .padding(bottom = 8.dp),
+                        .padding(horizontal = screenWidthDp(17.dp))
+                        .padding(bottom = screenHeightDp(8.dp)),
                     canWrite = true,
                     comment = commentText,
                     onCommentChange = { commentText = it },
@@ -230,7 +238,6 @@ fun PostContentScreen(
     }
 }
 
-
 @Composable
 fun PostContentDetailScreen(
     modifier: Modifier = Modifier,
@@ -242,12 +249,11 @@ fun PostContentDetailScreen(
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
-
     Column(
         modifier = modifier
             .wrapContentSize()
-            .padding(horizontal = 17.dp)
-            .padding(bottom = 13.dp),
+            .padding(horizontal = screenWidthDp(17.dp))
+            .padding(bottom = screenHeightDp(13.dp)),
         verticalArrangement = Arrangement.Top
     ) {
         Row(
@@ -263,14 +269,14 @@ fun PostContentDetailScreen(
 
             Box(
                 modifier = Modifier
-                    .size(33.dp)
+                    .size(screenWidthDp(33.dp))
             ) {
                 Image(
                     painter = painterResource(R.drawable.meetball),
                     contentDescription = null,
                     modifier = Modifier
                         .align(Alignment.Center)
-                        .size(30.dp)
+                        .size(screenWidthDp(14.dp))
                         .clickable { menuExpanded = true }
                 )
 
@@ -286,7 +292,7 @@ fun PostContentDetailScreen(
             }
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(screenHeightDp(12.dp)))
 
         PostDetailScreen(
             post.postType,
@@ -295,7 +301,7 @@ fun PostContentDetailScreen(
             post.content,
         )
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(screenHeightDp(20.dp)))
 
         CountView(
             item = post,
@@ -323,19 +329,19 @@ fun PostDetailScreen(
             color = SpotTheme.colors.B500
         )
 
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(screenHeightDp(4.dp)))
 
         Text(
             text = title,
             style = SpotTheme.typography.h5,
             maxLines = Int.MAX_VALUE,
-            softWrap = true,
+            softWrap = true
         )
         when (image) {
             ImageRef.None -> Unit
 
             is ImageRef.Url -> {
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(screenHeightDp(20.dp)))
                 AsyncImage(
                     model = Builder(context)
                         .data(image.url)
@@ -358,7 +364,7 @@ fun PostDetailScreen(
                     )
                 }
                 if (resId != 0) {
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(screenHeightDp(20.dp)))
                     Image(
                         painter = painterResource(id = resId),
                         contentDescription = null,
@@ -371,7 +377,7 @@ fun PostDetailScreen(
             }
 
             is ImageRef.LocalUri -> {
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(screenHeightDp(20.dp)))
                 AsyncImage(
                     model = Builder(context)
                         .data(image.uri)
@@ -386,11 +392,13 @@ fun PostDetailScreen(
             }
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(screenHeightDp(20.dp)))
 
         Text(
             text = content,
-            style = SpotTheme.typography.medium_400
+            style = SpotTheme.typography.medium_400,
+            maxLines = Int.MAX_VALUE,
+            softWrap = true,
         )
     }
 }
@@ -409,12 +417,14 @@ private fun CommentItem(
             commentWriterImage = comment.profileImageUrl
         )
 
-        Spacer(Modifier.height(7.dp))
+        Spacer(Modifier.height(screenHeightDp(7.dp)))
 
         Text(
             text = comment.content.toString(),
             style = SpotTheme.typography.medium_400,
-            color = SpotTheme.colors.black
+            color = SpotTheme.colors.black,
+            maxLines = Int.MAX_VALUE,
+            softWrap = true
         )
     }
 }
@@ -439,7 +449,7 @@ fun EditDeleteMenu(
         if (isOwner) {
             DropdownMenuItem(
                 modifier = Modifier
-                    .height(30.dp)
+                    .height(screenHeightDp(30.dp))
                     .wrapContentWidth(),
                 text = {
                     Text(
@@ -462,7 +472,7 @@ fun EditDeleteMenu(
 
             DropdownMenuItem(
                 modifier = Modifier
-                    .height(30.dp)
+                    .height(screenHeightDp(30.dp))
                     .wrapContentWidth(),
                 text = {
                     Text(
@@ -479,7 +489,7 @@ fun EditDeleteMenu(
         } else {
             DropdownMenuItem(
                 modifier = Modifier
-                    .height(30.dp)
+                    .height(screenHeightDp(30.dp))
                     .wrapContentWidth(),
                 text = {
                     Text(
