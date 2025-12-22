@@ -4,8 +4,14 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,13 +27,18 @@ import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.domain.board.model.postList.PostResult
 import com.umcspot.spot.post.model.postDetail.PostDetailResult
+import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
 
 @Composable
 fun CountView(
     item: PostResult,
     onLikeClick: (PostResult) -> Unit = {},
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(screenWidthDp(3.dp))
+    ) {
         Stat(
             iconRes = R.drawable.thumb_up,
             count2 = item.likeNum,
@@ -44,7 +55,10 @@ fun CountView(
     item: PostDetailResult,
     onLikeClick: (PostDetailResult) -> Unit = {},
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(screenWidthDp(3.dp))
+    ) {
         Stat(
             iconRes = R.drawable.thumb_up,
             count2 = item.likeCount,
@@ -71,8 +85,12 @@ private fun Stat(
     val interaction = remember { MutableInteractionSource() }
 
     Row(
+        modifier = Modifier
+            .width(screenWidthDp(55.dp))
+            .height(screenHeightDp(17.dp))
+            .padding(horizontal = screenWidthDp(3.dp), vertical = screenWidthDp(1.dp)),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalArrangement = Arrangement.spacedBy(screenWidthDp(4.dp))
     ) {
         Icon(
             painter = painterResource(iconRes),

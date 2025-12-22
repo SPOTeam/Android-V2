@@ -242,8 +242,9 @@ fun BoardListScreenContent(
     LazyColumn(
         state = listState,
         modifier = Modifier
+            .fillMaxSize()
             .padding(horizontal = screenWidthDp(17.dp))
-            .fillMaxSize(),
+            .padding(top = screenHeightDp(12.dp)),
     ) {
         items(
             items = itemList,
@@ -254,12 +255,15 @@ fun BoardListScreenContent(
                 onLikeClick = { onLikeClick(item) },
                 onClick = { onPostClicked(item) }
             )
+
+            Spacer(modifier = Modifier.height(screenHeightDp(5.dp)))
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth(),
                 thickness = 1.dp,
                 color = SpotTheme.colors.gray200
             )
+            Spacer(modifier = Modifier.height(screenHeightDp(5.dp)))
         }
 
         if (isLoadingMore) {

@@ -79,3 +79,17 @@ fun TextButtonXS_AssetsPreview() {
         }
     }
 }
+
+@Preview(showBackground = true, widthDp = 650)
+@Composable
+fun TextButtonToggle_AssetsPreview() {
+    SpotTheme {
+        Row(Modifier.padding(12.dp)) {
+            TextToggleButton(text = "Btn", onClick = {})
+            Spacer(Modifier.width(8.dp))
+            TextToggleButton(text = "Btn", onClick = {}, enabled = false)
+            Spacer(Modifier.width(8.dp))
+            TextToggleButton(text = "", onClick = {}, checked = true)
+        }
+    }
+}
