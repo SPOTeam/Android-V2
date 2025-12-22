@@ -51,6 +51,7 @@ import coil.request.ImageRequest.Builder
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.SpotSpinner
 import com.umcspot.spot.designsystem.component.comment.CommentField
+import com.umcspot.spot.designsystem.component.modal.DeleteDialog
 import com.umcspot.spot.designsystem.component.modal.RejectDialog
 import com.umcspot.spot.designsystem.component.post.CommentUserInfo
 import com.umcspot.spot.designsystem.component.post.CountView
@@ -215,12 +216,11 @@ fun PostContentScreen(
                     onFocusChanged = { focused -> isCommentFocused = focused }
                 )
 
-                RejectDialog(
+                DeleteDialog(
                     visible = showBackRequestDialog,
-                    modalTitle = "삭제하시겠어요?",
+                    modalTitle = "이 글을 삭제하시겠어요?",
                     modalDes = "삭제하면, 해당 게시글은 복구할 수 없어요",
                     okButtonText = "네",
-                    noButtonText = "아니요",
                     onDismiss = {
                         showBackRequestDialog = false
                     },
@@ -228,9 +228,6 @@ fun PostContentScreen(
                         showBackRequestDialog = false
                         postViewModel.deletePost()
                         onDeleteClick()
-                    },
-                    onCancel = {
-                        showBackRequestDialog = false
                     }
                 )
             }

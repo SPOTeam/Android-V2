@@ -3,22 +3,25 @@ package com.umcspot.spot.designsystem.component.modal
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,22 +31,20 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.TextButton
+import com.umcspot.spot.designsystem.component.button.TextButtonSize
 import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 
-
 @Composable
-fun RejectModal(
+fun DeleteModal(
     modalTitle : String,
     modalDes : String,
     okButtonText : String,
-    noButtonText : String,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    onCancel:() -> Unit= {},
     onDismiss:() -> Unit= {}
 ) {
     Card(
@@ -76,7 +77,7 @@ fun RejectModal(
             }
 
             Image(
-                painter = painterResource(R.drawable.emoji_sad),
+                painter = painterResource(R.drawable.delete),
                 contentDescription = null,
                 modifier = Modifier
                     .size(screenWidthDp(33.dp))
@@ -89,6 +90,7 @@ fun RejectModal(
                 text = modalTitle,
                 style = SpotTheme.typography.h2,
                 textAlign = TextAlign.Center
+
             )
 
             Spacer(Modifier.height(screenHeightDp(20.dp)))
@@ -101,53 +103,38 @@ fun RejectModal(
 
             Spacer(Modifier.height(screenHeightDp(20.dp)))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                TextButton(
-                    modifier = Modifier
-                        .width(screenWidthDp(141.dp))
-                        .height(screenHeightDp(39.dp)),
-                    text = okButtonText,
-                    style = SpotTheme.typography.h5,
-                    onClick = onClick,
-                    shape = SpotShapes.Soft,
-                    state = TextButtonState.R500State,
-                )
+            TextButton(
+                modifier = Modifier
+                    .width(screenWidthDp(156.dp))
+                    .height(screenHeightDp(39.dp)),
+                text = okButtonText,
+                style = SpotTheme.typography.h5,
+                onClick = onClick,
+                shape = SpotShapes.Soft,
+                state = TextButtonState.G500State,
+            )
 
-                TextButton(
-                    modifier = Modifier
-                        .width(screenWidthDp(141.dp))
-                        .height(screenHeightDp(39.dp)),
-                    text = noButtonText,
-                    style = SpotTheme.typography.h5,
-                    onClick = onCancel,
-                    shape = SpotShapes.Soft,
-                    state = TextButtonState.G500State,
-                )
-            }
         }
     }
 }
 
 @Composable
-fun RejectDialog(
+fun DeleteDialog(
     visible: Boolean,
     modalTitle : String,
     modalDes : String,
     okButtonText : String,
-    noButtonText : String,
-    onDismiss: () -> Unit,
     onClick: () -> Unit,
-    onCancel: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     if (!visible) return
     Dialog(onDismissRequest = onDismiss) {
-        RejectModal(
+        DeleteModal(
+            modifier = Modifier.fillMaxWidth(),
             modalTitle = modalTitle,
             modalDes = modalDes,
             okButtonText = okButtonText,
-            noButtonText = noButtonText,
             onClick = onClick,
-            onCancel = onCancel,
             onDismiss = onDismiss
         )
     }
@@ -155,17 +142,15 @@ fun RejectDialog(
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 640)
 @Composable
-private fun RejectDialog_Preview() {
+private fun DeleteDialog_Preview() {
     SpotTheme {
-        RejectDialog(
+        DeleteDialog(
             visible = true,
-            modalTitle = "나가시겠어요?",
-            modalDes = "지금 나가면, 쓰던 글은 저장되지 않아요.",
-            okButtonText = "네",
-            noButtonText = "아니요",
-            onDismiss = {},
+            modalTitle = "이 글을 삭제하시겠어요?",
+            modalDes = "한번 삭제한 글은 되돌릴 수 없어요.",
+            okButtonText = "삭제",
             onClick = {},
-            onCancel = {}
+            onDismiss = {}
         )
     }
 }

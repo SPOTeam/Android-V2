@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -35,7 +37,7 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.component.button.TextButton
-import com.umcspot.spot.designsystem.component.button.TextToggleButton
+import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.component.study.section.ActivityThemeSection
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ActivityType
@@ -181,9 +183,10 @@ fun ActivityTypeMultiSection(
         horizontalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         ActivityType.entries.forEach { type ->
-            TextToggleButton(
+            TextButton(
                 modifier = Modifier.weight(1f),
                 text = type.label,
+                state = TextButtonState.Toggle,
                 checked = selectedTypes.contains(type),
                 onClick = { onToggle(type) }
             )
@@ -213,9 +216,12 @@ fun ActivityFeeSection(
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             FeeRange.entries.forEach { fee ->
-                TextToggleButton(
+                TextButton(
                     text = fee.label,
-                    width = 71.dp,
+                    modifier = Modifier
+                        .width(screenWidthDp(71.dp))
+                        .wrapContentHeight(),
+                    state = TextButtonState.Toggle,
                     checked = selectedFees.contains(fee),
                     onClick = { onToggle(fee) },
                 )

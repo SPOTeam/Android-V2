@@ -22,9 +22,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,13 +42,13 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.TextButton
+import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G200
@@ -54,6 +56,8 @@ import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ImageRef
 import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.korean
+import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
 import com.umcspot.spot.ui.state.UiState
 
 @Composable
@@ -61,7 +65,7 @@ fun PostingScreen(
     contentPadding: PaddingValues,
     onBackRequest: () -> Unit,
     onSubmitSuccess: () -> Unit,
-    postingViewModel : PostingViewModel = hiltViewModel()
+    postingViewModel: PostingViewModel = hiltViewModel()
 ) {
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
@@ -90,6 +94,7 @@ fun PostingScreen(
                 postingViewModel.consumeSubmitResult()
                 onSubmitSuccess()
             }
+
             else -> Unit
         }
     }
@@ -100,32 +105,33 @@ fun PostingScreen(
 
     Box(
         modifier = Modifier
+            .background(SpotTheme.colors.white)
             .fillMaxSize()
             .clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
             ) {
-                 focusManager.clearFocus()
+                focusManager.clearFocus()
             }
             .padding(
                 top = topPad,
                 bottom = bottomPad
             )
-            .background(SpotTheme.colors.white)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp),
+                .padding(horizontal = screenWidthDp(17.dp)),
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(screenHeightDp(24.dp)))
 
             // 제목
             BasicTextField(
                 value = title,
                 onValueChange = postingViewModel::onTitleChange,
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(horizontal = screenHeightDp(12.dp), vertical = screenHeightDp(4.dp)),
                 textStyle = SpotTheme.typography.h4,
                 decorationBox = { innerTextField ->
                     if (title.isEmpty()) {
@@ -139,7 +145,7 @@ fun PostingScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
 
             HorizontalDivider(
                 modifier = Modifier
@@ -147,13 +153,14 @@ fun PostingScreen(
                 color = SpotTheme.colors.gray300
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
 
             BasicTextField(
                 value = body,
                 onValueChange = postingViewModel::onBodyChange,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = screenHeightDp(12.dp), vertical = screenHeightDp(4.dp))
                     .weight(1f),
                 textStyle = SpotTheme.typography.medium_400,
                 decorationBox = { innerTextField ->
@@ -176,14 +183,17 @@ fun PostingScreen(
             }
 
             if (previewModel != null) {
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(screenHeightDp(15.dp)))
 
-                Box(
-                    modifier = Modifier
-                        .size(72.dp)
-                ) {
-                    AsyncImage(
-                        model = previewModel,
+                val painter = rememberAsyncImagePainter(model = previewModel)
+                val dismissTint = rememberDismissTintFromPainter(
+                    painterState = painter.state,
+                    sampleCorner = Corner.TopEnd
+                )
+
+                Box(modifier = Modifier.size(screenWidthDp(80.dp))) {
+                    Image(
+                        painter = painter,
                         contentDescription = "선택한 이미지",
                         modifier = Modifier
                             .matchParentSize()
@@ -193,20 +203,17 @@ fun PostingScreen(
 
                     Image(
                         modifier = Modifier
-                            .size(20.dp)
+                            .size(screenWidthDp(16.dp))
                             .align(Alignment.TopEnd)
-                            .padding(top = 3.dp, end = 3.dp)
-                            .clickable{
-                                postingViewModel.clearImage()
-                            },
+                            .clickable { postingViewModel.clearImage() },
                         painter = painterResource(R.drawable.dismiss),
                         contentDescription = "이미지 삭제",
-                        colorFilter = ColorFilter.tint(SpotTheme.colors.black)
+                        colorFilter = ColorFilter.tint(dismissTint)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(screenHeightDp(15.dp)))
 
             Column(
                 modifier = Modifier.fillMaxWidth()
@@ -215,23 +222,30 @@ fun PostingScreen(
                     selectedBoardType = selectedBoardType,
                     onClickAddPhoto = {
                         pickSingleLauncher.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                    ) },
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    },
                     onSelectedBoardType = postingViewModel::onSelectPostType
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(screenHeightDp(12.dp)))
 
                 TextButton(
+                    modifier = Modifier
+                        .width(screenWidthDp(326.dp))
+                        .height(screenHeightDp(47.dp)),
                     text = "완료",
+                    style = SpotTheme.typography.h3,
                     enabled = isSubmitEnabled,
+                    shape = SpotShapes.Soft,
+                    state = TextButtonState.B500State,
                     onClick = {
                         postingViewModel.submit()
                     }
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(screenHeightDp(8.dp)))
         }
     }
 }
@@ -244,23 +258,23 @@ private fun BottomToolsRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp, vertical = 5.dp),
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
             modifier = Modifier
+                .padding(horizontal = screenWidthDp(5.dp), vertical = screenHeightDp(2.dp))
                 .clickable(
                     onClick = onClickAddPhoto
                 )
         ) {
             Image(
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(screenWidthDp(20.dp)),
                 painter = painterResource(R.drawable.camera),
                 contentDescription = "사진 추가",
             )
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(screenWidthDp(4.dp)))
             Text(
                 text = "사진 추가",
                 color = SpotTheme.colors.black,
@@ -275,6 +289,7 @@ private fun BottomToolsRow(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BoardCategorySelector(
     selected: PostType,
@@ -293,53 +308,58 @@ fun BoardCategorySelector(
                 style = SpotTheme.typography.regular_500
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(screenWidthDp(7.dp)))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .width(85.dp)
-                    .border(
-                        width = 1.dp,
-                        color = SpotTheme.colors.G200,
-                        shape = SpotShapes.Hard
-                    )
-                    .clickable { expanded = true }
-                    .padding(horizontal = 10.dp, vertical = 6.dp)
+            ExposedDropdownMenuBox (
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
             ) {
-                Text(
-                    text = selected.korean,                 // BoardType.korean 사용
-                    color = SpotTheme.colors.black,
-                    style = SpotTheme.typography.regular_500
-                )
-
-                Spacer(modifier = Modifier.width(4.dp))
-
-                Image(
-                    painter = painterResource(R.drawable.arrow_up),
-                    contentDescription = "게시판 선택",
-                    colorFilter =  ColorFilter.tint(SpotTheme.colors.B500),
-                    modifier = Modifier.size(14.dp)
-                )
-
-                DropdownMenu(
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .width(85.dp)
-                        .background(SpotTheme.colors.white),
+                        .menuAnchor() // ★ anchor 지정
+                        .width(screenWidthDp(85.dp))
+                        .border(1.dp, SpotTheme.colors.G200, SpotShapes.Hard)
+                        .clip(SpotShapes.Hard)
+                        .clickable { expanded = true }
+                        .padding(
+                            horizontal = screenWidthDp(10.dp),
+                            vertical = screenHeightDp(6.dp)
+                        )
+                ) {
+                    Text(
+                        text = selected.korean,
+                        color = SpotTheme.colors.black,
+                        style = SpotTheme.typography.regular_500
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+                    Image(
+                        painter = painterResource(R.drawable.arrow_up),
+                        contentDescription = "게시판 선택",
+                        colorFilter = ColorFilter.tint(SpotTheme.colors.B500),
+                        modifier = Modifier.size(screenWidthDp(14.dp))
+                    )
+                }
+
+                ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
-                    offset = DpOffset(
-                        x = 16.dp,
-                        y = 0.dp
-                    )
+                    modifier = Modifier
+                        .background(SpotTheme.colors.white)
+                        .width(screenWidthDp(85.dp))
                 ) {
                     PostType.entries.forEach { type ->
                         DropdownMenuItem(
+                            modifier = Modifier
+                                .height(screenHeightDp(30.dp))
+                                .wrapContentWidth(),
                             text = {
                                 Text(
                                     text = type.korean,
                                     style = SpotTheme.typography.regular_500,
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                             },
                             onClick = {

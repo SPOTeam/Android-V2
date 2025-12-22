@@ -20,8 +20,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.button.TextButtonState
-import com.umcspot.spot.designsystem.component.button.TextButtonXL
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.G400
@@ -96,7 +96,7 @@ fun EmptyAlertWithButton(
         alertTitle = alertTitle,
         alertDes = alertDes
     ) {
-        TextButtonXL(text = buttonText, onClick = onClick, state = TextButtonState.B400State)
+        TextButton(text = buttonText, onClick = onClick, state = TextButtonState.B500State)
     }
 }
 
