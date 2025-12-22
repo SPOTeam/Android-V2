@@ -90,10 +90,12 @@ fun CommentField(
         else "댓글 기능은 스터디원만 이용 가능합니다."
 
     val sendEnabled = canWrite && comment.isNotBlank()
+    val active = canWrite && (isFocused || comment.isNotBlank())
+
 
     val colors = when {
         !canWrite -> state.noFocus
-        isFocused -> state.focused
+        active -> state.focused
         else -> state.noFocus
     }
 
