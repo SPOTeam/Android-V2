@@ -308,10 +308,6 @@ fun TextButton(
                 .padding(contentPadding),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            leading?.let {
-                it()
-                Spacer(Modifier.width(8.dp))
-            }
 
             when {
                 content != null -> content()
@@ -327,10 +323,6 @@ fun TextButton(
 
             Spacer(Modifier.weight(1f))
 
-            trailing?.let {
-                Spacer(Modifier.width(8.dp))
-                it()
-            }
         }
     }
 }
@@ -350,7 +342,7 @@ fun TextButtonXL(
     state: TextButtonState = TextButtonState.B400State,
     content: @Composable () -> Unit = {}
 ) = TextButton(
-    text = text.takeIf { it.isNotEmpty() },
+    text = text,
     onClick = onClick,
     modifier = modifier,
     shape = shape,
@@ -374,7 +366,7 @@ fun TextButtonL(
     state: TextButtonState = TextButtonState.B400State,
     content: @Composable () -> Unit = {}
 ) = TextButton(
-    text = text.takeIf { it.isNotEmpty() },
+    text = text,
     onClick = onClick,
     modifier = modifier,
     shape = shape,
@@ -398,7 +390,7 @@ fun TextButtonM(
     state: TextButtonState = TextButtonState.B400State,
     content: @Composable () -> Unit = {}
 ) = TextButton(
-    text = text.takeIf { it.isNotEmpty() },
+    text = text,
     onClick = onClick,
     modifier = modifier,
     size = TextButtonSize.M,
@@ -422,7 +414,7 @@ fun TextButtonS(
     state: TextButtonState = TextButtonState.B400State,
     content: @Composable () -> Unit = {}
 ) = TextButton(
-    text = text.takeIf { it.isNotEmpty() },
+    text = text,
     onClick = onClick,
     modifier = modifier,
     size = TextButtonSize.S,
@@ -446,7 +438,7 @@ fun TextButtonXS(
     state: TextButtonState = TextButtonState.B400State,
     content: @Composable () -> Unit = {}
 ) = TextButton(
-    text = text.takeIf { it.isNotEmpty() },
+    text = text,
     onClick = onClick,
     modifier = modifier,
     size = TextButtonSize.XS,
@@ -471,7 +463,7 @@ fun TextToggleButton(
     state: TextButtonState = TextButtonState.Toggle,
     content: @Composable () -> Unit = {}
 ) = TextButton(
-    text = text.takeIf { it.isNotEmpty() },
+    text = text,
     onClick = onClick,
     modifier = modifier,
     size = size,
