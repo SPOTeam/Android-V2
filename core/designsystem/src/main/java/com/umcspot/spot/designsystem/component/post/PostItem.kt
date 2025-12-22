@@ -86,8 +86,6 @@ fun PostListItem(
     }
 }
 
-/* ============== Preview ============== */
-
 @Preview(showBackground = true, widthDp = 500)
 @Composable
 private fun PostListItemPreview() {

@@ -51,7 +51,7 @@ class PostingViewModel @Inject constructor(
     }
 
     fun load(postId: Long) {
-        _editingPostId.value = postId   // ✅ 추가
+        _editingPostId.value = postId
         viewModelScope.launch {
             runCatching {
                 postRepository.getPostDetail(postId).getOrThrow()

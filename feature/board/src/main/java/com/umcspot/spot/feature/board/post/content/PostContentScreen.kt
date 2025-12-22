@@ -219,8 +219,8 @@ fun PostContentScreen(
                 DeleteDialog(
                     visible = showBackRequestDialog,
                     modalTitle = "이 글을 삭제하시겠어요?",
-                    modalDes = "삭제하면, 해당 게시글은 복구할 수 없어요",
-                    okButtonText = "네",
+                    modalDes = "한 번 삭제한 글은 되돌릴 수 없어요.",
+                    okButtonText = "삭제",
                     onDismiss = {
                         showBackRequestDialog = false
                     },
@@ -304,7 +304,6 @@ fun PostContentDetailScreen(
             item = post,
             onLikeClick = { onLikeClick() }
         )
-
     }
 }
 

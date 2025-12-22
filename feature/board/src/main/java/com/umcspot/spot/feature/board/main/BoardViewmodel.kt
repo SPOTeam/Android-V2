@@ -32,12 +32,9 @@ class BoardViewModel @Inject constructor(
     private val _selectedPost = MutableStateFlow<PostResult?>(null)
     val selectedPost: StateFlow<PostResult?> = _selectedPost.asStateFlow()
 
-    /** 최초/재로딩: HomeViewModel.getDummies() 스타일 */
     fun load(sortBy: SortType) {
-        // 1) 로딩으로 전환
         _uiState.update { it.copy(user = UiState.Loading) }
 
-        // 2) 실제 호출
         viewModelScope.launch {
             runCatching {
                 val recentPosts = async { boardRepository.getRecentBoard() }
@@ -58,25 +55,21 @@ class BoardViewModel @Inject constructor(
             }.onSuccess { payload ->
                 _uiState.update { it.copy(user = UiState.Success(payload)) }
             }.onFailure {
-                // UiState.Error 타입이 없다면 Empty로 복구
                 _uiState.update { it.copy(user = UiState.Empty) }
             }
         }
     }
 
-    /** Tag 값만 새로고침 */
     fun selectSort(type: SortType) {
         val cur = (uiState.value.user as? UiState.Success<BoardPayload>)?.data
         if (cur == null) {
-            load(type) // 최초엔 전체 로드
+            load(type)
             return
         }
 
         viewModelScope.launch {
-            // 1) 탭 선택 즉시 반영(UX 빠르게)
             _uiState.update { it.copy(user = UiState.Success(cur.copy(selected = type))) }
 
-            // 2) 새 정렬(랜덤 순서 포함)로 tagBoards 가져와서 반영+
             runCatching { boardRepository.getBestBoard(type).getOrThrow() }
                 .onSuccess { newTagBoards ->
                     _uiState.update {
@@ -88,8 +81,8 @@ class BoardViewModel @Inject constructor(
                         ))
                     }
                 }
-                .onFailure {
-                    // 필요 시 에러 처리(토스트/스낵바 등). 최소한 선택값은 유지됨.
+                .onFailure { e ->
+                    Log.e("BoardViewModel", "selectSort: $e")
                 }
         }
     }

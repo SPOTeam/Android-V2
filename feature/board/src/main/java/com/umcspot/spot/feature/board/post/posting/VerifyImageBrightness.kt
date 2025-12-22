@@ -11,9 +11,8 @@ import kotlin.math.min
 @Composable
 fun rememberDismissTintFromPainter(
     painterState: AsyncImagePainter.State,
-    // dismiss가 TopEnd에 있으니, 그 근처만 샘플링
     sampleCorner: Corner = Corner.TopEnd,
-    threshold: Float = 0.55f, // 0~1, 높을수록 "밝다" 판정이 쉬움
+    threshold: Float = 0.55f,
 ): Color {
     var tint by remember { mutableStateOf(Color.Black) }
 
@@ -24,7 +23,6 @@ fun rememberDismissTintFromPainter(
         val bitmap = (drawable as? BitmapDrawable)?.bitmap ?: return@LaunchedEffect
         val luma = sampleCornerLuma(bitmap, sampleCorner)
 
-        // 어두우면 흰색 아이콘, 밝으면 검은색 아이콘
         tint = if (luma < threshold) Color.White else Color.Black
     }
 
@@ -34,7 +32,6 @@ fun rememberDismissTintFromPainter(
 enum class Corner { TopStart, TopEnd, BottomStart, BottomEnd }
 
 private fun sampleCornerLuma(bitmap: Bitmap, corner: Corner): Float {
-    // HARDWARE bitmap이면 픽셀 접근 불가 -> ARGB_8888로 복사
     val safeBitmap = if (bitmap.config == Bitmap.Config.HARDWARE) {
         bitmap.copy(Bitmap.Config.ARGB_8888, /* mutable = */ false)
     } else {
@@ -71,7 +68,6 @@ private fun sampleCornerLuma(bitmap: Bitmap, corner: Corner): Float {
         }
     }
 
-    // copy로 만든 비트맵이면 해제(메모리)
     if (safeBitmap !== bitmap) safeBitmap.recycle()
 
     return if (count == 0) 1f else sum / count

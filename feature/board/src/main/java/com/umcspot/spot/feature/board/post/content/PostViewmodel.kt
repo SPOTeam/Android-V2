@@ -75,7 +75,6 @@ class PostViewModel @Inject constructor(
                 }
 
                 result.onFailure {
-                    // 실패 시 롤백
                     applyLocalLike(wasLiked, -delta)
                 }
             } finally {

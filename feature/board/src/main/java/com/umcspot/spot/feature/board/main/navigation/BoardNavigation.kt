@@ -26,7 +26,6 @@ fun NavGraphBuilder.boardGraph(
 ) {
     composable<Board> { backStackEntry ->
         val parentEntry = remember(backStackEntry) {
-            // 🔹 NavHost 루트 그래프 기준으로 ViewModel 스코프
             navController.getBackStackEntry(navController.graph.id)
         }
         val boardViewModel: BoardViewModel = hiltViewModel(parentEntry)
