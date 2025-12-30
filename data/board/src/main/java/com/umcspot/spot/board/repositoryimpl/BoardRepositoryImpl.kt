@@ -20,7 +20,7 @@ class BoardRepositoryImpl @Inject constructor(
             boardService.getRecentBoard().result.toDomainList()
         }.onFailure { e ->
             Log.e("BoardRepository", "getRecentBoard failed", e)
-        }.recoverCatching { e ->
+        }.recoverCatching {
             recentPostDummies(3)
         }
 

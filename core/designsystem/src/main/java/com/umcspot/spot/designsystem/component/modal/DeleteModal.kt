@@ -123,7 +123,6 @@ fun DeleteDialog(
     if (!visible) return
     Dialog(onDismissRequest = onDismiss) {
         DeleteModal(
-            modifier = Modifier.fillMaxWidth(),
             modalTitle = modalTitle,
             modalDes = modalDes,
             okButtonText = okButtonText,

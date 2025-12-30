@@ -43,8 +43,8 @@ class BoardViewModel @Inject constructor(
                 val recents = recentPosts.await().getOrThrow()
                 val bests = bestPosts.await().getOrThrow()
 
-                Log.d("BoardRepositoryImpl", "getRecentBoard: $recents")
-                Log.d("BoardRepositoryImpl", "getBestBoard: $bests")
+                Log.d("BoardViewModel", "getRecentBoard: $recents")
+                Log.d("BoardViewModel", "getBestBoard: $bests")
 
 
                 BoardPayload(

@@ -50,7 +50,7 @@ fun PostListItem(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier.weight(1f))
+                Spacer(Modifier.weight(1f))
 
                 Text(
                     text = "#" + item.postType.korean,
@@ -59,7 +59,7 @@ fun PostListItem(
                 )
             }
 
-            Spacer(modifier.height(screenHeightDp(3.dp)))
+            Spacer(Modifier.height(screenHeightDp(3.dp)))
 
             Text(
                 text = item.content,

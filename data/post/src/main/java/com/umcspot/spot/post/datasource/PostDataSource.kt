@@ -16,6 +16,5 @@ interface PostDataSource {
 
     suspend fun deletePost(postId : Long) : NullResultResponse
 
-
     suspend fun sendComment(postId : Long, comment : CommentRequestDto) : BaseResponse<SendCommentResponseDto>
 }
