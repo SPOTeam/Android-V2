@@ -1,7 +1,5 @@
 package com.umcspot.spot.login.dto.response
 
-import android.annotation.SuppressLint
-import com.umcspot.spot.model.BoardType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

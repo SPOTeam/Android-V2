@@ -3,6 +3,7 @@ package com.umcspot.spot.main
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -27,7 +28,12 @@ import com.umcspot.spot.designsystem.component.FloatingMultipleButton
 import com.umcspot.spot.designsystem.component.FloatingToUpButton
 import com.umcspot.spot.designsystem.component.appBar.AppBarHome
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
+import com.umcspot.spot.designsystem.component.modal.RejectDialog
+import com.umcspot.spot.feature.board.boardList.navigation.BoardList
 import com.umcspot.spot.main.component.MainBottomBar
+import com.umcspot.spot.feature.board.post.content.navigation.POST_CONTENT_ROUTE
+import com.umcspot.spot.feature.board.post.posting.navigation.Posting
+import com.umcspot.spot.feature.board.post.posting.navigation.navigateToPostingNew
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
@@ -43,6 +49,8 @@ fun MainScreen(
     val dest = backStackEntry?.destination
     var scrollToTop by remember { mutableStateOf<(() -> Unit)?>(null) }
 
+    var showBackRequestDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             if (!navigator.isInLanding()) {
@@ -55,11 +63,20 @@ fun MainScreen(
                         dest?.hasRoute(RecruitingFilter::class) == true -> "모집중인 스터디"
                         dest?.hasRoute(SignUp::class) == true -> "회원가입"
                         dest?.hasRoute(CheckList::class) == true -> "체크리스트"
+                        dest?.hasRoute(Posting::class) == true -> "글쓰기"
+                        dest?.hasRoute(BoardList::class) == true -> "스터디 파트너들의 이야기"
+                        dest?.routeMatches(POST_CONTENT_ROUTE) == true -> "스터디 파트너들의 이야기"
                         else -> ""
                     }
                     BackTopBar(
                         title = title,
-                        onBackClick = { navController.popBackStack() },
+                        onBackClick = {
+                            if (dest?.hasRoute(Posting::class) == true) {
+                                showBackRequestDialog = true
+                            } else {
+                                navController.popBackStack()
+                            }
+                        },
                         modifier = Modifier.statusBarsPadding()
                     )
                 } else {
@@ -79,7 +96,14 @@ fun MainScreen(
                 showToTop = navigator.showToTopFab(),
                 onClickToTop = { scrollToTop?.invoke() },
                 showMultiple = navigator.showMultipleFab(),
-                onClickMultiple = { /* TODO */ },
+                onClickMultiple = {
+                    when {
+                        dest?.hasRoute(BoardList::class) == true -> {
+                            navigator.navController.navigateToPostingNew()
+                        }
+
+                    }
+                },
                 spacing = 12.dp,
             )
         },
@@ -103,9 +127,28 @@ fun MainScreen(
                 .fillMaxSize()
                 .consumeWindowInsets(innerPadding),
             contentPadding =  innerPadding,
-            onRegisterScrollToTop = { handler -> scrollToTop = handler }
+            onRegisterScrollToTop = { handler -> scrollToTop = handler },
+            onBackRequest = { showBackRequestDialog = true }
         )
     }
+
+    RejectDialog(
+        visible = showBackRequestDialog,
+        modalTitle = "나가시겠어요?",
+        modalDes = "지금 나가면, 쓰던 글은 저장되지 않아요",
+        okButtonText = "네",
+        noButtonText = "아니요",
+        onDismiss = {
+            showBackRequestDialog = false
+        },
+        onClick = {
+            showBackRequestDialog = false
+            navController.popBackStack()
+        },
+        onCancel = {
+            showBackRequestDialog = false
+        }
+    )
 }
 
 @Composable
@@ -119,15 +162,15 @@ private fun FabStack(
     Box(
         modifier = Modifier
     ) {
-        androidx.compose.foundation.layout.Column(
+        Column(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(spacing),
             modifier = Modifier.align(Alignment.BottomEnd)
         ) {
-            androidx.compose.animation.AnimatedVisibility(visible = showToTop) {
+            if(showToTop) {
                 FloatingToUpButton(onClick = onClickToTop)
             }
-            androidx.compose.animation.AnimatedVisibility(visible = showMultiple) {
+            if(showMultiple) {
                 FloatingMultipleButton(onClick = onClickMultiple)
             }
         }

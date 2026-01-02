@@ -7,12 +7,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.SpotActivationButton
-import com.umcspot.spot.designsystem.component.button.TextButtonM
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
@@ -43,7 +39,7 @@ fun PrivacyConsentDialog(
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
-            shape = RoundedCornerShape(14.dp),
+            shape = SpotShapes.Round,
             tonalElevation = 2.dp,
             color = SpotTheme.colors.white
         ) {
@@ -90,7 +86,7 @@ fun PrivacyConsentDialog(
                 Spacer(Modifier.height(screenHeightDp(20.dp)))
 
                 Surface(
-                    shape = RoundedCornerShape(10.dp),
+                    shape = SpotShapes.Soft,
                     border = BorderStroke(1.dp, SpotTheme.colors.gray300),
                     color = SpotTheme.colors.white,
                     modifier = Modifier
@@ -165,7 +161,7 @@ fun UniqueConsentDialog(
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
-            shape = RoundedCornerShape(14.dp),
+            shape = SpotShapes.Round,
             tonalElevation = 2.dp,
             color = SpotTheme.colors.white
         ) {
@@ -212,7 +208,7 @@ fun UniqueConsentDialog(
                 Spacer(Modifier.height(screenHeightDp(20.dp)))
 
                 Surface(
-                    shape = RoundedCornerShape(10.dp),
+                    shape = SpotShapes.Soft,
                     border = BorderStroke(1.dp, SpotTheme.colors.gray300),
                     color = SpotTheme.colors.white,
                     modifier = Modifier

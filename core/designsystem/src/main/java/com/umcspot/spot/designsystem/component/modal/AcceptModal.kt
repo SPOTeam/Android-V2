@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,12 +19,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.button.TextButtonState
-import com.umcspot.spot.designsystem.component.button.TextButtonM
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.designsystem.theme.White
 
 @Composable
 fun AcceptModal(
@@ -73,14 +71,14 @@ fun AcceptModal(
                 )
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TextButtonM(
+                    TextButton(
                         text = buttonText,
                         onClick = onClick,
-                        state = TextButtonState.B400State,
+                        state = TextButtonState.B500State,
                         modifier = Modifier.weight(1f)
                     )
 
-                    TextButtonM(
+                    TextButton(
                         text = "취소",
                         onClick = onCancel,
                         state = TextButtonState.G500State,

@@ -3,18 +3,20 @@ package com.umcspot.spot.designsystem.component.button
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
@@ -23,10 +25,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.Dp.Companion.Unspecified
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 import com.umcspot.spot.designsystem.shapes.ShapeBox
 import com.umcspot.spot.designsystem.shapes.SpotShapes
@@ -57,7 +57,7 @@ enum class TextButtonState(
     val pressed: TextButtonColors,
     val selected: TextButtonColors
 ) {
-    B400State(
+    B500State(
         normal = TextButtonColors(
             bg = White,
             text = B500,
@@ -149,6 +149,29 @@ enum class TextButtonState(
             text = B500,
             border = B100
         )
+    ),
+
+    Click(
+        normal = TextButtonColors(
+        bg = White,
+        text = Black,
+        border = White
+        ),
+        disabled = TextButtonColors(
+        bg = White,
+        text = G400,
+        border = White
+        ),
+        pressed = TextButtonColors(
+        bg = B100,
+        text = Black,
+        border = B100
+        ),
+        selected = TextButtonColors(
+        bg = B100,
+        text = B500,
+        border = B100
+        )
     )
 }
 
@@ -178,190 +201,253 @@ enum class TextButtonSize(
 }
 
 @Composable
-fun TextButtonSize.textStyle(): TextStyle = when (this) {
-    TextButtonSize.XL, TextButtonSize.L -> SpotTheme.typography.h3
-    TextButtonSize.M -> SpotTheme.typography.h4
-    TextButtonSize.S, TextButtonSize.XS -> SpotTheme.typography.h5
-}
+fun ClickSurface(
+    checked: Boolean = false,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = SpotShapes.Soft,
+    state: TextButtonState = TextButtonState.Click,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    content: @Composable () -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val colors = state.resolveColors(enabled = enabled, isPressed = isPressed, checked = checked)
 
-@Composable
-fun TextButtonSize.shape(): Shape = SpotShapes.Hard
+    Box(
+        modifier = modifier
+            .clip(shape)
+            .clickable(
+                enabled = enabled,
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick
+            )
+    ) {
+        // 배경/보더만 상태 색으로
+        ShapeBox(
+            shape = shape,
+            color = colors.bg,
+            borderWidth = 0.5.dp,
+            borderColor = colors.border,
+            modifier = Modifier.matchParentSize()
+        )
+
+        // 패딩 + 텍스트 컬러 적용
+        Box(Modifier.padding(contentPadding)) {
+            CompositionLocalProvider(LocalContentColor provides colors.text) {
+                content()
+            }
+        }
+    }
+}
 
 
 @Composable
 fun TextButton(
     text: String,
+    style : TextStyle = SpotTheme.typography.h5,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: TextButtonSize = TextButtonSize.M,
-    width: Dp = Unspecified,
+    state: TextButtonState = TextButtonState.B500State,
+    shape: Shape = SpotShapes.Hard,
     enabled: Boolean = true,
-    checked : Boolean = false,
-    state: TextButtonState = TextButtonState.B400State,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    checked: Boolean = false,
+    content: (@Composable () -> Unit)? = null
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val colors = state.resolveColors(enabled = enabled, isPressed = isPressed, checked = checked)
 
-    val widthMod = if (width.isSpecified) Modifier.width(width) else Modifier.fillMaxWidth()
-
     Box(
         modifier = modifier
-            .then(widthMod)
-            .heightIn(min = size.minHeight)
             .semantics { role = Role.Button }
+            .clip(shape)                                     // 클릭/리플 영역 클리핑
             .clickable(
                 enabled = enabled,
                 interactionSource = interactionSource,
-                indication = null, // 필요 시 리플로 교체
+                indication = null,
                 onClick = onClick
-            )
+            ),
+        contentAlignment = Alignment.Center
     ) {
         // 배경/보더
         ShapeBox(
-            shape = size.shape(),
+            shape = shape,
             color = colors.bg,
-            borderWidth = 0.5.dp,
+            borderWidth = 1.dp,
             borderColor = colors.border,
-            modifier = widthMod.height(size.minHeight)   // ✅ 동일 로직 적용
-
+            modifier = Modifier.matchParentSize()
         )
 
-        // 콘텐츠 (정중앙)
-        Box(
-            modifier = widthMod.height(size.minHeight),  // ✅ size(width, h) 대신 조합
-            contentAlignment = Alignment.Center
+        Row(
+            modifier = Modifier
+                .matchParentSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             Text(
                 text = text,
                 textAlign = TextAlign.Center,
-                style = size.textStyle(),
-                fontSize = size.fontSize,
+                style = style,
                 color = colors.text,
-                maxLines = 1
+                maxLines = 1,
             )
         }
     }
 }
 
-// ---------- Size Convenience ----------
 
-@Composable
-fun TextButtonXL(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    width: Dp = 200.dp,
-    enabled: Boolean = true,
-    checked : Boolean = false,
-    state: TextButtonState = TextButtonState.B400State,
-) = TextButton(
-    text = text,
-    onClick = onClick,
-    modifier = modifier,
-    size = TextButtonSize.XL,
-    width = width,
-    enabled = enabled,
-    checked = checked,
-    state = state
-)
-
-@Composable
-fun TextButtonL(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    width: Dp = 180.dp,
-    enabled: Boolean = true,
-    checked : Boolean = false,
-    state: TextButtonState = TextButtonState.B400State,
-) = TextButton(
-    text = text,
-    onClick = onClick,
-    modifier = modifier,
-    size = TextButtonSize.L,
-    width = width,
-    enabled = enabled,
-    checked = checked,
-    state = state
-)
-
-@Composable
-fun TextButtonM(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    width: Dp = 160.dp,
-    enabled: Boolean = true,
-    checked : Boolean = false,
-    state: TextButtonState = TextButtonState.B400State,
-) = TextButton(
-    text = text,
-    onClick = onClick,
-    modifier = modifier,
-    size = TextButtonSize.M,
-    width = width,
-    enabled = enabled,
-    checked = checked,
-    state = state
-)
-
-@Composable
-fun TextButtonS(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    width: Dp = 140.dp,
-    enabled: Boolean = true,
-    checked : Boolean = false,
-    state: TextButtonState = TextButtonState.B400State,
-) = TextButton(
-    text = text,
-    onClick = onClick,
-    modifier = modifier,
-    size = TextButtonSize.S,
-    width = width,
-    enabled = enabled,
-    checked = checked,
-    state = state
-)
-
-@Composable
-fun TextButtonXS(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    width: Dp = 70.dp,
-    enabled: Boolean = true,
-    checked : Boolean = false,
-    state: TextButtonState = TextButtonState.B400State,
-) = TextButton(
-    text = text,
-    onClick = onClick,
-    modifier = modifier,
-    size = TextButtonSize.XS,
-    width = width,
-    enabled = enabled,
-    checked = checked,
-    state = state
-)
-
-@Composable
-fun TextToggleButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    width: Dp = 126.dp,
-    enabled: Boolean = true,
-    checked : Boolean = false,
-    state: TextButtonState = TextButtonState.Toggle,
-) = TextButton(
-    text = text,
-    onClick = onClick,
-    modifier = modifier,
-    size = TextButtonSize.XS,
-    width = width,
-    enabled = enabled,
-    checked = checked,
-    state = state
-)
+//// ---------- Size Convenience ----------
+//
+//@Composable
+//fun TextButtonXL(
+//    text: String,
+//    style : TextStyle,
+//    onClick: () -> Unit,
+//    modifier: Modifier = Modifier,
+//    shape : Shape = SpotShapes.Soft,
+//    width: Dp = 200.dp,
+//    enabled: Boolean = true,
+//    checked : Boolean = false,
+//    state: TextButtonState = TextButtonState.B400State,
+//    content: @Composable () -> Unit = {}
+//) = TextButton(
+//    text = text,
+//    style = style,
+//    onClick = onClick,
+//    modifier = modifier,
+//    shape = shape,
+//    size = TextButtonSize.XL,
+//    width = width,
+//    enabled = enabled,
+//    checked = checked,
+//    state = state,
+//    content = content
+//)
+//
+//@Composable
+//fun TextButtonL(
+//    text: String,
+//    style : TextStyle,
+//    onClick: () -> Unit,
+//    modifier: Modifier = Modifier,
+//    shape : Shape = SpotShapes.Soft,
+//    width: Dp = 180.dp,
+//    enabled: Boolean = true,
+//    checked : Boolean = false,
+//    state: TextButtonState = TextButtonState.B400State,
+//    content: @Composable () -> Unit = {}
+//) = TextButton(
+//    text = text,
+//    onClick = onClick,
+//    modifier = modifier,
+//    shape = shape,
+//    size = TextButtonSize.L,
+//    width = width,
+//    enabled = enabled,
+//    checked = checked,
+//    state = state,
+//    content = content
+//)
+//
+//@Composable
+//fun TextButtonM(
+//    text: String,
+//    style : TextStyle,
+//    onClick: () -> Unit,
+//    modifier: Modifier = Modifier,
+//    width: Dp = 160.dp,
+//    shape : Shape = SpotShapes.Soft,
+//    enabled: Boolean = true,
+//    checked : Boolean = false,
+//    state: TextButtonState = TextButtonState.B400State,
+//    content: @Composable () -> Unit = {}
+//) = TextButton(
+//    text = text,
+//    onClick = onClick,
+//    modifier = modifier,
+//    size = TextButtonSize.M,
+//    shape = shape,
+//    width = width,
+//    enabled = enabled,
+//    checked = checked,
+//    state = state,
+//    content = content
+//)
+//
+//@Composable
+//fun TextButtonS(
+//    text: String,
+//    style : TextStyle,
+//    onClick: () -> Unit,
+//    modifier: Modifier = Modifier,
+//    width: Dp = 140.dp,
+//    shape : Shape = SpotShapes.Soft,
+//    enabled: Boolean = true,
+//    checked : Boolean = false,
+//    state: TextButtonState = TextButtonState.B400State,
+//    content: @Composable () -> Unit = {}
+//) = TextButton(
+//    text = text,
+//    onClick = onClick,
+//    modifier = modifier,
+//    size = TextButtonSize.S,
+//    shape = shape,
+//    width = width,
+//    enabled = enabled,
+//    checked = checked,
+//    state = state,
+//    content = content
+//)
+//
+//@Composable
+//fun TextButtonXS(
+//    text: String,
+//    style : TextStyle,
+//    onClick: () -> Unit,
+//    modifier: Modifier = Modifier,
+//    shape : Shape = SpotShapes.Soft,
+//    width: Dp = 70.dp,
+//    enabled: Boolean = true,
+//    checked : Boolean = false,
+//    state: TextButtonState = TextButtonState.B400State,
+//    content: @Composable () -> Unit = {}
+//) = TextButton(
+//    text = text,
+//    onClick = onClick,
+//    modifier = modifier,
+//    size = TextButtonSize.XS,
+//    shape = shape,
+//    width = width,
+//    enabled = enabled,
+//    checked = checked,
+//    state = state,
+//    content = content
+//)
+//
+//@Composable
+//fun TextToggleButton(
+//    text: String,
+//    onClick: () -> Unit,
+//    modifier: Modifier = Modifier,
+//    shape : Shape = SpotShapes.Soft,
+//    width: Dp = 126.dp,
+//    enabled: Boolean = true,
+//    checked : Boolean = false,
+//    size: TextButtonSize = TextButtonSize.M,   // ← 기본값을 M로
+//    state: TextButtonState = TextButtonState.Toggle,
+//    content: @Composable () -> Unit = {}
+//) = TextButton(
+//    text = text,
+//    onClick = onClick,
+//    modifier = modifier,
+//    size = size,
+//    shape = shape,
+//    width = width,
+//    enabled = enabled,
+//    checked = checked,
+//    state = state,
+//    content = content
+//)

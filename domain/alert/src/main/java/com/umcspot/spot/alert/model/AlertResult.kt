@@ -31,7 +31,7 @@ data class AppliedAlertInfo(
                 id = id,
                 title = "실시간 인기 글",
                 subtitle = "Sample Post Title",
-                studyImageRes = ImageRef.LocalName("ic_fire"),
+                studyImageRes = ImageRef.Name("ic_fire"),
             )
         }
     }
@@ -70,7 +70,7 @@ data class AlertInfo(
                         kind = kind,
                         title = "실시간 인기 글",
                         subtitle = "Sample Post Title",
-                        studyImageRes = ImageRef.LocalName("ic_fire"),
+                        studyImageRes = ImageRef.Name("ic_fire"),
                         isRead = false
                     )
 
@@ -80,7 +80,7 @@ data class AlertInfo(
                         kind = kind,
                         title = "내 스터디 '공지' 업데이트",
                         subtitle = "\"Sample Study\"의 새로운 공지",
-                        studyImageRes = ImageRef.LocalName("sample"),
+                        studyImageRes = ImageRef.Name("sample"),
                         isRead = false
                     )
 
@@ -90,7 +90,7 @@ data class AlertInfo(
                         kind = kind,
                         title = "내 스터디 '새 일정' 등록",
                         subtitle = "\"Sample Study\"의 새로운 일정",
-                        studyImageRes = ImageRef.LocalName("ic_study_default"),
+                        studyImageRes = ImageRef.Name("ic_study_default"),
                         isRead = false
                     )
 
@@ -100,7 +100,7 @@ data class AlertInfo(
                         kind = kind,
                         title = "‘사용자님’의 “Sample Todolist” 할 일 완료!",
                         subtitle = "\"Sample Study\"의 ‘사용자님’",
-                        studyImageRes = ImageRef.LocalName("ic_check_filled"),
+                        studyImageRes = ImageRef.Name("ic_check_filled"),
                         isRead = false
                     )
             }

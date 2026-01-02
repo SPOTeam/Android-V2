@@ -146,7 +146,7 @@ fun BlankButton(
 
 @Preview
 @Composable
-fun preview() {
+private fun preview() {
     SpotTheme {
         BlankButton(
             modifier = Modifier

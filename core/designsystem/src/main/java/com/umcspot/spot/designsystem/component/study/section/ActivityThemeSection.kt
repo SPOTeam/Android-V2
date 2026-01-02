@@ -11,6 +11,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.MultiButton
+import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
@@ -70,6 +71,7 @@ private fun BaseActivityThemeSection(
                     MultiButton(
                         modifier = Modifier.weight(1f),
                         text = theme.title,
+                        shape = SpotShapes.Soft,
                         painter = getIconForTheme(theme),
                         checked = isThemeSelected(theme),
                         enabled = isThemeEnabled(theme),

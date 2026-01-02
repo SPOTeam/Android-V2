@@ -48,7 +48,7 @@ data class StudyResult(
                 member = mem,
                 likes = 10 + index * 2,
                 views = 150 + index * 20,
-                studyImage = ImageRef.LocalName("ic_study_default") // 필요시 Url로 교체
+                studyImage = ImageRef.Name("ic_study_default") // 필요시 Url로 교체
             )
         }
     }
