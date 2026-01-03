@@ -1,17 +1,25 @@
 package com.umcspot.spot.study.mapper
 
 import com.umcspot.spot.study.dto.request.StudyRequestDto
+import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.Study as DTOStudy
 import com.umcspot.spot.study.dto.response.StudyResponseDto
-import com.umcspot.spot.study.model.Study as DomainStudy
+import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyResult
 import com.umcspot.spot.study.model.StudyResultList
 
-// Domain -> Request DTO
-fun DomainStudy.toData(): StudyRequestDto =
-    StudyRequestDto(
-        studyId = this.studyId
+fun StudyCreateModel.toData(): StudyRequestDto {
+    return StudyRequestDto(
+        name = this.name,
+        maxMembers = this.maxMembers,
+        hasFee = this.hasFee,
+        amount = this.amount,
+        description = this.description,
+        categories = this.categories, 
+        styles = this.styles,         
+        regionCodes = this.regionCodes
     )
+}
 
 fun DTOStudy.toDomain() : StudyResult =
     StudyResult (
@@ -29,3 +37,4 @@ fun StudyResponseDto.toDomainList(): StudyResultList =
     StudyResultList(
         studyList = this.studyList.map(DTOStudy::toDomain)
     )
+fun CreateStudyResponseDto.toDomain(): Long = this.studyId

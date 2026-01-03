@@ -1,12 +1,31 @@
 package com.umcspot.spot.study.dto.request
 
-import android.annotation.SuppressLint
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.google.gson.annotations.SerializedName
+import com.umcspot.spot.model.StudyStyle
+import com.umcspot.spot.model.StudyTheme
 
-@SuppressLint("UnsafeOptInUsageError")
-@Serializable
 data class StudyRequestDto(
-    @SerialName("studyId")
-    val studyId : Int
+    @SerializedName("name")
+    val name: String,
+
+    @SerializedName("maxMembers")
+    val maxMembers: Int,
+
+    @SerializedName("hasFee")
+    val hasFee: Boolean,
+
+    @SerializedName("amount")
+    val amount: Int,
+
+    @SerializedName("description")
+    val description: String,
+
+    @SerializedName("categories")
+    val categories: List<StudyTheme>,
+
+    @SerializedName("styles")
+    val styles: List<StudyStyle>,
+
+    @SerializedName("regionCodes")
+    val regionCodes: List<String>
 )

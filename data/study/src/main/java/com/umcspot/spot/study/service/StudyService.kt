@@ -5,10 +5,13 @@ import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
-import com.umcspot.spot.study.dto.request.StudyRequestDto
+import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
-import retrofit2.http.Body
+import okhttp3.MultipartBody
 import retrofit2.http.GET
+import retrofit2.http.Multipart
+import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Query
 
 interface StudyService {
@@ -30,4 +33,11 @@ interface StudyService {
         @Query("theme") theme: StudyTheme?,
         @Query("feeRange") feeRange: FeeRange?
     ): BaseResponse<StudyResponseDto>
+
+    @Multipart
+    @POST("/api/studies")
+    suspend fun createStudy(
+        @Part request: MultipartBody.Part,
+        @Part imageFile: MultipartBody.Part?
+    ): BaseResponse<CreateStudyResponseDto>
 }

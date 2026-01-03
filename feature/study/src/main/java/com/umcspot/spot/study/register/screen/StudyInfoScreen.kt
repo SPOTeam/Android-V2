@@ -12,12 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.model.StudyStyle
+import com.umcspot.spot.study.model.StudyPersonality
 import com.umcspot.spot.study.register.component.BinaryChoiceRow
 import com.umcspot.spot.study.register.component.FeeInputSection
 import com.umcspot.spot.study.register.component.MemberCountSelector
 import com.umcspot.spot.ui.extension.screenHeightDp
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun StudyInfoScreen(
@@ -26,7 +26,7 @@ fun StudyInfoScreen(
     hasFee: Boolean?,
     feeAmount: String,
     onFeeInfoChange: (Boolean?, String) -> Unit,
-    preferences: ImmutableList<Int?>,
+    selectedStyles: Map<StudyPersonality, StudyStyle>,
     onPersonalityChange: (Int, Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -79,22 +79,24 @@ fun StudyInfoScreen(
 
         Spacer(modifier = Modifier.height(screenHeightDp(16.dp)))
 
-        val choiceLabels = persistentListOf(
-            "네트워킹 중시" to "목표/규율 중시",
-            "단기 목표" to "장기 목표",
-            "개인 학습 + 함께 토론형" to "공동 학습 + 동시 진행형",
-            "학습형" to "토론형",
-            "가볍게 + 유연하게" to "규칙적인 + 계획적인"
-        )
+        StudyPersonality.entries.forEachIndexed { index, personality ->
 
-        choiceLabels.forEachIndexed { index, (left, right) ->
+            val currentStyle = selectedStyles[personality]
+
+            val selectedIndex = when (currentStyle) {
+                personality.option1 -> 0
+                personality.option2 -> 1
+                else -> null
+            }
+
             BinaryChoiceRow(
-                leftText = left,
-                rightText = right,
-                selectedIndex = preferences[index],
+                leftText = personality.leftLabel,
+                rightText = personality.rightLabel,
+                selectedIndex = selectedIndex,
                 onSelect = { value -> onPersonalityChange(index, value) }
             )
-            if (index < choiceLabels.lastIndex) {
+
+            if (index < StudyPersonality.entries.lastIndex) {
                 Spacer(modifier = Modifier.height(screenHeightDp(12.dp)))
             }
         }
