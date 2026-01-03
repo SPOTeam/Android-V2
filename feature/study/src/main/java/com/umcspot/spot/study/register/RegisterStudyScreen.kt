@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.component.button.SpotActivationButton
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.study.component.SpotStudyDialog
 import com.umcspot.spot.study.register.component.StepProgressBar
 import com.umcspot.spot.study.register.model.RegisterStudySideEffect
 import com.umcspot.spot.study.register.model.RegisterStudyState
@@ -33,7 +34,6 @@ import com.umcspot.spot.study.register.screen.StudyIntroduceScreen
 import com.umcspot.spot.study.register.screen.StudyPlaceScreen
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -42,7 +42,7 @@ import kotlinx.coroutines.launch
 fun RegisterStudyRoute(
     contentPadding: PaddingValues,
     onBackClick: () -> Unit,
-    navigateToHome: () -> Unit,
+    navigateToStudyDetail: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: RegisterStudyViewModel = hiltViewModel()
 ) {
@@ -62,11 +62,25 @@ fun RegisterStudyRoute(
 
     BackHandler { handleBackPress() }
 
+    if (uiState.isSuccessModalVisible) {
+        SpotStudyDialog(
+            onDismissRequest = {
+                uiState.createdStudyId?.let(navigateToStudyDetail)
+            },
+            title = "스터디 등록 완료",
+            description = "이제 스터디 모집이 시작됩니다!\n마이페이지에서 신청을 수락할 수 있어요.",
+            buttonText = "내 스터디 보러가기",
+            onButtonClick = {
+                uiState.createdStudyId?.let(navigateToStudyDetail)
+            }
+        )
+    }
+
     LaunchedEffect(viewModel.sideEffect) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
-                is RegisterStudySideEffect.NavigateToHome -> navigateToHome()
-                else -> {}
+                is RegisterStudySideEffect.ShowSnackBar -> {
+                }
             }
         }
     }
@@ -107,7 +121,8 @@ fun RegisterStudyRoute(
             onMemberCountChange = viewModel::onMemberCountChange,
             onFeeInfoChange = viewModel::onFeeInfoChange,
             onPersonalityChange = viewModel::onPersonalityChange,
-            onDescriptionChange = viewModel::onDescriptionChange
+            onDescriptionChange = viewModel::onDescriptionChange,
+            onImageSelected = viewModel::onImageSelected
         )
     }
 }
@@ -131,7 +146,8 @@ private fun RegisterStudyScreen(
     onMemberCountChange: (Int) -> Unit,
     onFeeInfoChange: (Boolean?, String) -> Unit,
     onPersonalityChange: (Int, Int) -> Unit,
-    onDescriptionChange: (String) -> Unit
+    onDescriptionChange: (String) -> Unit,
+    onImageSelected: (String?) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -162,6 +178,7 @@ private fun RegisterStudyScreen(
                         onStudyNameChange = onStudyNameChange,
                         onThemeSelect = onThemeSelect
                     )
+
                     1 -> StudyPlaceScreen(
                         activityType = uiState.activityType,
                         isSheetVisible = uiState.isSheetVisible,
@@ -175,24 +192,22 @@ private fun RegisterStudyScreen(
                         onAddSelected = onAddSelected,
                         onRemoveSelected = onRemoveSelected
                     )
+
                     2 -> StudyInfoScreen(
                         memberCount = uiState.memberCount,
                         onMemberCountChange = onMemberCountChange,
                         hasFee = uiState.hasFee,
                         feeAmount = uiState.feeAmount,
                         onFeeInfoChange = onFeeInfoChange,
-                        preferences = persistentListOf(
-                            uiState.networkingPreference,
-                            uiState.goalDurationPreference,
-                            uiState.discussionPreference,
-                            uiState.learningPreference,
-                            uiState.flexibilityPreference
-                        ),
+                        selectedStyles = uiState.personalitySelections,
                         onPersonalityChange = onPersonalityChange
                     )
+
                     3 -> StudyIntroduceScreen(
                         description = uiState.description,
                         onDescriptionChange = onDescriptionChange,
+                        selectedImageUri = uiState.studyImageUri,
+                        onImageSelected = onImageSelected,
                         onIntroduceValid = { }
                     )
                 }

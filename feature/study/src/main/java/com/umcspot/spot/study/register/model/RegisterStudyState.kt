@@ -2,10 +2,11 @@ package com.umcspot.spot.study.register.model
 
 import com.umcspot.spot.common.location.LocationRow
 import com.umcspot.spot.model.ActivityType
+import com.umcspot.spot.model.StudyStyle
 import com.umcspot.spot.model.StudyTheme
+import com.umcspot.spot.study.model.StudyPersonality
 
 data class RegisterStudyState(
-
     val studyName: String = "",
     val studyThemes: List<StudyTheme> = emptyList(),
 
@@ -19,17 +20,15 @@ data class RegisterStudyState(
     val hasFee: Boolean? = null,
     val feeAmount: String = "",
 
-    val networkingPreference: Int? = null,
-    val goalDurationPreference: Int? = null,
-    val discussionPreference: Int? = null,
-    val learningPreference: Int? = null,
-    val flexibilityPreference: Int? = null,
+    val personalitySelections: Map<StudyPersonality, StudyStyle> = emptyMap(),
 
     val description: String = "",
-    val studyImageUri: String? = null
+    val studyImageUri: String? = null,
+
+    val isSuccessModalVisible: Boolean = false,
+    val createdStudyId: Long? = null
 )
 
 sealed interface RegisterStudySideEffect {
-    data object NavigateToHome : RegisterStudySideEffect
     data class ShowSnackBar(val message: String) : RegisterStudySideEffect
 }

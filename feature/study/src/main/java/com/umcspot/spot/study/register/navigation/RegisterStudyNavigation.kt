@@ -18,18 +18,14 @@ fun NavController.navigateToRegisterStudy(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.registerStudyGraph(
     contentPadding : PaddingValues,
     onBackClick: () -> Unit,
-//    navigateToNextScreen: (Long) -> Unit
-    navigateToHome: () -> Unit
+    navigateToStudyDetail: (Long) -> Unit
 ) {
     composable<RegisterStudy> {
         
         RegisterStudyRoute(
             contentPadding = contentPadding,
             onBackClick = onBackClick,
-//            navigateToNext = { createdStudyId ->
-//                navigateToNextScreen(createdStudyId)
-//            }
-            navigateToHome = navigateToHome
+            navigateToStudyDetail = navigateToStudyDetail
         )
     }
 }

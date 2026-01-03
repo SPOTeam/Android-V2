@@ -6,9 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.umcspot.spot.common.location.LocationRow
 import com.umcspot.spot.common.location.LocationStore
 import com.umcspot.spot.common.location.searchLocations
+import com.umcspot.spot.common.util.FileUtil
 import com.umcspot.spot.model.ActivityType
+import com.umcspot.spot.study.model.StudyCreateModel
+import com.umcspot.spot.study.model.StudyPersonality
 import com.umcspot.spot.study.register.model.RegisterStudySideEffect
 import com.umcspot.spot.study.register.model.RegisterStudyState
+import com.umcspot.spot.study.repository.StudyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -21,10 +25,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 @HiltViewModel
 class RegisterStudyViewModel @Inject constructor(
-    @ApplicationContext private val appContext: Context
+    @ApplicationContext private val appContext: Context,
+    private val studyRepository: StudyRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterStudyState())
@@ -76,7 +82,10 @@ class RegisterStudyViewModel @Inject constructor(
     }
 
     fun addSelectedRegion(region: String) {
-        if (_uiState.value.selectedRegions.size < 10 && !_uiState.value.selectedRegions.contains(region)) {
+        if (_uiState.value.selectedRegions.size < 10 && !_uiState.value.selectedRegions.contains(
+                region
+            )
+        ) {
             _uiState.update {
                 it.copy(
                     selectedRegions = it.selectedRegions + region
@@ -130,16 +139,14 @@ class RegisterStudyViewModel @Inject constructor(
         _uiState.update { it.copy(hasFee = hasFee, feeAmount = amount) }
     }
 
-    fun onPersonalityChange(categoryIndex: Int, value: Int) {
+    fun onPersonalityChange(categoryIndex: Int, selectedOptionIndex: Int) {
+        val category = StudyPersonality.entriesList.getOrNull(categoryIndex) ?: return
+        val selectedStyle = category.getStyle(selectedOptionIndex)
+
         _uiState.update {
-            when (categoryIndex) {
-                0 -> it.copy(networkingPreference = value)
-                1 -> it.copy(goalDurationPreference = value)
-                2 -> it.copy(discussionPreference = value)
-                3 -> it.copy(learningPreference = value)
-                4 -> it.copy(flexibilityPreference = value)
-                else -> it
-            }
+            it.copy(
+                personalitySelections = it.personalitySelections + (category to selectedStyle)
+            )
         }
     }
 
@@ -155,24 +162,70 @@ class RegisterStudyViewModel @Inject constructor(
                 if (state.activityType == null) return false
                 if (state.activityType == ActivityType.OFFLINE) state.selectedRegions.isNotEmpty() else true
             }
+
             2 -> {
-                val isFeeValid = state.hasFee != null && (!state.hasFee || state.feeAmount.isNotBlank())
-                val isPersonalityValid = state.networkingPreference != null &&
-                        state.goalDurationPreference != null &&
-                        state.discussionPreference != null &&
-                        state.learningPreference != null &&
-                        state.flexibilityPreference != null
+                val isFeeValid =
+                    state.hasFee != null && (!state.hasFee || state.feeAmount.isNotBlank())
+                val isPersonalityValid =
+                    state.personalitySelections.size == StudyPersonality.entries.size
 
                 state.memberCount > 1 && isFeeValid && isPersonalityValid
             }
+
             3 -> state.description.isNotBlank()
             else -> false
         }
     }
 
+    fun onImageSelected(uri: String?) {
+        _uiState.update { it.copy(studyImageUri = uri) }
+    }
+
     fun submit() {
         viewModelScope.launch {
-            _sideEffect.emit(RegisterStudySideEffect.NavigateToHome)
+            val currentState = _uiState.value
+
+            val imageFile = currentState.studyImageUri?.let { uriString ->
+                FileUtil.createTempFileFromUri(appContext, uriString.toUri())
+            }
+
+            val regionCodes = if (currentState.activityType == ActivityType.ONLINE) {
+                emptyList()
+            } else {
+                currentState.selectedRegions.mapNotNull { regionName ->
+                    allLocations.find { it.name == regionName }?.code
+                }
+            }
+
+            val styles = currentState.personalitySelections.values.toList()
+
+            val createModel = StudyCreateModel(
+                name = currentState.studyName,
+                maxMembers = currentState.memberCount,
+                hasFee = currentState.hasFee ?: false,
+                amount = currentState.feeAmount.toIntOrNull() ?: 0,
+                description = currentState.description,
+                categories = currentState.studyThemes,
+                styles = styles,
+                regionCodes = regionCodes
+            )
+
+            studyRepository.createStudy(createModel, imageFile)
+                .onSuccess { id ->
+                    _uiState.update {
+                        it.copy(
+                            isSuccessModalVisible = true,
+                            createdStudyId = id
+                        )
+                    }
+                }
+                .onFailure { exception ->
+                    _sideEffect.emit(
+                        RegisterStudySideEffect.ShowSnackBar(
+                            exception.message ?: "실패"
+                        )
+                    )
+                }
         }
     }
 }
