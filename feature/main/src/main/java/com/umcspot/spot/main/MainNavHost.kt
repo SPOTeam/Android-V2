@@ -17,10 +17,12 @@ import com.umcspot.spot.jjim.navigation.jjimGraph
 import com.umcspot.spot.model.QuickMenuType
 import com.umcspot.spot.mypage.navigation.mypageGraph
 import com.umcspot.spot.signup.navigation.signupGraph
+import com.umcspot.spot.study.detail.navigation.studyDetailGraph
 import com.umcspot.spot.study.my.navigation.myStudyGraph
 import com.umcspot.spot.study.preferLocation.navigation.preferLocationStudyGraph
 import com.umcspot.spot.study.recruiting.navigation.recruitingStudyFilterGraph
 import com.umcspot.spot.study.recruiting.navigation.recruitingStudyGraph
+import com.umcspot.spot.study.register.navigation.RegisterStudy
 import com.umcspot.spot.study.register.navigation.registerStudyGraph
 
 @Composable
@@ -108,8 +110,20 @@ fun MainNavHost(
 
         registerStudyGraph(
             contentPadding = contentPadding,
-            onBackClick = { navigator.popBackStack() },
-            navigateToHome = { navigator.navigateToHome() },
+            onBackClick = { navigator.navigateToHome(clearStackNavOptions) },
+            navigateToStudyDetail = { studyId ->
+                navigator.navigateToStudyDetail(
+                    studyId = studyId,
+                    navOptions = navOptions {
+                        popUpTo<RegisterStudy> { inclusive = true }
+                    }
+                )
+            }
+        )
+
+        studyDetailGraph(
+            contentPadding = contentPadding,
+            onBackClick = { navigator.navigateToMyStudy(clearStackNavOptions) }
         )
     }
 }
