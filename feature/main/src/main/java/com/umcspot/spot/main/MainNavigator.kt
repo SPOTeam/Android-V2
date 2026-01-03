@@ -17,6 +17,7 @@ import com.umcspot.spot.alert.navigation.navigateToAppliedAlert
 import com.umcspot.spot.category.navigation.navigateToCategory
 import com.umcspot.spot.feature.board.navigation.Board
 import com.umcspot.spot.feature.board.navigation.navigateToBoard
+import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.navigateToJJim
 import com.umcspot.spot.mypage.navigation.navigateToMypage
@@ -27,6 +28,8 @@ import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.signup.navigation.navigateToCheckList
 import com.umcspot.spot.signup.navigation.navigateToSaving
 import com.umcspot.spot.signup.navigation.navigateToSignUp
+import com.umcspot.spot.study.detail.navigation.StudyDetail
+import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
 import com.umcspot.spot.study.recruiting.navigation.Recruiting
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocation
@@ -34,7 +37,6 @@ import com.umcspot.spot.study.preferLocation.navigation.navigateToPreferLocation
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudy
 import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudyFilter
-import com.umcspot.spot.study.register.navigation.RegisterStudy
 import com.umcspot.spot.study.register.navigation.navigateToRegisterStudy
 import kotlin.reflect.KClass
 
@@ -85,14 +87,17 @@ class MainNavigator(
     fun isInLanding(): Boolean = inAnyGraph(Landing::class, Saving::class)
 
     @Composable
-    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, RecruitingFilter::class,
-        SignUp::class, CheckList::class,RegisterStudy::class)
+    fun showBackTopBar(): Boolean = inAnyGraph(
+        Alert::class, AppliedAlert::class, RecruitingFilter::class,
+        SignUp::class, CheckList::class
+    )
 
     @Composable
-    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class,PreferLocation::class)
+    fun showToTopFab(): Boolean =
+        inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class, PreferLocation::class)
 
     @Composable
-    fun showMultipleFab(): Boolean = inAnyGraph(Board::class)
+    fun showMultipleFab(): Boolean = inAnyGraph(Board::class, Home::class)
 
     @Composable
     fun showBottomBar(): Boolean {
@@ -134,6 +139,10 @@ class MainNavigator(
         navController.navigateToHome(navOptions)
     }
 
+    fun navigateToMyStudy(navOptions: NavOptions? = null) {
+        navController.navigateToMyStudy(navOptions)
+    }
+
     fun navigateToRegisterStudy(navOptions: NavOptions? = null) {
         navController.navigateToRegisterStudy(navOptions)
     }
@@ -161,6 +170,11 @@ class MainNavigator(
     fun navigateToAppliedAlert(navOptions: NavOptions? = null) {
         navController.navigateToAppliedAlert(navOptions)
     }
+
+    fun navigateToStudyDetail(studyId: Long, navOptions: NavOptions? = null) {
+        navController.navigate(StudyDetail(studyId), navOptions)
+    }
+
     fun navigateToHomeAfterLogin() {
         val navOptions = navOptions {
             popUpTo(Landing) { inclusive = true }
