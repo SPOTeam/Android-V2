@@ -30,6 +30,7 @@ import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.main.component.MainBottomBar
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
+import com.umcspot.spot.study.detail.navigation.StudyDetail
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import com.umcspot.spot.study.register.navigation.RegisterStudy
 import kotlinx.collections.immutable.toImmutableList
@@ -46,9 +47,11 @@ fun MainScreen(
     Scaffold(
         topBar = {
             if (!navigator.isInLanding()) {
-                if (dest?.hasRoute(RegisterStudy::class) == true) {
-                }
-                else if (navigator.showBackTopBar()) {
+                val isRegisterOrDetail = dest?.hasRoute(RegisterStudy::class) == true ||
+                        dest?.hasRoute(StudyDetail::class) == true
+
+                if (isRegisterOrDetail) {
+                } else if (navigator.showBackTopBar()) {
                     val title = when {
                         dest?.hasRoute(Alert::class) == true -> "알림"
                         dest?.hasRoute(AppliedAlert::class) == true -> "신청한 알림"
@@ -79,12 +82,12 @@ fun MainScreen(
                 showToTop = navigator.showToTopFab(),
                 onClickToTop = { scrollToTop?.invoke() },
                 showMultiple = navigator.showMultipleFab(),
-                onClickMultiple = { /* TODO */ },
+                onClickMultiple = { navigator::navigateToRegisterStudy },
                 spacing = 12.dp,
             )
         },
         bottomBar = {
-            if(!navigator.isInLanding()) {
+            if (!navigator.isInLanding()) {
                 MainBottomBar(
                     visible = navigator.showBottomBar(),
                     tabs = MainNavTab.entries.toImmutableList(),
@@ -102,7 +105,7 @@ fun MainScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .consumeWindowInsets(innerPadding),
-            contentPadding =  innerPadding,
+            contentPadding = innerPadding,
             onRegisterScrollToTop = { handler -> scrollToTop = handler }
         )
     }
