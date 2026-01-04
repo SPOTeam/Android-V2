@@ -1,6 +1,8 @@
 package com.umcspot.spot.study.register.screen
 
-import androidx.compose.foundation.Image
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -30,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.Default
@@ -44,11 +47,17 @@ import com.umcspot.spot.ui.extension.screenWidthDp
 fun StudyIntroduceScreen(
     description: String,
     onDescriptionChange: (String) -> Unit,
+    selectedImageUri: String?,
+    onImageSelected: (String?) -> Unit,
     onIntroduceValid: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isImageSelected by remember { mutableStateOf(false) }
-
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            onImageSelected(uri?.toString())
+        }
+    )
     LaunchedEffect(description) {
         onIntroduceValid(description.isNotEmpty())
     }
@@ -128,15 +137,17 @@ fun StudyIntroduceScreen(
             modifier = Modifier
                 .size(width = screenWidthDp(80.dp), height = screenHeightDp(80.dp))
                 .clip(RoundedCornerShape(6.dp))
-                .background(if (isImageSelected) SpotTheme.colors.black else SpotTheme.colors.G100) // 이미지가 없을 때 배경색 지정 (G100)
+                .background(if (selectedImageUri != null) SpotTheme.colors.black else SpotTheme.colors.G100)
                 .noRippleClickable {
-                    isImageSelected = !isImageSelected
+                    photoPickerLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
                 },
             contentAlignment = Alignment.Center
         ) {
-            if (isImageSelected) {
-                Image(
-                    painter = painterResource(id = R.drawable.license),
+            if (selectedImageUri != null) {
+                AsyncImage(
+                    model = selectedImageUri,
                     contentDescription = "Selected Study Image",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()

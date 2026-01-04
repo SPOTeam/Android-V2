@@ -6,15 +6,15 @@ enum class WeatherType { HEAVYRAIN, RAIN, SNOW, WIND, COLD, HOT, SUNNY }
 
 enum class SortType { RECENT, RECOMMEND, COMMENT_COUNT }
 
-enum class PostType { PASS_EXPERIENCE, INFORMATION_SHARING, COUNSELING, JOB_TALK, FREE_TALK}
+enum class PostType { PASS_EXPERIENCE, INFORMATION_SHARING, COUNSELING, JOB_TALK, FREE_TALK }
 
 val PostType.korean: String
     get() = when (this) {
-        PostType.PASS_EXPERIENCE        -> "합격후기"
-        PostType.INFORMATION_SHARING    -> "정보공유"
-        PostType.COUNSELING             -> "고민상담"
-        PostType.JOB_TALK               -> "취준토크"
-        PostType.FREE_TALK              -> "자유토크"
+        PostType.PASS_EXPERIENCE -> "합격후기"
+        PostType.INFORMATION_SHARING -> "정보공유"
+        PostType.COUNSELING -> "고민상담"
+        PostType.JOB_TALK -> "취준토크"
+        PostType.FREE_TALK -> "자유토크"
     }
 
 enum class RecruitingStudySort(val label: String) {
@@ -27,7 +27,7 @@ enum class RecruitingStudySort(val label: String) {
 enum class AlertKind { POPULAR_POST, STUDY_NOTICE, STUDY_SCHEDULE, TODO_DONE }
 
 enum class ActivityType(
-    val label : String
+    val label: String
 ) {
     ONLINE("온라인"),
     OFFLINE("오프라인")
@@ -35,7 +35,7 @@ enum class ActivityType(
 
 enum class FeeRange(
     val label: String
-){
+) {
     NONE("없음"),
     UNDER_10K("1만원 미만"),
     ABOUT10K("1만원대"),
@@ -58,6 +58,19 @@ enum class StudyTheme(
     COMPETITION("공모전"),
     MAJOR_CAREER("전공 / 진로 학습"),
     OTHER("기타")
+}
+
+enum class StudyStyle {
+    NETWORKING,
+    GOAL_OR_RULE_ORIENTED,
+    SHORT_TERM,
+    LONG_TERM,
+    INDIVIDUAL_PLUS_DISCUSSION,
+    GROUP_PLUS_SIMULTANEOUS,
+    LEARNING_BASED,
+    DISCUSSION_BASED,
+    LIGHT_AND_FLEXIBLE,
+    STRUCTURED_AND_PLANNED
 }
 
 enum class SocialLoginType(

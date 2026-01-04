@@ -4,53 +4,75 @@ import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.model.StudyTheme
-import com.umcspot.spot.study.mapper.toDomainList
+import com.umcspot.spot.study.datasource.StudyDataSource
+import com.umcspot.spot.study.mapper.toData
+import com.umcspot.spot.study.mapper.toDomain
+import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.study.repository.StudyRepository
-import com.umcspot.spot.study.service.StudyService
+import java.io.File
 import javax.inject.Inject
 
 class StudyRepositoryImpl @Inject constructor(
-    private val studyService: StudyService
+    private val studyDataSource: StudyDataSource
 ) : StudyRepository {
+
     override suspend fun getPopularStudies(): Result<StudyResultList> =
         runCatching {
-            val response = studyService.getPopularStudies()
-            response.result!!.toDomainList()
-        }.recoverCatching {
-            setPopularDummies()
+            val response = studyDataSource.getPopularStudies()
+            response.result.toDomain()
         }
-
-    private fun setPopularDummies(count: Int = 5): StudyResultList =
-        StudyResultList(StudyResultList.getPopularDummies(count))
-
 
     override suspend fun getRecommendStudies(): Result<StudyResultList> =
         runCatching {
-            val response = studyService.getPopularStudies()
-            response.result!!.toDomainList()
-        }.recoverCatching {
-            setRecommendDummies()
+            val response = studyDataSource.getRecommendStudies()
+            response.result.toDomain()
         }
 
-    private fun setRecommendDummies(count: Int = 5): StudyResultList =
-        StudyResultList(StudyResultList.getRecommendedDummies(count))
-
-
-    override suspend fun getRecruitingStudies(sortType : RecruitingStudySort, activityType: ActivityType?, theme: StudyTheme?, feeRange: FeeRange?): Result<StudyResultList> =
+    override suspend fun getRecruitingStudies(
+        sortType: RecruitingStudySort,
+        activityType: ActivityType?,
+        theme: StudyTheme?,
+        feeRange: FeeRange?
+    ): Result<StudyResultList> =
         runCatching {
-            val response = studyService.getRecruitingStudies(sortType = sortType, activityType = activityType, theme = theme, feeRange = feeRange)
-            response.result!!.toDomainList()
-        }.recoverCatching {
-            setRecommendDummies(30)
+            val response = studyDataSource.getRecruitingStudies(
+                sortType = sortType,
+                activityType = activityType ?: ActivityType.OFFLINE,
+                theme = theme ?: StudyTheme.OTHER,
+                feeRange = feeRange ?: FeeRange.NONE
+            )
+            response.result.toDomain()
         }
 
-    override suspend fun getPreferLocationStudies(sortType : RecruitingStudySort, activityType: ActivityType?, theme: StudyTheme?, feeRange: FeeRange?): Result<StudyResultList> =
+    override suspend fun getPreferLocationStudies(
+        sortType: RecruitingStudySort,
+        activityType: ActivityType?,
+        theme: StudyTheme?,
+        feeRange: FeeRange?
+    ): Result<StudyResultList> =
         runCatching {
-            val response = studyService.getRecruitingStudies(sortType = sortType, activityType = activityType, theme = theme, feeRange = feeRange)
-            response.result!!.toDomainList()
-        }.recoverCatching {
-            setRecommendDummies(0)
+            val response = studyDataSource.getRecruitingStudies(
+                sortType = sortType,
+                activityType = activityType ?: ActivityType.OFFLINE,
+                theme = theme ?: StudyTheme.OTHER,
+                feeRange = feeRange ?: FeeRange.NONE
+            )
+            response.result.toDomain()
         }
 
+    override suspend fun createStudy(
+        studyCreateModel: StudyCreateModel,
+        imageFile: File?
+    ): Result<Long> = runCatching {
+        val requestDto = studyCreateModel.toData()
+
+        val response = studyDataSource.createStudy(requestDto, imageFile)
+
+        if (!response.isSuccess) {
+            throw Exception(response.message ?: "스터디 생성 실패")
+        }
+
+        response.result.studyId
+    }
 }

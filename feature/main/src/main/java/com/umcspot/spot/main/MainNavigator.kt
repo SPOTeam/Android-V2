@@ -30,6 +30,8 @@ import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.signup.navigation.navigateToCheckList
 import com.umcspot.spot.signup.navigation.navigateToSaving
 import com.umcspot.spot.signup.navigation.navigateToSignUp
+import com.umcspot.spot.study.detail.navigation.StudyDetail
+import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocation
 import com.umcspot.spot.study.preferLocation.navigation.navigateToPreferLocationStudy
@@ -37,7 +39,6 @@ import com.umcspot.spot.study.recruiting.navigation.Recruiting
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudy
 import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudyFilter
-import com.umcspot.spot.study.register.navigation.RegisterStudy
 import com.umcspot.spot.study.register.navigation.navigateToRegisterStudy
 import kotlin.reflect.KClass
 
@@ -94,7 +95,7 @@ class MainNavigator(
 
     @Composable
     fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, RecruitingFilter::class,
-        SignUp::class, CheckList::class,RegisterStudy::class, Posting::class, BoardList::class) || inAnyGraphRoutes(POST_CONTENT_ROUTE)
+        SignUp::class, CheckList::class, Posting::class, BoardList::class) || inAnyGraphRoutes(POST_CONTENT_ROUTE)
 
     @Composable
     fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class,PreferLocation::class, BoardList::class)
@@ -142,6 +143,10 @@ class MainNavigator(
         navController.navigateToHome(navOptions)
     }
 
+    fun navigateToMyStudy(navOptions: NavOptions? = null) {
+        navController.navigateToMyStudy(navOptions)
+    }
+
     fun navigateToRegisterStudy(navOptions: NavOptions? = null) {
         navController.navigateToRegisterStudy(navOptions)
     }
@@ -169,6 +174,11 @@ class MainNavigator(
     fun navigateToAppliedAlert(navOptions: NavOptions? = null) {
         navController.navigateToAppliedAlert(navOptions)
     }
+
+    fun navigateToStudyDetail(studyId: Long, navOptions: NavOptions? = null) {
+        navController.navigateToStudyDetail(studyId, navOptions)
+    }
+
     fun navigateToHomeAfterLogin() {
         val navOptions = navOptions {
             popUpTo(Landing) { inclusive = true }

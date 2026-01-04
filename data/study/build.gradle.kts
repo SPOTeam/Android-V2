@@ -7,4 +7,5 @@ android {
 }
 dependencies {
     implementation(projects.domain.study)
+    implementation(projects.core.ui)
 }
