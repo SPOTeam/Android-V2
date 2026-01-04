@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +52,8 @@ fun RegisterStudyRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     val handleBackPress: () -> Unit = {
         if (pagerState.currentPage > 0) {
             coroutineScope.launch {
@@ -76,10 +80,12 @@ fun RegisterStudyRoute(
         )
     }
 
+
     LaunchedEffect(viewModel.sideEffect) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
                 is RegisterStudySideEffect.ShowSnackBar -> {
+                    snackbarHostState.showSnackbar(effect.message)
                 }
             }
         }
