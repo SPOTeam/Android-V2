@@ -1,6 +1,5 @@
 package com.umcspot.spot.designsystem.component.study
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,12 +19,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.umcspot.spot.alert.model.AppliedAlertInfo
+import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.button.TextButtonState
-import com.umcspot.spot.designsystem.component.button.TextButtonM
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.study.model.StudyResult
 
 @Composable
 fun EnrollStudyListItem(
@@ -65,17 +63,17 @@ fun EnrollStudyListItem(
                 )
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TextButtonM(
+                    TextButton(
                         text = "불참",
                         onClick = onRejectClick,
                         state = TextButtonState.R500State,
                         modifier = Modifier.height(30.dp).weight(1f)
                     )
 
-                    TextButtonM(
+                    TextButton(
                         text = "참여",
                         onClick = onAcceptClick,
-                        state = TextButtonState.B400State,
+                        state = TextButtonState.B500State,
                         modifier = Modifier.height(30.dp).weight(1f)
                     )
                 }

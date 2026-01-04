@@ -1,16 +1,20 @@
 package com.umcspot.spot.domain.board.repository
 
-import com.umcspot.spot.domain.board.model.LabeledBoardResult
-import com.umcspot.spot.domain.board.model.LabeledBoardResultList
-import com.umcspot.spot.domain.board.model.RankedBoardResult
-import com.umcspot.spot.domain.board.model.RankedBoardResultList
+import com.umcspot.spot.domain.board.model.board.BestPostResultList
+import com.umcspot.spot.domain.board.model.board.RecentPostResultList
+import com.umcspot.spot.domain.board.model.postList.PostResultList
+import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.SortType
 
 interface BoardRepository {
-    suspend fun getTagBoardData(sortType : SortType): Result<RankedBoardResultList>
 
-    suspend fun getRankedBoardData(): Result<RankedBoardResultList>
+    suspend fun getRecentBoard(): Result<RecentPostResultList>
 
-    suspend fun getLabeledBoardData(): Result<LabeledBoardResultList>
+    suspend fun getBestBoard(sortBy: SortType): Result<BestPostResultList>
 
+    suspend fun getFilteredPosts(cursor : Long? = null, postType: PostType? = null, size : Int): Result<PostResultList>
+
+    suspend fun postPostLike(postId : Long) : Result<Unit>
+
+    suspend fun deletePostLike(postId : Long) : Result<Unit>
 }

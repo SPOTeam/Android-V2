@@ -15,12 +15,14 @@ import com.umcspot.spot.alert.navigation.AppliedAlert
 import com.umcspot.spot.alert.navigation.navigateToAlert
 import com.umcspot.spot.alert.navigation.navigateToAppliedAlert
 import com.umcspot.spot.category.navigation.navigateToCategory
-import com.umcspot.spot.feature.board.navigation.Board
-import com.umcspot.spot.feature.board.navigation.navigateToBoard
-import com.umcspot.spot.home.navigation.Home
+import com.umcspot.spot.feature.board.boardList.navigation.BoardList
+import com.umcspot.spot.feature.board.main.navigation.Board
+import com.umcspot.spot.feature.board.main.navigation.navigateToBoard
 import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.navigateToJJim
 import com.umcspot.spot.mypage.navigation.navigateToMypage
+import com.umcspot.spot.feature.board.post.content.navigation.POST_CONTENT_ROUTE
+import com.umcspot.spot.feature.board.post.posting.navigation.Posting
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.Landing
 import com.umcspot.spot.signup.navigation.Saving
@@ -31,9 +33,9 @@ import com.umcspot.spot.signup.navigation.navigateToSignUp
 import com.umcspot.spot.study.detail.navigation.StudyDetail
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
-import com.umcspot.spot.study.recruiting.navigation.Recruiting
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocation
 import com.umcspot.spot.study.preferLocation.navigation.navigateToPreferLocationStudy
+import com.umcspot.spot.study.recruiting.navigation.Recruiting
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudy
 import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudyFilter
@@ -76,7 +78,6 @@ class MainNavigator(
             MainNavTab.MYPAGE -> navController.navigateToMypage(navOptions)
         }
     }
-
     @Composable
     private fun inAnyGraph(vararg graphs: KClass<*>): Boolean {
         val dest = currentDestination ?: return false
@@ -84,20 +85,23 @@ class MainNavigator(
     }
 
     @Composable
+    private fun inAnyGraphRoutes(vararg routes: String): Boolean {
+        val dest = currentDestination ?: return false
+        return dest.hierarchy.any { h -> routes.any { r -> h.routeMatches(r) } }
+    }
+
+    @Composable
     fun isInLanding(): Boolean = inAnyGraph(Landing::class, Saving::class)
 
     @Composable
-    fun showBackTopBar(): Boolean = inAnyGraph(
-        Alert::class, AppliedAlert::class, RecruitingFilter::class,
-        SignUp::class, CheckList::class
-    )
+    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, RecruitingFilter::class,
+        SignUp::class, CheckList::class, Posting::class, BoardList::class) || inAnyGraphRoutes(POST_CONTENT_ROUTE)
 
     @Composable
-    fun showToTopFab(): Boolean =
-        inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class, PreferLocation::class)
+    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class,PreferLocation::class, BoardList::class)
 
     @Composable
-    fun showMultipleFab(): Boolean = inAnyGraph(Board::class, Home::class)
+    fun showMultipleFab(): Boolean = inAnyGraph(BoardList::class)
 
     @Composable
     fun showBottomBar(): Boolean {
@@ -190,4 +194,11 @@ fun rememberMainNavigator(
     navController: NavHostController = rememberNavController()
 ): MainNavigator = remember(navController) {
     MainNavigator(navController)
+}
+
+fun NavDestination.routeMatches(pattern: String): Boolean {
+    val actual = route ?: return false
+    return if (pattern.contains("{")) {
+        actual.startsWith(pattern.substringBefore("{"))
+    } else actual == pattern
 }

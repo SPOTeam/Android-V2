@@ -14,4 +14,7 @@ dependencies {
     implementation(projects.domain.weather)
     implementation(projects.domain.study)
     implementation(projects.domain.alert)
+    implementation(projects.domain.board)
+    implementation(projects.domain.post)
+    implementation(libs.lottie.compose)
 }

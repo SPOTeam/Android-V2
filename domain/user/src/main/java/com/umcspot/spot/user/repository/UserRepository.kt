@@ -6,6 +6,6 @@ import com.umcspot.spot.user.model.UserTheme
 
 interface UserRepository {
     suspend fun getUserName() : Result<UserResult>
-    suspend fun setUserName(name : String) : Result<Any?>
+    suspend fun setUserName(name : String) : Result<Unit>
     suspend fun setUserTheme(theme : List<StudyTheme>) : Result<Unit>
 }
