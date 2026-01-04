@@ -52,8 +52,6 @@ fun StudyIntroduceScreen(
     onIntroduceValid: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isImageSelected by remember { mutableStateOf(false) }
-
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
