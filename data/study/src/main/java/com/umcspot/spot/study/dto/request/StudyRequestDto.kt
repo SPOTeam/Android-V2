@@ -1,31 +1,33 @@
 package com.umcspot.spot.study.dto.request
 
-import com.google.gson.annotations.SerializedName
 import com.umcspot.spot.model.StudyStyle
 import com.umcspot.spot.model.StudyTheme
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
 
+@Serializable
 data class StudyRequestDto(
-    @SerializedName("name")
+    @SerialName("name")
     val name: String,
 
-    @SerializedName("maxMembers")
+    @SerialName("maxMembers")
     val maxMembers: Int,
 
-    @SerializedName("hasFee")
+    @SerialName("hasFee")
     val hasFee: Boolean,
 
-    @SerializedName("amount")
+    @SerialName("amount")
     val amount: Int,
 
-    @SerializedName("description")
+    @SerialName("description")
     val description: String,
 
-    @SerializedName("categories")
+    @SerialName("categories")
     val categories: List<StudyTheme>,
 
-    @SerializedName("styles")
+    @SerialName("styles")
     val styles: List<StudyStyle>,
 
-    @SerializedName("regionCodes")
+    @SerialName("regionCodes")
     val regionCodes: List<String>
 )
