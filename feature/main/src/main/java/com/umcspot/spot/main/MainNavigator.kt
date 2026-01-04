@@ -172,7 +172,7 @@ class MainNavigator(
     }
 
     fun navigateToStudyDetail(studyId: Long, navOptions: NavOptions? = null) {
-        navController.navigate(StudyDetail(studyId), navOptions)
+        navController.navigateToStudyDetail(studyId, navOptions)
     }
 
     fun navigateToHomeAfterLogin() {
