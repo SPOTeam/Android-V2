@@ -10,8 +10,8 @@ import com.umcspot.spot.navigation.Route
 import com.umcspot.spot.study.detail.StudyDetailRoute
 import kotlinx.serialization.Serializable
 
-fun NavController.navigateToStudyDetail(navOptions: NavOptions? = null) {
-    navigate(StudyDetail, navOptions)
+fun NavController.navigateToStudyDetail(studyId: Long, navOptions: NavOptions? = null) {
+    navigate(StudyDetail(studyId), navOptions)
 }
 
 fun NavGraphBuilder.studyDetailGraph(
