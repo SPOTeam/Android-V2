@@ -8,34 +8,43 @@ import kotlinx.serialization.Serializable
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class StudyResponseDto(
-    @SerialName("studyList")
-    val studyList : List<Study>
+    @SerialName("content")
+    val content : List<Study>,
+    @SerialName("hasNext")
+    val hasNext : Boolean,
+    @SerialName("nextCursor")
+    val nextCursor : String? = null,
+    @SerialName("totalElements")
+    val totalElements : Int,
 )
 
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class Study (
-    @SerialName("StudyId")
-    val studyId: String,
+    @SerialName("id")
+    val id: String,
 
-    @SerialName("title")
-    val title: String,
+    @SerialName("name")
+    val name: String,
 
-    @SerialName("goal")
-    val goal: String,
+    @SerialName("description")
+    val description: String,
 
-    @SerialName("maxMember")
-    val maxMember : Int,
+    @SerialName("maxMembers")
+    val maxMembers : Int,
 
-    @SerialName("member")
-    val member: Int = 0,
+    @SerialName("currentMembers")
+    val currentMembers: Int,
 
-    @SerialName("likes")
-    val likes: Int = 0,
+    @SerialName("likeCount")
+    val likeCount: Int,
 
-    @SerialName("views")
-    val views: Int = 0,
+    @SerialName("isLiked")
+    val isLiked: Boolean,
 
-    @SerialName("studyImage")
-    val studyImage: ImageRef
+    @SerialName("hitCount")
+    val hitCount: Int = 0,
+
+    @SerialName("profileImageUrl")
+    val profileImageUrl: String?
 )

@@ -25,13 +25,24 @@ interface StudyService {
 //        @Body request: StudyRequestDto
     ): BaseResponse<StudyResponseDto>
 
-
-    @GET("/api/v1/service")
+    @GET("/api/studies/recruiting")
     suspend fun getRecruitingStudies(
-        @Query("sortType") sortType: RecruitingStudySort,
-        @Query("activityType") activityType: ActivityType?,
-        @Query("theme") theme: StudyTheme?,
-        @Query("feeRange") feeRange: FeeRange?
+        @Query("feeCategory") feeCategory: FeeRange?,
+        @Query("categories") categories:  List<String>?,
+        @Query("isOnline") isOnline: Boolean?,
+        @Query("sortBy") sortBy: RecruitingStudySort?,
+        @Query("cursor") cursor: Long?,
+        @Query("size") size: Int
+    ): BaseResponse<StudyResponseDto>
+
+    @GET("/api/studies/preferLocation")
+    suspend fun getPreferLocationStudies(
+        @Query("feeCategory") feeCategory: FeeRange,
+        @Query("categories") categories: List<StudyTheme>,
+        @Query("isOnline") isOnline: Boolean,
+        @Query("sortBy") sortBy: RecruitingStudySort,
+        @Query("cursor") cursor: Long?,
+        @Query("size") size: Int
     ): BaseResponse<StudyResponseDto>
 
     @Multipart

@@ -12,11 +12,13 @@ interface StudyRepository {
     suspend fun getPopularStudies(): Result<StudyResultList>
     suspend fun getRecommendStudies(): Result<StudyResultList>
     suspend fun getRecruitingStudies(
-        sortType: RecruitingStudySort,
-        activityType: ActivityType?,
-        theme: StudyTheme?,
-        feeRange: FeeRange?
+        feeCategory: FeeRange? = null,
+        categories: List<String>? = null,
+        isOnline: Boolean? = null,
+        sortBy: RecruitingStudySort? = null,
+        cursor: Long? = null, size: Int
     ): Result<StudyResultList>
+
 
     suspend fun getPreferLocationStudies(
         sortType: RecruitingStudySort,

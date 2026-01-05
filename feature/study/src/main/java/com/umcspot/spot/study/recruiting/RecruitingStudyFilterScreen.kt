@@ -1,5 +1,6 @@
 package com.umcspot.spot.study.recruiting
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -24,9 +25,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -36,9 +42,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.button.MultiButton
 import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.component.study.section.ActivityThemeSection
+import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.FeeRange
@@ -51,45 +60,61 @@ import kotlinx.collections.immutable.ImmutableList
 fun RecruitingStudyFilterScreen(
     contentPadding: PaddingValues,
     onAcceptFilterClick: () -> Unit,
-    vm: RecruitingStudyFilterViewModel = hiltViewModel(),
+    viewModel: RecruitingStudyViewModel = hiltViewModel(),
 ) {
 
-    val activities by vm.activities.collectAsStateWithLifecycle()
-    val fees by vm.fees.collectAsStateWithLifecycle()
-    val themes by vm.themes.collectAsStateWithLifecycle()
-    val acceptEnabled by vm.notNull.collectAsStateWithLifecycle()
+    val activity by viewModel.activity.collectAsStateWithLifecycle()
+    val fee by viewModel.fee.collectAsStateWithLifecycle()
+    val themes by viewModel.themes.collectAsStateWithLifecycle()
+
+    var draftActivity by rememberSaveable { mutableStateOf(activity) }
+    var draftFee by rememberSaveable { mutableStateOf(fee) }
+
+    val themeSaver = listSaver<List<StudyTheme>, String>(
+        save = { list -> list.map { it.name } },
+        restore = { names -> names.map { StudyTheme.valueOf(it) } }
+    )
+    var draftThemes by rememberSaveable(stateSaver = themeSaver) { mutableStateOf(themes) }
+
+    val acceptEnabled = draftActivity != null || draftFee != null || draftThemes.isNotEmpty()
 
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
 
-    LaunchedEffect(Unit) {
-        vm.events.collect { ev ->
-            when (ev) {
-                is RecruitingStudyFilterViewModel.Event.Applied -> onAcceptFilterClick()
-            }
-        }
+    BackHandler {
+        onAcceptFilterClick()
     }
 
     RecruitingStudyFilterScreenContent(
-        modifier = Modifier
-            .padding(top = topPad, bottom = bottomPad),
-        selectedActivities = activities,
-        selectedFees = fees,
-        selectedThemes = themes,
+        modifier = Modifier.padding(top = topPad, bottom = bottomPad),
+        selectedActivity = draftActivity,
+        selectedFee = draftFee,
+        selectedThemes = draftThemes,
         buttonEnabled = acceptEnabled,
-        onToggleActivity = vm::toggleActivity,
-        onToggleFee = vm::toggleFee,
-        onToggleTheme = vm::toggleTheme,
-        onReset = vm::reset,
-        onApply = vm::apply
+        onToggleActivity = { type -> draftActivity = if (draftActivity == type) null else type },
+        onToggleFee = { fee -> draftFee = if (draftFee == fee) null else fee },
+        onToggleTheme = { theme -> draftThemes = if (draftThemes.contains(theme)) draftThemes - theme else draftThemes + theme },
+        onReset = {
+            draftActivity = null
+            draftFee = null
+            draftThemes = emptyList()
+        },
+        onApply = {
+            viewModel.applyFilter(
+                fee = draftFee,
+                activity = draftActivity,
+                themes = draftThemes
+            )
+            onAcceptFilterClick()
+        }
     )
 }
 
 @Composable
 fun RecruitingStudyFilterScreenContent(
-    selectedActivities: ImmutableList<ActivityType>,
-    selectedFees: ImmutableList<FeeRange>,
-    selectedThemes: ImmutableList<StudyTheme>,
+    selectedActivity: ActivityType?,
+    selectedFee: FeeRange?,
+    selectedThemes: List<StudyTheme>,
     buttonEnabled: Boolean,
     onToggleActivity: (ActivityType) -> Unit,
     onToggleFee: (FeeRange) -> Unit,
@@ -99,12 +124,12 @@ fun RecruitingStudyFilterScreenContent(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(SpotTheme.colors.white)
     ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
@@ -119,7 +144,7 @@ fun RecruitingStudyFilterScreenContent(
 
 
             ActivityTypeMultiSection(
-                selectedTypes = selectedActivities,
+                selectedTypes = selectedActivity,
                 onToggle = onToggleActivity
             )
 
@@ -127,7 +152,7 @@ fun RecruitingStudyFilterScreenContent(
 
 
             ActivityFeeSection(
-                selectedFees = selectedFees,
+                selectedFee = selectedFee,
                 onToggle = onToggleFee
             )
 
@@ -165,6 +190,9 @@ fun RecruitingStudyFilterScreenContent(
                 .zIndex(1f)
         ) {
             TextButton(
+                modifier = Modifier
+                    .width(screenWidthDp(326.dp))
+                    .height(screenHeightDp(47.dp)),
                 text = "검색 결과 보기",
                 enabled = buttonEnabled,
                 onClick = onApply
@@ -175,19 +203,20 @@ fun RecruitingStudyFilterScreenContent(
 
 @Composable
 fun ActivityTypeMultiSection(
-    selectedTypes: ImmutableList<ActivityType>,
+    selectedTypes: ActivityType?,
     onToggle: (ActivityType) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(14.dp)
+        horizontalArrangement = Arrangement.spacedBy(screenWidthDp(14.dp))
     ) {
         ActivityType.entries.forEach { type ->
-            TextButton(
+            MultiButton(
                 modifier = Modifier.weight(1f),
                 text = type.label,
-                state = TextButtonState.Toggle,
-                checked = selectedTypes.contains(type),
+                shape = SpotShapes.Soft,
+                painter = getIconForType(type),
+                checked = (selectedTypes == type),
                 onClick = { onToggle(type) }
             )
         }
@@ -196,7 +225,7 @@ fun ActivityTypeMultiSection(
 
 @Composable
 fun ActivityFeeSection(
-    selectedFees: ImmutableList<FeeRange>,
+    selectedFee: FeeRange?,
     onToggle: (FeeRange) -> Unit
 ) {
     Column(
@@ -220,10 +249,12 @@ fun ActivityFeeSection(
                     text = fee.label,
                     modifier = Modifier
                         .width(screenWidthDp(71.dp))
-                        .wrapContentHeight(),
+                        .height(screenHeightDp(35.dp)),
                     state = TextButtonState.Toggle,
-                    checked = selectedFees.contains(fee),
+                    checked = (selectedFee == fee),
                     onClick = { onToggle(fee) },
+                    shape = SpotShapes.Hard,
+                    style = SpotTheme.typography.medium_500
                 )
             }
         }
@@ -251,4 +282,10 @@ fun ResetFilterText(
             )
             .padding(vertical = 4.dp)
     )
+}
+
+@Composable
+private fun getIconForType(type: ActivityType) = when (type) {
+    ActivityType.ONLINE -> painterResource(R.drawable.online)
+    ActivityType.OFFLINE  -> painterResource(R.drawable.offline)
 }

@@ -26,7 +26,6 @@ import com.umcspot.spot.feature.board.post.posting.navigation.postingGraph
 import com.umcspot.spot.signup.navigation.signupGraph
 import com.umcspot.spot.study.detail.navigation.studyDetailGraph
 import com.umcspot.spot.study.my.navigation.myStudyGraph
-import com.umcspot.spot.study.preferLocation.navigation.preferLocationStudyGraph
 import com.umcspot.spot.study.recruiting.navigation.recruitingStudyFilterGraph
 import com.umcspot.spot.study.recruiting.navigation.recruitingStudyGraph
 import com.umcspot.spot.study.register.navigation.RegisterStudy
@@ -68,7 +67,7 @@ fun MainNavHost(
             onQuickMenuClick = { type ->
                 when (type) {
                     QuickMenuType.BOARD -> navigator.navigateToBoard()
-                    QuickMenuType.REGION -> navigator.navigateToPreferLocationStudy()
+                    QuickMenuType.REGION -> /*navigator.navigateToPreferLocationStudy()*/{}
                     QuickMenuType.INTERESTS -> { /* TODO */
                     }
 
@@ -90,15 +89,16 @@ fun MainNavHost(
 
         recruitingStudyFilterGraph(
             contentPadding = contentPadding,
+            navController = navigator.navController,
             onAcceptFilterClick = { navigator.popBackStack() }
         )
 
-        preferLocationStudyGraph(
-            contentPadding = contentPadding,
-            onRegisterScrollToTop = onRegisterScrollToTop,
-            onItemClick = { },
-            onFilterClick = { },
-        )
+//        preferLocationStudyGraph(
+//            contentPadding = contentPadding,
+//            onRegisterScrollToTop = onRegisterScrollToTop,
+//            onItemClick = { },
+//            onFilterClick = { },
+//        )
 
         boardGraph(
             contentPadding = contentPadding,
