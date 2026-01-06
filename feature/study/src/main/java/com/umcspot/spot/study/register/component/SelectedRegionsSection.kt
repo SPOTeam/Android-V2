@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.umcspot.spot.common.location.LocationRow
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.Black
@@ -30,8 +31,8 @@ import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun SelectedRegionsSection(
-    selectedRegions: ImmutableList<String>,
-    onRemoveClick: (String) -> Unit,
+    selectedRegions: ImmutableList<LocationRow>,
+    onRemoveClick: (LocationRow) -> Unit,
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -41,7 +42,7 @@ fun SelectedRegionsSection(
     ) {
         selectedRegions.forEach { region ->
             RegionItem(
-                regionName = region,
+                regionName = region.fullName,
                 onRemoveClick = { onRemoveClick(region) }
             )
         }

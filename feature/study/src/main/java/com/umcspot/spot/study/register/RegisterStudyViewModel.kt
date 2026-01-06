@@ -81,7 +81,7 @@ class RegisterStudyViewModel @Inject constructor(
         }
     }
 
-    fun addSelectedRegion(region: String) {
+    fun addSelectedRegion(region: LocationRow) {
         if (_uiState.value.selectedRegions.size < 10 && !_uiState.value.selectedRegions.contains(
                 region
             )
@@ -94,7 +94,7 @@ class RegisterStudyViewModel @Inject constructor(
         }
     }
 
-    fun removeSelectedRegion(region: String) {
+    fun removeSelectedRegion(region: LocationRow) {
         _uiState.update { currentState ->
             val updatedRegions = currentState.selectedRegions.toMutableList().apply {
                 remove(region)
@@ -192,8 +192,8 @@ class RegisterStudyViewModel @Inject constructor(
             val regionCodes = if (currentState.activityType == ActivityType.ONLINE) {
                 emptyList()
             } else {
-                currentState.selectedRegions.mapNotNull { regionName ->
-                    allLocations.find { it.name == regionName }?.code
+                currentState.selectedRegions.mapNotNull { it ->
+                    allLocations.find { it.fullName == it.fullName }?.code
                 }
             }
 

@@ -84,9 +84,9 @@ fun LocationBottomSheet(
     results: List<LocationRow>,
     onQueryChange: (String) -> Unit,
     onDismiss: () -> Unit,
-    selected: List<String>,
-    onAddSelected: (String) -> Unit,
-    onRemoveSelected: (String) -> Unit
+    selected: List<LocationRow>,
+    onAddSelected: (LocationRow) -> Unit,
+    onRemoveSelected: (LocationRow) -> Unit
 ) {
     if (!visible) return
 
@@ -97,8 +97,8 @@ fun LocationBottomSheet(
 
     val density = LocalDensity.current
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-
     val sheetHeight = screenHeightDp(533.dp)
+
     val scope = rememberCoroutineScope()
     val sheetOffset = remember { Animatable(with(density) { screenHeight.toPx() }) }
     val navBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -125,6 +125,7 @@ fun LocationBottomSheet(
             sheetOffset.animateTo(openY, animationSpec = tween(300))
         }
     }
+
     if (visible) {
         Dialog(
             onDismissRequest = { animateAndDismiss() },
@@ -150,7 +151,7 @@ fun LocationBottomSheet(
                 )
 
                 Box(
-                    Modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .height(sheetHeight)
                         .offset { IntOffset(0, sheetOffset.value.roundToInt()) }
@@ -163,7 +164,6 @@ fun LocationBottomSheet(
                             indication = null,
                             interactionSource = remember { MutableInteractionSource() }
                         ) {
-
                             blurFocusRequester.requestFocus()
                             keyboard?.hide()
                         }
@@ -173,7 +173,6 @@ fun LocationBottomSheet(
                             .fillMaxSize()
                             .padding(horizontal = screenWidthDp(17.dp))
                     ) {
-
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -191,6 +190,7 @@ fun LocationBottomSheet(
                                 Icon(
                                     painter = painterResource(R.drawable.dismiss),
                                     contentDescription = "닫기",
+                                    modifier = Modifier.size(screenWidthDp(13.dp))
                                 )
                             }
                         }
@@ -206,7 +206,7 @@ fun LocationBottomSheet(
                         Spacer(Modifier.height(screenHeightDp(6.dp)))
 
                         Text(
-                            text = "최대 3개까지 추가할 수 있어요",
+                            text = "최대 10개까지 추가할 수 있어요",
                             style = SpotTheme.typography.h5,
                             color = SpotTheme.colors.gray400
                         )
@@ -221,7 +221,7 @@ fun LocationBottomSheet(
                                 Text(
                                     text = "OO시, OO구, OO동",
                                     style = SpotTheme.typography.h5,
-                                    color = SpotTheme.colors.gray400
+                                    color = SpotTheme.colors.gray300
                                 )
                             },
                             trailingIcon = {
@@ -238,7 +238,8 @@ fun LocationBottomSheet(
                                     Icon(
                                         painter = painterResource(R.drawable.search),
                                         contentDescription = "검색",
-                                        modifier = Modifier.size(18.dp)
+                                        modifier = Modifier.size(screenWidthDp(18.dp)),
+                                        tint = SpotTheme.colors.gray400
                                     )
                                 }
                             },
@@ -246,7 +247,7 @@ fun LocationBottomSheet(
                             shape = RoundedCornerShape(10.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = SpotTheme.colors.B500,
-                                unfocusedBorderColor = SpotTheme.colors.gray400,
+                                unfocusedBorderColor = SpotTheme.colors.gray300,
                                 cursorColor = SpotTheme.colors.B500
                             ),
                             modifier = Modifier
@@ -264,7 +265,7 @@ fun LocationBottomSheet(
                         )
 
                         if (results.isNotEmpty()) {
-                            val isMaxSelected = selected.size >= 3
+                            val isMaxSelected = selected.size >= 10
 
                             HorizontalDivider(thickness = 0.5.dp, color = SpotTheme.colors.G200)
                             LazyColumn(
@@ -274,11 +275,11 @@ fun LocationBottomSheet(
                                     .background(SpotTheme.colors.white),
                             ) {
                                 itemsIndexed(results, key = { _, row -> row.code }) { index, row ->
-                                    val isAlreadySelected = selected.contains(row.name)
+                                    val isAlreadySelected = selected.any { it.code == row.code }
                                     ListItem(
                                         headlineContent = {
                                             Text(
-                                                text = row.name,
+                                                text = row.fullName,
                                                 style = SpotTheme.typography.h5,
                                                 maxLines = 1,
                                                 color = if (isMaxSelected && !isAlreadySelected) {
@@ -297,7 +298,7 @@ fun LocationBottomSheet(
                                                 enabled = !isMaxSelected || isAlreadySelected,
                                                 onClick = {
                                                     if (!isAlreadySelected) {
-                                                        onAddSelected(row.name)
+                                                        onAddSelected(row)
                                                     }
                                                 }
                                             )
@@ -331,8 +332,8 @@ fun LocationBottomSheet(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun SelectedChips(
-    items: List<String>,
-    onRemove: (String) -> Unit
+    items: List<LocationRow>,
+    onRemove: (LocationRow) -> Unit
 ) {
     if (items.isEmpty()) return
 
@@ -345,12 +346,12 @@ private fun SelectedChips(
             .horizontalScroll(scrollState),
         horizontalArrangement = Arrangement.spacedBy(screenWidthDp(7.dp))
     ) {
-        items.forEach { name ->
+        items.forEach { it ->
             AssistChip(
                 onClick = {},
                 label = {
                     Text(
-                        name,
+                        text = it.neighborhood,
                         style = SpotTheme.typography.small_400
                     )
                 },
@@ -361,7 +362,7 @@ private fun SelectedChips(
                         tint = SpotTheme.colors.B500,
                         modifier = Modifier
                             .size(14.dp)
-                            .clickable { onRemove(name) }
+                            .clickable { onRemove(it) }
                     )
                 },
                 colors = AssistChipDefaults.assistChipColors(

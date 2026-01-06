@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.umcspot.spot.common.location.LocationRow
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.component.button.SpotActivationButton
 import com.umcspot.spot.designsystem.theme.SpotTheme
@@ -147,8 +148,8 @@ private fun RegisterStudyScreen(
     onQueryChange: (String) -> Unit,
     onSheetOpen: () -> Unit,
     onSheetDismiss: () -> Unit,
-    onAddSelected: (String) -> Unit,
-    onRemoveSelected: (String) -> Unit,
+    onAddSelected: (LocationRow) -> Unit,
+    onRemoveSelected: (LocationRow) -> Unit,
     onMemberCountChange: (Int) -> Unit,
     onFeeInfoChange: (Boolean?, String) -> Unit,
     onPersonalityChange: (Int, Int) -> Unit,

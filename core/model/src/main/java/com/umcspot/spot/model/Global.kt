@@ -73,6 +73,14 @@ enum class StudyStyle {
     STRUCTURED_AND_PLANNED
 }
 
+enum class RecruitingStatus(
+    val value: String
+) {
+    RECRUITING("모집중"),
+    COMPLETED("모집완료"),
+//    BEFORE("모집전")
+}
+
 enum class SocialLoginType(
     val title: String
 ) {

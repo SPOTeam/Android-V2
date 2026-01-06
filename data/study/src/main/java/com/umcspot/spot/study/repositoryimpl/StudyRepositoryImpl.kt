@@ -1,10 +1,9 @@
 package com.umcspot.spot.study.repositoryimpl
 
 import android.util.Log
-import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.FeeRange
+import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
-import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.study.datasource.StudyDataSource
 import com.umcspot.spot.study.mapper.toData
 import com.umcspot.spot.study.mapper.toDomainList
@@ -15,7 +14,7 @@ import java.io.File
 import javax.inject.Inject
 
 class StudyRepositoryImpl @Inject constructor(
-    private val studyDataSource: StudyDataSource
+    private val studyDataSource: StudyDataSource,
 ) : StudyRepository {
     override suspend fun getPopularStudies(): Result<StudyResultList> =
         runCatching {
@@ -59,20 +58,28 @@ class StudyRepositoryImpl @Inject constructor(
         }
 
     override suspend fun getPreferLocationStudies(
-        sortType: RecruitingStudySort,
-        activityType: ActivityType?,
-        theme: StudyTheme?,
-        feeRange: FeeRange?
-    ): Result<StudyResultList> = TODO()
-//        runCatching {
-//            val response = studyDataSource.getRecruitingStudies(
-//                sortType = sortType,
-//                activityType = activityType ?: ActivityType.OFFLINE,
-//                theme = theme ?: StudyTheme.OTHER,
-//                feeRange = feeRange ?: FeeRange.NONE
-//            )
-//            response.result.toDomain()
-//        }
+        recruitingStatus: RecruitingStatus?,
+        feeRange: FeeRange?,
+        categories: List<String>?,
+        sortBy: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int,
+        regionCodes : List<String>?
+    ): Result<StudyResultList> =
+        runCatching {
+            val response = studyDataSource.getPreferLocationStudies(
+                recruitingStatus = recruitingStatus,
+                feeCategory = feeRange,
+                categories = categories,
+                sortType = sortBy,
+                cursor = cursor,
+                size = size,
+                regionCodes = regionCodes
+            )
+            response.result.toDomainList()
+        }.onFailure {
+            Log.e("StudyRepository", "getPreferLocationStudies failed", it)
+        }
 
     override suspend fun createStudy(
         studyCreateModel: StudyCreateModel,

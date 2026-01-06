@@ -33,6 +33,8 @@ import com.umcspot.spot.signup.navigation.navigateToSignUp
 import com.umcspot.spot.study.detail.navigation.StudyDetail
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
+import com.umcspot.spot.study.preferLocation.navigation.navigateToPreferLocationStudy
+import com.umcspot.spot.study.preferLocation.navigation.navigateToPreferLocationStudyFilter
 import com.umcspot.spot.study.recruiting.navigation.Recruiting
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudy
@@ -153,9 +155,9 @@ class MainNavigator(
         navController.navigateToBoard(navOptions)
     }
 
-//    fun navigateToPreferLocationStudy(navOptions: NavOptions? = null) {
-//        navController.navigateToPreferLocationStudy(navOptions)
-//    }
+    fun navigateToPreferLocationStudy(navOptions: NavOptions? = null) {
+        navController.navigateToPreferLocationStudy(navOptions)
+    }
 
     fun navigateToRecruitingStudy(navOptions: NavOptions? = null) {
         navController.navigateToRecruitingStudy(navOptions)
@@ -163,6 +165,10 @@ class MainNavigator(
 
     fun navigateToRecruitingStudyFilter(navOptions: NavOptions? = null) {
         navController.navigateToRecruitingStudyFilter(navOptions)
+    }
+
+    fun navigateToPreferLocationStudyFilter(navOptions: NavOptions? = null) {
+        navController.navigateToPreferLocationStudyFilter(navOptions)
     }
 
     fun navigateToAlert(navOptions: NavOptions? = null) {

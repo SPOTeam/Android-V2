@@ -14,7 +14,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -67,7 +66,8 @@ class RecruitingStudyViewModel @Inject constructor(
                     categories = _themes.value.map { it.name },
                     isOnline = _activity.value.toIsOnline(),
                     sortBy = _sortType.value,
-                    size = 10
+                    size = 10,
+                    cursor = null
                 ).getOrThrow()
             }.onSuccess { data ->
                 if (data.studyList.isEmpty()) {

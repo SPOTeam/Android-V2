@@ -293,7 +293,7 @@ fun HeaderRow(
                 Text(
                     text = sortType.label,
                     color = SpotTheme.colors.black,
-                    style = SpotTheme.typography.medium_500.copy(fontSize = 12.sp)
+                    style = SpotTheme.typography.regular_500
                 )
                 Spacer(Modifier.width(screenWidthDp(7.dp)))
                 Icon(
