@@ -78,7 +78,7 @@ fun PreferLocationStudyFilterScreen(
 
     RecruitingStudyFilterScreenContent(
         modifier = Modifier.padding(top = topPad, bottom = bottomPad),
-        recruitingStatus = recruitingStatus,
+        recruitingStatus = draftRecruitingStatus,
         fee = draftFee,
         themes = draftThemes,
         buttonEnabled = acceptEnabled,
@@ -115,12 +115,12 @@ fun RecruitingStudyFilterScreenContent(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(SpotTheme.colors.white)
     ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = screenWidthDp(17.dp))
@@ -155,6 +155,14 @@ fun RecruitingStudyFilterScreenContent(
             )
 
             Spacer(modifier = Modifier.height(53.dp))
+
+            Text(
+                text = "스터디 테마",
+                style = SpotTheme.typography.h5,
+                color = SpotTheme.colors.black
+            )
+
+            Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
 
             ActivityThemeSection(
                 selectedThemes = themes,
@@ -203,11 +211,15 @@ fun RecruitingStatusMultiSection(
     ) {
         RecruitingStatus.entries.forEach { type ->
             TextButton(
-                modifier = Modifier.weight(1f),
-                text = type.name,
-                shape = SpotShapes.Soft,
+                modifier = Modifier
+                    .width(screenWidthDp(71.dp))
+                    .height(screenHeightDp(35.dp)),
+                text = type.value,
+                shape = SpotShapes.Hard,
+                state = TextButtonState.Toggle,
                 checked = (recruitingStatus == type),
-                onClick = { onSelect(type) }
+                onClick = { onSelect(type) },
+                style = SpotTheme.typography.medium_500
             )
         }
     }

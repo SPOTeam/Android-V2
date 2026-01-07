@@ -12,8 +12,11 @@ import com.umcspot.spot.study.repository.StudyRepository
 import com.umcspot.spot.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -51,11 +54,14 @@ class RecruitingStudyViewModel @Inject constructor(
     private val _themes = MutableStateFlow<List<StudyTheme>>(emptyList())
     val themes: StateFlow<List<StudyTheme>> = _themes.asStateFlow()
 
-    private fun calcNotNull(): Boolean =
-        _activity.value != null || _fee.value != null || _themes.value.isNotEmpty()
-
-    private val _notNull = MutableStateFlow(calcNotNull())
-    val notNull: StateFlow<Boolean> = _notNull.asStateFlow()
+    val isFiltered: StateFlow<Boolean> =
+        combine(_activity, _fee, _themes) { activity, fee, themes ->
+            activity != null || fee != null || themes.isNotEmpty()
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = false
+        )
 
     fun load() {
         _uiState.update { it.copy(studies = UiState.Loading) }
@@ -121,34 +127,6 @@ class RecruitingStudyViewModel @Inject constructor(
 
 
     /** Filter 변경 **/
-    private fun updateNotNull() {
-        _notNull.value = calcNotNull()
-    }
-
-
-    fun toggleActivity(type: ActivityType) {
-        _activity.value = if (_activity.value == type) null else type
-        updateNotNull()
-    }
-
-    fun toggleFee(fee: FeeRange) {
-        _fee.value = if (_fee.value == fee) null else fee
-        updateNotNull()
-    }
-
-    fun toggleTheme(theme: StudyTheme) {
-        val cur = _themes.value
-        _themes.value = if (cur.contains(theme)) cur - theme else cur + theme
-        updateNotNull()
-    }
-
-    fun resetFilter() {
-        _fee.value = null
-        _activity.value = null
-        _themes.value = emptyList()
-        updateNotNull()
-    }
-
     fun applyFilter(fee: FeeRange?, activity: ActivityType?, themes: List<StudyTheme>) {
         _fee.value = fee
         _activity.value = activity

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -155,7 +156,7 @@ fun LocationBottomSheet(
                         .fillMaxWidth()
                         .height(sheetHeight)
                         .offset { IntOffset(0, sheetOffset.value.roundToInt()) }
-                        .clip(SpotShapes.SoftTop)
+                        .clip(SpotShapes.RoundTop)
                         .background(SpotTheme.colors.white)
                         .imePadding()
                         .focusRequester(blurFocusRequester)
@@ -180,17 +181,21 @@ fun LocationBottomSheet(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Spacer(Modifier.width(screenWidthDp(24.dp)))
+                            Spacer(modifier = Modifier.size(screenWidthDp(20.dp)))
+
                             Text(
                                 text = "스터디 지역",
                                 style = SpotTheme.typography.h5,
                                 color = SpotTheme.colors.black
                             )
-                            IconButton(onClick = { animateAndDismiss() }) {
+
+                            IconButton(
+                                modifier = Modifier.size(screenWidthDp(20.dp)),
+                                onClick = { animateAndDismiss() }) {
                                 Icon(
                                     painter = painterResource(R.drawable.dismiss),
                                     contentDescription = "닫기",
-                                    modifier = Modifier.size(screenWidthDp(13.dp))
+                                    modifier = Modifier.size(screenWidthDp(20.dp))
                                 )
                             }
                         }
@@ -203,7 +208,7 @@ fun LocationBottomSheet(
                             color = SpotTheme.colors.black
                         )
 
-                        Spacer(Modifier.height(screenHeightDp(6.dp)))
+                        Spacer(Modifier.height(screenHeightDp(4.dp)))
 
                         Text(
                             text = "최대 10개까지 추가할 수 있어요",
@@ -244,7 +249,7 @@ fun LocationBottomSheet(
                                 }
                             },
                             singleLine = true,
-                            shape = RoundedCornerShape(10.dp),
+                            shape = SpotShapes.Soft,
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = SpotTheme.colors.B500,
                                 unfocusedBorderColor = SpotTheme.colors.gray300,
@@ -252,11 +257,12 @@ fun LocationBottomSheet(
                             ),
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .height(screenHeightDp(51.dp))
                                 .focusRequester(focusRequester)
                                 .onFocusChanged { fs ->
                                     isFocused = fs.isFocused
                                     if (isFocused) keyboard?.show()
-                                }
+                                },
                         )
 
                         SelectedChips(

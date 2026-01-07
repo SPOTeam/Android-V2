@@ -26,6 +26,7 @@ import com.umcspot.spot.feature.board.post.posting.navigation.postingGraph
 import com.umcspot.spot.signup.navigation.signupGraph
 import com.umcspot.spot.study.detail.navigation.studyDetailGraph
 import com.umcspot.spot.study.my.navigation.myStudyGraph
+import com.umcspot.spot.study.preferLocation.navigation.preferLocationStudyFilterGraph
 import com.umcspot.spot.study.preferLocation.navigation.preferLocationStudyGraph
 import com.umcspot.spot.study.recruiting.navigation.recruitingStudyFilterGraph
 import com.umcspot.spot.study.recruiting.navigation.recruitingStudyGraph
@@ -99,6 +100,12 @@ fun MainNavHost(
             onRegisterScrollToTop = onRegisterScrollToTop,
             onItemClick = { },
             onFilterClick = { navigator.navigateToPreferLocationStudyFilter() },
+        )
+
+        preferLocationStudyFilterGraph(
+            contentPadding = contentPadding,
+            navController = navigator.navController,
+            onAcceptFilterClick = { navigator.popBackStack() }
         )
 
         boardGraph(

@@ -19,8 +19,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -76,6 +79,18 @@ class PreferLocationStudyViewModel @Inject constructor(
     private val _themes = MutableStateFlow<List<StudyTheme>>(emptyList())
     val themes: StateFlow<List<StudyTheme>> = _themes.asStateFlow()
 
+    val isFiltered: StateFlow<Boolean> =
+        combine(_recruitingStatus, _fee, _themes) { recruitingStatus, fee, themes ->
+            recruitingStatus != null || fee != null || themes.isNotEmpty()
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = false
+        )
+
+    private val _isNullPreferLocation = MutableStateFlow(false)
+    val isNullPreferLocation: StateFlow<Boolean> = _isNullPreferLocation.asStateFlow()
+
     /** ========== BoardListViewModel의 load() 역할 ========== */
     fun load(regionCode: String? = null) {
         currentRegionCode = regionCode
@@ -87,12 +102,30 @@ class PreferLocationStudyViewModel @Inject constructor(
                 }
 
                 // ✅ 현재 선호 지역이 없으면 호출하지 않음
-                val preferredCodes = _selectedRegion.value.map { it.code }
+                val preferredCodes = userRepository.getUserPreferredRegion()
+                    .getOrThrow()
+                    .regionCodes
+                    .map { it.trim() }
+                    .filter { it.isNotBlank() }
+
+                val preferredRows = preferredCodes.mapNotNull { code ->
+                    allLocations.find { it.code == code }
+                }
+
+                _selectedRegion.value = preferredRows
+
+                // 4) 선호지역이 없으면 스터디 호출 안 함
                 if (preferredCodes.isEmpty()) {
-                    _uiState.update { it.copy(data = UiState.Empty) }
+                    _isNullPreferLocation.value = true
+                    _uiState.update {
+                        it.copy(data = UiState.Empty)
+                    }
                     return@launch
                 }
 
+                _isNullPreferLocation.value = false
+
+                // 5) 탭(전체/특정지역)에 따라 요청 regionCodes 결정
                 val regionCodesForRequest =
                     if (regionCode.isNullOrBlank()) preferredCodes else listOf(regionCode)
 

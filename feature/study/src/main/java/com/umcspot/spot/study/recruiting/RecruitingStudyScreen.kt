@@ -1,8 +1,10 @@
 package com.umcspot.spot.study.recruiting
 
+import android.R.color.white
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,10 +25,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ModalBottomSheet
@@ -45,7 +49,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,6 +65,7 @@ import com.umcspot.spot.designsystem.component.SpotSpinner
 import com.umcspot.spot.designsystem.component.empty.EmptyAlert
 import com.umcspot.spot.designsystem.component.study.StudyListItem
 import com.umcspot.spot.designsystem.shapes.SpotShapes
+import com.umcspot.spot.designsystem.theme.B100
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G200
 import com.umcspot.spot.designsystem.theme.G300
@@ -97,6 +104,7 @@ fun RecruitingStudyScreen(
         is UiState.Success -> ui.data.studyList
         else -> emptyList()
     }
+    val isFiltered by viewmodel.isFiltered.collectAsStateWithLifecycle()
 
     val shouldLoadMore = remember {
         derivedStateOf {
@@ -159,7 +167,8 @@ fun RecruitingStudyScreen(
             size = itemList.size,
             sortType = sort,
             onOpenSortSheet = { showSortSheet = true },
-            onFilterClick = onFilterClick
+            onFilterClick = onFilterClick,
+            isFiltered = isFiltered
         )
         Spacer(Modifier.height(screenHeightDp(10.dp)))
 
@@ -267,7 +276,8 @@ fun HeaderRow(
     size: Int,
     sortType: RecruitingStudySort,
     onOpenSortSheet: () -> Unit,
-    onFilterClick: () -> Unit
+    onFilterClick: () -> Unit,
+    isFiltered: Boolean
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -306,14 +316,23 @@ fun HeaderRow(
 
             Spacer(Modifier.width(screenWidthDp(10.dp)))
 
-            IconButton(
-                onClick = onFilterClick,
-                modifier = Modifier.size(screenWidthDp(26.dp))
+            Box(
+                modifier = Modifier
+                    .size(screenWidthDp(26.dp))
+                    .clip(SpotShapes.Hard)
+                    .background(
+                        color = if (isFiltered) SpotTheme.colors.B100 else SpotTheme.colors.white
+                    )
+                    .clickable(
+                        onClick = onFilterClick
+                    ),
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(R.drawable.filter),
                     contentDescription = "필터",
-                    modifier = Modifier.size(screenWidthDp(14.dp))
+                    modifier = Modifier.size(screenWidthDp(14.dp)),
+                    tint = if (isFiltered) SpotTheme.colors.B500 else SpotTheme.colors.black
                 )
             }
         }
