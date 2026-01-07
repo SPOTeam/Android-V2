@@ -192,8 +192,8 @@ class RegisterStudyViewModel @Inject constructor(
             val regionCodes = if (currentState.activityType == ActivityType.ONLINE) {
                 emptyList()
             } else {
-                currentState.selectedRegions.mapNotNull { it ->
-                    allLocations.find { it.fullName == it.fullName }?.code
+                currentState.selectedRegions.mapNotNull { region ->
+                    allLocations.find { it.fullName == region.fullName }?.code
                 }
             }
 
