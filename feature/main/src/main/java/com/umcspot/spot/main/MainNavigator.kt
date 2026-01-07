@@ -23,6 +23,7 @@ import com.umcspot.spot.jjim.navigation.navigateToJJim
 import com.umcspot.spot.mypage.navigation.navigateToMypage
 import com.umcspot.spot.feature.board.post.content.navigation.POST_CONTENT_ROUTE
 import com.umcspot.spot.feature.board.post.posting.navigation.Posting
+import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.Landing
 import com.umcspot.spot.signup.navigation.Saving
@@ -104,7 +105,7 @@ class MainNavigator(
         PreferLocation::class, BoardList::class)
 
     @Composable
-    fun showMultipleFab(): Boolean = inAnyGraph(BoardList::class)
+    fun showMultipleFab(): Boolean = inAnyGraph(Home::class, BoardList::class)
 
     @Composable
     fun showBottomBar(): Boolean {
