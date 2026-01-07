@@ -3,7 +3,6 @@ package com.umcspot.spot.designsystem.component.bottomsheet
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -26,13 +24,10 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -56,7 +51,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -265,10 +259,14 @@ fun LocationBottomSheet(
                                 },
                         )
 
+                        Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
+
                         SelectedChips(
                             items = selected,
                             onRemove = onRemoveSelected
                         )
+
+                        Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
 
                         if (results.isNotEmpty()) {
                             val isMaxSelected = selected.size >= 10
@@ -348,36 +346,49 @@ private fun SelectedChips(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = screenHeightDp(13.dp))
+            .height(screenHeightDp(23.dp))
             .horizontalScroll(scrollState),
         horizontalArrangement = Arrangement.spacedBy(screenWidthDp(7.dp))
     ) {
-        items.forEach { it ->
-            AssistChip(
-                onClick = {},
-                label = {
+        items.forEach { item ->
+            Box(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .height(screenHeightDp(17.dp))
+                    .clip(SpotShapes.Hard)
+                    .background(SpotTheme.colors.B100)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        onRemove(item)
+                    }
+                    .padding(
+                        start = screenWidthDp(7.dp),
+                        end = screenWidthDp(4.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(screenWidthDp(4.dp))
+                ) {
                     Text(
-                        text = it.neighborhood,
-                        style = SpotTheme.typography.small_400
+                        text = item.neighborhood,
+                        style = SpotTheme.typography.small_400,
+                        color = SpotTheme.colors.B500,
+                        maxLines = 1
                     )
-                },
-                trailingIcon = {
+
                     Icon(
                         painter = painterResource(R.drawable.dismiss),
                         contentDescription = "삭제",
                         tint = SpotTheme.colors.B500,
                         modifier = Modifier
-                            .size(14.dp)
-                            .clickable { onRemove(it) }
+                            .size(screenWidthDp(14.dp))
                     )
-                },
-                colors = AssistChipDefaults.assistChipColors(
-                    containerColor = SpotTheme.colors.B100,
-                    labelColor = SpotTheme.colors.B500
-                ),
-                border = BorderStroke(1.dp, SolidColor(SpotTheme.colors.B100)),
-                shape = RoundedCornerShape(6.dp)
-            )
+                }
+            }
         }
     }
 }
