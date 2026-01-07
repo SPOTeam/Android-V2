@@ -23,7 +23,6 @@ fun NavGraphBuilder.recruitingStudyFilterGraph(
 ) {
     composable<RecruitingFilter> {
         val parentEntry = remember(navController) {
-
             navController.getBackStackEntry(Recruiting)
         }
 

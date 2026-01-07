@@ -17,13 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,7 +51,6 @@ import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
-import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun RecruitingStudyFilterScreen(
@@ -87,7 +83,9 @@ fun RecruitingStudyFilterScreen(
     }
 
     RecruitingStudyFilterScreenContent(
-        modifier = Modifier.padding(top = topPad, bottom = bottomPad),
+        modifier = Modifier
+            .background(SpotTheme.colors.white)
+            .padding(top = topPad, bottom = bottomPad),
         selectedActivity = draftActivity,
         selectedFee = draftFee,
         selectedThemes = draftThemes,
@@ -127,7 +125,6 @@ fun RecruitingStudyFilterScreenContent(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(SpotTheme.colors.white)
     ) {
         Column(
             modifier = Modifier

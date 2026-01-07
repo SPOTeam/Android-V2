@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -26,7 +25,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ModalBottomSheet
@@ -95,7 +93,7 @@ fun PreferLocationStudyScreen(
     var showLocationSheet by remember { mutableStateOf(false) }
     var showSortSheet by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf(0) } // 0 = 전체
-    val tabs: List<String> = remember(selected) { listOf("전체") + selected.map { it.fullName } }
+    val tabs: List<String> = remember(selected) { listOf("전체") + selected.map { it.neighborhood } }
 
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -121,7 +119,7 @@ fun PreferLocationStudyScreen(
 
     // 선택 칩 변화 시 탭 인덱스 보정
     LaunchedEffect(selected.size) {
-        val maxIdx = (1 + selected.size) - 1 // "전체" 1개 + selected 크기 - 1
+        val maxIdx = (1 + selected.size) - 1
         if (selectedTab > maxIdx) selectedTab = maxIdx
     }
 
@@ -129,7 +127,7 @@ fun PreferLocationStudyScreen(
         val maxIdx = (1 + selected.size) - 1
         if (selectedTab > maxIdx) {
             selectedTab = maxIdx
-            viewmodel.selectTab(selectedTab) // ✅ 탭 인덱스 바뀌었으니 다시 호출
+            viewmodel.selectTab(selectedTab)
         }
     }
 
@@ -260,6 +258,7 @@ fun PreferLocationStudyScreen(
         onQueryChange = { viewmodel.searchLocation(it) },
         onDismiss = {
             viewmodel.syncPreferredRegions()
+            viewmodel.clearLocationSearch()
             showLocationSheet = false
         },
         results = results,
@@ -499,8 +498,8 @@ fun SortTypeBottomSheet(
                 ListItem(
                     colors = ListItemDefaults.colors(
                         containerColor = SpotTheme.colors.white,
-                        headlineColor = SpotTheme.colors.black,   // (선택) 텍스트 색 명시
-                        trailingIconColor = SpotTheme.colors.B500 // (선택)
+                        headlineColor = SpotTheme.colors.black,
+                        trailingIconColor = SpotTheme.colors.B500
                     ),
                     headlineContent = {
                         Text(

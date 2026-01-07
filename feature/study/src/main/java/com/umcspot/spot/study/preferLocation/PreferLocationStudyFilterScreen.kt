@@ -50,7 +50,7 @@ import com.umcspot.spot.ui.extension.screenWidthDp
 
 @Composable
 fun PreferLocationStudyFilterScreen(
-    contentPadding : PaddingValues,
+    contentPadding: PaddingValues,
     onAcceptFilterClick: () -> Unit,
     preferLocationVm: PreferLocationStudyViewModel = hiltViewModel(),
 ) {
@@ -77,14 +77,21 @@ fun PreferLocationStudyFilterScreen(
     }
 
     RecruitingStudyFilterScreenContent(
-        modifier = Modifier.padding(top = topPad, bottom = bottomPad),
+        modifier = Modifier
+            .background(SpotTheme.colors.white)
+            .padding(top = topPad, bottom = bottomPad),
         recruitingStatus = draftRecruitingStatus,
         fee = draftFee,
         themes = draftThemes,
         buttonEnabled = acceptEnabled,
-        onToggleRecruitingStatus = { type -> draftRecruitingStatus = if (draftRecruitingStatus == type) null else type },
+        onToggleRecruitingStatus = { type ->
+            draftRecruitingStatus = if (draftRecruitingStatus == type) null else type
+        },
         onToggleFee = { fee -> draftFee = if (draftFee == fee) null else fee },
-        onToggleTheme = { theme -> draftThemes = if (draftThemes.contains(theme)) draftThemes - theme else draftThemes + theme },
+        onToggleTheme = { theme ->
+            draftThemes =
+                if (draftThemes.contains(theme)) draftThemes - theme else draftThemes + theme
+        },
         onReset = {
             draftRecruitingStatus = null
             draftFee = null
@@ -106,7 +113,7 @@ fun RecruitingStudyFilterScreenContent(
     recruitingStatus: RecruitingStatus?,
     fee: FeeRange?,
     themes: List<StudyTheme>,
-    buttonEnabled : Boolean,
+    buttonEnabled: Boolean,
     onToggleRecruitingStatus: (RecruitingStatus) -> Unit,
     onToggleFee: (FeeRange) -> Unit,
     onToggleTheme: (StudyTheme) -> Unit,
@@ -117,66 +124,84 @@ fun RecruitingStudyFilterScreenContent(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(SpotTheme.colors.white)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = screenWidthDp(17.dp))
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.Top
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(screenHeightDp(25.dp))
+                    .background(SpotTheme.colors.gray100),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "검색 결과는 모든 지역에 공통 반영됩니다.",
+                    style = SpotTheme.typography.small_500,
+                    color = SpotTheme.colors.black
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .padding(top = screenHeightDp(18.dp))
+                    .padding(horizontal = screenWidthDp(17.dp))
+            ) {
+                Text(
+                    text = "모집 상태",
+                    style = SpotTheme.typography.h5,
+                    color = SpotTheme.colors.black
+                )
 
-            Text(
-                text = "활동",
-                style = SpotTheme.typography.h5,
-                color = SpotTheme.colors.black
-            )
+                Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
 
-            Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
+                RecruitingStatusMultiSection(
+                    recruitingStatus = recruitingStatus,
+                    onSelect = onToggleRecruitingStatus
+                )
 
-            RecruitingStatusMultiSection(
-                recruitingStatus = recruitingStatus,
-                onSelect = onToggleRecruitingStatus
-            )
+                Spacer(modifier = Modifier.height(53.dp))
 
-            Spacer(modifier = Modifier.height(53.dp))
+                Text(
+                    text = "활동비",
+                    style = SpotTheme.typography.h5,
+                    color = SpotTheme.colors.black
+                )
 
-            Text(
-                text = "활동비",
-                style = SpotTheme.typography.h5,
-                color = SpotTheme.colors.black
-            )
+                Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
 
-            Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
+                ActivityFeeSection(
+                    activityFee = fee,
+                    onSelect = onToggleFee
+                )
 
-            ActivityFeeSection(
-                activityFee = fee,
-                onSelect = onToggleFee
-            )
+                Spacer(modifier = Modifier.height(53.dp))
 
-            Spacer(modifier = Modifier.height(53.dp))
+                Text(
+                    text = "스터디 테마",
+                    style = SpotTheme.typography.h5,
+                    color = SpotTheme.colors.black
+                )
 
-            Text(
-                text = "스터디 테마",
-                style = SpotTheme.typography.h5,
-                color = SpotTheme.colors.black
-            )
+                Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
 
-            Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
+                ActivityThemeSection(
+                    selectedThemes = themes,
+                    onSelect = onToggleTheme,
+                    maxSelection = 10
+                )
 
-            ActivityThemeSection(
-                selectedThemes = themes,
-                onSelect = onToggleTheme,
-                maxSelection = 10
-            )
+                Spacer(modifier = Modifier.height(33.dp))
 
-            Spacer(modifier = Modifier.height(33.dp))
+                ResetFilterText(
+                    onClick = onReset
+                )
 
-            ResetFilterText(
-                onClick = onReset
-            )
-
-            Spacer(Modifier.height(80.dp))
+                Spacer(Modifier.height(80.dp))
+            }
         }
 
         Box(
@@ -233,7 +258,7 @@ fun ActivityFeeSection(
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(screenWidthDp(14.dp)),
         verticalArrangement = Arrangement.spacedBy(screenHeightDp(14.dp))
-    ){
+    ) {
         FeeRange.entries.forEach { fee ->
             TextButton(
                 text = fee.label,
@@ -249,6 +274,7 @@ fun ActivityFeeSection(
         }
     }
 }
+
 @Composable
 fun ResetFilterText(
     onClick: () -> Unit,

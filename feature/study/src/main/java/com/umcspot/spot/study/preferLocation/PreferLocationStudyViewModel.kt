@@ -101,7 +101,6 @@ class PreferLocationStudyViewModel @Inject constructor(
                     allLocations = LocationStore.load(appContext)
                 }
 
-                // ✅ 현재 선호 지역이 없으면 호출하지 않음
                 val preferredCodes = userRepository.getUserPreferredRegion()
                     .getOrThrow()
                     .regionCodes
@@ -114,7 +113,6 @@ class PreferLocationStudyViewModel @Inject constructor(
 
                 _selectedRegion.value = preferredRows
 
-                // 4) 선호지역이 없으면 스터디 호출 안 함
                 if (preferredCodes.isEmpty()) {
                     _isNullPreferLocation.value = true
                     _uiState.update {
@@ -125,7 +123,6 @@ class PreferLocationStudyViewModel @Inject constructor(
 
                 _isNullPreferLocation.value = false
 
-                // 5) 탭(전체/특정지역)에 따라 요청 regionCodes 결정
                 val regionCodesForRequest =
                     if (regionCode.isNullOrBlank()) preferredCodes else listOf(regionCode)
 
@@ -156,13 +153,11 @@ class PreferLocationStudyViewModel @Inject constructor(
         }
     }
 
-
     fun loadNextPage() {
         val currentUi = _uiState.value.data
         val success = currentUi as? UiState.Success ?: return
         val currentList = success.data
 
-        // StudyResultList에 hasNext/nextCursor 있다고 가정(없으면 네 모델에 맞게 바꿔야 함)
         if (!currentList.hasNext) return
         if (_isLoadingMore.value) return
 
@@ -170,7 +165,6 @@ class PreferLocationStudyViewModel @Inject constructor(
             _isLoadingMore.value = true
 
             runCatching {
-                // 선호 지역 전체 목록(전체 탭일 때 필요)
                 val preferredCodes = userRepository.getUserPreferredRegion()
                     .getOrThrow()
                     .regionCodes
@@ -204,7 +198,6 @@ class PreferLocationStudyViewModel @Inject constructor(
     }
 
     fun selectTab(selectedTabIndex: Int) {
-        // 0 = 전체, 1..n = selectedRegion[index-1]
         val code = if (selectedTabIndex == 0) null else _selectedRegion.value.getOrNull(selectedTabIndex - 1)?.code
         load(code)
     }
@@ -260,6 +253,11 @@ class PreferLocationStudyViewModel @Inject constructor(
         _selectedRegion.update { list ->
             list.filterNot { it.code == row.code }
         }
+    }
+
+    fun clearLocationSearch() {
+        _query.value = ""
+        _results.value = emptyList()
     }
 
     fun syncPreferredRegions() {
