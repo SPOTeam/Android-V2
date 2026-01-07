@@ -97,6 +97,7 @@ class RecruitingStudyViewModel @Inject constructor(
         if (_isLoadingMore.value) return
 
         viewModelScope.launch {
+            _isLoadingMore.value = true
             runCatching {
                 studyRepository.getRecruitingStudies(
                     feeCategory = _fee.value,
@@ -116,6 +117,7 @@ class RecruitingStudyViewModel @Inject constructor(
             }.onFailure { e ->
                 Log.e("RecruitingStudyViewModel", "loadNextpageError", e)
             }
+            _isLoadingMore.value = false
         }
     }
 
