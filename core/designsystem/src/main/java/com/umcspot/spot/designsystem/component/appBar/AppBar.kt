@@ -84,7 +84,7 @@ fun AppBarHome (
                     ),
                     contentDescription = if (hasAlert) "New Notifications" else "Notifications",
                     tint = Color.Unspecified,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(screenWidthDp(24.dp))
                 )
             }
         }
