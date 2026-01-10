@@ -306,7 +306,8 @@ fun PopularStudyNow(
                 Icon(
                     painter = painterResource(R.drawable.arrow_right),
                     contentDescription = "더보기",
-                    modifier = Modifier.size(screenWidthDp(14.dp))
+                    modifier = Modifier.size(screenWidthDp(14.dp)),
+                    tint = SpotTheme.colors.B500
                 )
             }
         }
