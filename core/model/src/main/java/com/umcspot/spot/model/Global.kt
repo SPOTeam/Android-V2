@@ -1,6 +1,13 @@
 package com.umcspot.spot.model
 
-enum class QuickMenuType { REGION, INTERESTS, RECRUITING, BOARD }
+enum class QuickMenuType (
+    val label : String
+) { 
+    REGION("내 지역"),
+    INTERESTS("내 관심사"),
+    RECRUITING("모집 중"),
+    BOARD("게시판")
+}
 
 enum class WeatherType { HEAVYRAIN, RAIN, SNOW, WIND, COLD, HOT, SUNNY }
 

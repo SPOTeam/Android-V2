@@ -26,6 +26,8 @@ import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.WeatherType
+import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
 import java.time.LocalTime
 
 @Composable
@@ -56,14 +58,12 @@ fun WeatherCard(
         null -> R.drawable.spot_logo to "날씨를 불러오는 중 입니다."
     }
 
-
-
     Card(
-        shape = SpotShapes.Hard,                           // ✅ 프로젝트 정의 모서리
+        shape = SpotShapes.Hard,
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         modifier = modifier
-            .width(190.dp)
-            .height(80.dp)
+            .width(screenWidthDp(156.dp))
+            .height(screenHeightDp(79.dp))
     ) {
         Box(Modifier.fillMaxSize()) {
             // 배경 이미지
@@ -77,7 +77,7 @@ fun WeatherCard(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                    .padding(horizontal = screenWidthDp(12.dp), vertical = screenHeightDp(8.dp))
             ) {
                 Column(
                     verticalArrangement = Arrangement.SpaceBetween,
@@ -87,20 +87,18 @@ fun WeatherCard(
                         Image(
                             painter = painterResource(iconRes),
                             contentDescription = null,
-                            modifier = Modifier.size(40.dp)
+                            modifier = Modifier.size(screenWidthDp(36.dp))
                         )
-                        Spacer(Modifier.width(8.dp))
+                        Spacer(Modifier.width(screenWidthDp(14.dp)))
                         Text(
                             text = "${"%.1f".format(temperature?.toFloat())} °C",
                             style = SpotTheme.typography.h1,
-                            fontSize = 25.sp,
                             color = SpotTheme.colors.white
                         )
                     }
                     Text(
                         text = message,
-                        style = SpotTheme.typography.small_500,
-                        fontSize = 14.sp,
+                        style = SpotTheme.typography.regular_500,
                         color = SpotTheme.colors.white
                     )
                 }

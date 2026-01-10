@@ -1,17 +1,14 @@
 package com.umcspot.spot.study.repository
 
-import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
-import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyResultList
 import java.io.File
 
 interface StudyRepository {
-    suspend fun getPopularStudies(): Result<StudyResultList>
-    suspend fun getRecommendStudies(): Result<StudyResultList>
+    suspend fun getRecommendedStudies(): Result<StudyResultList>
     suspend fun getRecruitingStudies(
         feeCategory: FeeRange?,
         categories: List<String>?,

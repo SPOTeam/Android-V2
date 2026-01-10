@@ -133,6 +133,9 @@ spot-feature = { id = "spot.feature", version = "unspecified" }
 spot-data = { id = "spot.data", version = "unspecified"}
 
 [libraries]
+
+kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
+
 # Android Gradle Plugin
 android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "android-gradle-plugin" }
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }

@@ -2,19 +2,11 @@ package com.umcspot.spot.weather.mapper
 
 import com.umcspot.spot.weather.dto.request.WeatherRequestDto
 import com.umcspot.spot.weather.dto.response.WeatherResponseDto
-import com.umcspot.spot.weather.model.Weather
 import com.umcspot.spot.weather.model.WeatherResult
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.Locale
-
-// Domain -> DTO
-fun Weather.toData(): WeatherRequestDto =
-    WeatherRequestDto(
-        longitude  = this.longitude,
-        latitude = this.latitude
-    )
 
 // DTO -> Domain
 fun WeatherResponseDto.toDomain(): WeatherResult =

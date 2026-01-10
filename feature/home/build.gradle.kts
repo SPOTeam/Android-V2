@@ -6,6 +6,10 @@ android {
 }
 
 dependencies {
-    implementation(projects.domain.home)
+    implementation(projects.domain.weather)
+    implementation(projects.domain.board)
+    implementation(projects.domain.study)
     implementation(projects.core.designsystem)
+    implementation(libs.google.location)
+    implementation(libs.kotlinx.coroutines.play.services)
 }

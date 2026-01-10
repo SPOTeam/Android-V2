@@ -16,25 +16,6 @@ import javax.inject.Inject
 class StudyRepositoryImpl @Inject constructor(
     private val studyDataSource: StudyDataSource,
 ) : StudyRepository {
-    override suspend fun getPopularStudies(): Result<StudyResultList> =
-        runCatching {
-            val response = studyDataSource.getPopularStudies()
-            response.result.toDomainList()
-        }.recoverCatching {
-            setPopularDummies()
-        }
-
-    private fun setPopularDummies(count: Int = 5): StudyResultList =
-        StudyResultList(StudyResultList.getPopularDummies(count), hasNext = false, nextCursor = null)
-
-
-    override suspend fun getRecommendStudies(): Result<StudyResultList> =
-        runCatching {
-            val response = studyDataSource.getPopularStudies()
-            response.result.toDomainList()
-        }.recoverCatching {
-            setRecommendDummies()
-        }
 
     private fun setRecommendDummies(count: Int = 5): StudyResultList =
         StudyResultList(StudyResultList.getRecommendedDummies(count), hasNext = false, nextCursor = null)
@@ -77,6 +58,13 @@ class StudyRepositoryImpl @Inject constructor(
                 regionCodes = regionCodes
             )
             response.result.toDomainList()
+        }.onFailure {
+            Log.e("StudyRepository", "getPreferLocationStudies failed", it)
+        }
+
+    override suspend fun getRecommendedStudies(): Result<StudyResultList> =
+        runCatching {
+            studyDataSource.getRecommendedStudies().result.toDomainList()
         }.onFailure {
             Log.e("StudyRepository", "getPreferLocationStudies failed", it)
         }

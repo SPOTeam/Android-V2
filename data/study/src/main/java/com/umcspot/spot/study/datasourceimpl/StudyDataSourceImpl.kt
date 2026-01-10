@@ -19,13 +19,10 @@ import javax.inject.Inject
 class StudyDataSourceImpl @Inject constructor(
     private val studyService: StudyService
 ) : StudyDataSource {
-    override suspend fun getPopularStudies(
-    ): BaseResponse<StudyResponseDto> =
-        studyService.getPopularStudies()
 
-    override suspend fun getRecommendStudies(
+    override suspend fun getRecommendedStudies(
     ): BaseResponse<StudyResponseDto> =
-        studyService.getRecommendStudies()
+        studyService.getRecommendedStudies()
 
     override suspend fun getRecruitingStudies(
         feeCategory: FeeRange?,
@@ -47,7 +44,6 @@ class StudyDataSourceImpl @Inject constructor(
         regionCodes: List<String>?
     ): BaseResponse<StudyResponseDto> =
         studyService.getPreferLocationStudies(recruitingStatus, feeCategory, categories, null, sortType, cursor, size, regionCodes)
-
 
     override suspend fun createStudy(
         request: StudyRequestDto,
