@@ -3,7 +3,6 @@ package com.umcspot.spot.designsystem.component.bottomsheet
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -25,13 +24,10 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -55,7 +51,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -84,9 +79,9 @@ fun LocationBottomSheet(
     results: List<LocationRow>,
     onQueryChange: (String) -> Unit,
     onDismiss: () -> Unit,
-    selected: List<String>,
-    onAddSelected: (String) -> Unit,
-    onRemoveSelected: (String) -> Unit
+    selected: List<LocationRow>,
+    onAddSelected: (LocationRow) -> Unit,
+    onRemoveSelected: (LocationRow) -> Unit
 ) {
     if (!visible) return
 
@@ -97,8 +92,8 @@ fun LocationBottomSheet(
 
     val density = LocalDensity.current
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-
     val sheetHeight = screenHeightDp(533.dp)
+
     val scope = rememberCoroutineScope()
     val sheetOffset = remember { Animatable(with(density) { screenHeight.toPx() }) }
     val navBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -125,6 +120,7 @@ fun LocationBottomSheet(
             sheetOffset.animateTo(openY, animationSpec = tween(300))
         }
     }
+
     if (visible) {
         Dialog(
             onDismissRequest = { animateAndDismiss() },
@@ -150,11 +146,11 @@ fun LocationBottomSheet(
                 )
 
                 Box(
-                    Modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .height(sheetHeight)
                         .offset { IntOffset(0, sheetOffset.value.roundToInt()) }
-                        .clip(SpotShapes.SoftTop)
+                        .clip(SpotShapes.RoundTop)
                         .background(SpotTheme.colors.white)
                         .imePadding()
                         .focusRequester(blurFocusRequester)
@@ -163,7 +159,6 @@ fun LocationBottomSheet(
                             indication = null,
                             interactionSource = remember { MutableInteractionSource() }
                         ) {
-
                             blurFocusRequester.requestFocus()
                             keyboard?.hide()
                         }
@@ -173,7 +168,6 @@ fun LocationBottomSheet(
                             .fillMaxSize()
                             .padding(horizontal = screenWidthDp(17.dp))
                     ) {
-
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -181,16 +175,21 @@ fun LocationBottomSheet(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Spacer(Modifier.width(screenWidthDp(24.dp)))
+                            Spacer(modifier = Modifier.size(screenWidthDp(20.dp)))
+
                             Text(
                                 text = "스터디 지역",
                                 style = SpotTheme.typography.h5,
                                 color = SpotTheme.colors.black
                             )
-                            IconButton(onClick = { animateAndDismiss() }) {
+
+                            IconButton(
+                                modifier = Modifier.size(screenWidthDp(20.dp)),
+                                onClick = { animateAndDismiss() }) {
                                 Icon(
                                     painter = painterResource(R.drawable.dismiss),
                                     contentDescription = "닫기",
+                                    modifier = Modifier.size(screenWidthDp(20.dp))
                                 )
                             }
                         }
@@ -203,10 +202,10 @@ fun LocationBottomSheet(
                             color = SpotTheme.colors.black
                         )
 
-                        Spacer(Modifier.height(screenHeightDp(6.dp)))
+                        Spacer(Modifier.height(screenHeightDp(4.dp)))
 
                         Text(
-                            text = "최대 3개까지 추가할 수 있어요",
+                            text = "최대 10개까지 추가할 수 있어요",
                             style = SpotTheme.typography.h5,
                             color = SpotTheme.colors.gray400
                         )
@@ -221,7 +220,7 @@ fun LocationBottomSheet(
                                 Text(
                                     text = "OO시, OO구, OO동",
                                     style = SpotTheme.typography.h5,
-                                    color = SpotTheme.colors.gray400
+                                    color = SpotTheme.colors.gray300
                                 )
                             },
                             trailingIcon = {
@@ -238,33 +237,39 @@ fun LocationBottomSheet(
                                     Icon(
                                         painter = painterResource(R.drawable.search),
                                         contentDescription = "검색",
-                                        modifier = Modifier.size(18.dp)
+                                        modifier = Modifier.size(screenWidthDp(18.dp)),
+                                        tint = SpotTheme.colors.gray400
                                     )
                                 }
                             },
                             singleLine = true,
-                            shape = RoundedCornerShape(10.dp),
+                            shape = SpotShapes.Soft,
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = SpotTheme.colors.B500,
-                                unfocusedBorderColor = SpotTheme.colors.gray400,
+                                unfocusedBorderColor = SpotTheme.colors.gray300,
                                 cursorColor = SpotTheme.colors.B500
                             ),
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .height(screenHeightDp(51.dp))
                                 .focusRequester(focusRequester)
                                 .onFocusChanged { fs ->
                                     isFocused = fs.isFocused
                                     if (isFocused) keyboard?.show()
-                                }
+                                },
                         )
+
+                        Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
 
                         SelectedChips(
                             items = selected,
                             onRemove = onRemoveSelected
                         )
 
+                        Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
+
                         if (results.isNotEmpty()) {
-                            val isMaxSelected = selected.size >= 3
+                            val isMaxSelected = selected.size >= 10
 
                             HorizontalDivider(thickness = 0.5.dp, color = SpotTheme.colors.G200)
                             LazyColumn(
@@ -274,11 +279,11 @@ fun LocationBottomSheet(
                                     .background(SpotTheme.colors.white),
                             ) {
                                 itemsIndexed(results, key = { _, row -> row.code }) { index, row ->
-                                    val isAlreadySelected = selected.contains(row.name)
+                                    val isAlreadySelected = selected.any { it.code == row.code }
                                     ListItem(
                                         headlineContent = {
                                             Text(
-                                                text = row.name,
+                                                text = row.fullName,
                                                 style = SpotTheme.typography.h5,
                                                 maxLines = 1,
                                                 color = if (isMaxSelected && !isAlreadySelected) {
@@ -297,7 +302,7 @@ fun LocationBottomSheet(
                                                 enabled = !isMaxSelected || isAlreadySelected,
                                                 onClick = {
                                                     if (!isAlreadySelected) {
-                                                        onAddSelected(row.name)
+                                                        onAddSelected(row)
                                                     }
                                                 }
                                             )
@@ -331,8 +336,8 @@ fun LocationBottomSheet(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun SelectedChips(
-    items: List<String>,
-    onRemove: (String) -> Unit
+    items: List<LocationRow>,
+    onRemove: (LocationRow) -> Unit
 ) {
     if (items.isEmpty()) return
 
@@ -341,36 +346,49 @@ private fun SelectedChips(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = screenHeightDp(13.dp))
+            .height(screenHeightDp(23.dp))
             .horizontalScroll(scrollState),
         horizontalArrangement = Arrangement.spacedBy(screenWidthDp(7.dp))
     ) {
-        items.forEach { name ->
-            AssistChip(
-                onClick = {},
-                label = {
+        items.forEach { item ->
+            Box(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .height(screenHeightDp(17.dp))
+                    .clip(SpotShapes.Hard)
+                    .background(SpotTheme.colors.B100)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        onRemove(item)
+                    }
+                    .padding(
+                        start = screenWidthDp(7.dp),
+                        end = screenWidthDp(4.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(screenWidthDp(4.dp))
+                ) {
                     Text(
-                        name,
-                        style = SpotTheme.typography.small_400
+                        text = item.neighborhood,
+                        style = SpotTheme.typography.small_400,
+                        color = SpotTheme.colors.B500,
+                        maxLines = 1
                     )
-                },
-                trailingIcon = {
+
                     Icon(
                         painter = painterResource(R.drawable.dismiss),
                         contentDescription = "삭제",
                         tint = SpotTheme.colors.B500,
                         modifier = Modifier
-                            .size(14.dp)
-                            .clickable { onRemove(name) }
+                            .size(screenWidthDp(14.dp))
                     )
-                },
-                colors = AssistChipDefaults.assistChipColors(
-                    containerColor = SpotTheme.colors.B100,
-                    labelColor = SpotTheme.colors.B500
-                ),
-                border = BorderStroke(1.dp, SolidColor(SpotTheme.colors.B100)),
-                shape = RoundedCornerShape(6.dp)
-            )
+                }
+            }
         }
     }
 }

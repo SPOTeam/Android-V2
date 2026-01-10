@@ -18,9 +18,9 @@ val PostType.korean: String
     }
 
 enum class RecruitingStudySort(val label: String) {
-    LATEST("최신 순"),
-    VIEW("조회수 높은 순"),
-    LIKE("관심 많은 순")
+    RECENT("최신 순"),
+    HITS("조회수 높은 순"),
+    LIKES("관심 많은 순")
 }
 
 
@@ -37,12 +37,12 @@ enum class FeeRange(
     val label: String
 ) {
     NONE("없음"),
-    UNDER_10K("1만원 미만"),
-    ABOUT10K("1만원대"),
-    ABOUT20K("2만원대"),
-    ABOUT30K("3만원대"),
-    ABOUT40K("4만원대"),
-    OVER50K("5만원 이상")
+    BELOW_10K("1만원 미만"),
+    FROM_10K_TO_20K("1만원대"),
+    FROM_20K_TO_30K("2만원대"),
+    FROM_30K_TO_40K("3만원대"),
+    FROM_40K_TO_50K("4만원대"),
+    ABOVE_50K("5만원 이상")
 }
 
 enum class StudyTheme(
@@ -71,6 +71,14 @@ enum class StudyStyle {
     DISCUSSION_BASED,
     LIGHT_AND_FLEXIBLE,
     STRUCTURED_AND_PLANNED
+}
+
+enum class RecruitingStatus(
+    val value: String
+) {
+    RECRUITING("모집중"),
+    COMPLETED("모집완료"),
+//    BEFORE("모집전")
 }
 
 enum class SocialLoginType(

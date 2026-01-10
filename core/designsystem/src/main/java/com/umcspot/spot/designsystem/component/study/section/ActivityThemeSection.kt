@@ -33,7 +33,7 @@ fun ActivityThemeSection(
 
 @Composable
 fun ActivityThemeSection(
-    selectedThemes: ImmutableList<StudyTheme>,
+    selectedThemes: List<StudyTheme>,
     onSelect: (StudyTheme) -> Unit,
     modifier: Modifier = Modifier,
     maxSelection: Int = 3

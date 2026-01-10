@@ -23,6 +23,7 @@ import com.umcspot.spot.jjim.navigation.navigateToJJim
 import com.umcspot.spot.mypage.navigation.navigateToMypage
 import com.umcspot.spot.feature.board.post.content.navigation.POST_CONTENT_ROUTE
 import com.umcspot.spot.feature.board.post.posting.navigation.Posting
+import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.Landing
 import com.umcspot.spot.signup.navigation.Saving
@@ -34,7 +35,9 @@ import com.umcspot.spot.study.detail.navigation.StudyDetail
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocation
+import com.umcspot.spot.study.preferLocation.navigation.PreferLocationFilter
 import com.umcspot.spot.study.preferLocation.navigation.navigateToPreferLocationStudy
+import com.umcspot.spot.study.preferLocation.navigation.navigateToPreferLocationStudyFilter
 import com.umcspot.spot.study.recruiting.navigation.Recruiting
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudy
@@ -94,14 +97,15 @@ class MainNavigator(
     fun isInLanding(): Boolean = inAnyGraph(Landing::class, Saving::class)
 
     @Composable
-    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, RecruitingFilter::class,
+    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, RecruitingFilter::class, PreferLocationFilter::class,
         SignUp::class, CheckList::class, Posting::class, BoardList::class) || inAnyGraphRoutes(POST_CONTENT_ROUTE)
 
     @Composable
-    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class,PreferLocation::class, BoardList::class)
+    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, AppliedAlert::class, Recruiting::class,
+        PreferLocation::class, BoardList::class)
 
     @Composable
-    fun showMultipleFab(): Boolean = inAnyGraph(BoardList::class)
+    fun showMultipleFab(): Boolean = inAnyGraph(Home::class, BoardList::class)
 
     @Composable
     fun showBottomBar(): Boolean {
@@ -165,6 +169,10 @@ class MainNavigator(
 
     fun navigateToRecruitingStudyFilter(navOptions: NavOptions? = null) {
         navController.navigateToRecruitingStudyFilter(navOptions)
+    }
+
+    fun navigateToPreferLocationStudyFilter(navOptions: NavOptions? = null) {
+        navController.navigateToPreferLocationStudyFilter(navOptions)
     }
 
     fun navigateToAlert(navOptions: NavOptions? = null) {

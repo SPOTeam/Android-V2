@@ -14,7 +14,7 @@ data class RegisterStudyState(
     val isSheetVisible: Boolean = false,
     val locationQuery: String = "",
     val locationResults: List<LocationRow> = emptyList(),
-    val selectedRegions: List<String> = emptyList(),
+    val selectedRegions: List<LocationRow> = emptyList(),
 
     val memberCount: Int = 2,
     val hasFee: Boolean? = null,

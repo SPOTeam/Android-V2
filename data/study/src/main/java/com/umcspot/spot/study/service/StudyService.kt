@@ -2,6 +2,7 @@ package com.umcspot.spot.study.service
 
 import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.FeeRange
+import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
@@ -25,13 +26,26 @@ interface StudyService {
 //        @Body request: StudyRequestDto
     ): BaseResponse<StudyResponseDto>
 
-
-    @GET("/api/v1/service")
+    @GET("/api/studies/recruiting")
     suspend fun getRecruitingStudies(
-        @Query("sortType") sortType: RecruitingStudySort,
-        @Query("activityType") activityType: ActivityType?,
-        @Query("theme") theme: StudyTheme?,
-        @Query("feeRange") feeRange: FeeRange?
+        @Query("feeCategory") feeCategory: FeeRange?,
+        @Query("categories") categories:  List<String>?,
+        @Query("isOnline") isOnline: Boolean?,
+        @Query("sortBy") sortBy: RecruitingStudySort?,
+        @Query("cursor") cursor: Long?,
+        @Query("size") size: Int
+    ): BaseResponse<StudyResponseDto>
+
+    @GET("/api/studies/by-region")
+    suspend fun getPreferLocationStudies(
+        @Query("recruitingStatus") recruitingStatus: RecruitingStatus?,
+        @Query("feeCategory") feeCategory: FeeRange?,
+        @Query("categories") categories: List<String>?,
+        @Query("isOnline") isOnline: Boolean?,
+        @Query("sortBy") sortBy: RecruitingStudySort?,
+        @Query("cursor") cursor: Long?,
+        @Query("size") size: Int,
+        @Query("regionCodes") regionCodes: List<String>?
     ): BaseResponse<StudyResponseDto>
 
     @Multipart
