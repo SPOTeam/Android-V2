@@ -556,6 +556,8 @@ fun HomeScreenContent(
                         },
                         onItemClick = onStudyClick
                     )
+
+                    Spacer(modifier = Modifier.height(screenHeightDp(25.dp)))
                 }
 
                 is UiState.Loading -> {
