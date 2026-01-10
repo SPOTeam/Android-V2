@@ -299,7 +299,7 @@ fun PopularStudyNow(
                 shape = SpotShapes.Hard,
                 colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = SpotTheme.colors.white,
-                    contentColor = B500
+                    contentColor = Black
                 ),
                 modifier = Modifier.size(screenWidthDp(24.dp))
             ) {
@@ -357,7 +357,7 @@ fun RecommendStudyNow(
                 shape = SpotShapes.Hard,
                 colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = SpotTheme.colors.white,
-                    contentColor = B500
+                    contentColor = Black
                 ),
                 modifier = Modifier.size(screenWidthDp(24.dp))
             ) {
