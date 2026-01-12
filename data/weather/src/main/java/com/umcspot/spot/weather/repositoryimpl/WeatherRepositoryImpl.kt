@@ -22,8 +22,8 @@ class WeatherRepositoryImpl @Inject constructor(
     private val weatherConfigFieldProvider: WeatherConfigFieldProvider
 ) : WeatherRepository {
     override suspend fun getWeather(
-        longitude : Double,
-        latitude : Double
+        latitude : Double,
+        longitude : Double
     ): Result<WeatherResult> =
         runCatching {
             val (nx, ny) = latLonToGrid(latitude, longitude)
@@ -46,7 +46,7 @@ class WeatherRepositoryImpl @Inject constructor(
             } else {
                 first
             }
-            // 최종 파싱
+
             dto.toDomain()
 
         }.onFailure { e ->

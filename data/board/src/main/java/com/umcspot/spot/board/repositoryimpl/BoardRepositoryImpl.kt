@@ -42,7 +42,7 @@ class BoardRepositoryImpl @Inject constructor(
             val lists = boardService.getBestBoard(SortType.RECENT).result.toDomainList()
             lists.hotPosts[0]
         }.onFailure { e ->
-            Log.e("BoardRepository", "getBestBoard failed", e)
+            Log.e("BoardRepository", "getBestSingleBoard failed", e)
         }
 
     override suspend fun getFilteredPosts(

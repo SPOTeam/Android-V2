@@ -66,7 +66,7 @@ class StudyRepositoryImpl @Inject constructor(
         runCatching {
             studyDataSource.getRecommendedStudies().result.toDomainList()
         }.onFailure {
-            Log.e("StudyRepository", "getPreferLocationStudies failed", it)
+            Log.e("StudyRepository", "getRecommendedStudies failed", it)
         }
 
     override suspend fun createStudy(

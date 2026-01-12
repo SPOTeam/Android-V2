@@ -49,16 +49,16 @@ class HomeViewModel @Inject constructor(
             }
     }
 
-    fun load(longitude : Double = FALLBACK_LONGITUDE, latitude : Double = FALLBACK_LATITUDE) {
-        loadWeather(longitude, latitude)
+    fun load(latitude : Double = FALLBACK_LATITUDE, longitude : Double = FALLBACK_LONGITUDE) {
+        loadWeather(latitude, longitude)
         loadPosts()
     }
 
-    fun loadWeather(longitude : Double, latitude : Double) {
+    fun loadWeather(latitude : Double, longitude : Double) {
         _uiState.update { it.copy(weatherInfo = UiState.Loading) }
 
         viewModelScope.launch {
-            weatherRepository.getWeather(longitude, latitude)
+            weatherRepository.getWeather(latitude, longitude)
                 .onSuccess { weather ->
                     _uiState.update { it.copy(weatherInfo = UiState.Success(weather)) }
                 }
@@ -103,7 +103,7 @@ class HomeViewModel @Inject constructor(
                 _uiState.update { it.copy(popularStudies = UiState.Success(list)) }
             }
                 .onFailure { e ->
-                    Log.e("HomeViewModel", "loadgetPopularStudies error", e)
+                    Log.e("HomeViewModel", "loadRecommendedStudies  error", e)
 
 //                    _uiState.update { it.copy(popularStudies = UiState.Failure(e.message ?: "인기 스터디 실패")) }
                 }
@@ -116,7 +116,7 @@ class HomeViewModel @Inject constructor(
                     _uiState.update { it.copy(recommendStudies = UiState.Success(list)) }
                 }
                 .onFailure { e ->
-                    Log.e("HomeViewModel", "loadgetPopularStudies error", e)
+                    Log.e("HomeViewModel", "loadRecommendedStudies error", e)
 
 //                    _uiState.update { it.copy(recommendStudies = UiState.Failure(e.message ?: "추천 스터디 실패")) }
                 }
