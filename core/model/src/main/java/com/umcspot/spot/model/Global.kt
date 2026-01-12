@@ -9,7 +9,7 @@ enum class QuickMenuType (
     BOARD("게시판")
 }
 
-enum class WeatherType { HEAVYRAIN, RAIN, SNOW, WIND, COLD, HOT, SUNNY }
+enum class WeatherType { RAIN, SNOW, WIND, COLD, HOT, SUNNY }
 
 enum class SortType { RECENT, RECOMMEND, COMMENT_COUNT }
 

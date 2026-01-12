@@ -1,6 +1,7 @@
 package com.umcspot.spot.login.di
 
 import com.umcspot.spot.login.service.LoginService
+import com.umcspot.spot.network.di.SpotApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,7 +14,7 @@ import javax.inject.Singleton
 object LoginServiceModule {
     @Provides
     @Singleton
-    fun provideOAuthApi(retrofit: Retrofit): LoginService =
+    fun provideOAuthApi(@SpotApi retrofit: Retrofit): LoginService =
         retrofit.create(LoginService::class.java)
 
 }

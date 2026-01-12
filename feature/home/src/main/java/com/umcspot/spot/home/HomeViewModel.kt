@@ -28,32 +28,33 @@ class HomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(HomeState())
     val uiState: StateFlow<HomeState> = _uiState
 
+    companion object {
+        // 서울시청 fallback 좌표
+        private const val FALLBACK_LONGITUDE = 126.9780
+        private const val FALLBACK_LATITUDE = 37.5668
+    }
+
     @SuppressLint("MissingPermission")
     fun loadWithLocation(fusedClient: FusedLocationProviderClient) {
         fusedClient.lastLocation
             .addOnSuccessListener { loc ->
-                val fallback = 1269780L to 375668L // 서울시청 예시
-                val (lon, lat) = if (loc != null) {
-                    ((loc.longitude * 1_000_000).toLong()) to ((loc.latitude * 1_000_000).toLong())
-                } else fallback
+                val longitude = loc?.longitude ?: FALLBACK_LONGITUDE
+                val latitude = loc?.latitude ?: FALLBACK_LATITUDE
 
-                load(lon, lat) // ✅ 기존 load 재사용
+                load(longitude, latitude)
             }
             .addOnFailureListener { e ->
-                Log.e("HomeViewModel", "loadWithLocation lastLocation error", e)
-                val fallback = 1269780L to 375668L
-                load(fallback.first, fallback.second)
+                Log.e("HomeViewModel", "loadWithLocation error", e)
+                load(FALLBACK_LONGITUDE, FALLBACK_LATITUDE)
             }
     }
 
-
-
-    fun load(longitude : Long, latitude : Long) {
+    fun load(longitude : Double = FALLBACK_LONGITUDE, latitude : Double = FALLBACK_LATITUDE) {
         loadWeather(longitude, latitude)
         loadPosts()
     }
 
-    fun loadWeather(longitude : Long, latitude : Long) {
+    fun loadWeather(longitude : Double, latitude : Double) {
         _uiState.update { it.copy(weatherInfo = UiState.Loading) }
 
         viewModelScope.launch {
@@ -99,8 +100,8 @@ class HomeViewModel @Inject constructor(
                 cursor = null,
                 size = 3
             ).onSuccess { list ->
-                    _uiState.update { it.copy(popularStudies = UiState.Success(list)) }
-                }
+                _uiState.update { it.copy(popularStudies = UiState.Success(list)) }
+            }
                 .onFailure { e ->
                     Log.e("HomeViewModel", "loadgetPopularStudies error", e)
 

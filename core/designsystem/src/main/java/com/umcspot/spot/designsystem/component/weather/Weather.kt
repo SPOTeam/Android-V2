@@ -38,23 +38,21 @@ fun WeatherCard(
     modifier: Modifier = Modifier,
 ) {
     // 1) 배경 이미지 결정
-    val isDay = currentTime?.hour in 6..17
+    val isDay = currentTime?.hour in 7..18
     val backgroundRes = when {
         !isDay -> R.drawable.night_background
         weatherType == WeatherType.RAIN -> R.drawable.rainy_background
-        weatherType == WeatherType.HEAVYRAIN -> R.drawable.rainy_background
         else -> R.drawable.default_background
     }
 
     // 2) 날씨별 아이콘, 그라데이션 오버레이, 메시지
     val (iconRes, message) = when (weatherType) {
-        WeatherType.HEAVYRAIN   -> R.drawable.heavy_rain  to "실내에서 집중! 목표는 선명히!"
-        WeatherType.RAIN        -> R.drawable.light_rain  to "우산 챙기고 오늘도 파이팅!"
-        WeatherType.SNOW        -> R.drawable.heavy_snow  to "눈길 조심! 한 걸음씩 나아가요!"
+        WeatherType.RAIN        -> R.drawable.light_rain  to "실내에서 집중! 목표는 선명히!"
+        WeatherType.SNOW        -> R.drawable.heavy_snow  to "눈길 조심! 한 걸음씩 나아가요"
         WeatherType.WIND        -> R.drawable.gale        to "바람 조심! 흔들려도 전진!"
-        WeatherType.COLD        -> R.drawable.cold        to "따뜻하게! 오늘도 열정 가득!"
+        WeatherType.COLD        -> R.drawable.cold        to "날씨가 추워요! 실내 공부 추천"
         WeatherType.HOT         -> R.drawable.hot         to "수분 보충! 더위도 이겨내요!"
-        WeatherType.SUNNY -> R.drawable.sunny       to "좋은 날! 목표 향해 달려요!"
+        WeatherType.SUNNY       -> R.drawable.sunny       to "좋은 날! 목표 향해 달려요!"
         null -> R.drawable.spot_logo to "날씨를 불러오는 중 입니다."
     }
 
@@ -77,23 +75,27 @@ fun WeatherCard(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = screenWidthDp(12.dp), vertical = screenHeightDp(8.dp))
+                    .padding(horizontal = screenWidthDp(10.dp), vertical = screenHeightDp(7.dp))
             ) {
                 Column(
                     verticalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.Bottom
+                    ) {
                         Image(
                             painter = painterResource(iconRes),
                             contentDescription = null,
-                            modifier = Modifier.size(screenWidthDp(36.dp))
+                            modifier = Modifier.size(screenWidthDp(40.dp))
                         )
-                        Spacer(Modifier.width(screenWidthDp(14.dp)))
+                        Spacer(Modifier.width(screenWidthDp(13.dp)))
                         Text(
                             text = "${"%.1f".format(temperature?.toFloat())} °C",
                             style = SpotTheme.typography.h1,
-                            color = SpotTheme.colors.white
+                            color = SpotTheme.colors.white,
+                            modifier = Modifier.align(Alignment.CenterVertically)
                         )
                     }
                     Text(

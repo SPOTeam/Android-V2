@@ -93,7 +93,7 @@ fun HomeScreen(
         if (granted) {
             viewModel.loadWithLocation(fusedClient)
         } else {
-            viewModel.load(1269780L, 375668L)
+            viewModel.load()
         }
     }
 
@@ -279,41 +279,9 @@ fun PopularPostNow(
 fun PopularStudyNow(
     items: List<StudyResult>,
     modifier: Modifier = Modifier,
-    onMoreClick: () -> Unit = {},
     onItemClick: (StudyResult) -> Unit = {},
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = screenWidthDp(12.dp)),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "지금 가장 인기있는 스터디",
-                style = SpotTheme.typography.h3,
-            )
-
-            FilledIconButton(
-                onClick = onMoreClick,
-                shape = SpotShapes.Hard,
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = SpotTheme.colors.white,
-                    contentColor = Black
-                ),
-                modifier = Modifier.size(screenWidthDp(24.dp))
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.arrow_right),
-                    contentDescription = "더보기",
-                    modifier = Modifier.size(screenWidthDp(14.dp)),
-                    tint = SpotTheme.colors.B500
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(screenHeightDp(12.dp)))
-
         items.forEach { item ->
             Spacer(Modifier.padding(screenHeightDp(4.dp)))
             StudyListItem(
@@ -339,38 +307,9 @@ fun PopularStudyNow(
 fun RecommendStudyNow(
     items: List<StudyResult>,
     modifier: Modifier = Modifier,
-    onRefreshClick: () -> Unit = {},
     onItemClick: (StudyResult) -> Unit = {},
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = screenWidthDp(12.dp)),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "전공/진로학습 스터디 이건 어때요",
-                style = SpotTheme.typography.h3,
-            )
-            FilledIconButton(
-                onClick = onRefreshClick,
-                shape = SpotShapes.Hard,
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = SpotTheme.colors.white,
-                    contentColor = Black
-                ),
-                modifier = Modifier.size(screenWidthDp(24.dp))
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.refresh),
-                    contentDescription = "더보기",
-                    modifier = Modifier.size(screenWidthDp(14.dp)),
-                    tint = SpotTheme.colors.black
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(screenHeightDp(12.dp)))
         items.forEach { item ->
             Spacer(Modifier.padding(screenHeightDp(4.dp)))
 
@@ -446,7 +385,7 @@ fun HomeScreenContent(
 
                 WeatherCard(
                     temperature = temperature,
-                    weatherType = weatherType as WeatherType?, // WeatherInfo 타입에 맞춰 필요하면 수정
+                    weatherType = weatherType,
                     currentTime = currentTime
                 )
 
@@ -517,12 +456,42 @@ fun HomeScreenContent(
 
         item {
             Spacer(modifier = Modifier.height(screenHeightDp(30.dp)))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = screenWidthDp(12.dp)),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "지금 가장 인기있는 스터디",
+                    style = SpotTheme.typography.h3,
+                )
+
+                FilledIconButton(
+                    onClick = onStudyMoreClick,
+                    shape = SpotShapes.Hard,
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = SpotTheme.colors.white,
+                        contentColor = Black
+                    ),
+                    modifier = Modifier.size(screenWidthDp(24.dp))
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.arrow_right),
+                        contentDescription = "더보기",
+                        modifier = Modifier.size(screenWidthDp(14.dp)),
+                        tint = SpotTheme.colors.B500
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(screenHeightDp(12.dp)))
             when (popularStudiesState) {
                 is UiState.Success -> {
                     PopularStudyNow(
                         items = popularStudiesState.data.studyList,
                         modifier = Modifier.fillMaxWidth(),
-                        onMoreClick = onStudyMoreClick,
                         onItemClick = onStudyClick
                     )
                 }
@@ -544,20 +513,48 @@ fun HomeScreenContent(
 
         item {
             Spacer(modifier = Modifier.height(screenHeightDp(30.dp)))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = screenWidthDp(12.dp)),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "전공/진로학습 스터디 이건 어때요",
+                    style = SpotTheme.typography.h3,
+                )
+                FilledIconButton(
+                    onClick = {
+                        restoreIndex = listState.firstVisibleItemIndex
+                        restoreOffset = listState.firstVisibleItemScrollOffset
+                        onRefreshRecommended()
+                    },
+                    shape = SpotShapes.Hard,
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = SpotTheme.colors.white,
+                        contentColor = Black
+                    ),
+                    modifier = Modifier.size(screenWidthDp(24.dp))
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.refresh),
+                        contentDescription = "더보기",
+                        modifier = Modifier.size(screenWidthDp(14.dp)),
+                        tint = SpotTheme.colors.black
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(screenHeightDp(12.dp)))
+
             when (recommendedStudiesState) {
                 is UiState.Success -> {
                     RecommendStudyNow(
                         items = recommendedStudiesState.data.studyList,
                         modifier = Modifier.fillMaxWidth(),
-                        onRefreshClick = {
-                            restoreIndex = listState.firstVisibleItemIndex
-                            restoreOffset = listState.firstVisibleItemScrollOffset
-                            onRefreshRecommended()
-                        },
                         onItemClick = onStudyClick
                     )
-
-                    Spacer(modifier = Modifier.height(screenHeightDp(25.dp)))
                 }
 
                 is UiState.Loading -> {

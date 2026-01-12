@@ -1,5 +1,6 @@
 package com.umcspot.spot.weather.di
 
+import com.umcspot.spot.network.di.WeatherApi
 import com.umcspot.spot.weather.service.WeatherService
 import dagger.Module
 import dagger.Provides
@@ -13,7 +14,7 @@ import javax.inject.Singleton
 object WeatherServiceModule {
     @Provides
     @Singleton
-    fun providesWeatherService(retrofit: Retrofit): WeatherService = retrofit.create(
+    fun providesWeatherService(@WeatherApi retrofit: Retrofit): WeatherService = retrofit.create(
         WeatherService::class.java
     )
 }

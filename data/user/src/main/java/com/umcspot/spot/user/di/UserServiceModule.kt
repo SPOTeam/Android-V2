@@ -1,5 +1,6 @@
 package com.umcspot.spot.user.di
 
+import com.umcspot.spot.network.di.SpotApi
 import com.umcspot.spot.user.service.UserService
 import dagger.Module
 import dagger.Provides
@@ -13,7 +14,7 @@ import javax.inject.Singleton
 object UserServiceModule {
     @Provides
     @Singleton
-    fun providesUserService(retrofit: Retrofit): UserService = retrofit.create(
+    fun providesUserService(@SpotApi retrofit: Retrofit): UserService = retrofit.create(
         UserService::class.java
     )
 }

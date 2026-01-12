@@ -15,6 +15,8 @@ internal fun Project.configureBuildConfig(
     val naverClientSecret = properties.getProperty("NAVER_CLIENT_SECRET") ?: ""
     val appName = properties.getProperty("APP_NAME") ?: "SPOT"
 
+    val weatherUrl = properties.getProperty("WEATHER_BASE_URL") ?: ""
+    val weatherToken = properties.getProperty("WEATHER_TOKEN") ?: ""
 
     commonExtension.apply {
         defaultConfig {
@@ -47,6 +49,18 @@ internal fun Project.configureBuildConfig(
                 "String",
                 "APP_NAME",
                 "\"$appName\""
+            )
+
+            buildConfigField(
+                "String",
+                "WEATHER_BASE_URL",
+                "\"$weatherUrl\""
+            )
+
+            buildConfigField(
+                "String",
+                "WEATHER_TOKEN",
+                "\"$weatherToken\""
             )
         }
 
