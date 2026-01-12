@@ -377,17 +377,34 @@ fun HomeScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = screenWidthDp(17.dp))
-            .padding(top = screenHeightDp(18.dp)),
+            .padding(top = screenHeightDp(18.dp), bottom = screenHeightDp(24.dp)),
         state = listState
     ) {
         item {
             Row(modifier = Modifier.fillMaxWidth()) {
 
-                WeatherCard(
-                    temperature = temperature,
-                    weatherType = weatherType,
-                    currentTime = currentTime
-                )
+                when (weatherState) {
+                    is UiState.Success -> {
+                        WeatherCard(
+                            temperature = weatherState.data.weatherTemp,
+                            weatherType = weatherState.data.weatherType,
+                            currentTime = weatherState.data.currentTime
+                        )
+                    }
+
+                    // 로딩/실패/Empty => 빈 영역(=아무것도 안 그림)
+                    is UiState.Empty, is UiState.Loading, is UiState.Failure -> {
+                        // WeatherCard 자리만큼 공간을 유지하고 싶으면 Spacer로 자리만 잡아주면 됨
+                        Box(
+                            modifier = Modifier
+                                .width(screenWidthDp(156.dp))   // WeatherCard 실제 폭으로 맞춰줘
+                                .height(screenHeightDp(79.dp)), // WeatherCard 실제 높이로 맞춰줘
+                            contentAlignment = Alignment.Center
+                        ) {
+                            SpotSpinner()
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.width(screenWidthDp(14.dp)))
 

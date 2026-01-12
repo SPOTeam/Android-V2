@@ -60,7 +60,7 @@ class WeatherRepositoryImpl @Inject constructor(
         val formatterTime = DateTimeFormatter.ofPattern("HHmm")
 
         val baseDate = now.format(formatterDate)
-        val baseTime = now.withMinute(0).format(formatterTime) // HH00
+        val baseTime = now.format(formatterTime)
 
         return baseDate to baseTime
     }

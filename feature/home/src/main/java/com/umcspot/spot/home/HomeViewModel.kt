@@ -38,10 +38,10 @@ class HomeViewModel @Inject constructor(
     fun loadWithLocation(fusedClient: FusedLocationProviderClient) {
         fusedClient.lastLocation
             .addOnSuccessListener { loc ->
-                val longitude = loc?.longitude ?: FALLBACK_LONGITUDE
                 val latitude = loc?.latitude ?: FALLBACK_LATITUDE
+                val longitude = loc?.longitude ?: FALLBACK_LONGITUDE
 
-                load(longitude, latitude)
+                load(latitude, longitude)
             }
             .addOnFailureListener { e ->
                 Log.e("HomeViewModel", "loadWithLocation error", e)
