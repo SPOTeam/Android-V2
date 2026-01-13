@@ -268,61 +268,70 @@ fun LocationBottomSheet(
 
                         Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
 
-                        if (results.isNotEmpty()) {
-                            val isMaxSelected = selected.size >= 10
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(bottom = navBarPadding)
+                                .background(SpotTheme.colors.white)
+                        ) {
+                            if (results.isNotEmpty()) {
+                                val isMaxSelected = selected.size >= 10
 
-                            HorizontalDivider(thickness = 0.5.dp, color = SpotTheme.colors.G200)
-                            LazyColumn(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = navBarPadding)
-                                    .background(SpotTheme.colors.white),
-                            ) {
-                                itemsIndexed(results, key = { _, row -> row.code }) { index, row ->
-                                    val isAlreadySelected = selected.any { it.code == row.code }
-                                    ListItem(
-                                        headlineContent = {
-                                            Text(
-                                                text = row.fullName,
-                                                style = SpotTheme.typography.h5,
-                                                maxLines = 1,
-                                                color = if (isMaxSelected && !isAlreadySelected) {
-                                                    SpotTheme.colors.gray400
-                                                } else {
-                                                    LocalContentColor.current
-                                                }
-                                            )
-                                        },
-                                        colors = ListItemDefaults.colors(
-                                            containerColor = SpotTheme.colors.white
-                                        ),
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clickable(
-                                                enabled = !isMaxSelected || isAlreadySelected,
-                                                onClick = {
-                                                    if (!isAlreadySelected) {
-                                                        onAddSelected(row)
+                                HorizontalDivider(thickness = 0.5.dp, color = SpotTheme.colors.G200)
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = navBarPadding)
+                                        .background(SpotTheme.colors.white),
+                                ) {
+                                    itemsIndexed(
+                                        results,
+                                        key = { _, row -> row.code }) { index, row ->
+                                        val isAlreadySelected = selected.any { it.code == row.code }
+                                        ListItem(
+                                            headlineContent = {
+                                                Text(
+                                                    text = row.fullName,
+                                                    style = SpotTheme.typography.h5,
+                                                    maxLines = 1,
+                                                    color = if (isMaxSelected && !isAlreadySelected) {
+                                                        SpotTheme.colors.gray400
+                                                    } else {
+                                                        LocalContentColor.current
                                                     }
-                                                }
-                                            )
-                                    )
+                                                )
+                                            },
+                                            colors = ListItemDefaults.colors(
+                                                containerColor = SpotTheme.colors.white
+                                            ),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clickable(
+                                                    enabled = !isMaxSelected || isAlreadySelected,
+                                                    onClick = {
+                                                        if (!isAlreadySelected) {
+                                                            onAddSelected(row)
+                                                        }
+                                                    }
+                                                )
+                                        )
 
-                                    HorizontalDivider(
-                                        thickness = 0.5.dp,
-                                        color = SpotTheme.colors.G200
+                                        HorizontalDivider(
+                                            thickness = 0.5.dp,
+                                            color = SpotTheme.colors.G200
+                                        )
+                                    }
+                                }
+                            } else {
+                                if (query.isNotBlank()) {
+                                    Text(
+                                        text = "검색 결과가 없습니다.",
+                                        color = SpotTheme.colors.gray400,
+                                        style = SpotTheme.typography.medium_400,
+                                        modifier = Modifier.align(Alignment.Center),
                                     )
                                 }
-                            }
-                        } else {
-                            if (query.isNotBlank()) {
-                                Text(
-
-                                    text = "검색 결과가 없습니다.",
-                                    color = SpotTheme.colors.gray400,
-                                    style = SpotTheme.typography.small_300,
-                                    modifier = Modifier.padding(top = 14.dp),
-                                )
                             }
                         }
                     }
