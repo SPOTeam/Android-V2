@@ -29,7 +29,7 @@ class HomeViewModel @Inject constructor(
     val uiState: StateFlow<HomeState> = _uiState
 
     companion object {
-        // 서울시청 fallback 좌표
+        // 서울시청 fallback 좌표 : 서울 시청
         private const val FALLBACK_LONGITUDE = 126.9780
         private const val FALLBACK_LATITUDE = 37.5668
     }
@@ -101,12 +101,10 @@ class HomeViewModel @Inject constructor(
                 size = 3
             ).onSuccess { list ->
                 _uiState.update { it.copy(popularStudies = UiState.Success(list)) }
+            }.onFailure { e ->
+                Log.e("HomeViewModel", "loadRecruitingStudies  error", e)
+//              _uiState.update { it.copy(popularStudies = UiState.Failure(e.message ?: "인기 스터디 실패")) }
             }
-                .onFailure { e ->
-                    Log.e("HomeViewModel", "loadRecommendedStudies  error", e)
-
-//                    _uiState.update { it.copy(popularStudies = UiState.Failure(e.message ?: "인기 스터디 실패")) }
-                }
         }
 
         // 전공/진로학습 스터디 이건 어때요
@@ -133,7 +131,6 @@ class HomeViewModel @Inject constructor(
                 }
                 .onFailure { e ->
                     Log.e("HomeViewModel", "reLoadRecommendedStudies error", e)
-                    // 필요하면 Failure로:
                     // _uiState.update { it.copy(recommendStudies = UiState.Failure(e.message ?: "추천 스터디 실패")) }
                 }
         }
