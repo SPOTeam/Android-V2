@@ -282,7 +282,6 @@ fun LocationBottomSheet(
                                 LazyColumn(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(bottom = navBarPadding)
                                         .background(SpotTheme.colors.white),
                                 ) {
                                     itemsIndexed(
