@@ -45,7 +45,7 @@ class HomeViewModel @Inject constructor(
             }
             .addOnFailureListener { e ->
                 Log.e("HomeViewModel", "loadWithLocation error", e)
-                load(FALLBACK_LONGITUDE, FALLBACK_LATITUDE)
+                load(FALLBACK_LATITUDE, FALLBACK_LONGITUDE)
             }
     }
 
