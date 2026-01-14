@@ -21,11 +21,9 @@ class WeatherRepositoryImpl @Inject constructor(
     private val weatherDataSource: WeatherDataSource,
     private val weatherConfigFieldProvider: WeatherConfigFieldProvider
 ) : WeatherRepository {
-
-    // ✅ 메모리 캐시 (앱 프로세스 살아있는 동안)
-    private var lastBaseKey: String? = null         // 예: 20260114_1400
-    private var lastGrid: GridXY? = null            // nx, ny
-    private var lastWeather: WeatherResult? = null  // 마지막 성공 데이터
+    private var lastBaseKey: String? = null
+    private var lastGrid: GridXY? = null
+    private var lastWeather: WeatherResult? = null
 
 
     override suspend fun getWeather(
@@ -35,12 +33,10 @@ class WeatherRepositoryImpl @Inject constructor(
         runCatching {
             val grid = latLonToGrid(latitude, longitude)
 
-            // ✅ 초단기실황 "정시" 기준 base_date/base_time 산출
             val now = LocalDateTime.now()
             val (baseDate, baseTime) = calculateBaseDateTime(now)
             val baseKey = "${baseDate}_${baseTime}"
 
-            // ✅ 같은 정시 + 같은 격자면 네트워크 스킵
             if (lastBaseKey == baseKey && lastGrid == grid && lastWeather != null) {
                 return@runCatching lastWeather!!
             }
@@ -77,7 +73,6 @@ class WeatherRepositoryImpl @Inject constructor(
 
             val mapped = dto.toDomain()
 
-            // ✅ 성공 시 캐시 갱신
             lastBaseKey = baseKey
             lastGrid = grid
             lastWeather = mapped
@@ -85,10 +80,6 @@ class WeatherRepositoryImpl @Inject constructor(
             mapped
         }.onFailure { e ->
             Log.e("WeatherRepository", "loadWeatherError", e)
-        }.recoverCatching {
-            // 실패 시 더미 반환(기존 정책 유지)
-            // 주의: 더미를 캐시에 넣지는 않음(성공만 캐시)
-            WeatherResult.dummyFrom()
         }
 
     private fun calculateBaseDateTime(now: LocalDateTime): Pair<String, String> {
