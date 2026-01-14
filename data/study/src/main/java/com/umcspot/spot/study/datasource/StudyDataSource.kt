@@ -10,8 +10,7 @@ import com.umcspot.spot.study.dto.response.StudyResponseDto
 import java.io.File
 
 interface StudyDataSource {
-    suspend fun getPopularStudies(): BaseResponse<StudyResponseDto>
-    suspend fun getRecommendStudies(): BaseResponse<StudyResponseDto>
+    suspend fun getRecommendedStudies(): BaseResponse<StudyResponseDto>
     suspend fun getRecruitingStudies(feeCategory: FeeRange?, categories: List<String>?, isOnline: Boolean?, sortBy: RecruitingStudySort?, cursor: Long?, size: Int): BaseResponse<StudyResponseDto>
     suspend fun getPreferLocationStudies(
         recruitingStatus : RecruitingStatus?,
@@ -22,5 +21,6 @@ interface StudyDataSource {
         size: Int,
         regionCodes : List<String>?
     ): BaseResponse<StudyResponseDto>
+
     suspend fun createStudy(request: StudyRequestDto, imageFile: File?): BaseResponse<CreateStudyResponseDto>
 }

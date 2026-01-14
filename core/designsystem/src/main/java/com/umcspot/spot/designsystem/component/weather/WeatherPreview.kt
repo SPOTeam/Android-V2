@@ -9,28 +9,6 @@ import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.WeatherType
 import java.time.LocalTime
 
-// 🌧️ 낮, HeavyRain
-@Preview(showBackground = true)
-@Composable
-fun WeatherCardPreview_HeavyRainyDay() {
-    SpotTheme{
-        WeatherCard(
-            modifier = Modifier.padding(8.dp),
-            temperature = 15.0, weatherType = WeatherType.HEAVYRAIN, currentTime = LocalTime.of(8, 30))
-    }
-}
-
-// 🌧️ 밤, HeavyRain
-@Preview(showBackground = true)
-@Composable
-fun WeatherCardPreview_HeavyRainyNight() {
-    SpotTheme{
-        WeatherCard(
-            modifier = Modifier.padding(8.dp),
-            temperature = 15.0, weatherType = WeatherType.HEAVYRAIN, currentTime = LocalTime.of(19, 30))
-    }
-}
-
 // ❄ 낮, Snow
 @Preview(showBackground = true)
 @Composable

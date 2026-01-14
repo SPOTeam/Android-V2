@@ -1,5 +1,6 @@
 package com.umcspot.spot.study.di
 
+import com.umcspot.spot.network.di.SpotApi
 import com.umcspot.spot.study.service.StudyService
 import dagger.Module
 import dagger.Provides
@@ -13,7 +14,7 @@ import javax.inject.Singleton
 object StudyServiceModule {
     @Provides
     @Singleton
-    fun providesStudyService(retrofit: Retrofit): StudyService = retrofit.create(
+    fun providesStudyService(@SpotApi retrofit: Retrofit): StudyService = retrofit.create(
         StudyService::class.java
     )
 }

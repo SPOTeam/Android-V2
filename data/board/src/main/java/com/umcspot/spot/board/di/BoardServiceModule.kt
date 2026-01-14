@@ -1,6 +1,7 @@
 package com.umcspot.spot.board.di
 
 import com.umcspot.spot.board.service.BoardService
+import com.umcspot.spot.network.di.SpotApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,7 +14,7 @@ import javax.inject.Singleton
 object BoardServiceModule {
     @Provides
     @Singleton
-    fun providesBoardService(retrofit: Retrofit): BoardService = retrofit.create(
+    fun providesBoardService(@SpotApi retrofit: Retrofit): BoardService = retrofit.create(
         BoardService::class.java
     )
 }

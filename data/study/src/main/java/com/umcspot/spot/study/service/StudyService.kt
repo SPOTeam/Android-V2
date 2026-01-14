@@ -16,14 +16,9 @@ import retrofit2.http.Part
 import retrofit2.http.Query
 
 interface StudyService {
-    @GET("/api/v1/service")
-    suspend fun getPopularStudies(
-//        @Body request: StudyRequestDto
-    ): BaseResponse<StudyResponseDto>
 
-    @GET("/api/v1/service")
-    suspend fun getRecommendStudies(
-//        @Body request: StudyRequestDto
+    @GET("/api/studies/recommended")
+    suspend fun getRecommendedStudies(
     ): BaseResponse<StudyResponseDto>
 
     @GET("/api/studies/recruiting")

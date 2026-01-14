@@ -1,5 +1,6 @@
 package com.umcspot.spot.post.di
 
+import com.umcspot.spot.network.di.SpotApi
 import com.umcspot.spot.post.service.PostService
 import dagger.Module
 import dagger.Provides
@@ -13,7 +14,7 @@ import javax.inject.Singleton
 object PostServiceModule {
     @Provides
     @Singleton
-    fun providesPostService(retrofit: Retrofit): PostService = retrofit.create(
+    fun providesPostService(@SpotApi retrofit: Retrofit): PostService = retrofit.create(
         PostService::class.java
     )
 }

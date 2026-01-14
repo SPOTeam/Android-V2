@@ -60,7 +60,7 @@ fun MainNavHost(
             navigateToSignUp = { navigator.navigateToSignUp() },
             navigateToCheckList = { navigator.navigateToCheckList() },
             navigateToSaving = { navigator.navigateToSaving() },
-            navigateToHome = { navigator.navigateToHome() },
+            navigateToHome = { navigator.navigateToHome(clearStackNavOptions) },
             contentPadding = contentPadding,
         )
 
@@ -75,7 +75,11 @@ fun MainNavHost(
 
                     QuickMenuType.RECRUITING -> navigator.navigateToRecruitingStudy()
                 }
-            }
+            },
+            onPopularClick = { navigator.navigateToBoard() },
+            onPopularPostClick = { navigator.navController.navigateToPostContent(it) },
+            onStudyClick = {  },
+            onStudyMoreClick = {  }
         )
         categoryGraph()
         myStudyGraph()

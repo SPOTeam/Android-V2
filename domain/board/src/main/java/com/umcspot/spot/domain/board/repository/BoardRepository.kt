@@ -1,5 +1,6 @@
 package com.umcspot.spot.domain.board.repository
 
+import com.umcspot.spot.domain.board.model.board.BestPostResult
 import com.umcspot.spot.domain.board.model.board.BestPostResultList
 import com.umcspot.spot.domain.board.model.board.RecentPostResultList
 import com.umcspot.spot.domain.board.model.postList.PostResultList
@@ -17,4 +18,6 @@ interface BoardRepository {
     suspend fun postPostLike(postId : Long) : Result<Unit>
 
     suspend fun deletePostLike(postId : Long) : Result<Unit>
+
+    suspend fun getBestSinglePost() : Result<BestPostResult>
 }
