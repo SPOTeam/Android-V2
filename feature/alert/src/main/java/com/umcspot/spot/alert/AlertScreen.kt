@@ -1,374 +1,179 @@
 package com.umcspot.spot.alert
 
-import android.content.Context
-import android.util.Log
-import androidx.annotation.ColorInt
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.rememberAsyncImagePainter
 import com.umcspot.spot.alert.model.AlertInfo
 import com.umcspot.spot.alert.model.AlertResult
-import com.umcspot.spot.alert.model.AppliedAlertInfo
-import com.umcspot.spot.alert.model.AppliedAlertResult
 import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.component.appBar.BackTopBar
+import com.umcspot.spot.designsystem.component.SpotSpinner
+import com.umcspot.spot.designsystem.component.button.BlankButton
 import com.umcspot.spot.designsystem.component.empty.EmptyAlert
 import com.umcspot.spot.designsystem.shapes.ShapeBox
 import com.umcspot.spot.designsystem.shapes.ShapeImageBox
-import com.umcspot.spot.designsystem.shapes.ShapeImageWithBadge
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.B100
-import com.umcspot.spot.designsystem.theme.B200
 import com.umcspot.spot.designsystem.theme.B400
-import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.Black
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.model.AlertKind
-import com.umcspot.spot.model.ImageRef
+import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
 import com.umcspot.spot.ui.state.UiState
 import kotlinx.coroutines.launch
-import java.io.File
 
 @Composable
 fun AlertScreen(
     viewModel: AlertViewModel = hiltViewModel(),
-    contentPadding : PaddingValues,
+    contentPadding: PaddingValues,
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
+    onClickAlert:(Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val listState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
 
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
 
+    val listState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
+    val scope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
         onRegisterScrollToTop {
-            scope.launch {
-                listState.animateScrollToItem(0)
-            }
+            scope.launch { listState.animateScrollToItem(0) }
         }
     }
 
     LaunchedEffect(Unit) { viewModel.load() }
 
-    when (val state = uiState.general) {
-        is UiState.Loading -> Text("로딩 중...", color = Color.Gray)
-
-        is UiState.Failure -> Text("에러: ${state.msg}", color = Color.Red)
-
-        is UiState.Success, UiState.Empty -> {
-            val alerts: List<AlertInfo> = (state as? UiState.Success)?.data?.alerts.orEmpty()
-            val applied: List<AppliedAlertInfo> = (uiState.applied as? UiState.Success)?.data?.alerts.orEmpty()
-
-            AlertScreenContent(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(SpotTheme.colors.white)
-                    .padding(top = topPad, bottom = bottomPad),
-                alerts = alerts,
-                onClickAlert = { item -> viewModel.onClickAlert(item) },
-                listState = listState
-            )
-        }
-    }
-}
-
-@Composable
-fun AlertRow(
-    data: AlertInfo,
-    onClick: (AlertInfo) -> Unit
-) {
-    if (data.kind == AlertKind.POPULAR_POST) {
-        PopularPostAlert(data = data, onClick = onClick)
-    } else {
-        StudyNotiAlert(data = data, onClick = onClick)
-    }
-}
-
-@Composable
-fun PopularPostAlert(
-    modifier: Modifier = Modifier,
-    data: AlertInfo,
-    onClick: (AlertInfo) -> Unit
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-
-    val backgroundColor = when {
-        isPressed -> SpotTheme.colors.B200
-        data.isRead -> SpotTheme.colors.white
-        else -> SpotTheme.colors.B100
-    }
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(SpotTheme.colors.white)
+            .padding(top = topPad, bottom = bottomPad)
+            .padding(horizontal = screenWidthDp(17.dp))
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null, // ripple 없앰
-                ) { onClick(data) }, // 읽음 처리(상태 변경)는 ViewModel에서
-            shape = SpotShapes.Hard,
-            colors = CardDefaults.cardColors(containerColor = backgroundColor)
-        ) {
-            Row(
-                modifier = Modifier.padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ShapeImageBox(
-                    painter = painterResource(R.drawable.fire),
-                    shape = SpotShapes.Soft,
-                    modifier = Modifier.size(55.dp),
-                    backgroundColor = SpotTheme.colors.white,
-                    borderWidth = 0.5.dp,
-                    borderColor = SpotTheme.colors.G300,
+        when (val alertsState = uiState.alerts) {
+            is UiState.Success -> {
+                AlertScreenContent(
+                    state = alertsState.data,
+                    listState = listState,
+                    onClickAlert = onClickAlert
                 )
+            }
 
-                Spacer(Modifier.width(15.dp))
+            is UiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    SpotSpinner(size = screenWidthDp(30.dp))
+                }
+            }
 
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "실시간 인기글",
-                        style = SpotTheme.typography.medium_500,
-                        maxLines = 1,
-                        fontSize = 15.sp,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = data.title,
-                        style = SpotTheme.typography.medium_500,
-                        color = SpotTheme.colors.Black,
-                        maxLines = 1,
-                        fontSize = 15.sp,
-                        overflow = TextOverflow.Ellipsis
+            is UiState.Failure, is UiState.Empty -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    EmptyAlert(
+                        modifier = Modifier.fillMaxSize(),
+                        painter = painterResource(R.drawable.alert),
+                        alertTitle = "아직 알림이 없어요.",
+                        alertDes = "스팟에서 내 목표를 이뤄봐요."
                     )
                 }
-
-                if (!data.isRead) NewBadge()
             }
         }
-    }
-}
-
-@Composable
-fun StudyNotiAlert(
-    modifier: Modifier = Modifier,
-    data: AlertInfo,
-    onClick: (AlertInfo) -> Unit
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-
-    val backgroundColor = when {
-        isPressed -> SpotTheme.colors.B200
-        data.isRead -> SpotTheme.colors.white
-        else -> SpotTheme.colors.B100
-    }
-
-    val (primary, secondary) = when (data.kind) {
-        AlertKind.STUDY_NOTICE ->
-            "${data.title} '공지' 업데이트" to "\"${data.title}\"의 새로운 공지"
-        AlertKind.STUDY_SCHEDULE ->
-            "${data.title} '새 일정' 등록" to "\"${data.title}\"의 새로운 일정"
-        AlertKind.TODO_DONE ->
-            "${data.title} '할 일' 완료" to "\"${data.title}\"의 TODO가 완료되었어요"
-        else -> "" to ""
-    }
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(horizontal = 12.dp, vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null
-                ) { onClick(data) },
-            shape = SpotShapes.Hard,
-            colors = CardDefaults.cardColors(containerColor = backgroundColor)
-        ) {
-            Row(
-                modifier = Modifier.padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ShapeImageWithBadge(
-                    painter = rememberImageRefPainter(
-                        ref = data.studyImageRes,            // ImageRef.None / LocalName / UriRef / Url
-                    ),
-                    shape = SpotShapes.Soft,
-                    size = 55.dp,
-                )
-
-                Spacer(Modifier.width(12.dp))
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = primary,
-                        style = SpotTheme.typography.medium_500,
-                        fontSize = 15.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = secondary,
-                        style = SpotTheme.typography.medium_500,
-                        fontSize = 15.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                if (!data.isRead) NewBadge()
-            }
-        }
-    }
-}
-
-@Composable
-fun NewBadge(
-    modifier: Modifier = Modifier
-) {
-    ShapeBox(
-        shape = SpotShapes.Hard,
-        color = SpotTheme.colors.B400,
-        modifier = modifier.size(28.dp)
-    ) {
-        Text(
-            text = "N",
-            color = SpotTheme.colors.white,
-            style = SpotTheme.typography.medium_500,
-            fontSize = 16.sp,
-            modifier = Modifier.align(Alignment.Center)
-        )
     }
 }
 
 @Composable
 fun AlertScreenContent(
-    modifier: Modifier = Modifier,
-    alerts: List<AlertInfo>,
-    onClickAlert: (AlertInfo) -> Unit,
-    listState: LazyListState
+    state: AlertResult,
+    listState: LazyListState,
+    onClickAlert: (Long) -> Unit,
 ) {
-    Column(
-        modifier = modifier.fillMaxSize()
+    val alerts: List<AlertInfo> = state.studies
+
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.fillMaxSize(),
     ) {
-        if (alerts.isEmpty()) {
-            EmptyAlert(
-                modifier = Modifier.fillMaxSize(),
-                painter = painterResource(R.drawable.alert),
-                alertTitle = "아직 알림이 없어요.",
-                alertDes = "스팟에서 내 목표를 이뤄봐요."
+        items(
+            items = alerts,
+            key = { it.studyId }
+        ) { item ->
+            Spacer(modifier = Modifier.height(screenHeightDp(4.dp)))
+
+            AlertRow(data = item, onClick = onClickAlert)
+
+            Spacer(modifier = Modifier.height(screenHeightDp(4.dp)))
+
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = screenWidthDp(17.dp)),
+                color = SpotTheme.colors.G300,
+                thickness = 1.dp
             )
-        } else {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.fillMaxSize().weight(1f),
-            ) {
-                items(
-                    items = alerts,
-                    key = { it.id }
-                ) { item ->
-                    AlertRow(
-                        data = item,
-                        onClick = onClickAlert
-                    )
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 25.dp),
-                        color = SpotTheme.colors.G300,
-                        thickness = 0.5.dp
-                    )
-                }
+        }
+
+    }
+}
+
+
+
+@Composable
+fun AlertRow(
+    data: AlertInfo,
+    onClick: (Long) -> Unit
+) {
+    BlankButton(
+        modifier = Modifier
+            .width(screenWidthDp(326.dp))
+            .height(screenHeightDp(65.dp)),
+        onClick = { onClick(data.studyId) },
+    ) {
+        Row(
+            modifier = Modifier.padding(screenWidthDp(13.dp)),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ShapeImageBox(
+                imageRef = data.studyImageRes,
+                shape = SpotShapes.Soft,
+                modifier = Modifier.size(screenWidthDp(33.dp)),
+                backgroundColor = SpotTheme.colors.white,
+            )
+
+            Spacer(Modifier.width(screenWidthDp(13.dp)))
+
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "${data.title} 신청이 수락되었어요!",
+                    style = SpotTheme.typography.h5,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "게시판에서 가입 인사를 나눠보세요!",
+                    style = SpotTheme.typography.regular_400,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
     }
 }
-
-/****** 유틸리티 *******/
-
-@Composable
-fun rememberImageRefPainter(
-    ref: ImageRef,
-    @DrawableRes fallback: Int = R.drawable.spot_logo
-): Painter {
-    val context = LocalContext.current
-    return when (ref) {
-        is ImageRef.Name -> {
-            val id = context.resources.getIdentifier(ref.name, "drawable", context.packageName)
-            painterResource(id.takeIf { it != 0 } ?: fallback)
-        }
-        is ImageRef.Url -> rememberAsyncImagePainter(model = ref.url)
-        is ImageRef.None -> painterResource(fallback)
-        is ImageRef.LocalUri -> rememberAsyncImagePainter(model = ref.uri)
-    }
-}
-
-private fun Context.drawableIdByName(name: String): Int? {
-    val id = resources.getIdentifier(name, "drawable", packageName)
-    return if (id != 0) id else null
-}
-

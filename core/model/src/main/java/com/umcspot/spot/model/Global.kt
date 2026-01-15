@@ -29,10 +29,6 @@ enum class RecruitingStudySort(val label: String) {
     HITS("조회수 높은 순"),
     LIKES("관심 많은 순")
 }
-
-
-enum class AlertKind { POPULAR_POST, STUDY_NOTICE, STUDY_SCHEDULE, TODO_DONE }
-
 enum class ActivityType(
     val label: String
 ) {

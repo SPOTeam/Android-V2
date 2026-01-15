@@ -142,7 +142,8 @@ fun MainNavHost(
 
         alertGraph(
             contentPadding = contentPadding,
-            onRegisterScrollToTop = onRegisterScrollToTop
+            onRegisterScrollToTop = onRegisterScrollToTop,
+            onClickAlert = { navigator.navigateToStudyDetail(it) }
         )
 
         registerStudyGraph(

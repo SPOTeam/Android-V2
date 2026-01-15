@@ -17,11 +17,13 @@ fun NavController.navigateToAlert(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.alertGraph(
     contentPadding : PaddingValues,
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
+    onClickAlert: (Long) -> Unit
 ) {
     composable<Alert> {
         AlertScreen(
             contentPadding = contentPadding,
-            onRegisterScrollToTop = onRegisterScrollToTop
+            onRegisterScrollToTop = onRegisterScrollToTop,
+            onClickAlert = onClickAlert
         )
     }
 }
