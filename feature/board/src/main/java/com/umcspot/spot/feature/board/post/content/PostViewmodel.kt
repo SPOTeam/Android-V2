@@ -7,6 +7,7 @@ import com.umcspot.spot.feature.board.boardList.BoardListViewModel.BoardUiState
 import com.umcspot.spot.model.ImageRef
 import com.umcspot.spot.model.PostType
 import com.umcspot.spot.post.model.postDetail.PostDetailResult
+import com.umcspot.spot.post.model.postDetail.ReportPostReason
 import com.umcspot.spot.post.model.postDetail.SendComment
 import com.umcspot.spot.post.repository.PostRepository
 import com.umcspot.spot.ui.state.UiState
@@ -132,6 +133,28 @@ class PostViewModel @Inject constructor(
                 }
             }.onFailure { e ->
                 Log.e("PostViewModel", "deletePost error", e)
+            }
+        }
+    }
+
+    fun reportPost(reason : String) {
+        val current = (_uiState.value.data as? UiState.Success)?.data ?: return
+        val postId = current.postId
+
+        val reasonRequest = ReportPostReason(
+            reason = reason
+        )
+
+        viewModelScope.launch {
+            runCatching {
+                postRepository.reportPost(postId = postId, reason = reasonRequest)
+            }.onSuccess { result ->
+                result.onSuccess {
+                }.onFailure { e ->
+                    Log.e("PostViewModel", "reportPost failure", e)
+                }
+            }.onFailure { e ->
+                Log.e("PostViewModel", "reportPost error", e)
             }
         }
     }

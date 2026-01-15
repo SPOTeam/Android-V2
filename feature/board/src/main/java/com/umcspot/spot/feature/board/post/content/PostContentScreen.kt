@@ -51,8 +51,11 @@ import coil.request.ImageRequest.Builder
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.SpotSpinner
 import com.umcspot.spot.designsystem.component.comment.CommentField
+import com.umcspot.spot.designsystem.component.modal.AcceptDialog
+import com.umcspot.spot.designsystem.component.modal.AcceptModal
 import com.umcspot.spot.designsystem.component.modal.DeleteDialog
 import com.umcspot.spot.designsystem.component.modal.RejectDialog
+import com.umcspot.spot.designsystem.component.modal.ReportDialog
 import com.umcspot.spot.designsystem.component.post.CommentUserInfo
 import com.umcspot.spot.designsystem.component.post.CountView
 import com.umcspot.spot.designsystem.component.post.UserInfo
@@ -80,8 +83,11 @@ fun PostContentScreen(
 
 ) {
     val uiState by postViewModel.uiState.collectAsStateWithLifecycle()
-    var showBackRequestDialog by remember { mutableStateOf(false) }
+    var showReportRequestDialog by remember { mutableStateOf(false) }
+    var showDeleteRequestDialog by remember { mutableStateOf(false) }
+    var showAcceptRequestDialog by remember { mutableStateOf(false) }
 
+    var reason by rememberSaveable { mutableStateOf("") }
 
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
@@ -164,9 +170,11 @@ fun PostContentScreen(
                                 onEditClick(post.postId)
                             },
                             onDeleteClick = {
-                                showBackRequestDialog = true
+                                showDeleteRequestDialog = true
                             },
-                            onReportClick = { }
+                            onReportClick = {
+                                showReportRequestDialog = true
+                            }
                         )
                     }
 
@@ -217,18 +225,42 @@ fun PostContentScreen(
                 )
 
                 DeleteDialog(
-                    visible = showBackRequestDialog,
+                    visible = showDeleteRequestDialog,
                     modalTitle = "이 글을 삭제하시겠어요?",
                     modalDes = "한 번 삭제한 글은 되돌릴 수 없어요.",
                     okButtonText = "삭제",
                     onDismiss = {
-                        showBackRequestDialog = false
+                        showDeleteRequestDialog = false
                     },
                     onClick = {
-                        showBackRequestDialog = false
+                        showDeleteRequestDialog = false
                         postViewModel.deletePost()
                         onDeleteClick()
                     }
+                )
+
+                ReportDialog(
+                    visible = showReportRequestDialog,
+                    modalTitle = "스터디원을 신고하시겠습니까?",
+                    modalDes = "신고 이유를 작성해주세요.\nSPOT 내부 검토 후, 탈퇴 신청을 용인합니다.",
+                    reason = reason,
+                    onReasonChange = { reason = it },
+                    okButtonText = "완료",
+                    onDismiss = { showReportRequestDialog = false },
+                    onClick = { typed ->
+                        showReportRequestDialog = false
+                        showAcceptRequestDialog = true
+                        postViewModel.reportPost(reason)
+                    }
+                )
+
+                AcceptDialog(
+                    visible = showAcceptRequestDialog,
+                    modalTitle = "게시글 신고 완료",
+                    modalDes = "게시글 신고가 완료되었어요.\nSPOT 내부 검토 후, 삭제 처리 진행하겠습니다.",
+                    okButtonText = "확인",
+                    onDismiss = { showAcceptRequestDialog = false },
+                    onClick = { showAcceptRequestDialog = false }
                 )
             }
         }
@@ -434,7 +466,6 @@ fun EditDeleteMenu(
     onDelete: () -> Unit,
     onReport: () -> Unit
 ) {
-
     DropdownMenu(
         modifier = Modifier
             .background(SpotTheme.colors.white),

@@ -47,7 +47,7 @@ fun RejectModal(
         modifier = modifier
             .width(screenWidthDp(326.dp))
             .height(screenHeightDp(227.dp)),
-        shape = SpotShapes.Hard,
+        shape = SpotShapes.Round,
         colors = CardDefaults.elevatedCardColors(
             containerColor = SpotTheme.colors.white
         )

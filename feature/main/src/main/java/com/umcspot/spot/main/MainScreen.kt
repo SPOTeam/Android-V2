@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.umcspot.spot.alert.navigation.Alert
-import com.umcspot.spot.alert.navigation.AppliedAlert
 import com.umcspot.spot.alert.navigation.navigateToAlert
 import com.umcspot.spot.designsystem.component.FloatingMultipleButton
 import com.umcspot.spot.designsystem.component.FloatingToUpButton
@@ -30,11 +29,11 @@ import com.umcspot.spot.designsystem.component.appBar.AppBarHome
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.component.modal.RejectDialog
 import com.umcspot.spot.feature.board.boardList.navigation.BoardList
-import com.umcspot.spot.main.component.MainBottomBar
 import com.umcspot.spot.feature.board.post.content.navigation.POST_CONTENT_ROUTE
 import com.umcspot.spot.feature.board.post.posting.navigation.Posting
 import com.umcspot.spot.feature.board.post.posting.navigation.navigateToPostingNew
 import com.umcspot.spot.home.navigation.Home
+import com.umcspot.spot.main.component.MainBottomBar
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.detail.navigation.StudyDetail
@@ -64,7 +63,6 @@ fun MainScreen(
                 } else if (navigator.showBackTopBar()) {
                     val title = when {
                         dest?.hasRoute(Alert::class) == true -> "알림"
-                        dest?.hasRoute(AppliedAlert::class) == true -> "신청한 알림"
                         dest?.hasRoute(RecruitingFilter::class) == true -> "모집중인 스터디"
                         dest?.hasRoute(PreferLocationFilter::class) == true -> "내 지역 스터디"
                         dest?.hasRoute(SignUp::class) == true -> "회원가입"

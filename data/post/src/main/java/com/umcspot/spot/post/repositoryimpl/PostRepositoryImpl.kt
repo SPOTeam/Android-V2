@@ -1,38 +1,34 @@
 package com.umcspot.spot.post.repositoryimpl
 
-import android.content.Context
-import android.net.Uri
 import android.util.Log
 import com.umcspot.spot.model.ImageRef
 import com.umcspot.spot.network.multipart.MultipartFactory
+import com.umcspot.spot.post.datasource.PostDataSource
 import com.umcspot.spot.post.dto.request.RequestPosting
 import com.umcspot.spot.post.mapper.toDomain
 import com.umcspot.spot.post.mapper.toDto
+import com.umcspot.spot.post.mapper.toSendDto
 import com.umcspot.spot.post.model.postDetail.PostDetailResult
+import com.umcspot.spot.post.model.postDetail.ReportPostReason
 import com.umcspot.spot.post.model.postDetail.SendComment
 import com.umcspot.spot.post.model.postDetail.SendCommentResult
 import com.umcspot.spot.post.model.posting.Posting
 import com.umcspot.spot.post.model.posting.PostingResult
 import com.umcspot.spot.post.repository.PostRepository
-import com.umcspot.spot.post.service.PostService
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import okio.buffer
-import okio.source
 import javax.inject.Inject
 
 class PostRepositoryImpl @Inject constructor(
-    private val postService: PostService,
+    private val postDataSource: PostDataSource,
     private val multipartFactory: MultipartFactory
 ) : PostRepository {
     override suspend fun getPostDetail(postId : Long): Result<PostDetailResult> =
         runCatching {
-            val res = postService.getPostDetail(postId)
+            val res = postDataSource.getPostDetail(postId)
             Log.d("PostRepository", "getRecentBoard res = $res")
             val domain = res.result.toDomain()
             Log.d("PostRepository", "getRecentBoard mapped = $domain")
@@ -49,7 +45,7 @@ class PostRepositoryImpl @Inject constructor(
         content: SendComment
     ): Result<SendCommentResult> =
         runCatching {
-            val res = postService.sendComment(postId, content.toDto())
+            val res = postDataSource.sendComment(postId, content.toSendDto())
             Log.d("PostRepository", "senedComment res = $res")
             val domain = res.result.toDomain()
             Log.d("PostRepository", "senedComment mapped = $res")
@@ -73,28 +69,12 @@ class PostRepositoryImpl @Inject constructor(
                     ?.let { multipartFactory.imagePartOrNull(it.uri, formKey = "imageFile") }
 
 
-            val response = postService.postPost(
+            val response = postDataSource.postPost(
                 request = requestBody,
                 imageFile = imagePart
             )
 
-            // ✅ 여기부터가 핵심: 파싱 전에 상태/에러 바디 확인
-            Log.d("PostRepository", "postPost http=${response.code()} success=${response.isSuccessful}")
-
-            if (!response.isSuccessful) {
-                val errorBody = response.errorBody()?.string()
-                Log.e("PostRepository", "postPost errorBody=$errorBody")
-                throw IllegalStateException("postPost failed: http=${response.code()} errorBody=$errorBody")
-            }
-
-            val body = response.body()
-                ?: throw IllegalStateException("postPost failed: empty body (http=${response.code()})")
-
-            // BaseResponse.result 누락 케이스까지 방어
-            val result = body.result
-                ?: throw IllegalStateException("postPost failed: body.result is null. code=${body.code}, msg=${body.message}")
-
-            result.toDomain()
+            response.result.toDomain()
         }.onFailure { e ->
             Log.e("PostRepository", "postPost failed", e)
         }
@@ -116,24 +96,33 @@ class PostRepositoryImpl @Inject constructor(
 
             Log.d("PostRepository", "editPost RequestImagePart = $imagePart")
 
-            val res = postService.editPost(postId, requestBody, imagePart)
+            val res = postDataSource.editPost(postId, requestBody, imagePart)
             if (!res.isSuccess) error("edit failed: ${res.code} ${res.message}")
             Unit
         }
 
     override suspend fun deletePost(postId: Long): Result<Unit> =
         runCatching {
-            postService.deletePost(postId)
+            postDataSource.deletePost(postId)
+        }
+
+    override suspend fun reportPost(
+        postId: Long,
+        reason: ReportPostReason
+    ): Result<Unit> =
+        runCatching {
+            postDataSource.reportPost(postId, reason.toDto())
+            Unit
         }
 
     override suspend fun postPostLike(postId: Long): Result<Unit> =
         runCatching {
-            postService.postPostLike(postId)
+            postDataSource.postPostLike(postId)
         }
 
     override suspend fun deletePostLike(postId: Long): Result<Unit> =
         runCatching {
-            postService.deletePostLike(postId)
+            postDataSource.deletePostLike(postId)
         }
 
     fun getPostDetailDummy(): PostDetailResult {

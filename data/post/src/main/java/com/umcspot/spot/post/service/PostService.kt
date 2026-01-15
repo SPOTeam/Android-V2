@@ -4,6 +4,7 @@ import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.post.dto.request.CommentRequestDto
 import com.umcspot.spot.post.dto.request.PostingRequestDto
+import com.umcspot.spot.post.dto.request.ReportPostRequestDto
 import com.umcspot.spot.post.dto.response.FinishPostResponseDto
 import com.umcspot.spot.post.dto.response.PostDetailResponseDto
 import com.umcspot.spot.post.dto.response.SendCommentResponseDto
@@ -46,7 +47,7 @@ interface PostService {
     suspend fun postPost(
         @Part("request") request: RequestBody,
         @Part imageFile: MultipartBody.Part? = null
-    ): retrofit2.Response<BaseResponse<FinishPostResponseDto>>
+    ): BaseResponse<FinishPostResponseDto>
 
     @Multipart
     @PUT("/api/posts/{postId}")
@@ -59,6 +60,12 @@ interface PostService {
     @DELETE("/api/posts/{postId}")
     suspend fun deletePost(
         @Path("postId") postId: Long
+    ): NullResultResponse
+
+    @POST("/api/posts/{postId}/report")
+    suspend fun reportPost(
+        @Path("postId") postId: Long,
+        @Body reason: ReportPostRequestDto
     ): NullResultResponse
 
 }
