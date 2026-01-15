@@ -82,7 +82,6 @@ import java.io.File
 fun AlertScreen(
     viewModel: AlertViewModel = hiltViewModel(),
     contentPadding : PaddingValues,
-    onClickApplied: () -> Unit,
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -117,8 +116,6 @@ fun AlertScreen(
                     .background(SpotTheme.colors.white)
                     .padding(top = topPad, bottom = bottomPad),
                 alerts = alerts,
-                applied = applied,
-                onClickAppliedStudyCard = onClickApplied,
                 onClickAlert = { item -> viewModel.onClickAlert(item) },
                 listState = listState
             )
@@ -135,61 +132,6 @@ fun AlertRow(
         PopularPostAlert(data = data, onClick = onClick)
     } else {
         StudyNotiAlert(data = data, onClick = onClick)
-    }
-}
-
-@Composable
-fun EnrollStudyCard(
-    modifier: Modifier = Modifier,
-    isAvailable: Boolean = false,
-    onClick: () -> Unit
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-
-    // isAvailable 여부 + press 상태에 따라 색상 결정 (테마 컬러로 통일)
-    val containerColor = when {
-        isPressed -> SpotTheme.colors.B200
-        isAvailable -> SpotTheme.colors.B100
-        else -> SpotTheme.colors.white
-    }
-
-    ElevatedCard(
-        onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(horizontal = 12.dp),
-        interactionSource = interactionSource,
-        colors = CardDefaults.elevatedCardColors(containerColor = containerColor)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(R.drawable.success_default),
-                colorFilter = ColorFilter.tint(SpotTheme.colors.B500),
-                contentDescription = null,
-                modifier = Modifier.size(40.dp)
-            )
-            Spacer(Modifier.width(12.dp))
-            Column {
-                Text(
-                    text = "신청 스터디",
-                    style = SpotTheme.typography.medium_500,
-                    fontSize = 20.sp
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = "신청 스터디의 수락 알림입니다.\n클릭하여 스터디 참여를 확인해주세요.",
-                    style = SpotTheme.typography.medium_500,
-                    fontSize = 15.sp,
-                    lineHeight = 22.sp,
-                    color = SpotTheme.colors.Black
-                )
-            }
-        }
     }
 }
 
@@ -367,20 +309,12 @@ fun NewBadge(
 fun AlertScreenContent(
     modifier: Modifier = Modifier,
     alerts: List<AlertInfo>,
-    applied : List<AppliedAlertInfo>,
-    onClickAppliedStudyCard: () -> Unit,
     onClickAlert: (AlertInfo) -> Unit,
     listState: LazyListState
 ) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-        EnrollStudyCard(
-            isAvailable = !applied.isEmpty(),
-            onClick = onClickAppliedStudyCard,
-            modifier = Modifier.padding(bottom = 5.dp)
-        )
-
         if (alerts.isEmpty()) {
             EmptyAlert(
                 modifier = Modifier.fillMaxSize(),

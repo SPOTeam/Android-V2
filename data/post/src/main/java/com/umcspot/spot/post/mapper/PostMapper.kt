@@ -4,6 +4,7 @@ import com.umcspot.spot.model.formatCreatedAt
 import com.umcspot.spot.model.toImageRef
 import com.umcspot.spot.post.dto.request.CommentRequestDto
 import com.umcspot.spot.post.dto.request.PostingRequestDto
+import com.umcspot.spot.post.dto.request.ReportPostRequestDto
 import com.umcspot.spot.post.dto.request.RequestPosting
 import com.umcspot.spot.post.dto.response.CommentResponse
 import com.umcspot.spot.post.dto.response.FinishPostResponseDto
@@ -11,6 +12,7 @@ import com.umcspot.spot.post.dto.response.PostDetailResponseDto
 import com.umcspot.spot.post.dto.response.SendCommentResponseDto
 import com.umcspot.spot.post.model.postDetail.CommentResult
 import com.umcspot.spot.post.model.postDetail.PostDetailResult
+import com.umcspot.spot.post.model.postDetail.ReportPostReason
 import com.umcspot.spot.post.model.postDetail.SendComment
 import com.umcspot.spot.post.model.postDetail.SendCommentResult
 import com.umcspot.spot.post.model.posting.Posting
@@ -65,6 +67,22 @@ fun Posting.toDto(): PostingRequestDto =
         ),
         imageFile = this.imageFile
     )
+
+fun SendComment.toSendDto(): CommentRequestDto =
+    CommentRequestDto(
+        content = this.content
+    )
+
+fun ReportPostReason.toDto(): ReportPostRequestDto =
+    ReportPostRequestDto(
+        reason = this.reason
+    )
+
+fun ReportPostRequestDto.toDto(): ReportPostRequestDto =
+    ReportPostRequestDto(
+        reason = this.reason
+    )
+
 
 fun FinishPostResponseDto.toDomain(): PostingResult =
     PostingResult(
