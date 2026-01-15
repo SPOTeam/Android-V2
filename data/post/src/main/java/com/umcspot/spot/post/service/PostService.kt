@@ -62,7 +62,7 @@ interface PostService {
         @Path("postId") postId: Long
     ): NullResultResponse
 
-    @DELETE("/api/posts/{postId}/report")
+    @POST("/api/posts/{postId}/report")
     suspend fun reportPost(
         @Path("postId") postId: Long,
         @Body reason: ReportPostRequestDto

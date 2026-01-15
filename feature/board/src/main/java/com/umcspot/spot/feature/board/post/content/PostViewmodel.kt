@@ -151,10 +151,10 @@ class PostViewModel @Inject constructor(
             }.onSuccess { result ->
                 result.onSuccess {
                 }.onFailure { e ->
-                    Log.e("PostViewModel", "deletePost failure", e)
+                    Log.e("PostViewModel", "reportPost failure", e)
                 }
             }.onFailure { e ->
-                Log.e("PostViewModel", "deletePost error", e)
+                Log.e("PostViewModel", "reportPost error", e)
             }
         }
     }
