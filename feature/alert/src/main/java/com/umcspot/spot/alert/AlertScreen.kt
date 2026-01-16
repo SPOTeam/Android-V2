@@ -114,7 +114,7 @@ fun AlertScreenContent(
     ) {
         items(
             items = alerts,
-            key = { it.studyId }
+            key = { it.applicationId }
         ) { item ->
             Spacer(modifier = Modifier.height(screenHeightDp(4.dp)))
 
