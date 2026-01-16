@@ -4,6 +4,7 @@ import android.util.Log
 import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
+import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.study.datasource.StudyDataSource
 import com.umcspot.spot.study.mapper.toData
 import com.umcspot.spot.study.mapper.toDomainList
@@ -30,7 +31,14 @@ class StudyRepositoryImpl @Inject constructor(
         size: Int
     ): Result<StudyResultList> =
         runCatching {
-            val response = studyDataSource.getRecruitingStudies(feeCategory = feeCategory, categories = categories,  sortBy = sortBy, isOnline = isOnline,  cursor = cursor, size = size)
+            val response = studyDataSource.getRecruitingStudies(
+                feeCategory = feeCategory,
+                categories = categories,
+                sortBy = sortBy,
+                isOnline = isOnline,
+                cursor = cursor,
+                size = size
+            )
             response.result.toDomainList()
         }.onFailure { e ->
             Log.e("StudyRepository", "getRecruitingStudies failed", e)
@@ -83,4 +91,28 @@ class StudyRepositoryImpl @Inject constructor(
 
         response.result.studyId
     }
+
+    override suspend fun getCategoryStudies(
+        recruitingStatus: RecruitingStatus?,
+        feeRange: FeeRange?,
+        category: String?,
+        isOnline: Boolean?,
+        sortBy: RecruitingStudySort,
+        cursor: Long?,
+        size: Int
+    ): Result<StudyResultList> =
+        runCatching {
+            val response = studyDataSource.getCategoryStudies(
+                recruitingStatus = recruitingStatus,
+                feeCategory = feeRange,
+                category = category,
+                sortBy = sortBy,
+                isOnline = isOnline,
+                cursor = cursor,
+                size = size
+            )
+            response.result.toDomainList()
+        }.onFailure { e ->
+            Log.e("StudyRepository", "getCategoryStudies failed", e)
+        }
 }

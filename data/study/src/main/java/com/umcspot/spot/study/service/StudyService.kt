@@ -43,6 +43,17 @@ interface StudyService {
         @Query("regionCodes") regionCodes: List<String>?
     ): BaseResponse<StudyResponseDto>
 
+    @GET("/api/studies/categories")
+    suspend fun getCategoryStudies(
+        @Query("recruitingStatus") recruitingStatus: RecruitingStatus?,
+        @Query("feeCategory") feeCategory: FeeRange?,
+        @Query("category") category: String?,
+        @Query("isOnline") isOnline: Boolean?,
+        @Query("sortBy") sortBy: RecruitingStudySort?,
+        @Query("cursor") cursor: Long?,
+        @Query("size") size: Int
+    ): BaseResponse<StudyResponseDto>
+
     @Multipart
     @POST("/api/studies")
     suspend fun createStudy(

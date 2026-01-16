@@ -1,4 +1,4 @@
-package com.umcspot.spot.study.preferLocation
+package com.umcspot.spot.category
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -29,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -37,11 +38,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.button.MultiButton
 import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.component.study.section.ActivityThemeSection
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.StudyTheme
@@ -49,23 +53,18 @@ import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 
 @Composable
-fun PreferLocationStudyFilterScreen(
+fun CategoryFilterScreen(
     contentPadding: PaddingValues,
     onAcceptFilterClick: () -> Unit,
-    preferLocationVm: PreferLocationStudyViewModel = hiltViewModel(),
+    categoryVm: CategoryViewModel = hiltViewModel(),
 ) {
-    val recruitingStatus by preferLocationVm.recruitingStatus.collectAsStateWithLifecycle()
-    val fee by preferLocationVm.fee.collectAsStateWithLifecycle()
-    val themes by preferLocationVm.themes.collectAsStateWithLifecycle()
+    val recruitingStatus by categoryVm.recruitingStatus.collectAsStateWithLifecycle()
+    val fee by categoryVm.feeRange.collectAsStateWithLifecycle()
+    val activity by categoryVm.activity.collectAsStateWithLifecycle()
 
     var draftRecruitingStatus by rememberSaveable { mutableStateOf(recruitingStatus) }
     var draftFee by rememberSaveable { mutableStateOf(fee) }
-
-    val themeSaver = listSaver<List<StudyTheme>, String>(
-        save = { list -> list.map { it.name } },
-        restore = { names -> names.map { StudyTheme.valueOf(it) } }
-    )
-    var draftThemes by rememberSaveable(stateSaver = themeSaver) { mutableStateOf(themes) }
+    var draftActivity by rememberSaveable { mutableStateOf(activity) }
 
     val acceptEnabled = true
 
@@ -76,32 +75,29 @@ fun PreferLocationStudyFilterScreen(
         onAcceptFilterClick()
     }
 
-    RecruitingStudyFilterScreenContent(
+    CategoryFilterScreenContent(
         modifier = Modifier
             .background(SpotTheme.colors.white)
             .padding(top = topPad, bottom = bottomPad),
         recruitingStatus = draftRecruitingStatus,
         fee = draftFee,
-        themes = draftThemes,
+        activity = draftActivity,
         buttonEnabled = acceptEnabled,
         onToggleRecruitingStatus = { type ->
             draftRecruitingStatus = if (draftRecruitingStatus == type) null else type
         },
         onToggleFee = { fee -> draftFee = if (draftFee == fee) null else fee },
-        onToggleTheme = { theme ->
-            draftThemes =
-                if (draftThemes.contains(theme)) draftThemes - theme else draftThemes + theme
-        },
+        onToggleActivity = { activity -> draftActivity = if (draftActivity == activity) null else activity },
         onReset = {
             draftRecruitingStatus = null
             draftFee = null
-            draftThemes = emptyList()
+            draftActivity = null
         },
         onApply = {
-            preferLocationVm.applyFilter(
+            categoryVm.applyFilter(
                 fee = draftFee,
                 recruitingStatus = draftRecruitingStatus,
-                themes = draftThemes
+                activityType = draftActivity
             )
             onAcceptFilterClick()
         }
@@ -109,14 +105,14 @@ fun PreferLocationStudyFilterScreen(
 }
 
 @Composable
-fun RecruitingStudyFilterScreenContent(
+fun CategoryFilterScreenContent(
     recruitingStatus: RecruitingStatus?,
     fee: FeeRange?,
-    themes: List<StudyTheme>,
+    activity: ActivityType?,
     buttonEnabled: Boolean,
     onToggleRecruitingStatus: (RecruitingStatus) -> Unit,
     onToggleFee: (FeeRange) -> Unit,
-    onToggleTheme: (StudyTheme) -> Unit,
+    onToggleActivity: (ActivityType) -> Unit,
     onReset: () -> Unit,
     onApply: () -> Unit,
     modifier: Modifier = Modifier
@@ -140,11 +136,12 @@ fun RecruitingStudyFilterScreenContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "검색 결과는 모든 지역에 공통 반영됩니다.",
+                    text = "검색 결과는 모든 카테고리에 공통 반영됩니다.",
                     style = SpotTheme.typography.small_500,
                     color = SpotTheme.colors.black
                 )
             }
+
             Column(
                 modifier = Modifier
                     .padding(top = screenHeightDp(18.dp))
@@ -166,6 +163,22 @@ fun RecruitingStudyFilterScreenContent(
                 Spacer(modifier = Modifier.height(screenHeightDp(53.dp)))
 
                 Text(
+                    text = "활동",
+                    style = SpotTheme.typography.h5,
+                    color = SpotTheme.colors.black
+                )
+
+                Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
+
+
+                ActivityTypeMultiSection(
+                    selectedTypes = activity,
+                    onToggle = onToggleActivity
+                )
+
+                Spacer(modifier = Modifier.height(screenHeightDp(53.dp)))
+
+                Text(
                     text = "활동비",
                     style = SpotTheme.typography.h5,
                     color = SpotTheme.colors.black
@@ -178,29 +191,13 @@ fun RecruitingStudyFilterScreenContent(
                     onSelect = onToggleFee
                 )
 
-                Spacer(modifier = Modifier.height(screenHeightDp(53.dp)))
-
-                Text(
-                    text = "스터디 테마",
-                    style = SpotTheme.typography.h5,
-                    color = SpotTheme.colors.black
-                )
-
-                Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
-
-                ActivityThemeSection(
-                    selectedThemes = themes,
-                    onSelect = onToggleTheme,
-                    maxSelection = 10
-                )
-
                 Spacer(modifier = Modifier.height(screenHeightDp(33.dp)))
 
                 ResetFilterText(
                     onClick = onReset
                 )
 
-                Spacer(Modifier.height(screenHeightDp(80.dp)))
+                Spacer(Modifier.height(80.dp))
             }
         }
 
@@ -212,7 +209,6 @@ fun RecruitingStudyFilterScreenContent(
                 .padding(horizontal = screenWidthDp(16.dp), vertical = screenHeightDp(12.dp))
                 .zIndex(1f)
         ) {
-
             TextButton(
                 text = "검색 결과 보기",
                 modifier = Modifier
@@ -245,6 +241,28 @@ fun RecruitingStatusMultiSection(
                 checked = (recruitingStatus == type),
                 onClick = { onSelect(type) },
                 style = SpotTheme.typography.medium_500
+            )
+        }
+    }
+}
+
+@Composable
+fun ActivityTypeMultiSection(
+    selectedTypes: ActivityType?,
+    onToggle: (ActivityType) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(screenWidthDp(14.dp))
+    ) {
+        ActivityType.entries.forEach { type ->
+            MultiButton(
+                modifier = Modifier.weight(1f),
+                text = type.label,
+                shape = SpotShapes.Soft,
+                painter = getIconForType(type),
+                checked = (selectedTypes == type),
+                onClick = { onToggle(type) }
             )
         }
     }
@@ -293,5 +311,11 @@ fun ResetFilterText(
                 onClick = onClick
             )
     )
+}
+
+@Composable
+private fun getIconForType(type: ActivityType) = when (type) {
+    ActivityType.ONLINE -> painterResource(R.drawable.online)
+    ActivityType.OFFLINE  -> painterResource(R.drawable.offline)
 }
 

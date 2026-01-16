@@ -57,4 +57,22 @@ class StudyDataSourceImpl @Inject constructor(
         return studyService.createStudy(requestPart, imagePart)
     }
 
+    override suspend fun getCategoryStudies(
+        recruitingStatus: RecruitingStatus?,
+        feeCategory: FeeRange?,
+        category: String?,
+        isOnline: Boolean?,
+        sortBy: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyResponseDto> =
+        studyService.getCategoryStudies(
+            recruitingStatus = recruitingStatus,
+            feeCategory = feeCategory,
+            category = category,
+            isOnline = isOnline,
+            sortBy = sortBy,
+            cursor = cursor,
+            size = size
+        )
 }
