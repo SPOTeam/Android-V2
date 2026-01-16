@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,11 +21,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.umcspot.spot.designsystem.theme.*
 import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.model.ImageRef
+import com.umcspot.spot.ui.extension.screenWidthDp
 
 object SpotShapes {
 
@@ -69,8 +74,7 @@ object SpotShapes {
 
 @Composable
 fun ShapeImageWithBadge(
-    painter: Painter = painterResource(R.drawable.spot_logo),
-    contentDescription: String? = null,
+    imageRef: ImageRef = ImageRef.None,
     shape: Shape,
     size: Dp = 40.dp,
     modifier: Modifier = Modifier,
@@ -81,13 +85,12 @@ fun ShapeImageWithBadge(
     badgeSize: Dp = 16.dp,
 ) {
     Box(
-        modifier = modifier.size(size),
+        modifier = modifier.size(screenWidthDp(size)),
         contentAlignment = Alignment.Center
     ) {
         ShapeImageBox(
-            modifier = Modifier.size(size),
-            painter = painter,
-            contentDescription = contentDescription,
+            modifier = Modifier.size(screenWidthDp(size)),
+            imageRef = imageRef,
             shape = shape,
             borderWidth = borderWidth,
             padding = padding,
@@ -100,7 +103,7 @@ fun ShapeImageWithBadge(
             tint = Color.Unspecified,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .size(badgeSize),
+                .size(screenWidthDp(badgeSize)),
             contentDescription = null
         )
     }
@@ -109,17 +112,40 @@ fun ShapeImageWithBadge(
 
 @Composable
 fun ShapeImageBox(
-    painter: Painter,
-    contentDescription: String? = null,
-    shape: Shape,
+    imageRef: ImageRef,
     modifier: Modifier = Modifier,
+    shape: Shape,
     borderWidth: Dp = 0.dp,
     padding: Dp = 5.dp,
     borderColor: Color? = Color.Transparent,
     contentScale: ContentScale = ContentScale.Fit,
-    backgroundColor : Color = Color.Transparent,
-    content: @Composable BoxScope.() -> Unit = {}   // ✅ 추가
+    backgroundColor: Color = Color.Transparent,
+    fallback: Int = R.drawable.spot_logo,
+    content: @Composable BoxScope.() -> Unit = {}
 ) {
+    val context = LocalContext.current
+
+    val painter: Painter? = when (imageRef) {
+        ImageRef.None -> painterResource(fallback)
+
+        is ImageRef.Name -> {
+            val resId = remember(imageRef.name) {
+                context.resources.getIdentifier(
+                    imageRef.name,
+                    "drawable",
+                    context.packageName
+                )
+            }
+            if (resId != 0) painterResource(resId) else painterResource(fallback)
+        }
+
+        is ImageRef.Url ->
+            rememberAsyncImagePainter(model = imageRef.url)
+
+        is ImageRef.LocalUri ->
+            rememberAsyncImagePainter(model = imageRef.uri)
+    }
+
     Box(
         modifier = modifier
             .clip(shape)
@@ -127,23 +153,24 @@ fun ShapeImageBox(
             .then(
                 if (borderColor != null && borderWidth > 0.dp) {
                     Modifier.border(borderWidth, borderColor, shape)
-                } else {
-                    Modifier
-                }
+                } else Modifier
             ),
         contentAlignment = Alignment.Center
     ) {
-        Image(
-            painter = painter,
-            contentDescription = contentDescription,
-            contentScale = contentScale,
-            modifier = Modifier
-                .wrapContentSize()
-                .padding(padding)
-        )
+        if (painter != null) {
+            Image(
+                painter = painter,
+                contentDescription = null,
+                contentScale = contentScale,
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(padding)
+            )
+        }
         content()
     }
 }
+
 
 @Composable
 fun ShapeBox(
