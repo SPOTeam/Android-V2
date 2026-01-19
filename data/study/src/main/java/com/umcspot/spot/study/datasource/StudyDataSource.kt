@@ -33,4 +33,9 @@ interface StudyDataSource {
         cursor: Long?,
         size: Int
     ): BaseResponse<StudyResponseDto>
+
+    suspend fun getLikedStudies(
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyResponseDto>
 }

@@ -40,4 +40,9 @@ interface StudyRepository {
         cursor: Long?,
         size: Int,
     ): Result<StudyResultList>
+
+    suspend fun getLikedStudies(
+        cursor: Long?,
+        size: Int,
+    ): Result<StudyResultList>
 }
