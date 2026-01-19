@@ -115,4 +115,18 @@ class StudyRepositoryImpl @Inject constructor(
         }.onFailure { e ->
             Log.e("StudyRepository", "getCategoryStudies failed", e)
         }
+
+    override suspend fun getLikedStudies(
+        cursor: Long?,
+        size: Int
+    ): Result<StudyResultList> =
+        runCatching {
+            val response = studyDataSource.getLikedStudies(
+                cursor = cursor,
+                size = size
+            )
+            response.result.toDomainList()
+        }.onFailure { e ->
+            Log.e("StudyRepository", "getCategoryStudies failed", e)
+        }
 }

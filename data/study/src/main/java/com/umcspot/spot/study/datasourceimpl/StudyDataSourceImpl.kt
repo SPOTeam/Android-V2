@@ -75,4 +75,13 @@ class StudyDataSourceImpl @Inject constructor(
             cursor = cursor,
             size = size
         )
+
+    override suspend fun getLikedStudies(
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyResponseDto> =
+        studyService.getLikedStudies(
+            cursor = cursor,
+            size = size
+        )
 }

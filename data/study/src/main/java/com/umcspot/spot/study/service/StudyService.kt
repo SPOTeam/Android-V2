@@ -54,6 +54,12 @@ interface StudyService {
         @Query("size") size: Int
     ): BaseResponse<StudyResponseDto>
 
+    @GET("/api/studies/liked")
+    suspend fun getLikedStudies(
+        @Query("cursor") cursor: Long?,
+        @Query("size") size: Int
+    ): BaseResponse<StudyResponseDto>
+
     @Multipart
     @POST("/api/studies")
     suspend fun createStudy(

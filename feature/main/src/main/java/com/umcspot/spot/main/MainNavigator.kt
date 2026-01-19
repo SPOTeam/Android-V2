@@ -20,6 +20,7 @@ import com.umcspot.spot.feature.board.post.content.navigation.POST_CONTENT_ROUTE
 import com.umcspot.spot.feature.board.post.posting.navigation.Posting
 import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.home.navigation.navigateToHome
+import com.umcspot.spot.jjim.navigation.JJim
 import com.umcspot.spot.jjim.navigation.navigateToJJim
 import com.umcspot.spot.mypage.navigation.navigateToMypage
 import com.umcspot.spot.signup.navigation.CheckList
@@ -95,11 +96,11 @@ class MainNavigator(
 
     @Composable
     fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, RecruitingFilter::class, PreferLocationFilter::class,
-        SignUp::class, CheckList::class, Posting::class, BoardList::class) || inAnyGraphRoutes(POST_CONTENT_ROUTE)
+        SignUp::class, CheckList::class, Posting::class, BoardList::class, JJim::class) || inAnyGraphRoutes(POST_CONTENT_ROUTE)
 
     @Composable
     fun showToTopFab(): Boolean = inAnyGraph(Alert::class, Recruiting::class,
-        PreferLocation::class, BoardList::class)
+        PreferLocation::class, BoardList::class, JJim::class)
 
     @Composable
     fun showMultipleFab(): Boolean = inAnyGraph(Home::class, BoardList::class)
