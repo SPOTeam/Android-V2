@@ -127,6 +127,6 @@ class StudyRepositoryImpl @Inject constructor(
             )
             response.result.toDomainList()
         }.onFailure { e ->
-            Log.e("StudyRepository", "getCategoryStudies failed", e)
+            Log.e("StudyRepository", "getLikedStudies failed", e)
         }
 }

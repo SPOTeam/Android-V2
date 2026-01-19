@@ -56,7 +56,7 @@ class JJimViewModel @Inject constructor(
                     _uiState.update { it.copy(studies = UiState.Success(data)) }
                 }
             }.onFailure { e ->
-                Log.e("RecruitingStudyViewModel", "loadFristError", e)
+                Log.e("JJimViewModel", "loadFristError", e)
 //                UiState.Failure(e.message ?: e.toString())
             }
         }
@@ -85,7 +85,7 @@ class JJimViewModel @Inject constructor(
                 )
                 _uiState.update { it.copy(studies = UiState.Success(merged)) }
             }.onFailure { e ->
-                Log.e("RecruitingStudyViewModel", "loadNextpageError", e)
+                Log.e("JJimViewModel", "loadNextpageError", e)
             }
             _isLoadingMore.value = false
         }
