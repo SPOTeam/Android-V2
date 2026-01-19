@@ -65,6 +65,9 @@ class CategoryViewModel @Inject constructor(
 
     /** ========== 최초/새로고침 로드 ========== */
     fun load() {
+
+        _uiState.update { it.copy(data = UiState.Loading) }
+
         viewModelScope.launch {
             runCatching {
                 studyRepository.getCategoryStudies(
