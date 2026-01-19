@@ -23,4 +23,14 @@ interface StudyDataSource {
     ): BaseResponse<StudyResponseDto>
 
     suspend fun createStudy(request: StudyRequestDto, imageFile: File?): BaseResponse<CreateStudyResponseDto>
+
+    suspend fun getCategoryStudies(
+        recruitingStatus : RecruitingStatus?,
+        feeCategory: FeeRange?,
+        category: String?,
+        isOnline: Boolean?,
+        sortBy: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyResponseDto>
 }

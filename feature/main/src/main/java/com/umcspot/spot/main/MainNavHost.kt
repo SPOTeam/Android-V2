@@ -10,7 +10,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
 import com.umcspot.spot.alert.navigation.alertGraph
+import com.umcspot.spot.category.navigation.categoryFilterGraph
 import com.umcspot.spot.category.navigation.categoryGraph
+import com.umcspot.spot.category.navigation.navigateToCategoryFilter
 import com.umcspot.spot.feature.board.boardList.navigation.boardListGraph
 import com.umcspot.spot.feature.board.boardList.navigation.navigateToBoardList
 import com.umcspot.spot.feature.board.main.navigation.boardGraph
@@ -23,6 +25,7 @@ import com.umcspot.spot.jjim.navigation.jjimGraph
 import com.umcspot.spot.model.QuickMenuType
 import com.umcspot.spot.mypage.navigation.mypageGraph
 import com.umcspot.spot.signup.navigation.signupGraph
+import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.detail.navigation.studyDetailGraph
 import com.umcspot.spot.study.my.navigation.myStudyGraph
 import com.umcspot.spot.study.preferLocation.navigation.preferLocationStudyFilterGraph
@@ -80,7 +83,19 @@ fun MainNavHost(
             onStudyClick = {  },
             onStudyMoreClick = {  }
         )
-        categoryGraph()
+        categoryGraph(
+            contentPadding = contentPadding,
+            onRegisterScrollToTop = onRegisterScrollToTop,
+            onItemClick = { navigator.navController.navigateToStudyDetail(it) },
+            onFilterClick = { navigator.navController.navigateToCategoryFilter() },
+        )
+
+        categoryFilterGraph(
+            navController = navigator.navController,
+            contentPadding = contentPadding,
+            onAcceptFilterClick = { navigator.popBackStack() }
+        )
+
         myStudyGraph()
         jjimGraph()
         mypageGraph()
