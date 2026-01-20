@@ -1,35 +1,21 @@
 package com.umcspot.spot.alert.repositoryimpl
 
+import android.util.Log
+import com.umcspot.spot.alert.datasource.AlertDataSource
 import com.umcspot.spot.alert.mapper.toDomainList
 import com.umcspot.spot.alert.model.AlertResult
-import com.umcspot.spot.alert.model.AppliedAlertResult
 import com.umcspot.spot.alert.repository.AlertRepository
-import com.umcspot.spot.alert.service.AlertService
 import javax.inject.Inject
 
 class AlertRepositoryImpl @Inject constructor(
-    private val studyService: AlertService
+    private val alertDataSource: AlertDataSource
 ) : AlertRepository {
     override suspend fun getAlerts(): Result<AlertResult> =
         runCatching {
-            val response = studyService.getAlerts()
-            response.data.toDomainList()
-        }.recoverCatching {
-            getAlertDummies()
+            val response = alertDataSource.getAlerts()
+            response.result.toDomainList()
+        }.onFailure { e ->
+            Log.e("AlertRepositoryImpl", "getAlerts error", e)
         }
-
-    private fun getAlertDummies(): AlertResult =
-        AlertResult(AlertResult.getAlertDummies())
-
-    override suspend fun getAppliedAlerts(): Result<AppliedAlertResult> =
-        runCatching {
-            val response = studyService.getAppliedAlerts()
-            response.data.toDomainList()
-        }.recoverCatching {
-            getAppliedAlertDummies()
-        }
-
-    private fun getAppliedAlertDummies(): AppliedAlertResult =
-        AppliedAlertResult(AppliedAlertResult.getAppliedAlertDummies())
 
 }

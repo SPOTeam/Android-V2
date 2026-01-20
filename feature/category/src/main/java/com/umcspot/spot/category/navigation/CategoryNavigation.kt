@@ -1,5 +1,6 @@
 package com.umcspot.spot.category.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -12,9 +13,19 @@ fun NavController.navigateToCategory(navOptions: NavOptions? = null) {
     navigate(Category, navOptions)
 }
 
-fun NavGraphBuilder.categoryGraph() {
+fun NavGraphBuilder.categoryGraph(
+    contentPadding: PaddingValues,
+    onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
+    onItemClick: (Long) -> Unit,
+    onFilterClick: () -> Unit
+) {
     composable<Category> {
-        CategoryScreen()
+        CategoryScreen(
+            contentPadding = contentPadding,
+            onRegisterScrollToTop = onRegisterScrollToTop,
+            onItemClick = onItemClick,
+            onFilterClick = onFilterClick
+        )
     }
 }
 

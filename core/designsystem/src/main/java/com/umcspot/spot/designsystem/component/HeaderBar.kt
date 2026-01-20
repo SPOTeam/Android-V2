@@ -26,7 +26,7 @@ fun SheetTopBar(
     title: String,
     onCloseClick: () -> Unit,
     modifier: Modifier = Modifier,
-    titleStyle: TextStyle = SpotTheme.typography.header05,
+    titleStyle: TextStyle = SpotTheme.typography.h5,
     backgroundColor: Color = SpotTheme.colors.G100,
     @DrawableRes closeIconRes: Int = R.drawable.dismiss
 ) {

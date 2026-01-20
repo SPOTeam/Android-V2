@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.spot.android.application)
     alias(libs.plugins.kotlin.android)
@@ -9,9 +11,12 @@ android {
 
 //    signingConfigs {
 //        getByName("debug") {
-//            keyAlias = "androiddebugkey"
-//            keyPassword = "android"
-//            storeFile = file("debug.keystore")
+//            val props = gradleLocalProperties(rootDir, providers)
+//
+//            storeFile = file(props.getProperty("DEBUG_STORE_FILE"))
+//            storePassword = props.getProperty("DEBUG_STORE_PASSWORD")
+//            keyAlias = props.getProperty("DEBUG_KEY_ALIAS")
+//            keyPassword = props.getProperty("DEBUG_KEY_PASSWORD")
 //        }
 //    }
 
@@ -52,4 +57,13 @@ dependencies {
     implementation(projects.data.alert)
     implementation(projects.data.board)
     implementation(projects.data.user)
+    implementation(projects.data.login)
+    implementation(projects.data.post)
+
+    implementation(libs.kakao.common)
+    implementation(libs.kakao.login)
+    implementation(libs.kakao.auth)
+
+    implementation(libs.naver.oauth)
+//    implementation(libs.naver.jdk)
 }

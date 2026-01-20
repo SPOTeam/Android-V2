@@ -1,32 +1,48 @@
 package com.umcspot.spot.user.repositoryimpl
 
+import android.util.Log
 import com.umcspot.spot.model.StudyTheme
+import com.umcspot.spot.user.datasource.UserDataSource
 import com.umcspot.spot.user.mapper.toDomain
 import com.umcspot.spot.user.mapper.toRequestDto
+import com.umcspot.spot.user.model.UserPreferredRegionResult
 import com.umcspot.spot.user.model.UserResult
-import com.umcspot.spot.user.model.UserTheme
 import com.umcspot.spot.user.repository.UserRepository
-import com.umcspot.spot.user.service.UserService
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val userService: UserService
+    private val userDataSource: UserDataSource
 ) : UserRepository {
     override suspend fun getUserName(): Result<UserResult> =
         runCatching {
-            val userName = userService.getUser()
-            userName.data.toDomain()
+            val userName = userDataSource.getUser()
+            userName.result.toDomain()
         }.recoverCatching {
-            UserResult(name = "추연우")
+            UserResult(name = "123")
         }
 
-    override suspend fun setUserTheme(theme: List<StudyTheme>): Result<UserTheme> =
+    override suspend fun setUserName(name: String): Result<Unit> =
         runCatching {
-            val response = userService.setUserTheme(theme.toRequestDto())
-            response.data.toDomain()
-        }.recoverCatching {
-            UserTheme(
-                userThemes = listOf(StudyTheme.DISCUSSION, StudyTheme.SELFSTUDY)
-            )
+            userDataSource.setUserName(name.toRequestDto())
+        }
+
+
+    override suspend fun setUserTheme(theme: List<StudyTheme>): Result<Unit> =
+        runCatching {
+            userDataSource.setUserTheme(theme.toRequestDto())
+        }
+
+    override suspend fun setUserPreferredRegion(regions: List<String>): Result<Unit> =
+        runCatching {
+            userDataSource.setUserPreferredRegion(regions)
+        }
+
+
+    override suspend fun getUserPreferredRegion(): Result<UserPreferredRegionResult> =
+        runCatching {
+            val userPreferredRegions = userDataSource.getUserPreferredRegion()
+            userPreferredRegions.result.toDomain()
+        }.onFailure { e ->
+            Log.e("UserRepository", "getUserPreferredRegion failed", e)
         }
 }

@@ -7,5 +7,6 @@ android {
 
 dependencies {
     implementation(projects.domain.board)
+    implementation(projects.domain.post)
     implementation(projects.core.designsystem)
 }

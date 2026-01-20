@@ -9,9 +9,11 @@ android {
     namespace = "com.umcspot.spot.network"
 }
 dependencies {
+
     implementation(libs.bundles.datastore)
     implementation(projects.core.common)
     implementation(projects.core.model)
+    implementation(projects.core.datastore)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.kotlin.serialization)

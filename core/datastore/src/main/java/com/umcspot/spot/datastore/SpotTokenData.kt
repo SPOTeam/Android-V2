@@ -1,7 +1,6 @@
 @file:OptIn(kotlinx.serialization.InternalSerializationApi::class)
 package com.umcspot.spot.datastore
 
-
 import kotlinx.serialization.Serializable
 
 @Serializable

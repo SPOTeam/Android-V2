@@ -38,7 +38,8 @@ import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.G400
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.designsystem.theme.White
-
+import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
 
 @Composable
 fun AppBarHome (
@@ -50,35 +51,40 @@ fun AppBarHome (
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .height(screenHeightDp(53.dp))
             .background(SpotTheme.colors.white)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = screenWidthDp(17.dp)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // 로고
         Image(
             painter = painterResource(id = R.drawable.spot_logo),
             contentDescription = "App Logo",
-            modifier = Modifier.size(32.dp)
+            modifier = Modifier.size(screenWidthDp(33.dp))
         )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onSearchClick) {
+            IconButton(
+                modifier = Modifier.size(screenWidthDp(32.dp)),
+                onClick = onSearchClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.search),
                     contentDescription = "Search",
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(screenWidthDp(24.dp))
                 )
             }
-            Spacer(modifier = Modifier.width(8.dp))
-            IconButton(onClick = onAlertClick) {
+            Spacer(modifier = Modifier.width(screenWidthDp(8.dp)))
+            IconButton(
+                modifier = Modifier.size(screenWidthDp(32.dp)),
+                onClick = onAlertClick
+            ) {
                 Icon(
                     painter = painterResource(
                         id = if (hasAlert) R.drawable.alert_noti else R.drawable.alert
                     ),
                     contentDescription = if (hasAlert) "New Notifications" else "Notifications",
                     tint = Color.Unspecified,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(screenWidthDp(24.dp))
                 )
             }
         }
@@ -118,26 +124,28 @@ fun BackTopBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .height(screenHeightDp(53.dp))
             .background(SpotTheme.colors.white)
-            .padding(vertical = 6.dp),
+            .padding(start = screenWidthDp(17.dp)),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start // ✅ 왼쪽 정렬 고정verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.Start
     ) {
         IconButton(
-            onClick = onBackClick,
+            modifier = Modifier.size(screenWidthDp(20.dp)),
+            onClick = onBackClick
         ) {
             Icon(
+                modifier = Modifier.size(screenWidthDp(20.dp)),
                 painter = painterResource(id = R.drawable.arrow_left),
-                contentDescription = "Back",
-                modifier = Modifier.size(25.dp)
+                contentDescription = "Back"
             )
         }
 
-        Spacer(Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(screenWidthDp(10.dp)))
+
         Text(
             text = title,
-            style = SpotTheme.typography.bodyLarge500,
-            fontSize = 18.sp
+            style = SpotTheme.typography.h5
         )
     }
 }
@@ -165,7 +173,7 @@ fun SearchTopBar(
     borderWidth : Dp = 1.dp,
     borderColor: Color = SpotTheme.colors.G300,
     backgroundColor: Color = White,
-    modifier: Modifier = Modifier, // ✅ 추가
+    modifier: Modifier = Modifier, 
 ) {
     Row(
         modifier = modifier
@@ -174,7 +182,7 @@ fun SearchTopBar(
             .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Back
+        
         IconButton(onClick = onBackClick) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_left),
@@ -185,7 +193,7 @@ fun SearchTopBar(
 
         Spacer(Modifier.width(8.dp))
 
-        // Search pill
+        
         Box(
             modifier = Modifier.weight(1f)
         ) {
@@ -238,7 +246,6 @@ fun SearchTopBar(
 @Composable
 fun PreviewSearchTopBarWithText() {
     var text by remember { mutableStateOf("안녕하세요") }
-
     SpotTheme{
         SearchTopBar(
             value = text,

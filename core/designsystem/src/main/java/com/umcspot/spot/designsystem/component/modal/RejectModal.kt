@@ -1,89 +1,125 @@
 package com.umcspot.spot.designsystem.component.modal
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.button.TextButtonState
-import com.umcspot.spot.designsystem.component.button.TextButtonM
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.designsystem.theme.White
+import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
+
 
 @Composable
 fun RejectModal(
     modalTitle : String,
     modalDes : String,
-    buttonText : String,
+    okButtonText : String,
+    noButtonText : String,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    onCancel:() -> Unit= {}
+    onCancel:() -> Unit= {},
+    onDismiss:() -> Unit= {}
 ) {
     Card(
-        modifier = modifier,
-        shape = SpotShapes.Hard,
+        modifier = modifier
+            .width(screenWidthDp(326.dp))
+            .height(screenHeightDp(227.dp)),
+        shape = SpotShapes.Round,
         colors = CardDefaults.elevatedCardColors(
             containerColor = SpotTheme.colors.white
         )
     ) {
         Column(
-            modifier = Modifier.padding(15.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(17.dp),
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.dismiss),
+                    contentDescription = null,
+                    modifier = Modifier.clickable { onDismiss() }
+                )
+            }
+
             Image(
                 painter = painterResource(R.drawable.emoji_sad),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(56.dp)
+                    .size(screenWidthDp(33.dp))
             )
 
-            // 텍스트 + 통계
-            Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = modalTitle,
-                    style = SpotTheme.typography.bodyMedium500.copy(fontSize = 16.sp),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = modalDes,
-                    style = SpotTheme.typography.bodySmall500.copy(fontSize = 12.sp)
+            Spacer(Modifier.height(screenHeightDp(7.dp)))
+
+            Text(
+                modifier = Modifier.height(screenHeightDp(30.dp)),
+                text = modalTitle,
+                style = SpotTheme.typography.h2,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(Modifier.height(screenHeightDp(20.dp)))
+
+            Text(
+                text = modalDes,
+                style = SpotTheme.typography.regular_500,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(Modifier.height(screenHeightDp(20.dp)))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                TextButton(
+                    modifier = Modifier
+                        .width(screenWidthDp(141.dp))
+                        .height(screenHeightDp(39.dp)),
+                    text = okButtonText,
+                    style = SpotTheme.typography.h5,
+                    onClick = onClick,
+                    shape = SpotShapes.Soft,
+                    state = TextButtonState.R500State,
                 )
 
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TextButtonM(
-                        text = buttonText,
-                        onClick = onClick,
-                        state = TextButtonState.R500State,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    TextButtonM(
-                        text = "취소",
-                        onClick = onCancel,
-                        state = TextButtonState.G500State,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+                TextButton(
+                    modifier = Modifier
+                        .width(screenWidthDp(141.dp))
+                        .height(screenHeightDp(39.dp)),
+                    text = noButtonText,
+                    style = SpotTheme.typography.h5,
+                    onClick = onCancel,
+                    shape = SpotShapes.Soft,
+                    state = TextButtonState.G500State,
+                )
             }
         }
     }
@@ -94,32 +130,36 @@ fun RejectDialog(
     visible: Boolean,
     modalTitle : String,
     modalDes : String,
-    buttonText : String,
+    okButtonText : String,
+    noButtonText : String,
     onDismiss: () -> Unit,
     onClick: () -> Unit,
     onCancel: () -> Unit
 ) {
     if (!visible) return
-    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+    Dialog(onDismissRequest = onDismiss) {
         RejectModal(
             modalTitle = modalTitle,
             modalDes = modalDes,
-            buttonText = buttonText,
+            okButtonText = okButtonText,
+            noButtonText = noButtonText,
             onClick = onClick,
-            onCancel = onCancel
+            onCancel = onCancel,
+            onDismiss = onDismiss
         )
     }
 }
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 640)
 @Composable
-fun ReDialog_Preview() {
+private fun RejectDialog_Preview() {
     SpotTheme {
         RejectDialog(
             visible = true,
-            modalTitle = "불참하시겠습니까?",
-            modalDes = "신청했던 스터디를 참여 취소하면\n다시 결정을 번복할 수 없어요.",
-            buttonText = "불참",
+            modalTitle = "나가시겠어요?",
+            modalDes = "지금 나가면, 쓰던 글은 저장되지 않아요.",
+            okButtonText = "네",
+            noButtonText = "아니요",
             onDismiss = {},
             onClick = {},
             onCancel = {}

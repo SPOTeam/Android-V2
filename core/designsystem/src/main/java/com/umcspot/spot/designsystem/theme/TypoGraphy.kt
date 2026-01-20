@@ -7,13 +7,20 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.umcspot.spot.designsystem.R
 
@@ -28,172 +35,268 @@ val Pretendard = FontFamily(
     Font(R.font.pretendard_extrabold, weight = FontWeight.W800),
 )
 
-/**
- * SpotTheme가 CompositionLocal로 제공/갱신할 실제 타입.
- * var + update(other) 형태로 remember{copy()}/update() 패턴을 지원한다.
- */
-data class SpotTypography(
-    var header01: TextStyle,
-    var header02: TextStyle,
-    var header03: TextStyle,
-    var header04: TextStyle,
-    var header05: TextStyle,
-    var bodyLarge600: TextStyle,
-    var bodyLarge500: TextStyle,
-    var bodyMedium600: TextStyle,
-    var bodyMedium500: TextStyle,
-    var bodyRegular500: TextStyle,
-    var bodyRegular400: TextStyle,
-    var bodySmall500: TextStyle,
-    var bodySmall400: TextStyle,
-    var bodySmall300: TextStyle,
-) {
-    fun update(other: SpotTypography) {
-        header01 = other.header01
-        header02 = other.header02
-        header03 = other.header03
-        header04 = other.header04
-        header05 = other.header05
-        bodyLarge600 = other.bodyLarge600
-        bodyLarge500 = other.bodyLarge500
-        bodyMedium600 = other.bodyMedium600
-        bodyMedium500 = other.bodyMedium500
-        bodyRegular500 = other.bodyRegular500
-        bodyRegular400 = other.bodyRegular400
-        bodySmall500 = other.bodySmall500
-        bodySmall400 = other.bodySmall400
-        bodySmall300 = other.bodySmall300
-    }
-}
-
-/** 기본 SpotTypography 세트를 생성하는 팩토리 함수 */
-fun SpotTypography(): SpotTypography = SpotTypography(
-    header01 = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Bold,
-        fontSize = 85.sp, // 64pt ≈ 85sp
-    ),
-    header02 = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Bold,
-        fontSize = 69.sp, // 52pt ≈ 69sp
-    ),
-    header03 = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Bold,
-        fontSize = 48.sp, // 48pt ≈ 64sp
-    ),
-    header04 = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Bold,
-        fontSize = 44.sp, // 44pt ≈ 58sp
-    ),
-    header05 = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Bold,
-        fontSize = 40.sp, // 40pt ≈ 53sp
-    ),
-    bodyLarge600 = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 44.sp,
-    ),
-    bodyLarge500 = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Medium,
-        fontSize = 44.sp,
-    ),
-    bodyMedium600 = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 40.sp,
-    ),
-    bodyMedium500 = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Medium,
-        fontSize = 40.sp,
-    ),
-    bodyRegular500 = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Medium,
-        fontSize = 36.sp,
-    ),
-    bodyRegular400 = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Normal,
-        fontSize = 36.sp,
-    ),
-    bodySmall500 = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Medium,
-        fontSize = 32.sp,
-    ),
-    bodySmall400 = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Normal,
-        fontSize = 32.sp,
-    ),
-    bodySmall300 = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Light,
-        fontSize = 32.sp,
+private fun SpotTextStyle(
+    fontWeight: FontWeight,
+    fontSize: TextUnit,
+    lineHeight: TextUnit,
+    letterSpacing: TextUnit
+): TextStyle = TextStyle(
+    fontFamily = Pretendard,
+    fontWeight = fontWeight,
+    fontSize = fontSize,
+    lineHeight = lineHeight,
+    letterSpacing = letterSpacing,
+    lineHeightStyle = LineHeightStyle(
+        alignment = LineHeightStyle.Alignment.Center,
+        trim = LineHeightStyle.Trim.None
     )
 )
 
-/**
- * M3 Typography 매핑.
- * - Material 컴포넌트에서 사용할 수 있게 연결
- * - SpotTheme() 내부에서 typography = AppTypography 로 전달됨
- */
-private val DefaultSpotTypography = SpotTypography()
+@Stable
+class SpotTypography internal constructor(
+    h1: TextStyle,
+    h2: TextStyle,
+    h3: TextStyle,
+    h4: TextStyle,
+    h5: TextStyle,
+    large_500: TextStyle,
+    large_400: TextStyle,
+    medium_500: TextStyle,
+    medium_400: TextStyle,
+    regular_500: TextStyle,
+    regular_400: TextStyle,
+    small_500: TextStyle,
+    small_400: TextStyle,
+    small_300: TextStyle,
+) {
+    var h1 by mutableStateOf(h1)
+        private set
+    var h2 by mutableStateOf(h2)
+        private set
+    var h3 by mutableStateOf(h3)
+        private set
+    var h4 by mutableStateOf(h4)
+        private set
+    var h5 by mutableStateOf(h5)
+        private set
+    var large_500 by mutableStateOf(large_500)
+        private set
+    var large_400 by mutableStateOf(large_400)
+        private set
+    var medium_500 by mutableStateOf(medium_500)
+        private set
+    var medium_400 by mutableStateOf(medium_400)
+        private set
+    var regular_500 by mutableStateOf(regular_500)
+        private set
+    var regular_400 by mutableStateOf(regular_400)
+        private set
+    var small_500 by mutableStateOf(small_500)
+        private set
+    var small_400 by mutableStateOf(small_400)
+        private set
+    var small_300 by mutableStateOf(small_300)
+        private set
 
-val AppTypography: Typography = Typography(
-    displayLarge  = DefaultSpotTypography.header01,
-    displayMedium = DefaultSpotTypography.header02,
-    displaySmall  = DefaultSpotTypography.header03,
+    fun copy(): SpotTypography = SpotTypography(
+        h1 = h1,
+        h2 = h2,
+        h3 = h3,
+        h4 = h4,
+        h5 = h5,
+        large_500 = large_500,
+        large_400 = large_400,
+        medium_500 = medium_500,
+        medium_400 = medium_400,
+        regular_500 = regular_500,
+        regular_400 = regular_400,
+        small_500 = small_500,
+        small_400 = small_400,
+        small_300 = small_300,
+    )
 
-    headlineLarge  = DefaultSpotTypography.header04,
-    headlineMedium = DefaultSpotTypography.header05,
+    fun update(other: SpotTypography) {
+        h1 = other.h1
+        h2 = other.h2
+        h3 = other.h3
+        h4 = other.h4
+        h5 = other.h5
+        large_500 = other.large_500
+        large_400 = other.large_400
+        medium_500 = other.medium_500
+        medium_400 = other.medium_400
+        regular_500 = other.regular_500
+        regular_400 = other.regular_400
+        small_500 = other.small_500
+        small_400 = other.small_400
+        small_300 = other.small_300
+    }
+}
 
-    titleLarge  = DefaultSpotTypography.bodyLarge600,
-    titleMedium = DefaultSpotTypography.bodyMedium600,
-    titleSmall  = DefaultSpotTypography.bodySmall500,
+@Composable
+fun SpotTypography(): SpotTypography {
 
-    bodyLarge = DefaultSpotTypography.bodyLarge500,
-    bodyMedium = DefaultSpotTypography.bodyMedium500,
-    bodySmall = DefaultSpotTypography.bodySmall400,
+    val bodyLetterSpacing = (-0.022).em 
 
-    labelLarge = DefaultSpotTypography.bodyRegular500,
-    labelMedium = DefaultSpotTypography.bodyRegular400,
-    labelSmall = DefaultSpotTypography.bodySmall300
-)
+    return SpotTypography(
 
-/** 미리보기 */
+        h1 = SpotTextStyle(
+            fontWeight = FontWeight.SemiBold,      
+            fontSize = 24.sp,
+            lineHeight = (24 * 1.5).sp,
+            letterSpacing = bodyLetterSpacing      
+        ),
+
+        h2 = SpotTextStyle(
+            fontWeight = FontWeight.SemiBold,      
+            fontSize = 20.sp,
+            lineHeight = (20 * 1.5).sp,
+            letterSpacing = bodyLetterSpacing      
+        ),
+
+        h3 = SpotTextStyle(
+            fontWeight = FontWeight.SemiBold,      
+            fontSize = 18.sp,
+            lineHeight = (18 * 1.5).sp,
+            letterSpacing = bodyLetterSpacing      
+        ),
+
+        h4 = SpotTextStyle(
+            fontWeight = FontWeight.SemiBold,      
+            fontSize = 16.sp,
+            lineHeight = (16 * 1.5).sp,
+            letterSpacing = bodyLetterSpacing      
+        ),
+
+        h5 = SpotTextStyle(
+            fontWeight = FontWeight.SemiBold,      
+            fontSize = 14.sp,
+            lineHeight = (14 * 1.5).sp,
+            letterSpacing = bodyLetterSpacing      
+        ),
+        
+        large_500 = SpotTextStyle(
+            fontWeight = FontWeight.Medium, 
+            fontSize = 16.sp,
+            lineHeight = (16 * 1.5).sp, 
+            letterSpacing = bodyLetterSpacing
+        ),
+
+        large_400 = SpotTextStyle(
+            fontWeight = FontWeight.Normal, 
+            fontSize = 16.sp,
+            lineHeight = (16 * 1.5).sp, 
+            letterSpacing = bodyLetterSpacing
+        ),
+
+        medium_500 = SpotTextStyle(
+            fontWeight = FontWeight.Medium, 
+            fontSize = 14.sp,
+            lineHeight = (14 * 1.5).sp, 
+            letterSpacing = bodyLetterSpacing
+        ),
+        medium_400 = SpotTextStyle(
+            fontWeight = FontWeight.Normal, 
+            fontSize = 14.sp,
+            lineHeight = (14 * 1.5).sp, 
+            letterSpacing = bodyLetterSpacing
+        ),
+
+        regular_500 = SpotTextStyle(
+            fontWeight = FontWeight.Medium, 
+            fontSize = 12.sp,
+            lineHeight = (12 * 1.5).sp, 
+            letterSpacing = bodyLetterSpacing
+        ),
+        regular_400 = SpotTextStyle(
+            fontWeight = FontWeight.Normal, 
+            fontSize = 12.sp,
+            lineHeight = (12 * 1.5).sp, 
+            letterSpacing = bodyLetterSpacing
+        ),
+
+        small_500 = SpotTextStyle(
+            fontWeight = FontWeight.Medium, 
+            fontSize = 10.sp,
+            lineHeight = (10 * 1.5).sp, 
+            letterSpacing = bodyLetterSpacing
+        ),
+        small_400 = SpotTextStyle(
+            fontWeight = FontWeight.Normal, 
+            fontSize = 10.sp,
+            lineHeight = (10 * 1.5).sp, 
+            letterSpacing = bodyLetterSpacing
+        ),
+        small_300 = SpotTextStyle(
+            fontWeight = FontWeight.Light, 
+            fontSize = 10.sp,
+            lineHeight = (10 * 1.5).sp, 
+            letterSpacing = bodyLetterSpacing
+        )
+    )
+}
+
+@Composable
+private fun DefaultSpotTypography() = SpotTypography()
+
+val AppTypography: Typography
+    @Composable
+    get() = Typography(
+        
+        displayLarge = DefaultSpotTypography().h1,
+        displayMedium = DefaultSpotTypography().h2,
+        displaySmall = DefaultSpotTypography().h3,
+
+        
+        headlineLarge = DefaultSpotTypography().h4,
+        headlineMedium = DefaultSpotTypography().h5,
+        headlineSmall = DefaultSpotTypography().large_500, 
+
+        
+        titleLarge = DefaultSpotTypography().large_500,
+        titleMedium = DefaultSpotTypography().medium_500,
+        titleSmall = DefaultSpotTypography().regular_500,
+
+        
+        bodyLarge = DefaultSpotTypography().large_400,
+        bodyMedium = DefaultSpotTypography().medium_400,
+        bodySmall = DefaultSpotTypography().regular_400,
+
+        
+        labelLarge = DefaultSpotTypography().regular_500,
+        labelMedium = DefaultSpotTypography().small_500,
+        labelSmall = DefaultSpotTypography().small_400
+    )
+
 @Composable
 fun TypographyPreviewContent() {
     Surface {
-        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)) {
             val t = SpotTheme.typography
-            Text("Header01 - 64sp Bold", style = t.header01)
-            Text("Header02 - 52sp Bold", style = t.header02)
-            Text("Header03 - 48sp Bold", style = t.header03)
-            Text("Header04 - 44sp Bold", style = t.header04)
-            Text("Header05 - 40sp Bold", style = t.header05)
+            Text("H1 - 24sp Bold / 150%", style = t.h1)
+            Text("H2 - 20sp Bold / 150%", style = t.h2)
+            Text("H3 - 18sp Bold / 150%", style = t.h3)
+            Text("H4 - 16sp Bold / 150%", style = t.h4)
+            Text("H5 - 14sp Bold / 150%", style = t.h5)
 
-            Text("BodyLarge600 - 44sp SemiBold", style = t.bodyLarge600)
-            Text("BodyLarge500 - 44sp Medium", style = t.bodyLarge500)
-            Text("BodyMedium600 - 40sp SemiBold", style = t.bodyMedium600)
-            Text("BodyMedium500 - 40sp Medium", style = t.bodyMedium500)
-            Text("BodyRegular500 - 36sp Medium", style = t.bodyRegular500)
-            Text("BodyRegular400 - 36sp Normal", style = t.bodyRegular400)
-            Text("BodySmall500 - 32sp Medium", style = t.bodySmall500)
-            Text("BodySmall400 - 32sp Normal", style = t.bodySmall400)
-            Text("BodySmall300 - 32sp Light", style = t.bodySmall300)
+            Text("--- (Letter Spacing: -2.2%) ---", style = t.regular_400)
+
+            Text("Large 500 - 16sp Medium / 150%", style = t.large_500)
+            Text("Large 400 - 16sp Normal / 150%", style = t.large_400)
+            Text("Medium 500 - 14sp Medium / 150%", style = t.medium_500)
+            Text("Medium 400 - 14sp Normal / 150%", style = t.medium_400)
+            Text("Regular 500 - 12sp Medium / 150%", style = t.regular_500)
+            Text("Regular 400 - 12sp Normal / 150%", style = t.regular_400)
+            Text("Small 500 - 10sp Medium / 150%", style = t.small_500)
+            Text("Small 400 - 10sp Normal / 150%", style = t.small_400)
+            Text("Small 300 - 10sp Light / 150%", style = t.small_300)
         }
     }
 }
 
-@Preview(showBackground = true, widthDp = 400, heightDp = 3000)
+@Preview(showBackground = true, widthDp = 400, heightDp = 800)
 @Composable
 fun TypographyPreview() {
     SpotTheme {

@@ -8,7 +8,9 @@ android {
 
 dependencies {
     implementation(projects.domain.study)
+    implementation(projects.domain.user)
     implementation(projects.core.designsystem)
+    implementation(projects.core.common)
 
     implementation(libs.lottie)
     implementation(libs.lottie.compose)

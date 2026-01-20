@@ -10,8 +10,11 @@ dependencies {
     implementation(projects.core.model)
     implementation(libs.flexible.bottomsheet)
     implementation(libs.kizitonwose.calendar.compose)
-
+    implementation(projects.core.common)
     implementation(projects.domain.weather)
     implementation(projects.domain.study)
     implementation(projects.domain.alert)
+    implementation(projects.domain.board)
+    implementation(projects.domain.post)
+    implementation(libs.lottie.compose)
 }

@@ -8,13 +8,11 @@ android {
 dependencies {
     //start destination
     implementation(projects.feature.signup)
-
     implementation(projects.feature.home)
     implementation(projects.feature.category)
     implementation(projects.feature.jjim)
     implementation(projects.feature.mypage)
     implementation(projects.feature.study)
-
     implementation(projects.feature.board)
     implementation(projects.feature.alert)
 
