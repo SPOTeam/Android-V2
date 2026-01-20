@@ -35,7 +35,7 @@ import com.umcspot.spot.feature.board.post.posting.navigation.navigateToPostingN
 import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.jjim.navigation.JJim
 import com.umcspot.spot.main.component.MainBottomBar
-import com.umcspot.spot.mypage.navigation.MyPage
+import com.umcspot.spot.mypage.main.navigation.MyPage
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.detail.navigation.StudyDetail

@@ -1,5 +1,5 @@
 // HomeViewModel.kt (핵심만)
-package com.umcspot.spot.mypage
+package com.umcspot.spot.mypage.main
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

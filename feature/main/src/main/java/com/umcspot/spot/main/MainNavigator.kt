@@ -22,8 +22,8 @@ import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.JJim
 import com.umcspot.spot.jjim.navigation.navigateToJJim
-import com.umcspot.spot.mypage.navigation.MyPage
-import com.umcspot.spot.mypage.navigation.navigateToMyPage
+import com.umcspot.spot.mypage.main.navigation.MyPage
+import com.umcspot.spot.mypage.main.navigation.navigateToMyPage
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.Landing
 import com.umcspot.spot.signup.navigation.Saving
