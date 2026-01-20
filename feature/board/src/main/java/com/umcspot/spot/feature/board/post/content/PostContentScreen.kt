@@ -241,8 +241,8 @@ fun PostContentScreen(
 
                 ReportDialog(
                     visible = showReportRequestDialog,
-                    modalTitle = "스터디원을 신고하시겠습니까?",
-                    modalDes = "신고 이유를 작성해주세요.\nSPOT 내부 검토 후, 탈퇴 신청을 용인합니다.",
+                    modalTitle = "게시글을 신고하시겠습니까?",
+                    modalDes = "신고 이유를 작성해주세요.\nSPOT 내부 검토 후, 빠르게 처리합니다.",
                     reason = reason,
                     onReasonChange = { reason = it },
                     okButtonText = "완료",
@@ -256,8 +256,8 @@ fun PostContentScreen(
 
                 AcceptDialog(
                     visible = showAcceptRequestDialog,
-                    modalTitle = "게시글 신고 완료",
-                    modalDes = "게시글 신고가 완료되었어요.\nSPOT 내부 검토 후, 삭제 처리 진행하겠습니다.",
+                    modalTitle = "신고 완료",
+                    modalDes = "게시글 신고가 완료되었어요.\n쾌적한 서비스 이용을 위해 항상 노력하겠습니다.",
                     okButtonText = "확인",
                     onDismiss = { showAcceptRequestDialog = false },
                     onClick = { showAcceptRequestDialog = false }
