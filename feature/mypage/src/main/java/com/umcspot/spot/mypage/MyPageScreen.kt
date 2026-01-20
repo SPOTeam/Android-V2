@@ -134,7 +134,6 @@ fun MyPageScreenContent(
             }
         }
 
-
         item {
             when(memberInfo) {
                 is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
@@ -374,7 +373,9 @@ fun UserProfile(
     ) {
         ProfileImage(
             imageRef = profileImageUrl,
-            modifier = Modifier.size(screenWidthDp(55.dp))
+            modifier = Modifier
+                .size(screenWidthDp(55.dp))
+                .padding(start = screenWidthDp(3.dp), top = screenHeightDp(1.dp)) // 이미지 잘림 보정
         )
 
         Spacer(Modifier.width(screenWidthDp(13.dp)))
