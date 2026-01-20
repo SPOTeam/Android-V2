@@ -82,3 +82,13 @@ fun searchLocations(query: String, list: List<LocationRow>, limit: Int = 20): Li
         .take(limit)
 }
 
+fun List<LocationRow>.toCodeMap(): Map<String, LocationRow> =
+    associateBy { it.code }
+
+fun mapRegionCodesToFullNames(
+    regionCodes: List<String>,
+    locations: List<LocationRow>
+): List<String> {
+    val map = locations.toCodeMap()
+    return regionCodes.mapNotNull { code -> map[code]?.fullName }
+}
