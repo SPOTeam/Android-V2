@@ -35,6 +35,7 @@ import com.umcspot.spot.feature.board.post.posting.navigation.navigateToPostingN
 import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.jjim.navigation.JJim
 import com.umcspot.spot.main.component.MainBottomBar
+import com.umcspot.spot.mypage.navigation.MyPage
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.detail.navigation.StudyDetail
@@ -71,6 +72,7 @@ fun MainScreen(
                         dest?.hasRoute(Posting::class) == true -> "글쓰기"
                         dest?.hasRoute(BoardList::class) == true -> "스터디 파트너들의 이야기"
                         dest?.hasRoute(JJim::class) == true -> "찜한 스터디"
+                        dest?.hasRoute(MyPage::class) == true -> "마이페이지"
                         dest?.routeMatches(POST_CONTENT_ROUTE) == true -> "스터디 파트너들의 이야기"
                         else -> ""
                     }

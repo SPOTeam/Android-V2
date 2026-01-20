@@ -94,8 +94,26 @@ enum class ImageButtonState(
             bg = B100,
             icon = B400
         )
-    )
+    ),
 
+    XOUTLINEB100State(
+        normal = ImageButtonColors(
+            bg = Color.Transparent,
+            icon = Black
+        ),
+        disabled = ImageButtonColors(
+            bg = White,
+            icon = B400
+        ),
+        pressed = ImageButtonColors(
+            bg = B100,
+            icon = B400
+        ),
+        selected = ImageButtonColors(
+            bg = B100,
+            icon = B400
+        )
+    )
 }
 
 fun ImageButtonState.resolveColors(
@@ -118,6 +136,7 @@ fun BlankButton(
     state: ImageButtonState = ImageButtonState.XOUTLINEState,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = SpotShapes.Hard,
+    align : Alignment = Alignment.Center,
     content: @Composable BoxScope.() -> Unit = {}
 
 ) {
@@ -134,7 +153,7 @@ fun BlankButton(
                 indication = null,
                 onClick = onClick
             ),
-        contentAlignment = Alignment.Center
+        contentAlignment = align
     ) {
         // ✅ 보더 없이 배경만: ShapeBox 재사용
         ShapeBox(

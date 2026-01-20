@@ -97,13 +97,22 @@ fun MainNavHost(
         )
 
         myStudyGraph()
+
         jjimGraph(
             contentPadding = contentPadding,
             onRegisterScrollToTop = onRegisterScrollToTop,
             onMoveToStudyClick = { navigator.navigateToRecruitingStudy() },
             onItemClick = { navigator.navigateToStudyDetail(it) }
         )
-        mypageGraph()
+
+        mypageGraph(
+            contentPadding = contentPadding,
+            onParticipatingClick = { /*navigator.navigateToRecruitingStudy()*/ },
+            onMyRecruitingClick = { /*navigator.navigateToRecruitingStudy()*/ },
+            onMyAppliedClick = { /*navigator.navigateToRecruitingStudy()*/ },
+            onEditInterestClick = { /*navigator.navigateToCheckList*/ },
+            onEditInterestLocationClick =  {  }
+        )
 
         recruitingStudyGraph(
             contentPadding = contentPadding,
