@@ -163,7 +163,7 @@ fun ParticipatingStudyScreenContent(
             items = studyList,
             key = { it.id }
         ) { item ->
-            Spacer(Modifier.padding(screenHeightDp(5.dp)))
+            Spacer(Modifier.height(screenHeightDp(5.dp)))
 
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -205,7 +205,7 @@ fun ParticipatingStudyScreenContent(
             }
 
             if (studyList.indexOf(item) != studyList.lastIndex) {
-                Spacer(Modifier.padding(screenHeightDp(5.dp)))
+                Spacer(Modifier.height(screenHeightDp(5.dp)))
 
                 HorizontalDivider(
                     modifier = Modifier
