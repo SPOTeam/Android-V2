@@ -60,13 +60,15 @@ class RecruitingStudyViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoadingMore.value = true
             runCatching {
-                studyRepository.getParticipatingStudy(
+                studyRepository.getRecruitingStudy(
                     cursor = currentList.nextCursor,
                     size = 10
                 ).getOrThrow()
             }.onSuccess { newPage ->
                 val merged = currentList.copy(
                     studyList = currentList.studyList + newPage.studyList,
+                    hasNext = newPage.hasNext,
+                    nextCursor = newPage.nextCursor
                 )
                 _uiState.update { it.copy(recruitingStudy = UiState.Success(merged)) }
             }.onFailure { e ->

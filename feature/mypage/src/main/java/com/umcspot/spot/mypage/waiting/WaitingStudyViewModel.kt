@@ -31,21 +31,21 @@ class WaitingStudyViewModel @Inject constructor(
                 cursor = null,
                 size = 10
             )
-                .onSuccess { info ->
-                    _uiState.update {
-                        it.copy(
-                            waitingStudy = if (info.studyList.isEmpty()) {
-                                UiState.Empty
-                            } else {
-                                UiState.Success(info)
-                            }
-                        )
-                    }
+            .onSuccess { info ->
+                _uiState.update {
+                    it.copy(
+                        waitingStudy = if (info.studyList.isEmpty()) {
+                            UiState.Empty
+                        } else {
+                            UiState.Success(info)
+                        }
+                    )
                 }
-                .onFailure { e ->
-                    Log.e("HomeViewModel", "loadParticipatingStudy error", e)
+            }
+            .onFailure { e ->
+                Log.e("HomeViewModel", "loadParticipatingStudy error", e)
 //                    _uiState.update { it.copy(weatherInfo = UiState.Failure(e.message ?: "날씨 불러오기 실패")) }
-                }
+            }
         }
     }
 
@@ -67,6 +67,8 @@ class WaitingStudyViewModel @Inject constructor(
             }.onSuccess { newPage ->
                 val merged = currentList.copy(
                     studyList = currentList.studyList + newPage.studyList,
+                    hasNext = newPage.hasNext,
+                    nextCursor = newPage.nextCursor
                 )
                 _uiState.update { it.copy(waitingStudy = UiState.Success(merged)) }
             }.onFailure { e ->

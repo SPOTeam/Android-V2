@@ -70,6 +70,8 @@ class ParticipatingStudyViewModel @Inject constructor(
             }.onSuccess { newPage ->
                 val merged = currentList.copy(
                     studyList = currentList.studyList + newPage.studyList,
+                    hasNext = newPage.hasNext,
+                    nextCursor = newPage.nextCursor
                 )
                 _uiState.update { it.copy(participatingStudy = UiState.Success(merged)) }
             }.onFailure { e ->
