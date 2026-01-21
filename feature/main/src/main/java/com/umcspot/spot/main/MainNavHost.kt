@@ -23,6 +23,8 @@ import com.umcspot.spot.feature.board.post.posting.navigation.postingGraph
 import com.umcspot.spot.home.navigation.homeGraph
 import com.umcspot.spot.jjim.navigation.jjimGraph
 import com.umcspot.spot.model.QuickMenuType
+import com.umcspot.spot.mypage.cancelMemberShip.navigation.cancelMemberShipGraph
+import com.umcspot.spot.mypage.cancelMemberShip.navigation.navigateToCancelMembership
 import com.umcspot.spot.mypage.main.navigation.mypageGraph
 import com.umcspot.spot.mypage.participating.navigation.navigateToParticipatingStudy
 import com.umcspot.spot.mypage.participating.navigation.participatingGraph
@@ -111,13 +113,16 @@ fun MainNavHost(
             onItemClick = { navigator.navigateToStudyDetail(it) }
         )
 
+
+        /** MyPage **/
         mypageGraph(
             contentPadding = contentPadding,
             onParticipatingClick = { navigator.navController.navigateToParticipatingStudy() },
             onMyRecruitingClick = { navigator.navController.navigateToMyRecruitingStudy() },
             onMyAppliedClick = { navigator.navController.navigateToWaitingStudy() },
             onEditInterestClick = { /*navigator.navigateToCheckList*/ },
-            onEditInterestLocationClick =  {  }
+            onEditInterestLocationClick =  {  },
+            onCancelMemberShipClick = { navigator.navController.navigateToCancelMembership() }
         )
 
         participatingGraph(
@@ -141,6 +146,13 @@ fun MainNavHost(
             onStudyClick = { navigator.navigateToStudyDetail(it) },
             moveToRecruitingStudy = { navigator.navigateToRecruitingStudy() },
         )
+
+        cancelMemberShipGraph(
+            contentPadding = contentPadding,
+            onCancelMembershipClick = {  }
+        )
+        /************/
+
 
         recruitingStudyGraph(
             contentPadding = contentPadding,
