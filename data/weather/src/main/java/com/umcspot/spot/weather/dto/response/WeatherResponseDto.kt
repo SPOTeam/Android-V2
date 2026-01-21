@@ -1,10 +1,8 @@
 package com.umcspot.spot.weather.dto.response
 
 import android.annotation.SuppressLint
-import com.umcspot.spot.model.WeatherType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.time.LocalTime
 
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
@@ -20,7 +18,7 @@ data class WeatherResponse(
     val header: WeatherHeader,
 
     @SerialName("body")
-    val body: WeatherBody
+    val body: WeatherBody? = null
 )
 
 @SuppressLint("UnsafeOptInUsageError")
