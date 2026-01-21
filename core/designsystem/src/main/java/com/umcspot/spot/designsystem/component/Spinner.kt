@@ -53,7 +53,7 @@ fun SpotSpinner(
         speed = speed,
         dynamicProperties = dynamicProps,
         modifier = modifier
-            .size(screenWidthDp(size))
+            .size(size)
             .semantics {
                 if (contentDescription != null) this.contentDescription = contentDescription
             }
