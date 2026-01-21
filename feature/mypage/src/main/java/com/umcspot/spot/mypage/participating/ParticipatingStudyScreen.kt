@@ -188,7 +188,7 @@ fun ParticipatingStudyScreenContent(
                             }
 
                             MeetballMenu(
-                                isOwner = false /* item.isOwner */,
+                                isOwner = item.isOwner ,
                                 expanded = expandedForId == item.id,
                                 onDismiss = { expandedForId = null },
                                 onEdit = { expandedForId = null; onEditClick(item.id) },

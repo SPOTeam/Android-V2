@@ -42,6 +42,9 @@ data class Study (
     @SerialName("isLiked")
     val isLiked: Boolean,
 
+    @SerialName("isOwner")
+    val isOwner: Boolean,
+
     @SerialName("hitCount")
     val hitCount: Int = 0,
 

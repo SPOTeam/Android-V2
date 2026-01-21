@@ -27,6 +27,7 @@ data class StudyResult(
     val currentMembers: Int = 0,
     val likeCount: Int = 0,
     val isLiked : Boolean,
+    val isOwner : Boolean,
     val hitCount: Int = 0,
     val profileImageUrl: ImageRef
 ) {
@@ -51,6 +52,7 @@ data class StudyResult(
                 currentMembers = mem,
                 likeCount = 10 + index * 2,
                 isLiked = index%2 == 0,
+                isOwner = index%2 == 1,
                 hitCount = 150 + index * 20,
                 profileImageUrl = ImageRef.Name("ic_study_default")
             )
