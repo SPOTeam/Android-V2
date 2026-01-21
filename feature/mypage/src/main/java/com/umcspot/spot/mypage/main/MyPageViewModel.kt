@@ -99,9 +99,10 @@ class MyPageViewModel @Inject constructor(
                 it.copy(appVersion = UiState.Success(versionName))
             }
         } catch (e: Exception) {
-            _uiState.update {
-                it.copy(appVersion = UiState.Failure("앱 버전 조회 실패"))
-            }
+            Log.e("MyPageViewModel", "loadAppVersion error", e)
+//            _uiState.update {
+//                it.copy(appVersion = UiState.Failure(e.message ?: "앱 버전 조회 실패"))
+//            }
         }
     }
 
