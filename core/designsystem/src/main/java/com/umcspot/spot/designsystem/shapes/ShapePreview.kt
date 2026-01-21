@@ -3,11 +3,19 @@ package com.umcspot.spot.designsystem.shapes
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.umcspot.spot.designsystem.theme.*
+import com.umcspot.spot.designsystem.theme.B100
+import com.umcspot.spot.designsystem.theme.B200
+import com.umcspot.spot.designsystem.theme.B400
+import com.umcspot.spot.designsystem.theme.B500
+import com.umcspot.spot.designsystem.theme.G300
+import com.umcspot.spot.designsystem.theme.G500
+import com.umcspot.spot.designsystem.theme.R500
+import com.umcspot.spot.designsystem.theme.SpotTheme
 
 
 /** Border Shape **/

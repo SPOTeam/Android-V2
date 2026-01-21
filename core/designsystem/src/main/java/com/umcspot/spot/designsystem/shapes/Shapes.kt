@@ -1,5 +1,6 @@
 package com.umcspot.spot.designsystem.shapes
 
+import android.graphics.Paint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -179,7 +180,8 @@ fun ShapeBox(
     borderWidth: Dp = 0.dp,
     borderColor: Color? = Color.Transparent,
     modifier: Modifier = Modifier,
-    content: @Composable BoxScope.() -> Unit = {}
+    alignment : Alignment = Alignment.Center,
+    content: @Composable BoxScope.() -> Unit = {},
 ) {
     Box(
         modifier = modifier
@@ -190,7 +192,8 @@ fun ShapeBox(
                 } else {
                     Modifier
                 }
-            )
+            ),
+        contentAlignment = alignment
     ) {
         content()
     }

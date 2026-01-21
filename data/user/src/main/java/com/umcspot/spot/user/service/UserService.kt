@@ -5,6 +5,8 @@ import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.user.dto.request.UserNameRequestDto
 import com.umcspot.spot.user.dto.request.UserPreferredRegionRequestDto
 import com.umcspot.spot.user.dto.request.UserThemeRequestDto
+import com.umcspot.spot.user.dto.response.MyPageResponseDto
+import com.umcspot.spot.user.dto.response.UserPreferredCategoryResponseDto
 import com.umcspot.spot.user.dto.response.UserPreferredRegionResponseDto
 import com.umcspot.spot.user.dto.response.UserResponseDto
 import retrofit2.http.Body
@@ -34,4 +36,12 @@ interface UserService {
     @GET("/api/members/prefer-regions")
     suspend fun getUserPreferredRegion(
     ): BaseResponse<UserPreferredRegionResponseDto>
+
+    @GET("/api/members/info")
+    suspend fun getMyPageInfo(
+    ): BaseResponse<MyPageResponseDto>
+
+    @GET("/api/members/prefer-categories")
+    suspend fun getUserPreferredCategory(
+    ): BaseResponse<UserPreferredCategoryResponseDto>
 }

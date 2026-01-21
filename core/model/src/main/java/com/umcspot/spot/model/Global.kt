@@ -60,7 +60,12 @@ enum class StudyTheme(
     PROJECT("프로젝트"),
     COMPETITION("공모전"),
     MAJOR_CAREER("전공 / 진로 학습"),
-    OTHER("기타")
+    OTHER("기타");
+
+    companion object {
+        fun from(value: String): StudyTheme? =
+            values().firstOrNull { it.name == value }
+    }
 }
 
 enum class StudyStyle {
@@ -88,5 +93,15 @@ enum class SocialLoginType(
     val title: String
 ) {
     KAKAO("kakao"),
-    NAVER("naver"),
+    NAVER("naver");
+
+    companion object {
+        fun from(value: String): SocialLoginType {
+            val normalized = value.lowercase()
+
+            return values().firstOrNull {
+                it.title == normalized
+            } ?: KAKAO
+        }
+    }
 }
