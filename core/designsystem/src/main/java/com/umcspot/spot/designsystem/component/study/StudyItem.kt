@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,8 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -42,15 +45,17 @@ fun StudyListItem(
     item: StudyResult,
     modifier: Modifier = Modifier,
     onClick: (StudyResult) -> Unit = {},
+    showMeetball: Boolean = false,
+    onMeetballClick: () -> Unit = {}
 ) {
     ClickSurface(
-        onClick = { onClick(item)},
+        onClick = { onClick(item) },
         modifier = modifier
     ) {
         Row(
             modifier = Modifier.padding(screenWidthDp(7.dp)),
             horizontalArrangement = Arrangement.spacedBy(13.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.Top
         ) {
             StudyThumbnail(
                 imageRef = item.profileImageUrl,
@@ -62,10 +67,10 @@ fun StudyListItem(
             // 텍스트 + 통계
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .wrapContentWidth()
                     .height(screenHeightDp(73.dp))
                     .padding(screenHeightDp(4.dp))
-            ){
+            ) {
                 Text(
                     text = item.name,
                     style = SpotTheme.typography.h5,
@@ -95,6 +100,26 @@ fun StudyListItem(
                     )
                 }
             }
+
+            if (showMeetball) {
+                Spacer(modifier = Modifier.weight(1f))
+
+                Box(
+                    modifier = Modifier
+                        .padding(top = screenHeightDp(4.dp))
+                        .width(screenWidthDp(24.dp))
+                        .height(screenWidthDp(22.dp))
+                        .clip(SpotShapes.Hard)
+                        .clickable(onClick = onMeetballClick),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.meetball),
+                        contentDescription = null,
+                        modifier = Modifier.size(screenWidthDp(14.dp))
+                    )
+                }
+            }
         }
     }
 }
@@ -109,6 +134,9 @@ private fun Stat(
     val display = if (count1 != 0) "${cap(count1)} / ${cap(count2)}" else cap(count2)
 
     Row(
+        modifier = Modifier
+            .width(screenWidthDp(56.dp))
+            .height(screenHeightDp(17.dp)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(screenWidthDp(4.dp))
     ) {
@@ -142,6 +170,7 @@ fun StudyThumbnail(
                 modifier = modifier
             )
         }
+
         is ImageRef.Url -> {
             AsyncImage(
                 model = img.url,
@@ -151,6 +180,7 @@ fun StudyThumbnail(
                 modifier = modifier
             )
         }
+
         ImageRef.None, null -> {
             Image(
                 painter = painterResource(placeholder),
@@ -174,10 +204,10 @@ fun StudyThumbnail(
 
 /* ============== Preview ============== */
 
-@Preview(showBackground = true, widthDp = 300)
+@Preview(showBackground = true, widthDp = 326)
 @Composable
 private fun StudyListItemPreview() {
-    SpotTheme{
+    SpotTheme {
         StudyListItem(
             item = StudyResult(
                 id = 1,
@@ -191,7 +221,9 @@ private fun StudyListItemPreview() {
                 profileImageUrl = ImageRef.Name("spot_logo"),
             ),
             modifier = Modifier.padding(10.dp),
-            onClick = {}
+            onClick = {},
+            showMeetball = true,
+            onMeetballClick = {}
         )
     }
 }
