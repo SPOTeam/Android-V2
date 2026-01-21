@@ -159,4 +159,19 @@ class StudyRepositoryImpl @Inject constructor(
         }.onFailure { e ->
             Log.e("StudyRepository", "getRecruitingStudy failed", e)
         }
+
+    override suspend fun getWaitingStudy(
+        cursor: Long?,
+        size: Int
+    ): Result<StudyResultList> =
+        runCatching {
+            val response = studyDataSource.getMyPageStudy(
+                statuses = listOf("APPLIED"),
+                cursor = cursor,
+                size = size
+            )
+            response.result.toDomainList()
+        }.onFailure { e ->
+            Log.e("StudyRepository", "getRecruitingStudy failed", e)
+        }
 }

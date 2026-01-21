@@ -55,4 +55,9 @@ interface StudyRepository {
         cursor: Long?,
         size: Int,
     ): Result<StudyResultList>
+
+    suspend fun getWaitingStudy(
+        cursor: Long?,
+        size: Int,
+    ): Result<StudyResultList>
 }
