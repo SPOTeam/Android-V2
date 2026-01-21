@@ -38,7 +38,8 @@ fun StudyListItem(
     item: StudyResult,
     modifier: Modifier = Modifier,
     onClick: (StudyResult) -> Unit = {},
-    meetballSlot: (@Composable () -> Unit)? = null
+    meetballSlot: (@Composable () -> Unit)? = null,
+    checkAppliedSlot: (@Composable () -> Unit)? = null
 ) {
     ClickSurface(
         onClick = { onClick(item) },
@@ -96,6 +97,9 @@ fun StudyListItem(
 
             if (meetballSlot != null) {
                 meetballSlot()
+            }
+            if (checkAppliedSlot != null) {
+                checkAppliedSlot()
             }
         }
     }
