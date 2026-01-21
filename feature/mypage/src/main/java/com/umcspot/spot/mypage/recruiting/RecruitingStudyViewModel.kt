@@ -32,7 +32,15 @@ class RecruitingStudyViewModel @Inject constructor(
                 size = 10
             )
             .onSuccess { info ->
-                _uiState.update { it.copy(recruitingStudy = UiState.Success(info)) }
+                _uiState.update {
+                    it.copy(
+                        recruitingStudy = if (info.studyList.isEmpty()) {
+                            UiState.Empty
+                        } else {
+                            UiState.Success(info)
+                        }
+                    )
+                }
             }
             .onFailure { e ->
                 Log.e("HomeViewModel", "loadParticipatingStudy error", e)
