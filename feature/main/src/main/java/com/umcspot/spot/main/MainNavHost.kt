@@ -28,6 +28,7 @@ import com.umcspot.spot.mypage.participating.navigation.navigateToParticipatingS
 import com.umcspot.spot.mypage.participating.navigation.participatingGraph
 import com.umcspot.spot.mypage.recruiting.navigation.myRecruitingStudyGraph
 import com.umcspot.spot.mypage.recruiting.navigation.navigateToMyRecruitingStudy
+import com.umcspot.spot.mypage.waiting.navigation.navigateToWaitingStudy
 import com.umcspot.spot.mypage.waiting.navigation.waitingStudyGraph
 import com.umcspot.spot.signup.navigation.signupGraph
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
@@ -114,7 +115,7 @@ fun MainNavHost(
             contentPadding = contentPadding,
             onParticipatingClick = { navigator.navController.navigateToParticipatingStudy() },
             onMyRecruitingClick = { navigator.navController.navigateToMyRecruitingStudy() },
-            onMyAppliedClick = { /*navigator.navigateToRecruitingStudy()*/ },
+            onMyAppliedClick = { navigator.navController.navigateToWaitingStudy() },
             onEditInterestClick = { /*navigator.navigateToCheckList*/ },
             onEditInterestLocationClick =  {  }
         )
