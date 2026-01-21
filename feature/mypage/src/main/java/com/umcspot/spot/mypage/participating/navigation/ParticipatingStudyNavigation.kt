@@ -6,7 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.umcspot.spot.mypage.participating.ParticipatingScreen
-import com.umcspot.spot.navigation.MainTabRoute
+import com.umcspot.spot.navigation.Route
 import kotlinx.serialization.Serializable
 
 fun NavController.navigateToParticipatingStudy(navOptions: NavOptions? = null) {
@@ -28,4 +28,4 @@ fun NavGraphBuilder.participatingGraph(
 }
 
 @Serializable
-data object ParticipatingStudy : MainTabRoute
+data object ParticipatingStudy : Route
