@@ -63,7 +63,7 @@ fun RecruitingStudyScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewmodel.loadParticipatingStudy()
+        viewmodel.loadRecruitingStudy()
         onRegisterScrollToTop {
             scope.launch {
                 listState.animateScrollToItem(0)

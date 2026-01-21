@@ -23,7 +23,7 @@ class WaitingStudyViewModel @Inject constructor(
     private val _isLoadingMore = MutableStateFlow(false)
     val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
 
-    fun loadParticipatingStudy() {
+    fun loadWaitingStudy() {
         _uiState.update { it.copy(waitingStudy = UiState.Loading) }
 
         viewModelScope.launch {
@@ -43,7 +43,7 @@ class WaitingStudyViewModel @Inject constructor(
                 }
             }
             .onFailure { e ->
-                Log.e("HomeViewModel", "loadParticipatingStudy error", e)
+                Log.e("WaitingStudyViewModel", "loadWaiting error", e)
 //                    _uiState.update { it.copy(weatherInfo = UiState.Failure(e.message ?: "날씨 불러오기 실패")) }
             }
         }
@@ -72,7 +72,7 @@ class WaitingStudyViewModel @Inject constructor(
                 )
                 _uiState.update { it.copy(waitingStudy = UiState.Success(merged)) }
             }.onFailure { e ->
-                Log.e("HomeViewModel", "loadNextpageError", e)
+                Log.e("WaitingStudyViewModel", "loadNextpageError", e)
             }
             _isLoadingMore.value = false
         }

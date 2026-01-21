@@ -63,7 +63,7 @@ fun WaitingStudyScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewmodel.loadParticipatingStudy()
+        viewmodel.loadWaitingStudy()
         onRegisterScrollToTop {
             scope.launch {
                 listState.animateScrollToItem(0)

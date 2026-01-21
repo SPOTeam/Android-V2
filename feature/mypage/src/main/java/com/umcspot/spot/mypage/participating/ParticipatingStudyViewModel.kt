@@ -46,7 +46,7 @@ class ParticipatingStudyViewModel @Inject constructor(
                 }
             }
             .onFailure { e ->
-                Log.e("HomeViewModel", "loadParticipatingStudy error", e)
+                Log.e("ParticipatingStudyViewModel", "loadParticipatingStudy error", e)
 //              _uiState.update { it.copy(weatherInfo = UiState.Failure(e.message ?: "날씨 불러오기 실패")) }
             }
         }
@@ -75,7 +75,7 @@ class ParticipatingStudyViewModel @Inject constructor(
                 )
                 _uiState.update { it.copy(participatingStudy = UiState.Success(merged)) }
             }.onFailure { e ->
-                Log.e("HomeViewModel", "loadNextpageError", e)
+                Log.e("ParticipatingStudyViewModel", "loadNextpageError", e)
             }
             _isLoadingMore.value = false
         }

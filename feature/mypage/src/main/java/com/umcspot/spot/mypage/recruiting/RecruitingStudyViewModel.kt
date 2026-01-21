@@ -23,7 +23,7 @@ class RecruitingStudyViewModel @Inject constructor(
     private val _isLoadingMore = MutableStateFlow(false)
     val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
 
-    fun loadParticipatingStudy() {
+    fun loadRecruitingStudy() {
         _uiState.update { it.copy(recruitingStudy = UiState.Loading) }
 
         viewModelScope.launch {
@@ -43,7 +43,7 @@ class RecruitingStudyViewModel @Inject constructor(
                 }
             }
             .onFailure { e ->
-                Log.e("HomeViewModel", "loadParticipatingStudy error", e)
+                Log.e("RecruitingStudyViewModel", "loadRecruitingStudy error", e)
 //                    _uiState.update { it.copy(weatherInfo = UiState.Failure(e.message ?: "날씨 불러오기 실패")) }
             }
         }
@@ -72,7 +72,7 @@ class RecruitingStudyViewModel @Inject constructor(
                 )
                 _uiState.update { it.copy(recruitingStudy = UiState.Success(merged)) }
             }.onFailure { e ->
-                Log.e("HomeViewModel", "loadNextpageError", e)
+                Log.e("RecruitingStudyViewModel", "loadNextpageError", e)
             }
             _isLoadingMore.value = false
         }
