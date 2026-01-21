@@ -2,21 +2,16 @@ package com.umcspot.spot.designsystem.component.study
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,12 +23,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.ClickSurface
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ImageRef
 import com.umcspot.spot.study.model.StudyResult
@@ -45,8 +38,7 @@ fun StudyListItem(
     item: StudyResult,
     modifier: Modifier = Modifier,
     onClick: (StudyResult) -> Unit = {},
-    showMeetball: Boolean = false,
-    onMeetballClick: () -> Unit = {}
+    meetballSlot: (@Composable () -> Unit)? = null
 ) {
     ClickSurface(
         onClick = { onClick(item) },
@@ -100,25 +92,10 @@ fun StudyListItem(
                     )
                 }
             }
+            Spacer(modifier = Modifier.weight(1f))
 
-            if (showMeetball) {
-                Spacer(modifier = Modifier.weight(1f))
-
-                Box(
-                    modifier = Modifier
-                        .padding(top = screenHeightDp(4.dp))
-                        .width(screenWidthDp(24.dp))
-                        .height(screenWidthDp(22.dp))
-                        .clip(SpotShapes.Hard)
-                        .clickable(onClick = onMeetballClick),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.meetball),
-                        contentDescription = null,
-                        modifier = Modifier.size(screenWidthDp(14.dp))
-                    )
-                }
+            if (meetballSlot != null) {
+                meetballSlot()
             }
         }
     }
@@ -222,8 +199,6 @@ private fun StudyListItemPreview() {
             ),
             modifier = Modifier.padding(10.dp),
             onClick = {},
-            showMeetball = true,
-            onMeetballClick = {}
         )
     }
 }
