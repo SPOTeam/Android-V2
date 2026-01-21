@@ -93,7 +93,9 @@ fun RecruitingStudyScreen(
     when (ui) {
         is UiState.Loading -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(SpotTheme.colors.white),
                 contentAlignment = Alignment.Center
             ) {
                 SpotSpinner(size = screenWidthDp(30.dp))
@@ -101,7 +103,9 @@ fun RecruitingStudyScreen(
         }
         is UiState.Empty, is UiState.Failure -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(SpotTheme.colors.white),
                 contentAlignment = Alignment.Center
             ) {
                 EmptyAlertWithButton(
