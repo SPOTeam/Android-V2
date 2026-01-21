@@ -15,12 +15,14 @@ fun NavController.navigateToCancelMembership(navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.cancelMemberShipGraph(
     contentPadding : PaddingValues,
-    onCancelMembershipClick : () -> Unit,
+    successCancelMemberShip: () -> Unit,
+    moveToParticipatingStudy: () -> Unit,
 ) {
     composable<CancelMemberShip> {
         CancelMemberShipScreen(
             contentPadding = contentPadding,
-            onCancelMembershipClick = onCancelMembershipClick
+            successCancelMemberShip = successCancelMemberShip,
+            moveToParticipatingStudy = moveToParticipatingStudy
         )
     }
 }

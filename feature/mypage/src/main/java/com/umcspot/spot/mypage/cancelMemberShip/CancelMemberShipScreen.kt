@@ -13,18 +13,25 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.button.TextButtonState
+import com.umcspot.spot.designsystem.component.modal.RejectDialog
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.G300
+import com.umcspot.spot.designsystem.theme.G400
 import com.umcspot.spot.designsystem.theme.R500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
@@ -33,14 +40,29 @@ import com.umcspot.spot.ui.extension.screenWidthDp
 @Composable
 fun CancelMemberShipScreen(
     contentPadding : PaddingValues,
-    onCancelMembershipClick : () -> Unit
+    successCancelMemberShip: () -> Unit,
+    moveToParticipatingStudy: () -> Unit,
+    viewmodel : CancelMemberShipViewModel = hiltViewModel()
 ) {
     var showDialog by remember { mutableStateOf(false) }
+    var showFailDialog by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    val status by viewmodel.leaveStatus.collectAsStateWithLifecycle()
+
+    LaunchedEffect(status) {
+        when(status) {
+            "MEMBER4006" -> { showFailDialog = true }
+            "MEMBER200" -> { showSuccessDialog = true }
+        }
+    }
 
     Column(
         modifier = Modifier
             .background(SpotTheme.colors.white)
-            .padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding())
+            .padding(
+                top = contentPadding.calculateTopPadding(),
+                bottom = contentPadding.calculateBottomPadding()
+            )
             .padding(horizontal = screenWidthDp(17.dp), vertical = screenHeightDp(18.dp)),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top
@@ -69,7 +91,9 @@ fun CancelMemberShipScreen(
         Spacer(modifier = Modifier.height(screenHeightDp(40.dp)))
 
         HorizontalDivider(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = screenWidthDp(4.dp)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = screenWidthDp(4.dp)),
             color = SpotTheme.colors.G300,
             thickness = 1.dp,
         )
@@ -104,7 +128,54 @@ fun CancelMemberShipScreen(
             style = SpotTheme.typography.h3,
             state = TextButtonState.R500State,
             shape = SpotShapes.Soft,
-            onClick = onCancelMembershipClick
+            onClick = { showDialog = true }
+        )
+
+        RejectDialog(
+            visible = showDialog,
+            painter = painterResource(R.drawable.cancel_membership),
+            painterTint = SpotTheme.colors.G400,
+            modalTitle = "정말 탈퇴할까요?",
+            modalDes = null,
+            okButtonText = "탈퇴",
+            noButtonText = "취소",
+            onDismiss = { showDialog = false },
+            onClick = {
+                viewmodel.leaveSpot()
+                showDialog = false
+            },
+            onCancel = { showDialog = false }
+        )
+
+        RejectDialog(
+            visible = showFailDialog,
+            painter = painterResource(R.drawable.error),
+            painterTint = SpotTheme.colors.R500,
+            modalTitle = "호스트로 운영중인 스터디가 있어요.",
+            modalDes = "호스트로 운영중인 스터디를 먼저 나가야\n스팟 서비스를 탈퇴할 수 있어요.",
+            okButtonText = "스터디 나가기",
+            noButtonText = "취소",
+            onDismiss = { showFailDialog = false },
+            onClick = moveToParticipatingStudy,
+            onCancel = { showFailDialog = false }
+        )
+
+        RejectDialog(
+            visible = showSuccessDialog,
+            painter = painterResource(R.drawable.success_default),
+            painterTint = SpotTheme.colors.R500,
+            modalTitle = "탈퇴 처리 완료",
+            modalDes = null,
+            okButtonText = "확인",
+            noButtonText = "취소",
+            onDismiss = {
+                showSuccessDialog = false
+                successCancelMemberShip()
+            },
+            onClick = {
+                showSuccessDialog = false
+                successCancelMemberShip()
+            },
         )
     }
 }
@@ -115,7 +186,8 @@ private fun CancelMemberShipScreenPreview() {
     SpotTheme {
         CancelMemberShipScreen(
             contentPadding = PaddingValues(0.dp),
-            onCancelMembershipClick = {}
+            successCancelMemberShip = {},
+            moveToParticipatingStudy = {}
         )
     }
 }
