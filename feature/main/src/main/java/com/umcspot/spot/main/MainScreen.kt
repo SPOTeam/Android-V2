@@ -51,7 +51,8 @@ import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun MainScreen(
-    navigator: MainNavigator = rememberMainNavigator()
+    navigator: MainNavigator = rememberMainNavigator(),
+    finishApp : () -> Unit
 ) {
     val navController = navigator.navController
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -147,7 +148,8 @@ fun MainScreen(
                 .consumeWindowInsets(innerPadding),
             contentPadding =  innerPadding,
             onRegisterScrollToTop = { handler -> scrollToTop = handler },
-            onBackRequest = { showBackRequestDialog = true }
+            onBackRequest = { showBackRequestDialog = true },
+            finishApp = { finishApp() }
         )
     }
 

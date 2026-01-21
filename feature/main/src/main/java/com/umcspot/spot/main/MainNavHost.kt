@@ -25,6 +25,7 @@ import com.umcspot.spot.jjim.navigation.jjimGraph
 import com.umcspot.spot.model.QuickMenuType
 import com.umcspot.spot.mypage.cancelMemberShip.navigation.cancelMemberShipGraph
 import com.umcspot.spot.mypage.cancelMemberShip.navigation.navigateToCancelMembership
+import com.umcspot.spot.mypage.main.navigation.MyPage
 import com.umcspot.spot.mypage.main.navigation.mypageGraph
 import com.umcspot.spot.mypage.participating.navigation.navigateToParticipatingStudy
 import com.umcspot.spot.mypage.participating.navigation.participatingGraph
@@ -49,7 +50,8 @@ fun MainNavHost(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
-    onBackRequest : () -> Unit
+    onBackRequest : () -> Unit,
+    finishApp: () -> Unit
 ) {
     val clearStackNavOptions = navOptions {
         popUpTo(0) { inclusive = true }
@@ -149,7 +151,14 @@ fun MainNavHost(
 
         cancelMemberShipGraph(
             contentPadding = contentPadding,
-            onCancelMembershipClick = {  }
+            successCancelMemberShip = { finishApp() },
+            moveToParticipatingStudy = { navigator.navController.navigateToParticipatingStudy(
+                navOptions {
+                    popUpTo<MyPage> { inclusive = false }
+                    launchSingleTop = true
+                    restoreState = false
+                }
+            ) }
         )
         /************/
 

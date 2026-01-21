@@ -23,7 +23,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SpotTheme {
-                MainScreen()
+                MainScreen(
+                    finishApp = {
+                        finishAffinity()
+                    }
+                )
             }
         }
     }
