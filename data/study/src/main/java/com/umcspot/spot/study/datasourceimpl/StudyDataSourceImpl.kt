@@ -84,4 +84,15 @@ class StudyDataSourceImpl @Inject constructor(
             cursor = cursor,
             size = size
         )
+
+    override suspend fun getParticipatingStudy(
+        statuses: List<String>,
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyResponseDto> =
+        studyService.getMyPageStudy(
+            statuses = statuses,
+            cursor = cursor,
+            size = size
+        )
 }

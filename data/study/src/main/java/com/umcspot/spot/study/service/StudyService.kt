@@ -66,4 +66,11 @@ interface StudyService {
         @Part request: MultipartBody.Part,
         @Part imageFile: MultipartBody.Part?
     ): BaseResponse<CreateStudyResponseDto>
+
+    @GET("/api/studies/me")
+    suspend fun getMyPageStudy(
+        @Query("statuses") statuses: List<String>,
+        @Query("cursor") cursor: Long?,
+        @Query("size") size: Int
+    ): BaseResponse<StudyResponseDto>
 }

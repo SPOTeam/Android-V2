@@ -38,4 +38,10 @@ interface StudyDataSource {
         cursor: Long?,
         size: Int
     ): BaseResponse<StudyResponseDto>
+
+    suspend fun getParticipatingStudy(
+        statuses : List<String>,
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyResponseDto>
 }
