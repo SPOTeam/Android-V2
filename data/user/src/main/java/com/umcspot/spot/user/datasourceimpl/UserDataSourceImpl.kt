@@ -51,4 +51,7 @@ class UserDataSourceImpl @Inject constructor(
 
     override suspend fun getUserPreferredCategory(): BaseResponse<UserPreferredCategoryResponseDto> =
         userService.getUserPreferredCategory()
+
+    override suspend fun leaveSpot(): NullResultResponse =
+        userService.leaveSpot()
 }

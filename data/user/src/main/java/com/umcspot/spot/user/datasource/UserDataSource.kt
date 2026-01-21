@@ -18,4 +18,6 @@ interface UserDataSource {
 
     suspend fun getMyPageInfo() : BaseResponse<MyPageResponseDto>
     suspend fun getUserPreferredCategory() : BaseResponse<UserPreferredCategoryResponseDto>
+
+    suspend fun leaveSpot() : NullResultResponse
 }
