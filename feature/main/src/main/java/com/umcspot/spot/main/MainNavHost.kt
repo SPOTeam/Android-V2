@@ -139,7 +139,7 @@ fun MainNavHost(
             contentPadding = contentPadding,
             onRegisterScrollToTop = onRegisterScrollToTop,
             onStudyClick = { navigator.navigateToStudyDetail(it) },
-            moveToMakeStudy = {  },
+            moveToRecruitingStudy = { navigator.navigateToRecruitingStudy() },
         )
 
         recruitingStudyGraph(
