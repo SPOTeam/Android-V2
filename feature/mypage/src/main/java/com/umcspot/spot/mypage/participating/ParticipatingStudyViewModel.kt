@@ -39,7 +39,7 @@ class ParticipatingStudyViewModel @Inject constructor(
             }
             .onFailure { e ->
                 Log.e("HomeViewModel", "loadParticipatingStudy error", e)
-//                    _uiState.update { it.copy(weatherInfo = UiState.Failure(e.message ?: "날씨 불러오기 실패")) }
+//              _uiState.update { it.copy(weatherInfo = UiState.Failure(e.message ?: "날씨 불러오기 실패")) }
             }
         }
     }

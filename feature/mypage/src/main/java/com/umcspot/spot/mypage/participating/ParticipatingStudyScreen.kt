@@ -1,13 +1,9 @@
 package com.umcspot.spot.mypage.participating
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -26,7 +21,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -39,36 +33,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.component.ProfileImage
 import com.umcspot.spot.designsystem.component.SpotSpinner
-import com.umcspot.spot.designsystem.component.button.BlankButton
-import com.umcspot.spot.designsystem.component.button.ImageButtonState
+import com.umcspot.spot.designsystem.component.empty.EmptyAlertWithButton
 import com.umcspot.spot.designsystem.component.study.StudyListItem
-import com.umcspot.spot.designsystem.shapes.ShapeBox
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.B100
-import com.umcspot.spot.designsystem.theme.B200
-import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G300
-import com.umcspot.spot.designsystem.theme.G400
 import com.umcspot.spot.designsystem.theme.R500
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.model.ImageRef
-import com.umcspot.spot.model.SocialLoginType
 import com.umcspot.spot.study.model.StudyResult
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 import com.umcspot.spot.ui.state.UiState
-import com.umcspot.spot.user.model.MyPageResult
 import kotlinx.coroutines.launch
 
 @Composable
@@ -76,6 +56,7 @@ fun ParticipatingScreen(
     contentPadding : PaddingValues,
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
     onStudyClick : (Long) -> Unit,
+    moveToRecruitingStudy : () -> Unit,
     viewmodel : ParticipatingStudyViewModel = hiltViewModel()
 ) {
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
@@ -117,19 +98,45 @@ fun ParticipatingScreen(
         }
     }
 
-    ParticipatingStudyScreenContent(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding())
-            .padding(horizontal = screenWidthDp(17.dp)),
-        studyList = itemList,
-        listState = listState,
-        onStudyClick = onStudyClick,
-        onEditClick = {},
-        onReportClick = {},
-        onLeaveClick = {}
-    )
+    when (ui) {
+        is UiState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                SpotSpinner(size = screenWidthDp(30.dp))
+            }
+        }
+        is UiState.Empty, is UiState.Failure -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                EmptyAlertWithButton(
+                    alertTitle = "참여 중인 스터디가 아직 없어요!",
+                    alertDes = "스팟에서 내 목표를 이뤄봐요",
+                    buttonText = "스터디 둘러보기",
+                    painter = painterResource(R.drawable.study_default),
+                    onClick = { moveToRecruitingStudy() },
+                )
+            }
+        }
+        is UiState.Success -> {
+            ParticipatingStudyScreenContent(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White)
+                    .padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding())
+                    .padding(horizontal = screenWidthDp(17.dp)),
+                studyList = itemList,
+                listState = listState,
+                onStudyClick = onStudyClick,
+                onEditClick = {},
+                onReportClick = {},
+                onLeaveClick = {}
+            )
+        }
+    }
 }
 
 @Composable
@@ -284,16 +291,4 @@ fun MeetballMenu(
             }
         )
     }
-}
-
-@Composable
-fun EditDeleteMenu(
-    isOwner: Boolean,
-    expanded: Boolean,
-    onDismiss: () -> Unit,
-    onEdit: () -> Unit,
-    onReport: () -> Unit,
-    onLeave: () -> Unit
-) {
-    TODO("Not yet implemented")
 }

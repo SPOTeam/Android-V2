@@ -16,13 +16,15 @@ fun NavController.navigateToParticipatingStudy(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.participatingGraph(
     contentPadding : PaddingValues,
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
-    onStudyClick : (Long) -> Unit
+    onStudyClick : (Long) -> Unit,
+    moveToRecruitingStudy : () -> Unit
 ) {
     composable<ParticipatingStudy> {
         ParticipatingScreen(
             contentPadding = contentPadding,
             onRegisterScrollToTop = onRegisterScrollToTop,
-            onStudyClick = onStudyClick
+            onStudyClick = onStudyClick,
+            moveToRecruitingStudy = moveToRecruitingStudy
         )
     }
 }
