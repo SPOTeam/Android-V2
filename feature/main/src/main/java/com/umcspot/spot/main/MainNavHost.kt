@@ -28,6 +28,7 @@ import com.umcspot.spot.mypage.participating.navigation.navigateToParticipatingS
 import com.umcspot.spot.mypage.participating.navigation.participatingGraph
 import com.umcspot.spot.mypage.recruiting.navigation.myRecruitingStudyGraph
 import com.umcspot.spot.mypage.recruiting.navigation.navigateToMyRecruitingStudy
+import com.umcspot.spot.mypage.waiting.navigation.waitingStudyGraph
 import com.umcspot.spot.signup.navigation.signupGraph
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.detail.navigation.studyDetailGraph
@@ -131,6 +132,13 @@ fun MainNavHost(
             onStudyClick = { navigator.navigateToStudyDetail(it) },
             moveToMakeStudy = {  },
             moveToCheckApplied = { }
+        )
+
+        waitingStudyGraph(
+            contentPadding = contentPadding,
+            onRegisterScrollToTop = onRegisterScrollToTop,
+            onStudyClick = { navigator.navigateToStudyDetail(it) },
+            moveToMakeStudy = {  },
         )
 
         recruitingStudyGraph(
