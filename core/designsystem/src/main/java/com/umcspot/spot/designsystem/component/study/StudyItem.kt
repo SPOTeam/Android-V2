@@ -2,17 +2,15 @@ package com.umcspot.spot.designsystem.component.study
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,12 +23,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.ClickSurface
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ImageRef
 import com.umcspot.spot.study.model.StudyResult
@@ -42,15 +38,17 @@ fun StudyListItem(
     item: StudyResult,
     modifier: Modifier = Modifier,
     onClick: (StudyResult) -> Unit = {},
+    meetballSlot: (@Composable () -> Unit)? = null,
+    checkAppliedSlot: (@Composable () -> Unit)? = null
 ) {
     ClickSurface(
-        onClick = { onClick(item)},
+        onClick = { onClick(item) },
         modifier = modifier
     ) {
         Row(
             modifier = Modifier.padding(screenWidthDp(7.dp)),
             horizontalArrangement = Arrangement.spacedBy(13.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.Top
         ) {
             StudyThumbnail(
                 imageRef = item.profileImageUrl,
@@ -62,22 +60,31 @@ fun StudyListItem(
             // 텍스트 + 통계
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .wrapContentWidth()
                     .height(screenHeightDp(73.dp))
                     .padding(screenHeightDp(4.dp))
-            ){
-                Text(
-                    text = item.name,
-                    style = SpotTheme.typography.h5,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = item.description,
-                    style = SpotTheme.typography.regular_400,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+            ) {
+                Row{
+                    Column{
+                        Text(
+                            text = item.name,
+                            style = SpotTheme.typography.h5,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = item.description,
+                            style = SpotTheme.typography.regular_400,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    if (checkAppliedSlot != null) {
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        checkAppliedSlot()
+                    }
+                }
 
                 Spacer(modifier = Modifier.weight(1f))
 
@@ -95,6 +102,11 @@ fun StudyListItem(
                     )
                 }
             }
+            Spacer(modifier = Modifier.weight(1f))
+
+            if (meetballSlot != null) {
+                meetballSlot()
+            }
         }
     }
 }
@@ -109,6 +121,9 @@ private fun Stat(
     val display = if (count1 != 0) "${cap(count1)} / ${cap(count2)}" else cap(count2)
 
     Row(
+        modifier = Modifier
+            .width(screenWidthDp(56.dp))
+            .height(screenHeightDp(17.dp)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(screenWidthDp(4.dp))
     ) {
@@ -142,6 +157,7 @@ fun StudyThumbnail(
                 modifier = modifier
             )
         }
+
         is ImageRef.Url -> {
             AsyncImage(
                 model = img.url,
@@ -151,6 +167,7 @@ fun StudyThumbnail(
                 modifier = modifier
             )
         }
+
         ImageRef.None, null -> {
             Image(
                 painter = painterResource(placeholder),
@@ -174,10 +191,10 @@ fun StudyThumbnail(
 
 /* ============== Preview ============== */
 
-@Preview(showBackground = true, widthDp = 300)
+@Preview(showBackground = true, widthDp = 326)
 @Composable
 private fun StudyListItemPreview() {
-    SpotTheme{
+    SpotTheme {
         StudyListItem(
             item = StudyResult(
                 id = 1,
@@ -189,9 +206,10 @@ private fun StudyListItemPreview() {
                 isLiked = false,
                 hitCount = 1200,
                 profileImageUrl = ImageRef.Name("spot_logo"),
+                isOwner = false
             ),
             modifier = Modifier.padding(10.dp),
-            onClick = {}
+            onClick = {},
         )
     }
 }

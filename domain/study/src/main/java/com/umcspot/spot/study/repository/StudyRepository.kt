@@ -45,4 +45,19 @@ interface StudyRepository {
         cursor: Long?,
         size: Int,
     ): Result<StudyResultList>
+
+    suspend fun getParticipatingStudy(
+        cursor: Long?,
+        size: Int,
+    ): Result<StudyResultList>
+
+    suspend fun getRecruitingStudy(
+        cursor: Long?,
+        size: Int,
+    ): Result<StudyResultList>
+
+    suspend fun getWaitingStudy(
+        cursor: Long?,
+        size: Int,
+    ): Result<StudyResultList>
 }

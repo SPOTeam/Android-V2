@@ -36,6 +36,9 @@ import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.jjim.navigation.JJim
 import com.umcspot.spot.main.component.MainBottomBar
 import com.umcspot.spot.mypage.main.navigation.MyPage
+import com.umcspot.spot.mypage.participating.navigation.ParticipatingStudy
+import com.umcspot.spot.mypage.recruiting.navigation.MyRecruitingStudy
+import com.umcspot.spot.mypage.waiting.navigation.WaitingStudy
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.detail.navigation.StudyDetail
@@ -73,6 +76,9 @@ fun MainScreen(
                         dest?.hasRoute(BoardList::class) == true -> "스터디 파트너들의 이야기"
                         dest?.hasRoute(JJim::class) == true -> "찜한 스터디"
                         dest?.hasRoute(MyPage::class) == true -> "마이페이지"
+                        dest?.hasRoute(ParticipatingStudy::class) == true -> "참여 중인 스터디"
+                        dest?.hasRoute(MyRecruitingStudy::class) == true -> "모집 중인 스터디"
+                        dest?.hasRoute(WaitingStudy::class) == true -> "대기 중인 스터디"
                         dest?.routeMatches(POST_CONTENT_ROUTE) == true -> "스터디 파트너들의 이야기"
                         else -> ""
                     }

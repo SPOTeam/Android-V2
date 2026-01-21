@@ -1,4 +1,3 @@
-// HomeViewModel.kt (핵심만)
 package com.umcspot.spot.mypage.main
 
 import android.app.Application

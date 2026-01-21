@@ -7,7 +7,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 fun WeatherResponseDto.toDomain(): WeatherResult {
-    val items = response.body.items.item
+    val items = response.body!!.items.item
 
     // 기준 시간 (HHmm)
     val time = items.firstOrNull()?.baseTime
