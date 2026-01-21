@@ -1,5 +1,6 @@
 package com.umcspot.spot.mypage.main
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -79,6 +80,7 @@ fun MyPageScreen(
         memberInfo = uiState.memberInfo,
         preferRegion = uiState.preferRegions,
         preferCategory = uiState.preferCategories,
+        appVersion = uiState.appVersion,
         onParticipatingClick = onParticipatingClick,
         onMyRecruitingClick = onMyRecruitingClick,
         onMyAppliedClick = onMyAppliedClick,
@@ -93,6 +95,7 @@ fun MyPageScreenContent(
     memberInfo: UiState<MyPageResult>,
     preferRegion: UiState<List<String?>>,
     preferCategory: UiState<List<String?>>,
+    appVersion : UiState<String>,
     onParticipatingClick: () -> Unit,
     onMyRecruitingClick: () -> Unit,
     onMyAppliedClick: () -> Unit,
@@ -302,18 +305,37 @@ fun MyPageScreenContent(
         }
 
         item {
-            Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
+            when(appVersion) {
+                is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        SpotSpinner()
+                    }
 
-            AppVersion()
+                    Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
+                }
 
-            Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
-            HorizontalDivider(
-                color = SpotTheme.colors.G300,
-                thickness = 1.dp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = screenWidthDp(4.dp))
-            )
+                is UiState.Success -> {
+                    val version = appVersion.data
+
+                    Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
+
+                    AppVersion(appVersion = version)
+
+                    Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
+                    HorizontalDivider(
+                        color = SpotTheme.colors.G300,
+                        thickness = 1.dp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = screenWidthDp(4.dp))
+                    )
+                }
+            }
         }
 
         item {
@@ -684,7 +706,9 @@ fun TermSection(
 }
 
 @Composable
-fun AppVersion() {
+fun AppVersion(
+    appVersion : String
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -699,13 +723,12 @@ fun AppVersion() {
         Spacer(modifier = Modifier.height(screenHeightDp(1.dp)))
 
         Text(
-            text = "v1.0.0",
+            text = "v${appVersion}",
             color = SpotTheme.colors.G400,
             style = SpotTheme.typography.medium_500,
         )
     }
 }
-
 
 @Composable
 fun Logout(

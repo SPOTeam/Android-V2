@@ -1,8 +1,10 @@
 // HomeViewModel.kt (핵심만)
 package com.umcspot.spot.mypage.main
 
+import android.app.Application
+import android.os.Build
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.umcspot.spot.ui.state.UiState
 import com.umcspot.spot.user.repository.UserRepository
@@ -16,13 +18,15 @@ import javax.inject.Inject
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
     private val userRepository: UserRepository,
-) : ViewModel() {
+    application: Application
+) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(MyPageState())
     val uiState: StateFlow<MyPageState> = _uiState
 
     fun load() {
         loadPrefer()
         loadMemberInfo()
+        loadAppVersion()
     }
 
     fun loadMemberInfo() {
@@ -70,5 +74,36 @@ class MyPageViewModel @Inject constructor(
                 }
         }
     }
+
+    fun loadAppVersion() {
+        _uiState.update { it.copy(appVersion = UiState.Loading) }
+
+        try {
+            val context = getApplication<Application>()
+            val pm = context.packageManager
+            val pkgName = context.packageName
+
+            val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                pm.getPackageInfo(
+                    pkgName,
+                    android.content.pm.PackageManager.PackageInfoFlags.of(0)
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                pm.getPackageInfo(pkgName, 0)
+            }
+
+            val versionName = packageInfo.versionName ?: "unknown"
+
+            _uiState.update {
+                it.copy(appVersion = UiState.Success(versionName))
+            }
+        } catch (e: Exception) {
+            _uiState.update {
+                it.copy(appVersion = UiState.Failure("앱 버전 조회 실패"))
+            }
+        }
+    }
+
 }
 
