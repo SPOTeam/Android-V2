@@ -64,18 +64,27 @@ fun StudyListItem(
                     .height(screenHeightDp(73.dp))
                     .padding(screenHeightDp(4.dp))
             ) {
-                Text(
-                    text = item.name,
-                    style = SpotTheme.typography.h5,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = item.description,
-                    style = SpotTheme.typography.regular_400,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Row{
+                    Column{
+                        Text(
+                            text = item.name,
+                            style = SpotTheme.typography.h5,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = item.description,
+                            style = SpotTheme.typography.regular_400,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    if (checkAppliedSlot != null) {
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        checkAppliedSlot()
+                    }
+                }
 
                 Spacer(modifier = Modifier.weight(1f))
 
@@ -97,9 +106,6 @@ fun StudyListItem(
 
             if (meetballSlot != null) {
                 meetballSlot()
-            }
-            if (checkAppliedSlot != null) {
-                checkAppliedSlot()
             }
         }
     }
@@ -200,6 +206,7 @@ private fun StudyListItemPreview() {
                 isLiked = false,
                 hitCount = 1200,
                 profileImageUrl = ImageRef.Name("spot_logo"),
+                isOwner = false
             ),
             modifier = Modifier.padding(10.dp),
             onClick = {},
