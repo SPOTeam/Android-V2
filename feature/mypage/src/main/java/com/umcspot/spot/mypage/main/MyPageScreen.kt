@@ -63,6 +63,7 @@ fun MyPageScreen(
     onMyAppliedClick : () -> Unit,
     onEditInterestClick : () -> Unit,
     onEditInterestLocationClick : () -> Unit,
+    onCancelMemberShipClick: () -> Unit,
     viewmodel : MyPageViewModel = hiltViewModel()
 ) {
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
@@ -85,7 +86,8 @@ fun MyPageScreen(
         onMyRecruitingClick = onMyRecruitingClick,
         onMyAppliedClick = onMyAppliedClick,
         onEditInterestClick = onEditInterestClick,
-        onEditInterestLocationClick = onEditInterestLocationClick
+        onEditInterestLocationClick = onEditInterestLocationClick,
+        onCancelMemberShipClick = onCancelMemberShipClick
     )
 }
 
@@ -101,6 +103,7 @@ fun MyPageScreenContent(
     onMyAppliedClick: () -> Unit,
     onEditInterestClick: () -> Unit,
     onEditInterestLocationClick: () -> Unit,
+    onCancelMemberShipClick: () -> Unit
 ) {
     LazyColumn(
         modifier = modifier
@@ -365,7 +368,7 @@ fun MyPageScreenContent(
                     .height(screenHeightDp(26.dp)),
                 state = ImageButtonState.XOUTLINEB100State,
                 shape = SpotShapes.Hard,
-                onClick = {}
+                onClick = onCancelMemberShipClick
             ) {
                 Text(
                     text = "회원 탈퇴",
