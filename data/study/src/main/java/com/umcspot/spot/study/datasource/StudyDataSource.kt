@@ -39,7 +39,7 @@ interface StudyDataSource {
         size: Int
     ): BaseResponse<StudyResponseDto>
 
-    suspend fun getParticipatingStudy(
+    suspend fun getMyPageStudy(
         statuses : List<String>,
         cursor: Long?,
         size: Int

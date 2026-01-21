@@ -50,4 +50,9 @@ interface StudyRepository {
         cursor: Long?,
         size: Int,
     ): Result<StudyResultList>
+
+    suspend fun getRecruitingStudy(
+        cursor: Long?,
+        size: Int,
+    ): Result<StudyResultList>
 }

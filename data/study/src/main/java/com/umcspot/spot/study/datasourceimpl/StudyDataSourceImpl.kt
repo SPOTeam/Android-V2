@@ -85,7 +85,7 @@ class StudyDataSourceImpl @Inject constructor(
             size = size
         )
 
-    override suspend fun getParticipatingStudy(
+    override suspend fun getMyPageStudy(
         statuses: List<String>,
         cursor: Long?,
         size: Int
