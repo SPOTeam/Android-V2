@@ -26,6 +26,8 @@ import com.umcspot.spot.model.QuickMenuType
 import com.umcspot.spot.mypage.main.navigation.mypageGraph
 import com.umcspot.spot.mypage.participating.navigation.navigateToParticipatingStudy
 import com.umcspot.spot.mypage.participating.navigation.participatingGraph
+import com.umcspot.spot.mypage.recruiting.navigation.myRecruitingStudyGraph
+import com.umcspot.spot.mypage.recruiting.navigation.navigateToMyRecruitingStudy
 import com.umcspot.spot.signup.navigation.signupGraph
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.detail.navigation.studyDetailGraph
@@ -110,7 +112,7 @@ fun MainNavHost(
         mypageGraph(
             contentPadding = contentPadding,
             onParticipatingClick = { navigator.navController.navigateToParticipatingStudy() },
-            onMyRecruitingClick = { /*navigator.navigateToRecruitingStudy()*/ },
+            onMyRecruitingClick = { navigator.navController.navigateToMyRecruitingStudy() },
             onMyAppliedClick = { /*navigator.navigateToRecruitingStudy()*/ },
             onEditInterestClick = { /*navigator.navigateToCheckList*/ },
             onEditInterestLocationClick =  {  }
@@ -119,7 +121,16 @@ fun MainNavHost(
         participatingGraph(
             contentPadding = contentPadding,
             onRegisterScrollToTop = onRegisterScrollToTop,
-            onStudyClick = { navigator.navigateToStudyDetail(it) }
+            onStudyClick = { navigator.navigateToStudyDetail(it) },
+            moveToRecruitingStudy = { navigator.navigateToRecruitingStudy() }
+        )
+
+        myRecruitingStudyGraph(
+            contentPadding = contentPadding,
+            onRegisterScrollToTop = onRegisterScrollToTop,
+            onStudyClick = { navigator.navigateToStudyDetail(it) },
+            moveToMakeStudy = {  },
+            moveToCheckApplied = { }
         )
 
         recruitingStudyGraph(
