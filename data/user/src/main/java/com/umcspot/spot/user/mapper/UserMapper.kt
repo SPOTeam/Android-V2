@@ -17,7 +17,7 @@ import com.umcspot.spot.user.model.UserPreferredCategoryResult
 import com.umcspot.spot.user.model.UserPreferredRegionResult
 
 fun List<StudyTheme>.toRequestDto(): UserThemeRequestDto =
-    UserThemeRequestDto(userThemes = this)
+    UserThemeRequestDto(categories = this)
 
 fun String.toRequestDto(): UserNameRequestDto =
     UserNameRequestDto(name = this)
@@ -53,6 +53,6 @@ fun MyPageResponseDto.toDomain(): MyPageResult =
 
 fun UserPreferredCategoryResponseDto.toDomain(): UserPreferredCategoryResult =
     UserPreferredCategoryResult(
-        categories = categories.map { StudyTheme.from(it)?.title },
+        categories = categories.map { StudyTheme.from(it) },
         totalCount = totalCount
     )

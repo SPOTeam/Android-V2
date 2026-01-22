@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserThemeRequestDto(
-    @SerialName("userThemes")
-    val userThemes: List<StudyTheme>
+    @SerialName("categories")
+    val categories: List<StudyTheme>
 )
 
 @Serializable
