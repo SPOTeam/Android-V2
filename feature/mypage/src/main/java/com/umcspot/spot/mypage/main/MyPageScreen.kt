@@ -1,6 +1,5 @@
 package com.umcspot.spot.mypage.main
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +22,9 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +41,7 @@ import com.umcspot.spot.designsystem.component.ProfileImage
 import com.umcspot.spot.designsystem.component.SpotSpinner
 import com.umcspot.spot.designsystem.component.button.BlankButton
 import com.umcspot.spot.designsystem.component.button.ImageButtonState
+import com.umcspot.spot.designsystem.component.modal.AcceptDialog
 import com.umcspot.spot.designsystem.shapes.ShapeBox
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B100
@@ -64,10 +66,10 @@ fun MyPageScreen(
     onEditInterestClick : () -> Unit,
     onEditInterestLocationClick : () -> Unit,
     onCancelMemberShipClick: () -> Unit,
+    onLogoutClick:() -> Unit,
     viewmodel : MyPageViewModel = hiltViewModel()
 ) {
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
-
 
     LaunchedEffect(Unit) {
         viewmodel.load()
@@ -87,7 +89,8 @@ fun MyPageScreen(
         onMyAppliedClick = onMyAppliedClick,
         onEditInterestClick = onEditInterestClick,
         onEditInterestLocationClick = onEditInterestLocationClick,
-        onCancelMemberShipClick = onCancelMemberShipClick
+        onCancelMemberShipClick = onCancelMemberShipClick,
+        onLogoutClick = onLogoutClick
     )
 }
 
@@ -103,283 +106,326 @@ fun MyPageScreenContent(
     onMyAppliedClick: () -> Unit,
     onEditInterestClick: () -> Unit,
     onEditInterestLocationClick: () -> Unit,
-    onCancelMemberShipClick: () -> Unit
+    onCancelMemberShipClick: () -> Unit,
+    onLogoutClick: () -> Unit
 ) {
-    LazyColumn(
-        modifier = modifier
-            .padding(top = screenHeightDp(18.dp))
-            .padding(horizontal = screenWidthDp(17.dp)),
-        contentPadding = PaddingValues(bottom = screenHeightDp(24.dp))
+    var logout by remember { mutableStateOf(false) }
+    var successLogout by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        item {
-            when (memberInfo) {
-                is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        SpotSpinner()
+        LazyColumn(
+            modifier = modifier
+                .padding(top = screenHeightDp(18.dp))
+                .padding(horizontal = screenWidthDp(17.dp)),
+            contentPadding = PaddingValues(bottom = screenHeightDp(24.dp))
+        ) {
+            item {
+                when (memberInfo) {
+                    is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            SpotSpinner()
+                        }
+
+                        Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
                     }
 
-                    Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
-                }
+                    is UiState.Success -> {
+                        val data = memberInfo.data
 
-                is UiState.Success -> {
-                    val data = memberInfo.data
+                        UserProfile(
+                            nickName = data.nickname,
+                            profileImageUrl = data.profileImageUrl
+                        )
 
-                    UserProfile(
-                        nickName = data.nickname,
-                        profileImageUrl = data.profileImageUrl
-                    )
-
-                    Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
+                        Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
+                    }
                 }
             }
-        }
 
-        item {
-            when(memberInfo) {
-                is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        SpotSpinner()
+            item {
+                when(memberInfo) {
+                    is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            SpotSpinner()
+                        }
+
+                        Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
                     }
 
-                    Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
-                }
+                    is UiState.Success -> {
+                        val data = memberInfo.data
 
-                is UiState.Success -> {
-                    val data = memberInfo.data
+                        StudyInfoFrame(
+                            participatingStudyCount = data.participateCount,
+                            recruitingStudyCount = data.recruitingCount,
+                            appliedStudyCount = data.appliedCount,
+                            onParticipatingClick = onParticipatingClick,
+                            onRecruitingClick = onMyRecruitingClick,
+                            onAppliedClick = onMyAppliedClick
+                        )
 
-                    StudyInfoFrame(
-                        participatingStudyCount = data.participateCount,
-                        recruitingStudyCount = data.recruitingCount,
-                        appliedStudyCount = data.appliedCount,
-                        onParticipatingClick = onParticipatingClick,
-                        onRecruitingClick = onMyRecruitingClick,
-                        onAppliedClick = onMyAppliedClick
-                    )
-
-                    Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
+                        Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
+                    }
                 }
             }
-        }
 
 
-        item {
-            when(preferCategory) {
-                is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        SpotSpinner()
+            item {
+                when(preferCategory) {
+                    is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            SpotSpinner()
+                        }
+
+                        Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
+                    }
+                    is UiState.Success -> {
+                        val data = preferCategory.data
+
+                        InterestedInfo(
+                            title = "관심 분야",
+                            icon = painterResource(id = R.drawable.search_prefer),
+                            interest = data,
+                            onClick = onEditInterestClick
+                        )
+
+                        Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
+
+                        HorizontalDivider(
+                            color = SpotTheme.colors.G300,
+                            thickness = 1.dp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = screenWidthDp(4.dp))
+                        )
+                    }
+                }
+            }
+
+            item {
+                when(preferRegion) {
+                    is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            SpotSpinner()
+                        }
+
+                        Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
                     }
 
-                    Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
-                }
-                is UiState.Success -> {
-                    val data = preferCategory.data
+                    is UiState.Success -> {
+                        val data = preferRegion.data
 
-                    InterestedInfo(
-                        title = "관심 분야",
-                        icon = painterResource(id = R.drawable.search_prefer),
-                        interest = data,
-                        onClick = onEditInterestClick
-                    )
+                        Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
 
-                    Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
+                        InterestedInfo(
+                            title = "관심 지역",
+                            icon = painterResource(id = R.drawable.location_outline),
+                            interest = data,
+                            onClick = onEditInterestLocationClick
+                        )
 
-                    HorizontalDivider(
-                        color = SpotTheme.colors.G300,
-                        thickness = 1.dp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = screenWidthDp(4.dp))
-                    )
+                        Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
+
+                        HorizontalDivider(
+                            color = SpotTheme.colors.G300,
+                            thickness = 1.dp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = screenWidthDp(4.dp))
+                        )
+                    }
                 }
             }
-        }
 
-        item {
-            when(preferRegion) {
-                is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        SpotSpinner()
+
+            item {
+                when(memberInfo) {
+                    is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            SpotSpinner()
+                        }
+
+                        Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
                     }
 
-                    Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
-                }
+                    is UiState.Success -> {
+                        val data = memberInfo.data
 
-                is UiState.Success -> {
-                    val data = preferRegion.data
+                        Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
 
-                    Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
+                        LoginType(type = data.loginType)
 
-                    InterestedInfo(
-                        title = "관심 지역",
-                        icon = painterResource(id = R.drawable.location_outline),
-                        interest = data,
-                        onClick = onEditInterestLocationClick
-                    )
+                        EmailInfo(email = data.email)
 
-                    Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
+                        Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
 
-                    HorizontalDivider(
-                        color = SpotTheme.colors.G300,
-                        thickness = 1.dp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = screenWidthDp(4.dp))
-                    )
-                }
-            }
-        }
-
-
-        item {
-            when(memberInfo) {
-                is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        SpotSpinner()
+                        HorizontalDivider(
+                            color = SpotTheme.colors.G300,
+                            thickness = 1.dp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = screenWidthDp(4.dp))
+                        )
                     }
-
-                    Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
-                }
-
-                is UiState.Success -> {
-                    val data = memberInfo.data
-
-                    Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
-
-                    LoginType(type = data.loginType)
-
-                    EmailInfo(email = data.email)
-
-                    Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
-
-                    HorizontalDivider(
-                        color = SpotTheme.colors.G300,
-                        thickness = 1.dp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = screenWidthDp(4.dp))
-                    )
                 }
             }
-        }
 
-        item {
-            Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
+            item {
+                Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
 
-            TermSection(
-                onCommunityRuleClick = {},
-                onRestrictionHistoryClick = {},
-                onPrivacyPolicyClick = {},
-                onTermsOfServiceClick = {}
-            )
+                TermSection(
+                    onCommunityRuleClick = {},
+                    onRestrictionHistoryClick = {},
+                    onPrivacyPolicyClick = {},
+                    onTermsOfServiceClick = {}
+                )
 
-            Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
-            HorizontalDivider(
-                color = SpotTheme.colors.G300,
-                thickness = 1.dp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = screenWidthDp(4.dp))
-            )
-        }
-
-        item {
-            when(appVersion) {
-                is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        SpotSpinner()
-                    }
-
-                    Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
-                }
-
-                is UiState.Success -> {
-                    val version = appVersion.data
-
-                    Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
-
-                    AppVersion(appVersion = version)
-
-                    Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
-                    HorizontalDivider(
-                        color = SpotTheme.colors.G300,
-                        thickness = 1.dp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = screenWidthDp(4.dp))
-                    )
-                }
-            }
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
-
-            Logout(
-                onLogOutClick = {}
-            )
-
-            Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
-
-            HorizontalDivider(
-                color = SpotTheme.colors.G300,
-                thickness = 1.dp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = screenWidthDp(4.dp))
-            )
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
-
-            BlankButton(
-                modifier = Modifier
-                    .width(screenWidthDp(60.dp))
-                    .height(screenHeightDp(26.dp)),
-                state = ImageButtonState.XOUTLINEB100State,
-                shape = SpotShapes.Hard,
-                onClick = onCancelMemberShipClick
-            ) {
-                Text(
-                    text = "회원 탈퇴",
-                    style = SpotTheme.typography.regular_500,
-                    color = SpotTheme.colors.G400,
-                    textDecoration = TextDecoration.Underline,
+                Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
+                HorizontalDivider(
+                    color = SpotTheme.colors.G300,
+                    thickness = 1.dp,
                     modifier = Modifier
-                        .padding(horizontal = screenWidthDp(8.dp), vertical = screenHeightDp(4.dp))
+                        .fillMaxWidth()
+                        .padding(horizontal = screenWidthDp(4.dp))
                 )
             }
+
+            item {
+                when(appVersion) {
+                    is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            SpotSpinner()
+                        }
+
+                        Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
+                    }
+
+                    is UiState.Success -> {
+                        val version = appVersion.data
+
+                        Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
+
+                        AppVersion(appVersion = version)
+
+                        Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
+                        HorizontalDivider(
+                            color = SpotTheme.colors.G300,
+                            thickness = 1.dp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = screenWidthDp(4.dp))
+                        )
+                    }
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
+
+                Logout(
+                    onLogOutClick = { logout = true }
+                )
+
+                Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
+
+                HorizontalDivider(
+                    color = SpotTheme.colors.G300,
+                    thickness = 1.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = screenWidthDp(4.dp))
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(screenHeightDp(13.dp)))
+
+                BlankButton(
+                    modifier = Modifier
+                        .width(screenWidthDp(60.dp))
+                        .height(screenHeightDp(26.dp)),
+                    state = ImageButtonState.XOUTLINEB100State,
+                    shape = SpotShapes.Hard,
+                    onClick = onCancelMemberShipClick
+                ) {
+                    Text(
+                        text = "회원 탈퇴",
+                        style = SpotTheme.typography.regular_500,
+                        color = SpotTheme.colors.G400,
+                        textDecoration = TextDecoration.Underline,
+                        modifier = Modifier
+                            .padding(horizontal = screenWidthDp(8.dp), vertical = screenHeightDp(4.dp))
+                    )
+                }
+            }
         }
+
+        AcceptDialog(
+            visible = logout,
+            painter = painterResource(R.drawable.logout),
+            painterTint = SpotTheme.colors.G400,
+            modalTitle = "로그아웃 할까요?",
+            modalDes = null,
+            okButtonText = "로그아웃",
+            noButtonText = "취소",
+            onClick = {
+                successLogout = true
+                logout = false
+            },
+            onDismiss = {
+                logout = false
+            }
+        )
+
+        AcceptDialog(
+            visible = successLogout,
+            painter = painterResource(R.drawable.ic_check),
+            painterTint = SpotTheme.colors.B500,
+            modalTitle = "로그아웃 처리 완료",
+            modalDes = null,
+            okButtonText = "확인",
+            noButtonText = null,
+            onClick = {
+                successLogout = false
+                onLogoutClick()
+            },
+            onDismiss = {
+                successLogout = false
+                onLogoutClick()
+            }
+        )
     }
 }
 

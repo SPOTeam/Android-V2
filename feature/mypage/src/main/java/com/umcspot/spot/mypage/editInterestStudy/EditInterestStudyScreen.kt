@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,29 +18,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.component.button.SpotActivationButton
 import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.component.modal.AcceptDialog
-import com.umcspot.spot.designsystem.component.modal.RejectDialog
 import com.umcspot.spot.designsystem.component.study.section.ActivityThemeSection
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.G300
-import com.umcspot.spot.designsystem.theme.G400
-import com.umcspot.spot.designsystem.theme.R500
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
-import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun EditInterestStudyScreen(
@@ -151,9 +139,10 @@ fun EditInterestStudyScreen(
 
         AcceptDialog(
             visible = showDialog,
-            modalTitle = "수정 완료",
+            modalTitle = "",
             modalDes = "수정이 완료되었어요.\n새로운 관심 분야에 맞는 스터디를 확인해보세요.",
             okButtonText = "내 관심 스터디 보기",
+            noButtonText = null,
             onClick = {
                 showDialog = false
                 moveToMyInterestStudy()

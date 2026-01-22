@@ -20,7 +20,8 @@ fun NavGraphBuilder.mypageGraph(
     onMyAppliedClick : () -> Unit,
     onEditInterestClick : () -> Unit,
     onEditInterestLocationClick : () -> Unit,
-    onCancelMemberShipClick: () -> Unit
+    onCancelMemberShipClick: () -> Unit,
+    onLogoutClick: () -> Unit
 ) {
     composable<MyPage> {
         MyPageScreen(
@@ -30,7 +31,8 @@ fun NavGraphBuilder.mypageGraph(
             onMyAppliedClick = onMyAppliedClick,
             onEditInterestClick = onEditInterestClick,
             onEditInterestLocationClick = onEditInterestLocationClick,
-            onCancelMemberShipClick = onCancelMemberShipClick
+            onCancelMemberShipClick = onCancelMemberShipClick,
+            onLogoutClick = onLogoutClick
         )
     }
 }

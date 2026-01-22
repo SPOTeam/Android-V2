@@ -35,6 +35,7 @@ import com.umcspot.spot.mypage.recruiting.navigation.myRecruitingStudyGraph
 import com.umcspot.spot.mypage.recruiting.navigation.navigateToMyRecruitingStudy
 import com.umcspot.spot.mypage.waiting.navigation.navigateToWaitingStudy
 import com.umcspot.spot.mypage.waiting.navigation.waitingStudyGraph
+import com.umcspot.spot.signup.navigation.navigateToLanding
 import com.umcspot.spot.signup.navigation.signupGraph
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.detail.navigation.studyDetailGraph
@@ -128,7 +129,13 @@ fun MainNavHost(
             onMyAppliedClick = { navigator.navController.navigateToWaitingStudy() },
             onEditInterestClick = { navigator.navController.navigateToEditInterestStudy() },
             onEditInterestLocationClick =  {  },
-            onCancelMemberShipClick = { navigator.navController.navigateToCancelMembership() }
+            onCancelMemberShipClick = { navigator.navController.navigateToCancelMembership() },
+            onLogoutClick = {
+                // 1) 로그아웃 처리(데이터 삭제) 트리거
+
+                // 2) Landing으로 이동하면서 스택 클리어
+                navigator.navController.navigateToLanding(clearStackNavOptions)
+            }
         )
 
         participatingGraph(

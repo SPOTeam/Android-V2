@@ -156,7 +156,10 @@ fun CancelMemberShipScreen(
             okButtonText = "스터디 나가기",
             noButtonText = "취소",
             onDismiss = { showFailDialog = false },
-            onClick = moveToParticipatingStudy,
+            onClick = {
+                showFailDialog = false
+                moveToParticipatingStudy()
+            },
             onCancel = { showFailDialog = false }
         )
 
@@ -167,7 +170,7 @@ fun CancelMemberShipScreen(
             modalTitle = "탈퇴 처리 완료",
             modalDes = null,
             okButtonText = "확인",
-            noButtonText = "취소",
+            noButtonText = null,
             onDismiss = {
                 showSuccessDialog = false
                 successCancelMemberShip()

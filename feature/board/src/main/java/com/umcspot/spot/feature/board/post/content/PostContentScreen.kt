@@ -259,6 +259,7 @@ fun PostContentScreen(
                     modalTitle = "신고 완료",
                     modalDes = "게시글 신고가 완료되었어요.\n쾌적한 서비스 이용을 위해 항상 노력하겠습니다.",
                     okButtonText = "확인",
+                    noButtonText = null,
                     onDismiss = { showAcceptRequestDialog = false },
                     onClick = { showAcceptRequestDialog = false }
                 )
