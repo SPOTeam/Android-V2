@@ -5,25 +5,27 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.umcspot.spot.mypage.cancelMemberShip.CancelMemberShipScreen
+import com.umcspot.spot.mypage.editInterestStudy.EditInterestStudyScreen
 import com.umcspot.spot.navigation.MainTabRoute
 import kotlinx.serialization.Serializable
 
 fun NavController.navigateToEditInterestStudy(navOptions: NavOptions? = null) {
-    navigate(InterestStudy, navOptions)
+    navigate(EditInterest, navOptions)
 }
 
 fun NavGraphBuilder.interestStudyGraph(
     contentPadding : PaddingValues,
     moveToMyInterestStudy: () -> Unit,
+    moveToMyPage: () -> Unit
 ) {
-    composable<InterestStudy> {
-        EditInterstStudyScreen(
+    composable<EditInterest> {
+        EditInterestStudyScreen(
             contentPadding = contentPadding,
-            moveToMyInterestStudy = moveToMyInterestStudy
+            moveToMyInterestStudy = moveToMyInterestStudy,
+            moveToMyPage = moveToMyPage
         )
     }
 }
 
 @Serializable
-data object InterestStudy : MainTabRoute
+data object EditInterest : MainTabRoute

@@ -25,6 +25,8 @@ import com.umcspot.spot.jjim.navigation.jjimGraph
 import com.umcspot.spot.model.QuickMenuType
 import com.umcspot.spot.mypage.cancelMemberShip.navigation.cancelMemberShipGraph
 import com.umcspot.spot.mypage.cancelMemberShip.navigation.navigateToCancelMembership
+import com.umcspot.spot.mypage.editInterestStudy.navigation.interestStudyGraph
+import com.umcspot.spot.mypage.editInterestStudy.navigation.navigateToEditInterestStudy
 import com.umcspot.spot.mypage.main.navigation.MyPage
 import com.umcspot.spot.mypage.main.navigation.mypageGraph
 import com.umcspot.spot.mypage.participating.navigation.navigateToParticipatingStudy
@@ -124,7 +126,7 @@ fun MainNavHost(
             onParticipatingClick = { navigator.navController.navigateToParticipatingStudy() },
             onMyRecruitingClick = { navigator.navController.navigateToMyRecruitingStudy() },
             onMyAppliedClick = { navigator.navController.navigateToWaitingStudy() },
-            onEditInterestClick = { /*navigator.navigateToCheckList*/ },
+            onEditInterestClick = { navigator.navController.navigateToEditInterestStudy() },
             onEditInterestLocationClick =  {  },
             onCancelMemberShipClick = { navigator.navController.navigateToCancelMembership() }
         )
@@ -149,6 +151,18 @@ fun MainNavHost(
             onRegisterScrollToTop = onRegisterScrollToTop,
             onStudyClick = { navigator.navigateToStudyDetail(it) },
             moveToRecruitingStudy = { navigator.navigateToRecruitingStudy() },
+        )
+
+        interestStudyGraph(
+            contentPadding = contentPadding,
+            moveToMyInterestStudy = { navigator.navController.navigateToPreferCategoryStudy(
+                navOptions {
+                    popUpTo<MyPage> { inclusive = false }
+                    launchSingleTop = true
+                    restoreState = false
+                }
+            ) },
+            moveToMyPage = { navigator.navController.popBackStack() }
         )
 
         cancelMemberShipGraph(

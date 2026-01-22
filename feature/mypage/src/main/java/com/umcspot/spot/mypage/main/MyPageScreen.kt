@@ -193,7 +193,7 @@ fun MyPageScreenContent(
                         title = "관심 분야",
                         icon = painterResource(id = R.drawable.search_prefer),
                         interest = data,
-                        onClick = {}
+                        onClick = onEditInterestClick
                     )
 
                     Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
@@ -233,7 +233,7 @@ fun MyPageScreenContent(
                         title = "관심 지역",
                         icon = painterResource(id = R.drawable.location_outline),
                         interest = data,
-                        onClick = {}
+                        onClick = onEditInterestLocationClick
                     )
 
                     Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
