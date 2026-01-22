@@ -1,6 +1,5 @@
 package com.umcspot.spot.study.service
 
-import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
@@ -41,6 +40,17 @@ interface StudyService {
         @Query("cursor") cursor: Long?,
         @Query("size") size: Int,
         @Query("regionCodes") regionCodes: List<String>?
+    ): BaseResponse<StudyResponseDto>
+
+    @GET("/api/studies/by-category")
+    suspend fun getPreferCategoryStudies(
+        @Query("category") category: StudyTheme?,
+        @Query("recruitingStatus") recruitingStatus: RecruitingStatus?,
+        @Query("feeCategory") feeCategory: FeeRange?,
+        @Query("isOnline") isOnline: Boolean?,
+        @Query("sortBy") sortBy: RecruitingStudySort?,
+        @Query("cursor") cursor: Long?,
+        @Query("size") size: Int,
     ): BaseResponse<StudyResponseDto>
 
     @GET("/api/studies/categories")

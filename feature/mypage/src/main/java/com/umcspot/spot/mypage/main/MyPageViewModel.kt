@@ -65,7 +65,8 @@ class MyPageViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.getUserPreferredCategory()
                 .onSuccess { info ->
-                    _uiState.update { it.copy(preferCategories = UiState.Success(info.categories)) }
+                    val titles = info.categories.mapNotNull { it?.title }
+                    _uiState.update { it.copy(preferCategories = UiState.Success(titles)) }
                 }
                 .onFailure { e ->
                     Log.e("HomeViewModel", "loadPreferCategories error", e)

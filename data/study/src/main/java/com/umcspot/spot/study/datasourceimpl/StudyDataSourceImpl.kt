@@ -3,6 +3,7 @@ package com.umcspot.spot.study.datasourceimpl
 import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
+import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.study.datasource.StudyDataSource
 import com.umcspot.spot.study.dto.request.StudyRequestDto
@@ -44,6 +45,17 @@ class StudyDataSourceImpl @Inject constructor(
         regionCodes: List<String>?
     ): BaseResponse<StudyResponseDto> =
         studyService.getPreferLocationStudies(recruitingStatus, feeCategory, categories, null, sortType, cursor, size, regionCodes)
+
+    override suspend fun getPreferCategoryStudies(
+        category: StudyTheme?,
+        recruitingStatus: RecruitingStatus?,
+        feeCategory: FeeRange?,
+        isOnline : Boolean?,
+        sortType: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int,
+    ): BaseResponse<StudyResponseDto> =
+        studyService.getPreferCategoryStudies(category, recruitingStatus, feeCategory, isOnline, sortType, cursor, size)
 
     override suspend fun createStudy(
         request: StudyRequestDto,
