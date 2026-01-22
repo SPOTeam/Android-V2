@@ -44,6 +44,7 @@ import com.umcspot.spot.mypage.waiting.navigation.WaitingStudy
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.detail.navigation.StudyDetail
+import com.umcspot.spot.study.preferCategory.navigation.PreferCategoryFilter
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocationFilter
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import com.umcspot.spot.study.register.navigation.RegisterStudy
@@ -73,6 +74,7 @@ fun MainScreen(
                         dest?.hasRoute(Alert::class) == true -> "알림"
                         dest?.hasRoute(RecruitingFilter::class) == true -> "모집중인 스터디"
                         dest?.hasRoute(PreferLocationFilter::class) == true -> "내 지역 스터디"
+                        dest?.hasRoute(PreferCategoryFilter::class) == true -> "내 관심사 스터디"
                         dest?.hasRoute(SignUp::class) == true -> "회원가입"
                         dest?.hasRoute(CheckList::class) == true -> "체크리스트"
                         dest?.hasRoute(Posting::class) == true -> "글쓰기"

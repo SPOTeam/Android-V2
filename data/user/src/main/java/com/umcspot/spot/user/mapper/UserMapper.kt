@@ -17,7 +17,7 @@ import com.umcspot.spot.user.model.UserPreferredCategoryResult
 import com.umcspot.spot.user.model.UserPreferredRegionResult
 
 fun List<StudyTheme>.toRequestDto(): UserThemeRequestDto =
-    UserThemeRequestDto(userThemes = this)
+    UserThemeRequestDto(categories = this)
 
 fun String.toRequestDto(): UserNameRequestDto =
     UserNameRequestDto(name = this)

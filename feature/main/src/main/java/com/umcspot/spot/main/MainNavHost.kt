@@ -37,6 +37,10 @@ import com.umcspot.spot.signup.navigation.signupGraph
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.detail.navigation.studyDetailGraph
 import com.umcspot.spot.study.my.navigation.myStudyGraph
+import com.umcspot.spot.study.preferCategory.navigation.navigateToPreferCategoryStudy
+import com.umcspot.spot.study.preferCategory.navigation.navigateToPreferCategoryStudyFilter
+import com.umcspot.spot.study.preferCategory.navigation.preferCategoryStudyFilterGraph
+import com.umcspot.spot.study.preferCategory.navigation.preferCategoryStudyGraph
 import com.umcspot.spot.study.preferLocation.navigation.preferLocationStudyFilterGraph
 import com.umcspot.spot.study.preferLocation.navigation.preferLocationStudyGraph
 import com.umcspot.spot.study.recruiting.navigation.recruitingStudyFilterGraph
@@ -82,9 +86,7 @@ fun MainNavHost(
                 when (type) {
                     QuickMenuType.BOARD -> navigator.navigateToBoard()
                     QuickMenuType.REGION -> navigator.navigateToPreferLocationStudy()
-                    QuickMenuType.INTERESTS -> { /* TODO */
-                    }
-
+                    QuickMenuType.INTERESTS -> navigator.navController.navigateToPreferCategoryStudy()
                     QuickMenuType.RECRUITING -> navigator.navigateToRecruitingStudy()
                 }
             },
@@ -184,6 +186,19 @@ fun MainNavHost(
         )
 
         preferLocationStudyFilterGraph(
+            contentPadding = contentPadding,
+            navController = navigator.navController,
+            onAcceptFilterClick = { navigator.popBackStack() }
+        )
+
+        preferCategoryStudyGraph(
+            contentPadding = contentPadding,
+            onRegisterScrollToTop = onRegisterScrollToTop,
+            onItemClick = { },
+            onFilterClick = { navigator.navController.navigateToPreferCategoryStudyFilter() },
+        )
+
+        preferCategoryStudyFilterGraph(
             contentPadding = contentPadding,
             navController = navigator.navController,
             onAcceptFilterClick = { navigator.popBackStack() }

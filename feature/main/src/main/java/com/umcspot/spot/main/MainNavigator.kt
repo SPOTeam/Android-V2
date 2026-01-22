@@ -37,6 +37,8 @@ import com.umcspot.spot.signup.navigation.navigateToSaving
 import com.umcspot.spot.signup.navigation.navigateToSignUp
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
+import com.umcspot.spot.study.preferCategory.navigation.PreferCategory
+import com.umcspot.spot.study.preferCategory.navigation.PreferCategoryFilter
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocation
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocationFilter
 import com.umcspot.spot.study.preferLocation.navigation.navigateToPreferLocationStudy
@@ -100,14 +102,14 @@ class MainNavigator(
     fun isInLanding(): Boolean = inAnyGraph(Landing::class, Saving::class)
 
     @Composable
-    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, RecruitingFilter::class, PreferLocationFilter::class,
+    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, RecruitingFilter::class, PreferLocationFilter::class, PreferCategoryFilter::class,
         SignUp::class, CheckList::class, Posting::class, BoardList::class, JJim::class, MyPage::class,
         ParticipatingStudy::class, MyRecruitingStudy::class, WaitingStudy::class, CancelMemberShip::class
     ) || inAnyGraphRoutes(POST_CONTENT_ROUTE)
 
     @Composable
     fun showToTopFab(): Boolean = inAnyGraph(Alert::class, Recruiting::class,
-        PreferLocation::class, BoardList::class, JJim::class, ParticipatingStudy::class, MyRecruitingStudy::class, WaitingStudy::class)
+        PreferLocation::class, PreferCategory::class, BoardList::class, JJim::class, ParticipatingStudy::class, MyRecruitingStudy::class, WaitingStudy::class)
 
     @Composable
     fun showMultipleFab(): Boolean = inAnyGraph(Home::class, BoardList::class)

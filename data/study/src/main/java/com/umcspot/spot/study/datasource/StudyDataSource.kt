@@ -3,6 +3,7 @@ package com.umcspot.spot.study.datasource
 import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
+import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
@@ -20,6 +21,16 @@ interface StudyDataSource {
         cursor: Long?,
         size: Int,
         regionCodes : List<String>?
+    ): BaseResponse<StudyResponseDto>
+
+    suspend fun getPreferCategoryStudies(
+        category : StudyTheme?,
+        recruitingStatus : RecruitingStatus?,
+        feeCategory: FeeRange?,
+        isOnline : Boolean?,
+        sortType: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int,
     ): BaseResponse<StudyResponseDto>
 
     suspend fun createStudy(request: StudyRequestDto, imageFile: File?): BaseResponse<CreateStudyResponseDto>
