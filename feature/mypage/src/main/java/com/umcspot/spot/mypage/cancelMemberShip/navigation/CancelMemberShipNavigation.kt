@@ -6,7 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.umcspot.spot.mypage.cancelMemberShip.CancelMemberShipScreen
-import com.umcspot.spot.navigation.MainTabRoute
+import com.umcspot.spot.navigation.Route
 import kotlinx.serialization.Serializable
 
 fun NavController.navigateToCancelMembership(navOptions: NavOptions? = null) {
@@ -28,4 +28,4 @@ fun NavGraphBuilder.cancelMemberShipGraph(
 }
 
 @Serializable
-data object CancelMemberShip : MainTabRoute
+data object CancelMemberShip : Route
