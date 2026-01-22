@@ -11,6 +11,7 @@ import com.umcspot.spot.study.mapper.toDomainList
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.study.repository.StudyRepository
+import org.junit.experimental.categories.Category
 import java.io.File
 import javax.inject.Inject
 
@@ -64,6 +65,30 @@ class StudyRepositoryImpl @Inject constructor(
                 cursor = cursor,
                 size = size,
                 regionCodes = regionCodes
+            )
+            response.result.toDomainList()
+        }.onFailure {
+            Log.e("StudyRepository", "getPreferLocationStudies failed", it)
+        }
+
+    override suspend fun getPreferCategoryStudies(
+        category: StudyTheme?,
+        recruitingStatus: RecruitingStatus?,
+        feeRange: FeeRange?,
+        isOnline : Boolean?,
+        sortBy: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int,
+    ): Result<StudyResultList> =
+        runCatching {
+            val response = studyDataSource.getPreferCategoryStudies(
+                category = category,
+                recruitingStatus = recruitingStatus,
+                feeCategory = feeRange,
+                isOnline = isOnline,
+                sortType = sortBy,
+                cursor = cursor,
+                size = size,
             )
             response.result.toDomainList()
         }.onFailure {

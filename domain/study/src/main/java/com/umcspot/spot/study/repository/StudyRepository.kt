@@ -29,6 +29,16 @@ interface StudyRepository {
         regionCodes : List<String>?
     ): Result<StudyResultList>
 
+    suspend fun getPreferCategoryStudies(
+        category : StudyTheme?,
+        recruitingStatus : RecruitingStatus?,
+        feeRange: FeeRange?,
+        isOnline : Boolean?,
+        sortBy: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int,
+    ): Result<StudyResultList>
+
     suspend fun createStudy(studyCreateModel: StudyCreateModel, imageFile: File?): Result<Long>
 
     suspend fun getCategoryStudies(
