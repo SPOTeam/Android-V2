@@ -11,7 +11,6 @@ import com.umcspot.spot.study.mapper.toDomainList
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.study.repository.StudyRepository
-import org.junit.experimental.categories.Category
 import java.io.File
 import javax.inject.Inject
 
@@ -92,7 +91,7 @@ class StudyRepositoryImpl @Inject constructor(
             )
             response.result.toDomainList()
         }.onFailure {
-            Log.e("StudyRepository", "getPreferLocationStudies failed", it)
+            Log.e("StudyRepository", "getPreferCategoryStudies failed", it)
         }
 
     override suspend fun getRecommendedStudies(): Result<StudyResultList> =
