@@ -30,6 +30,7 @@ import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.shapes.SpotShapes
+import com.umcspot.spot.designsystem.theme.R500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
@@ -170,6 +171,8 @@ private fun RejectDialog_Preview() {
     SpotTheme {
         RejectDialog(
             visible = true,
+            painter = painterResource(R.drawable.emoji_sad),
+            painterTint = SpotTheme.colors.R500,
             modalTitle = "나가시겠어요?",
             modalDes = "지금 나가면, 쓰던 글은 저장되지 않아요.",
             okButtonText = "네",
