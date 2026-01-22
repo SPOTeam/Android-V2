@@ -53,6 +53,6 @@ fun MyPageResponseDto.toDomain(): MyPageResult =
 
 fun UserPreferredCategoryResponseDto.toDomain(): UserPreferredCategoryResult =
     UserPreferredCategoryResult(
-        categories = categories.map { StudyTheme.from(it)?.title },
+        categories = categories.map { StudyTheme.from(it) },
         totalCount = totalCount
     )
