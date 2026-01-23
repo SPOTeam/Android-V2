@@ -58,7 +58,6 @@ fun MainNavHost(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
     onBackRequest : () -> Unit,
-    finishApp: () -> Unit
 ) {
     val clearStackNavOptions = navOptions {
         popUpTo(0) { inclusive = true }
@@ -174,7 +173,7 @@ fun MainNavHost(
 
         cancelMemberShipGraph(
             contentPadding = contentPadding,
-            successCancelMemberShip = { finishApp() },
+            successCancelMemberShip = { navigator.navController.navigateToLanding(clearStackNavOptions) },
             moveToParticipatingStudy = { navigator.navController.navigateToParticipatingStudy(
                 navOptions {
                     popUpTo<MyPage> { inclusive = false }
