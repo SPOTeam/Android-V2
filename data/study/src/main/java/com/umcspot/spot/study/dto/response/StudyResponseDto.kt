@@ -45,6 +45,9 @@ data class Study (
     @SerialName("isOwner")
     val isOwner: Boolean,
 
+    @SerialName("isAlone")
+    val isAlone: Boolean,
+
     @SerialName("hitCount")
     val hitCount: Int = 0,
 

@@ -206,7 +206,8 @@ private fun StudyListItemPreview() {
                 isLiked = false,
                 hitCount = 1200,
                 profileImageUrl = ImageRef.Name("spot_logo"),
-                isOwner = false
+                isOwner = false,
+                isAlone = false
             ),
             modifier = Modifier.padding(10.dp),
             onClick = {},
