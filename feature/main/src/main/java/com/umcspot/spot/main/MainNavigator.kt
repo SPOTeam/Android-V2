@@ -22,6 +22,8 @@ import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.JJim
 import com.umcspot.spot.jjim.navigation.navigateToJJim
+import com.umcspot.spot.mypage.cancelMemberShip.navigation.CancelMemberShip
+import com.umcspot.spot.mypage.editInterestStudy.navigation.EditInterest
 import com.umcspot.spot.mypage.main.navigation.MyPage
 import com.umcspot.spot.mypage.main.navigation.navigateToMyPage
 import com.umcspot.spot.mypage.participating.navigation.ParticipatingStudy
@@ -103,7 +105,7 @@ class MainNavigator(
     @Composable
     fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, RecruitingFilter::class, PreferLocationFilter::class, PreferCategoryFilter::class,
         SignUp::class, CheckList::class, Posting::class, BoardList::class, JJim::class, MyPage::class,
-        ParticipatingStudy::class, MyRecruitingStudy::class, WaitingStudy::class
+        ParticipatingStudy::class, MyRecruitingStudy::class, WaitingStudy::class, EditInterest::class, CancelMemberShip::class
     ) || inAnyGraphRoutes(POST_CONTENT_ROUTE)
 
     @Composable

@@ -35,6 +35,9 @@ import com.umcspot.spot.feature.board.post.posting.navigation.navigateToPostingN
 import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.jjim.navigation.JJim
 import com.umcspot.spot.main.component.MainBottomBar
+import com.umcspot.spot.mypage.cancelMemberShip.CancelMemberShipScreen
+import com.umcspot.spot.mypage.cancelMemberShip.navigation.CancelMemberShip
+import com.umcspot.spot.mypage.editInterestStudy.navigation.EditInterest
 import com.umcspot.spot.mypage.main.navigation.MyPage
 import com.umcspot.spot.mypage.participating.navigation.ParticipatingStudy
 import com.umcspot.spot.mypage.recruiting.navigation.MyRecruitingStudy
@@ -50,7 +53,7 @@ import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun MainScreen(
-    navigator: MainNavigator = rememberMainNavigator()
+    navigator: MainNavigator = rememberMainNavigator(),
 ) {
     val navController = navigator.navController
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -81,6 +84,8 @@ fun MainScreen(
                         dest?.hasRoute(ParticipatingStudy::class) == true -> "참여 중인 스터디"
                         dest?.hasRoute(MyRecruitingStudy::class) == true -> "모집 중인 스터디"
                         dest?.hasRoute(WaitingStudy::class) == true -> "대기 중인 스터디"
+                        dest?.hasRoute(EditInterest::class) == true -> "관심 분야"
+                        dest?.hasRoute(CancelMemberShip::class) == true -> "회원 탈퇴"
                         dest?.routeMatches(POST_CONTENT_ROUTE) == true -> "스터디 파트너들의 이야기"
                         else -> ""
                     }
@@ -146,7 +151,7 @@ fun MainScreen(
                 .consumeWindowInsets(innerPadding),
             contentPadding =  innerPadding,
             onRegisterScrollToTop = { handler -> scrollToTop = handler },
-            onBackRequest = { showBackRequestDialog = true }
+            onBackRequest = { showBackRequestDialog = true },
         )
     }
 

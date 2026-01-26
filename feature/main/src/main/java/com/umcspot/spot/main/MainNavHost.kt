@@ -23,6 +23,11 @@ import com.umcspot.spot.feature.board.post.posting.navigation.postingGraph
 import com.umcspot.spot.home.navigation.homeGraph
 import com.umcspot.spot.jjim.navigation.jjimGraph
 import com.umcspot.spot.model.QuickMenuType
+import com.umcspot.spot.mypage.cancelMemberShip.navigation.cancelMemberShipGraph
+import com.umcspot.spot.mypage.cancelMemberShip.navigation.navigateToCancelMembership
+import com.umcspot.spot.mypage.editInterestStudy.navigation.interestStudyGraph
+import com.umcspot.spot.mypage.editInterestStudy.navigation.navigateToEditInterestStudy
+import com.umcspot.spot.mypage.main.navigation.MyPage
 import com.umcspot.spot.mypage.main.navigation.mypageGraph
 import com.umcspot.spot.mypage.participating.navigation.navigateToParticipatingStudy
 import com.umcspot.spot.mypage.participating.navigation.participatingGraph
@@ -30,6 +35,7 @@ import com.umcspot.spot.mypage.recruiting.navigation.myRecruitingStudyGraph
 import com.umcspot.spot.mypage.recruiting.navigation.navigateToMyRecruitingStudy
 import com.umcspot.spot.mypage.waiting.navigation.navigateToWaitingStudy
 import com.umcspot.spot.mypage.waiting.navigation.waitingStudyGraph
+import com.umcspot.spot.signup.navigation.navigateToLanding
 import com.umcspot.spot.signup.navigation.signupGraph
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.detail.navigation.studyDetailGraph
@@ -51,7 +57,7 @@ fun MainNavHost(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
-    onBackRequest : () -> Unit
+    onBackRequest : () -> Unit,
 ) {
     val clearStackNavOptions = navOptions {
         popUpTo(0) { inclusive = true }
@@ -113,13 +119,22 @@ fun MainNavHost(
             onItemClick = { navigator.navigateToStudyDetail(it) }
         )
 
+
+        /** MyPage **/
         mypageGraph(
             contentPadding = contentPadding,
             onParticipatingClick = { navigator.navController.navigateToParticipatingStudy() },
             onMyRecruitingClick = { navigator.navController.navigateToMyRecruitingStudy() },
             onMyAppliedClick = { navigator.navController.navigateToWaitingStudy() },
-            onEditInterestClick = { /*navigator.navigateToCheckList*/ },
-            onEditInterestLocationClick =  {  }
+            onEditInterestClick = { navigator.navController.navigateToEditInterestStudy() },
+            onEditInterestLocationClick =  {  },
+            onCancelMemberShipClick = { navigator.navController.navigateToCancelMembership() },
+            onLogoutClick = {
+                // 1) 로그아웃 처리(데이터 삭제) 트리거
+
+                // 2) Landing으로 이동하면서 스택 클리어
+                navigator.navController.navigateToLanding(clearStackNavOptions)
+            }
         )
 
         participatingGraph(
@@ -143,6 +158,32 @@ fun MainNavHost(
             onStudyClick = { navigator.navigateToStudyDetail(it) },
             moveToRecruitingStudy = { navigator.navigateToRecruitingStudy() },
         )
+
+        interestStudyGraph(
+            contentPadding = contentPadding,
+            moveToMyInterestStudy = { navigator.navController.navigateToPreferCategoryStudy(
+                navOptions {
+                    popUpTo<MyPage> { inclusive = false }
+                    launchSingleTop = true
+                    restoreState = false
+                }
+            ) },
+            moveToMyPage = { navigator.navController.popBackStack() }
+        )
+
+        cancelMemberShipGraph(
+            contentPadding = contentPadding,
+            successCancelMemberShip = { navigator.navController.navigateToLanding(clearStackNavOptions) },
+            moveToParticipatingStudy = { navigator.navController.navigateToParticipatingStudy(
+                navOptions {
+                    popUpTo<MyPage> { inclusive = false }
+                    launchSingleTop = true
+                    restoreState = false
+                }
+            ) }
+        )
+        /************/
+
 
         recruitingStudyGraph(
             contentPadding = contentPadding,

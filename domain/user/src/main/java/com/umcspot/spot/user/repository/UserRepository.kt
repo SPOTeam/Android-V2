@@ -17,4 +17,6 @@ interface UserRepository {
 
     suspend fun getMyPageInfo() : Result<MyPageResult>
     suspend fun getUserPreferredCategory() : Result<UserPreferredCategoryResult>
+
+    suspend fun leaveSpot() : Result<String>
 }

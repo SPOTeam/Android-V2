@@ -63,8 +63,8 @@ enum class StudyTheme(
     OTHER("기타");
 
     companion object {
-        fun from(value: String): StudyTheme? =
-            values().firstOrNull { it.name == value }
+        fun from(value: String): StudyTheme =
+            StudyTheme.entries.first { it.name == value }
     }
 }
 

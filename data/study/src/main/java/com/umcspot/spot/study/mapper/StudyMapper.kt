@@ -29,6 +29,7 @@ fun Study.toDomain() : StudyResult =
         likeCount = this.likeCount,
         isLiked = this.isLiked,
         isOwner = this.isOwner,
+        isAlone = this.isAlone,
         hitCount = this.hitCount,
         profileImageUrl = this.profileImageUrl.toImageRef()
     )

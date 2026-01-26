@@ -3,7 +3,6 @@ package com.umcspot.spot.user.repositoryimpl
 import android.content.Context
 import android.util.Log
 import com.umcspot.spot.common.location.LocationStore
-import com.umcspot.spot.common.location.mapRegionCodesToFullNames
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.user.datasource.UserDataSource
 import com.umcspot.spot.user.mapper.toDomain
@@ -18,7 +17,7 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val userDataSource: UserDataSource,
-    @ApplicationContext private val appContext: Context, // @ApplicationContext 로 주입 추천
+    @ApplicationContext private val appContext: Context,
 ) : UserRepository {
     override suspend fun getUserName(): Result<UserResult> =
         runCatching {
@@ -86,5 +85,12 @@ class UserRepositoryImpl @Inject constructor(
             userDataSource.getUserPreferredCategory().result.toDomain()
         }.onFailure {
             Log.e("UserRepository", "getUserPreferredCategory failed", it)
+        }
+
+    override suspend fun leaveSpot() : Result<String> =
+        runCatching {
+            userDataSource.leaveSpot().code
+        }.onFailure {
+            Log.e("UserRepository", "leaveSpot failed", it)
         }
 }

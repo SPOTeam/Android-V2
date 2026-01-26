@@ -10,6 +10,7 @@ import com.umcspot.spot.user.dto.response.UserPreferredCategoryResponseDto
 import com.umcspot.spot.user.dto.response.UserPreferredRegionResponseDto
 import com.umcspot.spot.user.dto.response.UserResponseDto
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 
@@ -44,4 +45,8 @@ interface UserService {
     @GET("/api/members/prefer-categories")
     suspend fun getUserPreferredCategory(
     ): BaseResponse<UserPreferredCategoryResponseDto>
+
+    @DELETE("/api/members/me")
+    suspend fun leaveSpot(
+    ): NullResultResponse
 }

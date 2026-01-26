@@ -137,7 +137,8 @@ fun ParticipatingScreen(
                 onStudyClick = onStudyClick,
                 onEditClick = {},
                 onReportClick = {},
-                onLeaveClick = {}
+                onLeaveClick = {},
+                onDeleteClick = {}
             )
         }
     }
@@ -151,7 +152,8 @@ fun ParticipatingStudyScreenContent(
     onStudyClick: (Long) -> Unit,
     onEditClick: (Long) -> Unit,
     onReportClick: (Long) -> Unit,
-    onLeaveClick: (Long) -> Unit
+    onLeaveClick: (Long) -> Unit,
+    onDeleteClick: (Long) -> Unit
 ) {
     var expandedForId by remember { mutableStateOf<Long?>(null) }
 
@@ -193,11 +195,13 @@ fun ParticipatingStudyScreenContent(
 
                             MeetballMenu(
                                 isOwner = item.isOwner ,
+                                isAlone = item.isAlone,
                                 expanded = expandedForId == item.id,
                                 onDismiss = { expandedForId = null },
                                 onEdit = { expandedForId = null; onEditClick(item.id) },
                                 onReport = { expandedForId = null; onReportClick(item.id) },
                                 onLeave = { expandedForId = null; onLeaveClick(item.id) },
+                                onDelete = { expandedForId = null; onDeleteClick(item.id) }
                             )
                         }
                     }
@@ -221,11 +225,13 @@ fun ParticipatingStudyScreenContent(
 @Composable
 fun MeetballMenu(
     isOwner: Boolean,
+    isAlone: Boolean,
     expanded: Boolean,
     onDismiss: () -> Unit,
     onEdit: () -> Unit,
     onReport: () -> Unit,
-    onLeave: () -> Unit
+    onLeave: () -> Unit,
+    onDelete:() -> Unit
 ) {
     DropdownMenu(
         modifier = Modifier
@@ -251,47 +257,56 @@ fun MeetballMenu(
                     onEdit()
                 }
             )
-            HorizontalDivider(
-                modifier = Modifier.fillMaxWidth(),
-                thickness = 1.dp,
-                color = SpotTheme.colors.gray200
+        }
+
+        if(!isAlone) {
+            if(isOwner) {
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    thickness = 1.dp,
+                    color = SpotTheme.colors.gray200
+                )
+            }
+
+            DropdownMenuItem(
+                modifier = Modifier
+                    .height(screenHeightDp(30.dp))
+                    .wrapContentWidth(),
+                text = {
+                    Text(
+                        text = "스터디원 신고",
+                        style = SpotTheme.typography.regular_500,
+                        color = SpotTheme.colors.black
+                    )
+                },
+                onClick = {
+                    onDismiss()
+                    onReport()
+                }
             )
         }
-        DropdownMenuItem(
-            modifier = Modifier
-                .height(screenHeightDp(30.dp))
-                .wrapContentWidth(),
-            text = {
-                Text(
-                    text = "스터디원 신고",
-                    style = SpotTheme.typography.regular_500,
-                    color = SpotTheme.colors.black
-                )
-            },
-            onClick = {
-                onDismiss()
-                onReport()
-            }
-        )
+
         HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
             thickness = 1.dp,
             color = SpotTheme.colors.gray200
         )
+
         DropdownMenuItem(
             modifier = Modifier
                 .height(screenHeightDp(30.dp))
                 .wrapContentWidth(),
             text = {
                 Text(
-                    text = "스터디 나가기",
+                    text = if(isAlone) "스터디 삭제하기" else "스터디 나가기",
                     style = SpotTheme.typography.regular_500,
                     color = SpotTheme.colors.R500
                 )
             },
             onClick = {
                 onDismiss()
-                onLeave()
+                if(isAlone) onDelete()
+                else onLeave()
             }
         )
     }

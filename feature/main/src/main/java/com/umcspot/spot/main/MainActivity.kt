@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SpotTheme {
-                MainScreen()
+                MainScreen( )
             }
         }
     }
