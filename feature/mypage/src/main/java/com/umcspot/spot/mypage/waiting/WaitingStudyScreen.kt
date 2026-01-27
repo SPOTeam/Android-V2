@@ -109,8 +109,8 @@ fun WaitingStudyScreen(
                 contentAlignment = Alignment.Center
             ) {
                 EmptyAlertWithButton(
-                    alertTitle = "신청한 스터디가 아직 없어요!",
-                    alertDes = "스터디 파트너들과 함께 목표를 이뤄보세요!",
+                    alertTitle = "대기 중인 스터디가 아직 없어요.",
+                    alertDes = "스팟에서 내 목표를 이뤄봐요",
                     buttonText = "스터디 둘러보기",
                     painter = painterResource(R.drawable.study_default),
                     onClick = { moveToRecruitingStudy() },
