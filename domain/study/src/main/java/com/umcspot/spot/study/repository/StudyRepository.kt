@@ -4,6 +4,8 @@ import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.model.StudyTheme
+import com.umcspot.spot.study.model.StudyApplicationResult
+import com.umcspot.spot.study.model.StudyApplicationResultList
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyResultList
 import java.io.File
@@ -70,4 +72,13 @@ interface StudyRepository {
         cursor: Long?,
         size: Int,
     ): Result<StudyResultList>
+
+    suspend fun getStudyApplications(
+        studyId: Long
+    ) : Result<StudyApplicationResultList>
+
+    suspend fun entryAcceptance(
+        applicationId: Long,
+        decision: String
+    ) : Result<Unit>
 }

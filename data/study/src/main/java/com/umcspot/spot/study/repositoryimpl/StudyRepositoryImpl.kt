@@ -8,6 +8,7 @@ import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.study.datasource.StudyDataSource
 import com.umcspot.spot.study.mapper.toData
 import com.umcspot.spot.study.mapper.toDomainList
+import com.umcspot.spot.study.model.StudyApplicationResultList
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.study.repository.StudyRepository
@@ -197,5 +198,21 @@ class StudyRepositoryImpl @Inject constructor(
             response.result.toDomainList()
         }.onFailure { e ->
             Log.e("StudyRepository", "getRecruitingStudy failed", e)
+        }
+
+    override suspend fun getStudyApplications(studyId: Long): Result<StudyApplicationResultList> =
+        runCatching {
+            val response = studyDataSource.getStudyApplications(studyId)
+            response.result.toDomainList()
+        }.onFailure {
+            Log.e("StudyRepository", "getStudyApplicationMembers failed", it)
+        }
+
+    override suspend fun entryAcceptance(
+        applicationId: Long,
+        decision: String
+    ): Result<Unit> =
+        runCatching {
+            studyDataSource.entryAcceptance(applicationId, decision)
         }
 }

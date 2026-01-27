@@ -5,8 +5,11 @@ import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
+import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
+import com.umcspot.spot.study.dto.response.StudyApplication
+import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import java.io.File
 
@@ -55,4 +58,13 @@ interface StudyDataSource {
         cursor: Long?,
         size: Int
     ): BaseResponse<StudyResponseDto>
+
+    suspend fun getStudyApplications(
+        studyId: Long
+    ): BaseResponse<StudyApplicationResponseDto>
+
+    suspend fun entryAcceptance(
+        applicationId : Long,
+        decision : String
+    ) : NullResultResponse
 }

@@ -27,6 +27,7 @@ import com.umcspot.spot.mypage.editInterestStudy.navigation.EditInterest
 import com.umcspot.spot.mypage.main.navigation.MyPage
 import com.umcspot.spot.mypage.main.navigation.navigateToMyPage
 import com.umcspot.spot.mypage.participating.navigation.ParticipatingStudy
+import com.umcspot.spot.mypage.recruiting.application.navigation.STUDY_APPLICATION_ROUTE
 import com.umcspot.spot.mypage.recruiting.navigation.MyRecruitingStudy
 import com.umcspot.spot.mypage.waiting.navigation.WaitingStudy
 import com.umcspot.spot.signup.navigation.CheckList
@@ -106,11 +107,12 @@ class MainNavigator(
     fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, RecruitingFilter::class, PreferLocationFilter::class, PreferCategoryFilter::class,
         SignUp::class, CheckList::class, Posting::class, BoardList::class, JJim::class, MyPage::class,
         ParticipatingStudy::class, MyRecruitingStudy::class, WaitingStudy::class, EditInterest::class, CancelMemberShip::class
-    ) || inAnyGraphRoutes(POST_CONTENT_ROUTE)
+    ) || inAnyGraphRoutes(POST_CONTENT_ROUTE) || inAnyGraphRoutes(STUDY_APPLICATION_ROUTE)
 
     @Composable
     fun showToTopFab(): Boolean = inAnyGraph(Alert::class, Recruiting::class,
-        PreferLocation::class, PreferCategory::class, BoardList::class, JJim::class, ParticipatingStudy::class, MyRecruitingStudy::class, WaitingStudy::class)
+        PreferLocation::class, PreferCategory::class, BoardList::class, JJim::class, ParticipatingStudy::class, MyRecruitingStudy::class, WaitingStudy::class
+    ) || inAnyGraphRoutes(STUDY_APPLICATION_ROUTE)
 
     @Composable
     fun showMultipleFab(): Boolean = inAnyGraph(Home::class, BoardList::class)
