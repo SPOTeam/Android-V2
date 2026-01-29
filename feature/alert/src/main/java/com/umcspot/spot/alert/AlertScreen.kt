@@ -1,20 +1,32 @@
 package com.umcspot.spot.alert
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.alert.model.AlertInfo
@@ -23,11 +35,9 @@ import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.SpotSpinner
 import com.umcspot.spot.designsystem.component.button.BlankButton
 import com.umcspot.spot.designsystem.component.empty.EmptyAlert
-import com.umcspot.spot.designsystem.shapes.ShapeBox
 import com.umcspot.spot.designsystem.shapes.ShapeImageBox
+import com.umcspot.spot.designsystem.shapes.ShapeImageWithBadge
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.B400
-import com.umcspot.spot.designsystem.theme.Black
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
@@ -70,7 +80,12 @@ fun AlertScreen(
                 AlertScreenContent(
                     state = alertsState.data,
                     listState = listState,
-                    onClickAlert = onClickAlert
+                    onClickAlert = {
+                        if(it.referenceType == "STUDY") {
+                            viewModel.readAlert(it.notificationId)
+                            onClickAlert(it.referenceId)
+                        }
+                    }
                 )
             }
 
@@ -104,9 +119,9 @@ fun AlertScreen(
 fun AlertScreenContent(
     state: AlertResult,
     listState: LazyListState,
-    onClickAlert: (Long) -> Unit,
+    onClickAlert: (AlertInfo) -> Unit,
 ) {
-    val alerts: List<AlertInfo> = state.studies
+    val alerts: List<AlertInfo> = state.notifications
 
     LazyColumn(
         state = listState,
@@ -114,7 +129,7 @@ fun AlertScreenContent(
     ) {
         items(
             items = alerts,
-            key = { it.applicationId }
+            key = { it.notificationId }
         ) { item ->
             Spacer(modifier = Modifier.height(screenHeightDp(4.dp)))
 
@@ -125,9 +140,9 @@ fun AlertScreenContent(
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = screenWidthDp(17.dp)),
+                    .padding(horizontal = screenWidthDp(10.dp)),
                 color = SpotTheme.colors.G300,
-                thickness = 1.dp
+                thickness = 0.5.dp
             )
         }
 
@@ -139,22 +154,24 @@ fun AlertScreenContent(
 @Composable
 fun AlertRow(
     data: AlertInfo,
-    onClick: (Long) -> Unit
+    onClick: (AlertInfo) -> Unit
 ) {
     BlankButton(
         modifier = Modifier
             .width(screenWidthDp(326.dp))
             .height(screenHeightDp(65.dp)),
-        onClick = { onClick(data.studyId) },
+        onClick = { onClick(data) },
+        shape = SpotShapes.Hard
     ) {
         Row(
             modifier = Modifier.padding(screenWidthDp(13.dp)),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ShapeImageBox(
-                imageRef = data.studyImageRes,
+            ShapeImageWithBadge(
+                imageRef = data.imageUrl,
                 shape = SpotShapes.Soft,
-                modifier = Modifier.size(screenWidthDp(33.dp)),
+                modifier = Modifier.size(screenWidthDp(36.dp)),
+                badgeSize = 10.dp,
                 backgroundColor = SpotTheme.colors.white,
             )
 
@@ -168,7 +185,7 @@ fun AlertRow(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "게시판에서 가입 인사를 나눠보세요!",
+                    text = data.body,
                     style = SpotTheme.typography.regular_400,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

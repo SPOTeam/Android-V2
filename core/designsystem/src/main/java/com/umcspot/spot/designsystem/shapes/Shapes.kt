@@ -84,6 +84,7 @@ fun ShapeImageWithBadge(
     borderColor: Color? = Color.Transparent,
     contentScale: ContentScale = ContentScale.Fit,
     badgeSize: Dp = 16.dp,
+    backgroundColor: Color = SpotTheme.colors.white
 ) {
     Box(
         modifier = modifier.size(screenWidthDp(size)),
@@ -96,7 +97,8 @@ fun ShapeImageWithBadge(
             borderWidth = borderWidth,
             padding = padding,
             borderColor = borderColor,
-            contentScale = contentScale
+            contentScale = contentScale,
+            backgroundColor = backgroundColor
         )
 
         Icon(

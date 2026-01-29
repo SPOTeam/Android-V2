@@ -4,12 +4,18 @@ import com.umcspot.spot.model.ImageRef
 
 /******** 일반 알람 ********/
 data class AlertResult (
-    val studies : List<AlertInfo>
+    val notifications : List<AlertInfo>,
+    val totalCount : Int
 )
 
 data class AlertInfo(
-    val applicationId: Long,
-    val studyId: Long,
+    val notificationId: Long,
+    val type: String,
     val title: String,
-    val studyImageRes: ImageRef,
+    val body: String,
+    val imageUrl: ImageRef,
+    val referenceType: String,
+    val referenceId: Long,
+    val isRead: Boolean,
+    val createdAt: String,
 )
