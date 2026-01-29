@@ -4,6 +4,10 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
+import com.umcspot.spot.datastore.token.SpotSecureDataStoreSerializer
+import com.umcspot.spot.datastore.token.SpotTokenData
+import com.umcspot.spot.datastore.userId.SpotUserIdData
+import com.umcspot.spot.datastore.userId.SpotUserIdDataStoreSerializer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,6 +28,18 @@ object DataStoreModule {
         return DataStoreFactory.create(
             serializer = serializer,
             produceFile = { context.dataStoreFile("spot_tokens.secure") }
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideSpotUserIdDataStore(
+        @ApplicationContext context: Context,
+        serializer: SpotUserIdDataStoreSerializer
+    ): DataStore<SpotUserIdData> {
+        return DataStoreFactory.create(
+            serializer = serializer,
+            produceFile = { context.dataStoreFile("spot_userId.secure") }
         )
     }
 }

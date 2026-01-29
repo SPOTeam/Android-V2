@@ -1,7 +1,8 @@
 package com.umcspot.spot.login.repositoryimpl
 
 import androidx.datastore.core.DataStore
-import com.umcspot.spot.datastore.SpotTokenData
+import com.umcspot.spot.datastore.token.SpotTokenData
+import com.umcspot.spot.datastore.userId.SpotUserIdData
 import com.umcspot.spot.login.mapper.toDomain
 import com.umcspot.spot.login.service.LoginService
 import com.umcspot.spot.model.SocialLoginType
@@ -11,7 +12,8 @@ import javax.inject.Inject
 
 class LoginRepositoryImpl @Inject constructor(
     private val studyService: LoginService,
-    private val spotTokenDataStore: DataStore<SpotTokenData>
+    private val spotTokenDataStore: DataStore<SpotTokenData>,
+    private val spotUserIdDataStore: DataStore<SpotUserIdData>
 ) : TokenRepository {
 
     override suspend fun finishSocialLogin(
@@ -26,6 +28,12 @@ class LoginRepositoryImpl @Inject constructor(
                 current.copy(
                     accessToken = tokenResult.accessToken,
                     refreshToken = tokenResult.refreshToken
+                )
+            }
+
+            spotUserIdDataStore.updateData { current ->
+                current.copy(
+                    userId = tokenResult.userId
                 )
             }
 
