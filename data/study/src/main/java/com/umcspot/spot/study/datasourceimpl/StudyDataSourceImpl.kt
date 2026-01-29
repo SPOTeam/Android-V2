@@ -5,9 +5,11 @@ import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
+import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.study.datasource.StudyDataSource
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
+import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.service.StudyService
 import com.umcspot.spot.ui.extension.toMultipartBodyPart
@@ -107,4 +109,13 @@ class StudyDataSourceImpl @Inject constructor(
             cursor = cursor,
             size = size
         )
+
+    override suspend fun getStudyApplications(studyId: Long): BaseResponse<StudyApplicationResponseDto> =
+        studyService.getStudyApplications(studyId)
+
+    override suspend fun entryAcceptance(
+        applicationId: Long,
+        decision: String
+    ): NullResultResponse =
+        studyService.entryAcceptance(applicationId,decision)
 }

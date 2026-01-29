@@ -3,7 +3,11 @@ package com.umcspot.spot.study.mapper
 import com.umcspot.spot.model.toImageRef
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.response.Study
+import com.umcspot.spot.study.dto.response.StudyApplication
+import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
+import com.umcspot.spot.study.model.StudyApplicationResult
+import com.umcspot.spot.study.model.StudyApplicationResultList
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyResult
 import com.umcspot.spot.study.model.StudyResultList
@@ -39,4 +43,16 @@ fun StudyResponseDto.toDomainList(): StudyResultList =
         studyList = this.content.map(Study::toDomain),
         hasNext = this.hasNext,
         nextCursor = this.nextCursor?.toLong()
+    )
+
+fun StudyApplicationResponseDto.toDomainList(): StudyApplicationResultList =
+    StudyApplicationResultList(applies = this.applies.map {it.toDomain()})
+
+fun StudyApplication.toDomain() : StudyApplicationResult =
+    StudyApplicationResult(
+        applicantId = this.applicantId.toLong(),
+        memberId = this.memberId.toLong(),
+        nickname = this.nickname,
+        description = this.description,
+        profileImageUrl = this.profileImageUrl.toImageRef()
     )

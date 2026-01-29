@@ -40,6 +40,7 @@ import com.umcspot.spot.mypage.cancelMemberShip.navigation.CancelMemberShip
 import com.umcspot.spot.mypage.editInterestStudy.navigation.EditInterest
 import com.umcspot.spot.mypage.main.navigation.MyPage
 import com.umcspot.spot.mypage.participating.navigation.ParticipatingStudy
+import com.umcspot.spot.mypage.recruiting.application.navigation.STUDY_APPLICATION_ROUTE
 import com.umcspot.spot.mypage.recruiting.navigation.MyRecruitingStudy
 import com.umcspot.spot.mypage.waiting.navigation.WaitingStudy
 import com.umcspot.spot.signup.navigation.CheckList
@@ -87,6 +88,7 @@ fun MainScreen(
                         dest?.hasRoute(EditInterest::class) == true -> "관심 분야"
                         dest?.hasRoute(CancelMemberShip::class) == true -> "회원 탈퇴"
                         dest?.routeMatches(POST_CONTENT_ROUTE) == true -> "스터디 파트너들의 이야기"
+                        dest?.routeMatches(STUDY_APPLICATION_ROUTE) == true -> "신청 확인"
                         else -> ""
                     }
                     BackTopBar(

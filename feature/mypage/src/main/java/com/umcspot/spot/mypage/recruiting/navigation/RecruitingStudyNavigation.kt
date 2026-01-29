@@ -18,7 +18,7 @@ fun NavGraphBuilder.myRecruitingStudyGraph(
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
     onStudyClick : (Long) -> Unit,
     moveToMakeStudy :() -> Unit,
-    moveToCheckApplied: () -> Unit
+    moveToCheckApplied: (Long) -> Unit
 ) {
     composable<MyRecruitingStudy> {
         RecruitingStudyScreen(

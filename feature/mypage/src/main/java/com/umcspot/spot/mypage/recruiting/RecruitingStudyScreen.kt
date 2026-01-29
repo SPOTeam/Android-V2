@@ -48,7 +48,7 @@ fun RecruitingStudyScreen(
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
     onStudyClick : (Long) -> Unit,
     moveToMakeStudy : () -> Unit,
-    moveToCheckApplied: () -> Unit,
+    moveToCheckApplied: (Long) -> Unit,
     viewmodel : RecruitingStudyViewModel = hiltViewModel()
 ) {
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
@@ -139,7 +139,7 @@ fun RecruitingStudyScreenContent(
     studyList: List<StudyResult>,
     listState: LazyListState,
     onStudyClick: (Long) -> Unit,
-    moveToCheckApplied: () -> Unit
+    moveToCheckApplied: (Long) -> Unit
 ) {
     LazyColumn(
         state = listState,
@@ -166,7 +166,7 @@ fun RecruitingStudyScreenContent(
                                 .height(screenHeightDp(26.dp)),
                             text = "신청 확인",
                             style = SpotTheme.typography.regular_500,
-                            onClick = moveToCheckApplied,
+                            onClick = {moveToCheckApplied(item.id)},
                             state = TextButtonState.B500State,
                             shape = SpotShapes.Hard
                         )

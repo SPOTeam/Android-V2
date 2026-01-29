@@ -5,13 +5,16 @@ import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
+import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
+import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import okhttp3.MultipartBody
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface StudyService {
@@ -83,4 +86,15 @@ interface StudyService {
         @Query("cursor") cursor: Long?,
         @Query("size") size: Int
     ): BaseResponse<StudyResponseDto>
+
+    @GET("/api/studies/{studyId}/applications")
+    suspend fun getStudyApplications(
+        @Path("studyId") studyId: Long
+    ): BaseResponse<StudyApplicationResponseDto>
+
+    @POST("/api/studies/applications/{applicationId}")
+    suspend fun entryAcceptance(
+        @Path("applicationId") applicationId: Long,
+        @Query("decision") decision: String
+    ): NullResultResponse
 }

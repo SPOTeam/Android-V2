@@ -1,6 +1,5 @@
 package com.umcspot.spot.main
 
-import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,6 +30,8 @@ import com.umcspot.spot.mypage.main.navigation.MyPage
 import com.umcspot.spot.mypage.main.navigation.mypageGraph
 import com.umcspot.spot.mypage.participating.navigation.navigateToParticipatingStudy
 import com.umcspot.spot.mypage.participating.navigation.participatingGraph
+import com.umcspot.spot.mypage.recruiting.application.navigation.navigateToStudyApplications
+import com.umcspot.spot.mypage.recruiting.application.navigation.recruitingStudyApplicationsGraph
 import com.umcspot.spot.mypage.recruiting.navigation.myRecruitingStudyGraph
 import com.umcspot.spot.mypage.recruiting.navigation.navigateToMyRecruitingStudy
 import com.umcspot.spot.mypage.waiting.navigation.navigateToWaitingStudy
@@ -149,7 +150,12 @@ fun MainNavHost(
             onRegisterScrollToTop = onRegisterScrollToTop,
             onStudyClick = { navigator.navigateToStudyDetail(it) },
             moveToMakeStudy = {  },
-            moveToCheckApplied = { }
+            moveToCheckApplied = { navigator.navController.navigateToStudyApplications(it) }
+        )
+
+        recruitingStudyApplicationsGraph(
+            contentPadding = contentPadding,
+            onRegisterScrollToTop = onRegisterScrollToTop,
         )
 
         waitingStudyGraph(
@@ -246,10 +252,7 @@ fun MainNavHost(
 
         postContentGraph(
             contentPadding = contentPadding,
-            onDeleteClick = {
-                val popped = navigator.navController.popBackStack()
-                Log.d("NAV", "popBackStack popped=$popped")
-            },
+            onDeleteClick = { navigator.navController.popBackStack() },
             onEditClick = { navigator.navController.navigateToPostingEdit(it) }
         )
 
