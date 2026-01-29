@@ -13,15 +13,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,7 +41,6 @@ import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.component.empty.EmptyAlert
 import com.umcspot.spot.designsystem.component.modal.AcceptDialog
 import com.umcspot.spot.designsystem.component.modal.RejectDialog
-import com.umcspot.spot.designsystem.component.modal.RejectModal
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.G500
@@ -123,7 +119,7 @@ fun RecruitingStudyRequestScreen(
                 applicationList = itemList,
                 listState = listState,
                 onAcceptClick = {
-                    selectedApplicationId = it
+                    viewmodel.accept(it)
                     showAcceptDialog = true
                 },
                 onRejectClick = {
@@ -145,7 +141,7 @@ fun RecruitingStudyRequestScreen(
                 },
                 onClick = {
                     showRejectDialog = false
-                    viewmodel.reject(selectedApplicationId!!)
+                    selectedApplicationId?.let { viewmodel.reject(it) }
                 },
                 onCancel = {
                     showRejectDialog = false
@@ -165,7 +161,6 @@ fun RecruitingStudyRequestScreen(
                 },
                 onClick = {
                     showAcceptDialog = false
-                    viewmodel.accept(selectedApplicationId!!)
                 }
             )
         }
