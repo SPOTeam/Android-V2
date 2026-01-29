@@ -25,12 +25,12 @@ class RecruitingStudyApplicationViewModel @Inject constructor(
         _uiState.update { it.copy(applications = UiState.Loading) }
 
         viewModelScope.launch {
+            currentStudyId = studyId
             studyRepository.getStudyApplications(
                 studyId = studyId
             )
             .onSuccess { info ->
                 _uiState.update {
-                    currentStudyId = studyId
                     it.copy(
                         applications = if (info.applies.isEmpty()) {
                             UiState.Empty
@@ -42,7 +42,6 @@ class RecruitingStudyApplicationViewModel @Inject constructor(
             }
             .onFailure { e ->
                 Log.e("RecruitingStudyApplicationViewModel", "loadStudyApplicationsError", e)
-//                    _uiState.update { it.copy(weatherInfo = UiState.Failure(e.message ?: "날씨 불러오기 실패")) }
             }
         }
     }
