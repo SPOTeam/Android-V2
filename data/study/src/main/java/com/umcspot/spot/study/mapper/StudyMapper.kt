@@ -64,9 +64,6 @@ fun StudyResponseDto.toDomainList(): StudyResultList =
         nextCursor = this.nextCursor?.toLong()
     )
 
-fun StudyResponseDto.toDomain(): StudyResultList = StudyResultList(
-    studyList = this.studyList.map { it.toDomain() }
-)
 
 fun MemberDto.toDomain(): StudyMemberModel = StudyMemberModel(
     id = this.memberId.toLong(),
