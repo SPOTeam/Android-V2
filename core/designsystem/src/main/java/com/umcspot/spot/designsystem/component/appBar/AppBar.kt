@@ -31,13 +31,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.G400
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.designsystem.theme.White
+import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 
 
@@ -120,7 +120,7 @@ fun BackTopBar(
         modifier = modifier
             .fillMaxWidth()
             .background(SpotTheme.colors.white)
-            .padding(start = 5.dp, top = 16.dp, bottom = 16.dp),
+            .padding(start = screenWidthDp(5.dp), top = screenHeightDp(16.dp), bottom = screenHeightDp(16.dp)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
