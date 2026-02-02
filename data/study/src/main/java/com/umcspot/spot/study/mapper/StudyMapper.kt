@@ -1,12 +1,15 @@
 package com.umcspot.spot.study.mapper
 
 import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
+import com.umcspot.spot.model.toImageRef
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.response.MemberDto
 import com.umcspot.spot.study.dto.response.MemoirDto
 import com.umcspot.spot.study.dto.response.ScheduleResponseDto
 import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
-import com.umcspot.spot.study.dto.response.Study as DTOStudy
+import com.umcspot.spot.study.dto.response.Study
+import com.umcspot.spot.study.dto.response.StudyApplication
+import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
 import com.umcspot.spot.study.dto.response.TodoItemDto
@@ -15,6 +18,8 @@ import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.MemoirModel
 import com.umcspot.spot.study.model.MemoirReactionCounts
 import com.umcspot.spot.study.model.MemoirReactionStatus
+import com.umcspot.spot.study.model.StudyApplicationResult
+import com.umcspot.spot.study.model.StudyApplicationResultList
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyDetailModel
 import com.umcspot.spot.study.model.StudyMemberModel
@@ -37,16 +42,27 @@ fun StudyCreateModel.toData(): StudyRequestDto = StudyRequestDto(
     regionCodes = this.regionCodes
 )
 
-fun DTOStudy.toDomain(): StudyResult = StudyResult(
-    studyId = this.studyId,
-    title = this.title,
-    goal = this.goal,
-    maxMember = this.maxMember,
-    member = this.member,
-    likes = this.likes,
-    views = this.views,
-    studyImage = this.studyImage
-)
+fun Study.toDomain() : StudyResult =
+    StudyResult (
+        id = this.id.toLong(),
+        name = this.name,
+        description = this.description,
+        maxMembers = this.maxMembers,
+        currentMembers = this.currentMembers,
+        likeCount = this.likeCount,
+        isLiked = this.isLiked,
+        isOwner = this.isOwner,
+        isAlone = this.isAlone,
+        hitCount = this.hitCount,
+        profileImageUrl = this.profileImageUrl.toImageRef()
+    )
+
+fun StudyResponseDto.toDomainList(): StudyResultList =
+    StudyResultList(
+        studyList = this.content.map(Study::toDomain),
+        hasNext = this.hasNext,
+        nextCursor = this.nextCursor?.toLong()
+    )
 
 fun StudyResponseDto.toDomain(): StudyResultList = StudyResultList(
     studyList = this.studyList.map { it.toDomain() }
@@ -134,3 +150,14 @@ fun MemoirCreateModel.toData(): MemoirCreateRequestDto = MemoirCreateRequestDto(
     encouragement = this.encouragement,
     isPrivate = this.isPrivate
 )
+fun StudyApplicationResponseDto.toDomainList(): StudyApplicationResultList =
+    StudyApplicationResultList(applies = this.applies.map {it.toDomain()})
+
+fun StudyApplication.toDomain() : StudyApplicationResult =
+    StudyApplicationResult(
+        applicantId = this.applicantId.toLong(),
+        memberId = this.memberId.toLong(),
+        nickname = this.nickname,
+        description = this.description,
+        profileImageUrl = this.profileImageUrl.toImageRef()
+    )

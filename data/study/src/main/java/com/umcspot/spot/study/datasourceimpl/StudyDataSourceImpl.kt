@@ -1,10 +1,11 @@
 package com.umcspot.spot.study.datasourceimpl
 
-import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.FeeRange
+import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
+import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.study.datasource.StudyDataSource
 import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.study.dto.request.StudyRequestDto
@@ -15,6 +16,7 @@ import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
 import com.umcspot.spot.study.dto.response.StudyMonthlyScheduleResponseDto
+import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.dto.response.StudyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
@@ -29,21 +31,42 @@ import javax.inject.Inject
 class StudyDataSourceImpl @Inject constructor(
     private val studyService: StudyService
 ) : StudyDataSource {
-    override suspend fun getPopularStudies(
-    ): BaseResponse<StudyResponseDto> =
-        studyService.getPopularStudies()
 
-    override suspend fun getRecommendStudies(
+    override suspend fun getRecommendedStudies(
     ): BaseResponse<StudyResponseDto> =
-        studyService.getRecommendStudies()
+        studyService.getRecommendedStudies()
 
     override suspend fun getRecruitingStudies(
-        sortType: RecruitingStudySort,
-        activityType: ActivityType,
-        theme: StudyTheme,
-        feeRange: FeeRange
+        feeCategory: FeeRange?,
+        categories: List<String>?,
+        isOnline: Boolean?,
+        sortBy: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int
     ): BaseResponse<StudyResponseDto> =
-        studyService.getRecruitingStudies(sortType, activityType, theme, feeRange)
+        studyService.getRecruitingStudies(feeCategory, categories, isOnline, sortBy, cursor, size)
+
+    override suspend fun getPreferLocationStudies(
+        recruitingStatus: RecruitingStatus?,
+        feeCategory: FeeRange?,
+        categories: List<String>?,
+        sortType: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int,
+        regionCodes: List<String>?
+    ): BaseResponse<StudyResponseDto> =
+        studyService.getPreferLocationStudies(recruitingStatus, feeCategory, categories, null, sortType, cursor, size, regionCodes)
+
+    override suspend fun getPreferCategoryStudies(
+        category: StudyTheme?,
+        recruitingStatus: RecruitingStatus?,
+        feeCategory: FeeRange?,
+        isOnline : Boolean?,
+        sortType: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int,
+    ): BaseResponse<StudyResponseDto> =
+        studyService.getPreferCategoryStudies(category, recruitingStatus, feeCategory, isOnline, sortType, cursor, size)
 
     override suspend fun createStudy(
         request: StudyRequestDto,
@@ -129,4 +152,51 @@ class StudyDataSourceImpl @Inject constructor(
     override suspend fun deleteReviewReaction(studyId: Long, reviewId: Long, reaction: String): BaseResponse<Unit?> {
         return studyService.deleteReviewReaction(studyId, reviewId, reaction)
     }
+    override suspend fun getCategoryStudies(
+        recruitingStatus: RecruitingStatus?,
+        feeCategory: FeeRange?,
+        category: String?,
+        isOnline: Boolean?,
+        sortBy: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyResponseDto> =
+        studyService.getCategoryStudies(
+            recruitingStatus = recruitingStatus,
+            feeCategory = feeCategory,
+            category = category,
+            isOnline = isOnline,
+            sortBy = sortBy,
+            cursor = cursor,
+            size = size
+        )
+
+    override suspend fun getLikedStudies(
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyResponseDto> =
+        studyService.getLikedStudies(
+            cursor = cursor,
+            size = size
+        )
+
+    override suspend fun getMyPageStudy(
+        statuses: List<String>,
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyResponseDto> =
+        studyService.getMyPageStudy(
+            statuses = statuses,
+            cursor = cursor,
+            size = size
+        )
+
+    override suspend fun getStudyApplications(studyId: Long): BaseResponse<StudyApplicationResponseDto> =
+        studyService.getStudyApplications(studyId)
+
+    override suspend fun entryAcceptance(
+        applicationId: Long,
+        decision: String
+    ): NullResultResponse =
+        studyService.entryAcceptance(applicationId,decision)
 }

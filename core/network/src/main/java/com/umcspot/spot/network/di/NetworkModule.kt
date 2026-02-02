@@ -2,6 +2,7 @@ package com.umcspot.spot.network.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.umcspot.spot.common.BuildConfigFieldProvider
+import com.umcspot.spot.common.WeatherConfigFieldProvider
 import com.umcspot.spot.network.AuthInterceptor
 import dagger.Module
 import dagger.Provides
@@ -26,15 +27,30 @@ object NetworkModule {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
+    // ---------- Spot API ----------
+
     @Provides
     @Singleton
-    fun providesOkHttpClient(
+    @SpotApi
+    fun providesSpotOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
         authInterceptor: AuthInterceptor
     ): OkHttpClient =
         OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .addInterceptor(authInterceptor)
+            .build()
+
+    // ---------- Weather API ----------
+
+    @Provides
+    @Singleton
+    @WeatherApi
+    fun providesWeatherOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor,
+    ): OkHttpClient =
+        OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
             .build()
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -46,14 +62,27 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun providesRetrofit(
-        client: OkHttpClient,
+    @SpotApi
+    fun providesSpotRetrofit(
+        @SpotApi client: OkHttpClient,
         converterFactory: Converter.Factory,
         buildConfigProvider: BuildConfigFieldProvider
     ): Retrofit =
         Retrofit.Builder()
             .baseUrl(buildConfigProvider.get().baseUrl)
             .client(client)
+            .addConverterFactory(converterFactory)
+            .build()
+
+    @Provides @Singleton @WeatherApi
+    fun providesWeatherRetrofit(
+        @WeatherApi weatherClient: OkHttpClient,
+        converterFactory: Converter.Factory,
+        weatherConfigProvider: WeatherConfigFieldProvider
+    ): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(weatherConfigProvider.getWeather().weatherUrl)
+            .client(weatherClient)
             .addConverterFactory(converterFactory)
             .build()
 }

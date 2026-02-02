@@ -1,8 +1,15 @@
 package com.umcspot.spot.model
 
-enum class QuickMenuType { REGION, INTERESTS, RECRUITING, BOARD }
+enum class QuickMenuType (
+    val label : String
+) { 
+    REGION("내 지역"),
+    INTERESTS("내 관심사"),
+    RECRUITING("모집 중"),
+    BOARD("게시판")
+}
 
-enum class WeatherType { HEAVYRAIN, RAIN, SNOW, WIND, COLD, HOT, SUNNY }
+enum class WeatherType { RAIN, SNOW, WIND, COLD, HOT, SUNNY }
 
 enum class SortType { RECENT, RECOMMEND, COMMENT_COUNT }
 
@@ -18,14 +25,10 @@ val PostType.korean: String
     }
 
 enum class RecruitingStudySort(val label: String) {
-    LATEST("최신 순"),
-    VIEW("조회수 높은 순"),
-    LIKE("관심 많은 순")
+    RECENT("최신 순"),
+    HITS("조회수 높은 순"),
+    LIKES("관심 많은 순")
 }
-
-
-enum class AlertKind { POPULAR_POST, STUDY_NOTICE, STUDY_SCHEDULE, TODO_DONE }
-
 enum class ActivityType(
     val label: String
 ) {
@@ -37,12 +40,12 @@ enum class FeeRange(
     val label: String
 ) {
     NONE("없음"),
-    UNDER_10K("1만원 미만"),
-    ABOUT10K("1만원대"),
-    ABOUT20K("2만원대"),
-    ABOUT30K("3만원대"),
-    ABOUT40K("4만원대"),
-    OVER50K("5만원 이상")
+    BELOW_10K("1만원 미만"),
+    FROM_10K_TO_20K("1만원대"),
+    FROM_20K_TO_30K("2만원대"),
+    FROM_30K_TO_40K("3만원대"),
+    FROM_40K_TO_50K("4만원대"),
+    ABOVE_50K("5만원 이상")
 }
 
 enum class StudyTheme(
@@ -57,7 +60,12 @@ enum class StudyTheme(
     PROJECT("프로젝트"),
     COMPETITION("공모전"),
     MAJOR_CAREER("전공 / 진로 학습"),
-    OTHER("기타")
+    OTHER("기타");
+
+    companion object {
+        fun from(value: String): StudyTheme =
+            StudyTheme.entries.first { it.name == value }
+    }
 }
 
 enum class StudyStyle {
@@ -73,9 +81,27 @@ enum class StudyStyle {
     STRUCTURED_AND_PLANNED
 }
 
+enum class RecruitingStatus(
+    val value: String
+) {
+    RECRUITING("모집중"),
+    COMPLETED("모집완료"),
+//    BEFORE("모집전")
+}
+
 enum class SocialLoginType(
     val title: String
 ) {
     KAKAO("kakao"),
-    NAVER("naver"),
+    NAVER("naver");
+
+    companion object {
+        fun from(value: String): SocialLoginType {
+            val normalized = value.lowercase()
+
+            return values().firstOrNull {
+                it.title == normalized
+            } ?: KAKAO
+        }
+    }
 }

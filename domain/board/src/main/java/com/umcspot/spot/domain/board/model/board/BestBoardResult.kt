@@ -31,8 +31,6 @@ data class BestPostResult(
             val label = labels[index% labels.size]
             val title = "Lorem ipsum dolor sit amet consectetur Lorem ipsum dolor sit amet consectetur Lorem ipsum dolor sit amet consectetur"
 
-
-
             return BestPostResult(
                 postId = index.toLong(),
                 postType = label,

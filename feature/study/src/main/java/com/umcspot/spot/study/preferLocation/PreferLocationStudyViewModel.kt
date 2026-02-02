@@ -7,26 +7,23 @@ import androidx.lifecycle.viewModelScope
 import com.umcspot.spot.common.location.LocationRow
 import com.umcspot.spot.common.location.LocationStore
 import com.umcspot.spot.common.location.searchLocations
-import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.FeeRange
+import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.study.repository.StudyRepository
 import com.umcspot.spot.ui.state.UiState
+import com.umcspot.spot.user.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,22 +31,23 @@ import javax.inject.Inject
 @HiltViewModel
 class PreferLocationStudyViewModel @Inject constructor(
     private val studyRepository: StudyRepository,
-    @ApplicationContext private val appContext: Context
+    private val userRepository: UserRepository,
+    @ApplicationContext private val appContext: Context,
 ) : ViewModel() {
 
-    data class PreferLocationStudyUiState(
-        val studies: UiState<StudyResultList> = UiState.Empty
+    data class ScrollPosition(
+        val index: Int = 0,
+        val offset: Int = 0
     )
+
+    data class PreferLocationStudyUiState(
+        val data: UiState<StudyResultList> = UiState.Empty
+    )
+
+    var scrollPosition: ScrollPosition = ScrollPosition()
 
     private val _uiState = MutableStateFlow(PreferLocationStudyUiState())
     val uiState: StateFlow<PreferLocationStudyUiState> = _uiState.asStateFlow()
-
-    private val _sortType = MutableStateFlow(RecruitingStudySort.LATEST)
-    val sortType: StateFlow<RecruitingStudySort> = _sortType.asStateFlow()
-
-    private val _activity = MutableStateFlow<ActivityType?>(null)
-    private val _fee = MutableStateFlow<FeeRange?>(null)
-    private val _theme = MutableStateFlow<StudyTheme?>(null)
 
     /** ---------------- 행정구역 관련 ---------------- */
     private var allLocations: List<LocationRow> = emptyList()
@@ -60,62 +58,173 @@ class PreferLocationStudyViewModel @Inject constructor(
     private val _results = MutableStateFlow<List<LocationRow>>(emptyList())
     val results = _results.asStateFlow()
 
-    private val _selected = MutableStateFlow<List<String>>(emptyList())
-    val selected = _selected.asStateFlow()
+    private val _selectedRegion = MutableStateFlow<List<LocationRow>>(emptyList())
+    val selected = _selectedRegion.asStateFlow()
 
+    /** 탭/페이징 상태 */
+    private var currentRegionCode: String? = null
+    private val _isLoadingMore = MutableStateFlow(false)
+    val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
 
-    /** ---------------- 초기 네트워크 fetch ---------------- */
-    init {
-        combine(_sortType, _activity, _fee, _theme) { s, a, f, t ->
-            Params(s, a, f, t)
-        }
-            .distinctUntilChanged()
-            .debounce(200)
-            .onStart { emit(Params(_sortType.value, _activity.value, _fee.value, _theme.value)) }
-            .collectLatestIn(viewModelScope) { params ->
-                fetch(params)
+    private val _sortType = MutableStateFlow(RecruitingStudySort.RECENT)
+    val sortType: StateFlow<RecruitingStudySort> = _sortType.asStateFlow()
+
+    /** Filter **/
+    private val _recruitingStatus = MutableStateFlow<RecruitingStatus?>(null)
+    val recruitingStatus: StateFlow<RecruitingStatus?> = _recruitingStatus.asStateFlow()
+
+    private val _fee = MutableStateFlow<FeeRange?>(null)
+    val fee: StateFlow<FeeRange?> = _fee.asStateFlow()
+
+    private val _themes = MutableStateFlow<List<StudyTheme>>(emptyList())
+    val themes: StateFlow<List<StudyTheme>> = _themes.asStateFlow()
+
+    val isFiltered: StateFlow<Boolean> =
+        combine(_recruitingStatus, _fee, _themes) { recruitingStatus, fee, themes ->
+            recruitingStatus != null || fee != null || themes.isNotEmpty()
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = false
+        )
+
+    private val _isNullPreferLocation = MutableStateFlow(false)
+    val isNullPreferLocation: StateFlow<Boolean> = _isNullPreferLocation.asStateFlow()
+
+    /** ========== BoardListViewModel의 load() 역할 ========== */
+    fun load(regionCode: String? = null) {
+        currentRegionCode = regionCode
+
+        viewModelScope.launch {
+            runCatching {
+                if (allLocations.isEmpty()) {
+                    allLocations = LocationStore.load(appContext)
+                }
+
+                val preferredCodes = userRepository.getUserPreferredRegion()
+                    .getOrThrow()
+                    .regionCodes
+                    .map { it.trim() }
+                    .filter { it.isNotBlank() }
+
+                val preferredRows = preferredCodes.mapNotNull { code ->
+                    allLocations.find { it.code == code }
+                }
+
+                _selectedRegion.value = preferredRows
+
+                if (preferredCodes.isEmpty()) {
+                    _isNullPreferLocation.value = true
+                    _uiState.update {
+                        it.copy(data = UiState.Empty)
+                    }
+                    return@launch
+                }
+
+                _isNullPreferLocation.value = false
+
+                val regionCodesForRequest =
+                    if (regionCode.isNullOrBlank()) preferredCodes else listOf(regionCode)
+
+                _uiState.update { it.copy(data = UiState.Loading) }
+
+                studyRepository.getPreferLocationStudies(
+                    recruitingStatus = _recruitingStatus.value,
+                    feeRange = _fee.value,
+                    categories = _themes.value.map { it.name },
+                    sortBy = _sortType.value,
+                    cursor = null,
+                    size = 20,
+                    regionCodes = regionCodesForRequest
+                ).getOrThrow()
+            }.onSuccess { firstPage ->
+                _uiState.update {
+                    it.copy(
+                        data = if (firstPage.studyList.isEmpty())
+                            UiState.Empty
+                        else
+                            UiState.Success(firstPage)
+                    )
+                }
+            }.onFailure { e ->
+                Log.e("PreferLocationStudyViewModel", "load error", e)
+                _uiState.update { it.copy(data = UiState.Empty) }
             }
-    }
-
-    private suspend fun fetch(p: Params) {
-        _uiState.update { it.copy(studies = UiState.Loading) }
-        val newState: UiState<StudyResultList> = try {
-            val res = studyRepository.getPreferLocationStudies(
-                sortType = p.sort,
-                activityType = p.activity,
-                feeRange = p.fee,
-                theme = p.theme
-            )
-            res.fold(
-                onSuccess = { data -> UiState.Success(data) },
-                onFailure = { e -> UiState.Failure(e.message ?: e.toString()) }
-            )
-        } catch (e: Exception) {
-            UiState.Failure(e.message ?: e.toString())
         }
-        _uiState.update { it.copy(studies = newState) }
     }
 
-    /** ---------------- 공개 API ---------------- */
-    fun load(selected: RecruitingStudySort = _sortType.value) { _sortType.value = selected }
-    fun selectSort(type: RecruitingStudySort) { _sortType.value = type }
-    fun setActivityFilter(type: ActivityType?) { _activity.value = type }
-    fun setFeeFilter(fee: FeeRange?) { _fee.value = fee }
-    fun setThemeFilter(theme: StudyTheme?) { _theme.value = theme }
-    fun clearFilters() {
-        _activity.value = null
-        _fee.value = null
-        _theme.value = null
+    fun loadNextPage() {
+        val currentUi = _uiState.value.data
+        val success = currentUi as? UiState.Success ?: return
+        val currentList = success.data
+
+        if (!currentList.hasNext) return
+        if (_isLoadingMore.value) return
+
+        viewModelScope.launch {
+            _isLoadingMore.value = true
+
+            runCatching {
+                val preferredCodes = userRepository.getUserPreferredRegion()
+                    .getOrThrow()
+                    .regionCodes
+                    .map { it.trim() }
+
+                val regionCodesForRequest =
+                    if (currentRegionCode.isNullOrBlank()) preferredCodes else listOf(currentRegionCode!!)
+
+                studyRepository.getPreferLocationStudies(
+                    recruitingStatus = _recruitingStatus.value,
+                    feeRange = _fee.value,
+                    categories = _themes.value.map { it.name },
+                    sortBy = _sortType.value,
+                    cursor = currentList.nextCursor,
+                    size = 20,
+                    regionCodes = regionCodesForRequest
+                ).getOrThrow()
+            }.onSuccess { newPage ->
+                val merged = currentList.copy(
+                    studyList = currentList.studyList + newPage.studyList,
+                    hasNext = newPage.hasNext,
+                    nextCursor = newPage.nextCursor
+                )
+                _uiState.update { it.copy(data = UiState.Success(merged)) }
+            }.onFailure { e ->
+                Log.e("PreferLocationStudyViewModel", "loadNextPage error", e)
+            }
+
+            _isLoadingMore.value = false
+        }
     }
 
-    fun add(name: String) = _selected.update { if (name in it || it.size>=10) it else it + name }
-    fun remove(name: String) = _selected.update { it - name }
-    fun clear() = _selected.update { emptyList() }
+    fun selectTab(selectedTabIndex: Int) {
+        val code = if (selectedTabIndex == 0) null else _selectedRegion.value.getOrNull(selectedTabIndex - 1)?.code
+        load(code)
+    }
+
+    /** Filter 적용 후 현재 탭 기준으로 다시 load */
+    fun applyFilter(
+        recruitingStatus: RecruitingStatus?,
+        fee: FeeRange?,
+        themes: List<StudyTheme>,
+    ) {
+        _recruitingStatus.value = recruitingStatus
+        _fee.value = fee
+        _themes.value = themes
+
+        load(currentRegionCode)
+    }
+
+    fun setSort(sort: RecruitingStudySort) {
+        _sortType.value = sort
+        load(currentRegionCode)
+    }
 
     /** ---------------- 행정구역 검색용 메서드 ---------------- */
     fun loadLocationData() {
         viewModelScope.launch(Dispatchers.IO) {
-            allLocations = LocationStore.load(appContext)}
+            allLocations = LocationStore.load(appContext)
+        }
     }
 
     fun searchLocation(query: String) {
@@ -130,25 +239,37 @@ class PreferLocationStudyViewModel @Inject constructor(
                 allLocations = LocationStore.load(appContext)
             }
 
-            val filtered = searchLocations(query, allLocations)
-
-            _results.value = filtered
+            _results.value = searchLocations(query, allLocations)
         }
     }
 
+    fun addLocation(row: LocationRow) {
+        _selectedRegion.update { list ->
+            if (list.any { it.code == row.code }) list else list + row
+        }
+    }
 
-    private data class Params(
-        val sort: RecruitingStudySort,
-        val activity: ActivityType?,
-        val fee: FeeRange?,
-        val theme: StudyTheme?
-    )
-}
+    fun removeLocation(row: LocationRow) {
+        _selectedRegion.update { list ->
+            list.filterNot { it.code == row.code }
+        }
+    }
 
-/** 작은 헬퍼: Flow collectLatest 축약 */
-private inline fun <T> Flow<T>.collectLatestIn(
-    scope: CoroutineScope,
-    crossinline block: suspend (T) -> Unit
-) = scope.launch {
-    collectLatest { block(it) }
+    fun clearLocationSearch() {
+        _query.value = ""
+        _results.value = emptyList()
+    }
+
+    fun syncPreferredRegions() {
+        viewModelScope.launch {
+            runCatching {
+                val regionCodes = _selectedRegion.value.map { it.code }
+                userRepository.setUserPreferredRegion(regionCodes).getOrThrow()
+            }.onSuccess {
+                load(currentRegionCode)
+            }.onFailure { e ->
+                Log.e("PreferLocationStudyViewModel", "setUserPreferredRegion failed", e)
+            }
+        }
+    }
 }

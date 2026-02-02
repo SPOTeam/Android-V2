@@ -1,18 +1,23 @@
 package com.umcspot.spot.alert.service
 
 import com.umcspot.spot.alert.dto.response.AlertResponseDto
-import com.umcspot.spot.alert.dto.response.AppliedAlertResponseDto
+import com.umcspot.spot.alert.dto.response.UnReadAlertResponseDto
 import com.umcspot.spot.network.model.BaseResponse
+import com.umcspot.spot.network.model.NullResultResponse
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface AlertService {
-    @GET("/api/v1/service")
+    @GET("/api/notifications/me")
     suspend fun getAlerts(
-
     ): BaseResponse<AlertResponseDto>
 
-    @GET("/api/v1/service")
-    suspend fun getAppliedAlerts(
+    @GET("/api/notifications/me/unread")
+    suspend fun getUnReadAlerts(
+    ): BaseResponse<UnReadAlertResponseDto>
 
-    ): BaseResponse<AppliedAlertResponseDto>
+    @GET("/api/notifications/{notificationId}/read")
+    suspend fun readAlert(
+        @Path("notificationId") notificationId: Long,
+    ): NullResultResponse
 }

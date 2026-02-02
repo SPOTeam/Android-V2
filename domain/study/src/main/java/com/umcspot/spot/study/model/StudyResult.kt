@@ -3,7 +3,9 @@ package com.umcspot.spot.study.model
 import com.umcspot.spot.model.ImageRef
 
 data class StudyResultList (
-    val studyList: List<StudyResult>
+    val studyList: List<StudyResult>,
+    val hasNext: Boolean,
+    val nextCursor: Long?
 ) {
     companion object {
         @JvmStatic
@@ -18,14 +20,17 @@ data class StudyResultList (
 }
 
 data class StudyResult(
-    val studyId: String,
-    val title: String,
-    val goal: String,
-    val maxMember : Int,
-    val member: Int = 0,
-    val likes: Int = 0,
-    val views: Int = 0,
-    val studyImage: ImageRef = ImageRef.None
+    val id: Long,
+    val name: String,
+    val description: String,
+    val maxMembers : Int,
+    val currentMembers: Int = 0,
+    val likeCount: Int = 0,
+    val isLiked : Boolean,
+    val isOwner : Boolean,
+    val isAlone : Boolean,
+    val hitCount: Int = 0,
+    val profileImageUrl: ImageRef
 ) {
     companion object {
         private val titles = listOf(
@@ -41,14 +46,17 @@ data class StudyResult(
             val max = 8 + (index % 5)                // 8~12
             val mem = (3 + (index % 6)).coerceAtMost(max)
             return StudyResult(
-                studyId = "$idPrefix-$index",
-                title = title,
-                goal = "주 2회 진행, 코드리뷰",
-                maxMember = max,
-                member = mem,
-                likes = 10 + index * 2,
-                views = 150 + index * 20,
-                studyImage = ImageRef.Name("ic_study_default") // 필요시 Url로 교체
+                id = index.toLong(),
+                name = title,
+                description = "주 2회 진행, 코드리뷰",
+                maxMembers = max,
+                currentMembers = mem,
+                likeCount = 10 + index * 2,
+                isLiked = index%2 == 0,
+                isOwner = index%2 == 1,
+                isAlone = index%2 == 1,
+                hitCount = 150 + index * 20,
+                profileImageUrl = ImageRef.Name("ic_study_default")
             )
         }
     }

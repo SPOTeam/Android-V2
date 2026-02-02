@@ -18,6 +18,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,6 +30,7 @@ import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.shapes.SpotShapes
+import com.umcspot.spot.designsystem.theme.R500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
@@ -34,10 +38,12 @@ import com.umcspot.spot.ui.extension.screenWidthDp
 
 @Composable
 fun RejectModal(
+    painter : Painter,
+    painterTint : Color,
     modalTitle : String,
-    modalDes : String,
+    modalDes : String?,
     okButtonText : String,
-    noButtonText : String,
+    noButtonText : String?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     onCancel:() -> Unit= {},
@@ -46,8 +52,8 @@ fun RejectModal(
     Card(
         modifier = modifier
             .width(screenWidthDp(326.dp))
-            .height(screenHeightDp(227.dp)),
-        shape = SpotShapes.Hard,
+            .wrapContentHeight(),
+        shape = SpotShapes.Round,
         colors = CardDefaults.elevatedCardColors(
             containerColor = SpotTheme.colors.white
         )
@@ -73,10 +79,11 @@ fun RejectModal(
             }
 
             Image(
-                painter = painterResource(R.drawable.emoji_sad),
+                painter = painter,
                 contentDescription = null,
                 modifier = Modifier
-                    .size(screenWidthDp(33.dp))
+                    .size(screenWidthDp(33.dp)),
+                colorFilter = ColorFilter.tint(painterTint)
             )
 
             Spacer(Modifier.height(screenHeightDp(7.dp)))
@@ -90,13 +97,15 @@ fun RejectModal(
 
             Spacer(Modifier.height(screenHeightDp(20.dp)))
 
-            Text(
-                text = modalDes,
-                style = SpotTheme.typography.regular_500,
-                textAlign = TextAlign.Center
-            )
+            if(modalDes != null) {
+                Text(
+                    text = modalDes,
+                    style = SpotTheme.typography.regular_500,
+                    textAlign = TextAlign.Center
+                )
 
-            Spacer(Modifier.height(screenHeightDp(20.dp)))
+                Spacer(Modifier.height(screenHeightDp(20.dp)))
+            }
 
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 TextButton(
@@ -110,16 +119,18 @@ fun RejectModal(
                     state = TextButtonState.R500State,
                 )
 
-                TextButton(
-                    modifier = Modifier
-                        .width(screenWidthDp(141.dp))
-                        .height(screenHeightDp(39.dp)),
-                    text = noButtonText,
-                    style = SpotTheme.typography.h5,
-                    onClick = onCancel,
-                    shape = SpotShapes.Soft,
-                    state = TextButtonState.G500State,
-                )
+                if(noButtonText != null) {
+                    TextButton(
+                        modifier = Modifier
+                            .width(screenWidthDp(141.dp))
+                            .height(screenHeightDp(39.dp)),
+                        text = noButtonText,
+                        style = SpotTheme.typography.h5,
+                        onClick = onCancel,
+                        shape = SpotShapes.Soft,
+                        state = TextButtonState.G500State,
+                    )
+                }
             }
         }
     }
@@ -128,17 +139,21 @@ fun RejectModal(
 @Composable
 fun RejectDialog(
     visible: Boolean,
+    painter : Painter = painterResource(R.drawable.emoji_sad),
+    painterTint : Color = Color.Unspecified,
     modalTitle : String,
-    modalDes : String,
+    modalDes : String?,
     okButtonText : String,
-    noButtonText : String,
-    onDismiss: () -> Unit,
+    noButtonText : String?,
+    onDismiss: () -> Unit = {},
     onClick: () -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit = {}
 ) {
     if (!visible) return
     Dialog(onDismissRequest = onDismiss) {
         RejectModal(
+            painter = painter,
+            painterTint = painterTint,
             modalTitle = modalTitle,
             modalDes = modalDes,
             okButtonText = okButtonText,
@@ -156,6 +171,8 @@ private fun RejectDialog_Preview() {
     SpotTheme {
         RejectDialog(
             visible = true,
+            painter = painterResource(R.drawable.emoji_sad),
+            painterTint = SpotTheme.colors.R500,
             modalTitle = "나가시겠어요?",
             modalDes = "지금 나가면, 쓰던 글은 저장되지 않아요.",
             okButtonText = "네",

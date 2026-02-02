@@ -25,13 +25,13 @@ fun StudyPlaceScreen(
     isSheetVisible: Boolean,
     query: String,
     searchResults: List<LocationRow>,
-    selectedRegions: ImmutableList<String>,
+    selectedRegions: ImmutableList<LocationRow>,
     onActivityTypeSelect: (ActivityType) -> Unit,
     onQueryChange: (String) -> Unit,
     onSheetOpen: () -> Unit,
     onSheetDismiss: () -> Unit,
-    onAddSelected: (String) -> Unit,
-    onRemoveSelected: (String) -> Unit,
+    onAddSelected: (LocationRow) -> Unit,
+    onRemoveSelected: (LocationRow) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LocationBottomSheet(

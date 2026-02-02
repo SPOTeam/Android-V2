@@ -1,17 +1,14 @@
 package com.umcspot.spot.feature.board.main
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,8 +21,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -41,7 +36,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.R
@@ -68,26 +62,18 @@ import com.umcspot.spot.ui.state.UiState
 @Composable
 fun BoardScreen(
     viewmodel: BoardViewModel = hiltViewModel(),
-    contentPadding: PaddingValues = PaddingValues(0.dp),
+    contentPadding: PaddingValues,
     onMoveToBoardList: () -> Unit,
     onMoveToPostContent: (Long) -> Unit
 ) {
-    val state by viewmodel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
+    val sortType by viewmodel.sortType.collectAsStateWithLifecycle()
 
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
 
-    val ui = state.user
-    val isLoading = ui is UiState.Loading
-
-    val payload = (ui as? UiState.Success<BoardPayload>)?.data
-
-    val recentBoards = payload?.recentBoards ?: RecentPostResultList(recentPosts = emptyList())
-    val bestBoards = payload?.bestBoards ?: BestPostResultList(hotPosts = emptyList())
-    val selected = payload?.selected ?: SortType.RECENT
-
     LaunchedEffect(Unit) {
-        viewmodel.load(SortType.RECENT)
+        viewmodel.load()
     }
 
     Box(
@@ -112,8 +98,7 @@ fun BoardScreen(
             }
             item {
                 RecentCardList(
-                    isLoading = isLoading,
-                    items = recentBoards,
+                    items = uiState.recentBoards,
                     onItemClick = { onMoveToPostContent(it.postId) }
                 )
 
@@ -152,7 +137,7 @@ fun BoardScreen(
                     Spacer(Modifier.weight(1f))
 
                     BoardTabs(
-                        selected = selected,
+                        selected = sortType,
                         onSelect = viewmodel::selectSort
                     )
                 }
@@ -161,34 +146,11 @@ fun BoardScreen(
             }
 
             item {
-                if (isLoading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(screenHeightDp(326.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        SpotSpinner()
-                    }
-                } else {
-                    BestCardList(
-                        items = bestBoards,
-                        onItemClick = { onMoveToPostContent(it.postId) }
-                    )
-                }
+                BestCardList(
+                    items = uiState.bestBoards,
+                    onItemClick = { onMoveToPostContent(it.postId) }
+                )
             }
-        }
-
-        when (ui) {
-            is UiState.Failure -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "에러: ${ui.msg}", color = Color.Red)
-            }
-
-            is UiState.Empty -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "데이터가 없습니다.", color = Color.Gray)
-            }
-
-            else -> Unit
         }
     }
 }
@@ -308,39 +270,54 @@ private fun SectionHeader(
 
 @Composable
 private fun BestCardList(
-    items: BestPostResultList,
+    items: UiState<BestPostResultList>,
     onItemClick: (BestPostResult) -> Unit
 ) {
-    items.hotPosts.forEachIndexed { index, item ->
-        ShapeBox(
-            shape = SpotShapes.Round,
-            color = SpotTheme.colors.white,
-            borderWidth = 1.dp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .clip(SpotShapes.Round)
-                .clickable{ onItemClick(item) },
-            borderColor = SpotTheme.colors.G200,
-        ) {
-            BestRow(
-                title = item.title,
-                count = item.commentCount,
-                content = item.content,
-                postType = item.postType,
+    when(items) {
+        is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
+            Box(
                 modifier = Modifier
-            )
+                    .fillMaxWidth()
+                    .height(screenHeightDp(326.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                SpotSpinner()
+            }
         }
+        is UiState.Success -> {
+            val list: List<BestPostResult> = items.data.hotPosts
 
-        if(index != items.hotPosts.lastIndex)
-            Spacer(Modifier.height(screenHeightDp(10.dp)))
+            list.forEachIndexed { index, item ->
+                ShapeBox(
+                    shape = SpotShapes.Round,
+                    color = SpotTheme.colors.white,
+                    borderWidth = 1.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .clip(SpotShapes.Round)
+                        .clickable{ onItemClick(item) },
+                    borderColor = SpotTheme.colors.G200,
+                ) {
+                    BestRow(
+                        title = item.title,
+                        count = item.commentCount,
+                        content = item.content,
+                        postType = item.postType,
+                        modifier = Modifier
+                    )
+                }
+
+                if(index != list.lastIndex)
+                    Spacer(Modifier.height(screenHeightDp(10.dp)))
+            }
+        }
     }
 }
 
 @Composable
 private fun RecentCardList(
-    isLoading : Boolean,
-    items: RecentPostResultList,
+    items: UiState<RecentPostResultList>,
     onItemClick: (RecentPostResult) -> Unit
 ) {
     ShapeBox(
@@ -353,52 +330,57 @@ private fun RecentCardList(
             .clip(SpotShapes.Soft)
             .height(screenHeightDp(162.dp))
     ) {
-        if(isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                SpotSpinner()
+        when (items) {
+            is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    SpotSpinner()
+                }
             }
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(screenWidthDp(7.dp)),
-                verticalArrangement = Arrangement.spacedBy(screenHeightDp(7.dp))
-            ) {
-                items.recentPosts.forEach { item ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onItemClick(item) }
-                            .padding(horizontal = screenWidthDp(7.dp), vertical = screenHeightDp(3.dp)),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(screenWidthDp(7.dp))
-                    ) {
-                        // 왼쪽 라벨
-                        Text(
-                            text = item.postType.korean,
-                            style = SpotTheme.typography.regular_500,
-                            color = SpotTheme.colors.B500,
-                            modifier = Modifier.widthIn(min = screenWidthDp(41.dp))
-                        )
-                        // 제목
-                        Text(
-                            text = item.title,
-                            style = SpotTheme.typography.regular_400,
-                            color = SpotTheme.colors.black,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f)
-                        )
-                        // 카운트
-                        Text(
-                            text = "( ${cap(item.commentCount)} )",
-                            style = SpotTheme.typography.small_400,
-                            color = SpotTheme.colors.B500
-                        )
+            is UiState.Success -> {
+                val list: List<RecentPostResult> = items.data.recentPosts
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(screenWidthDp(7.dp)),
+                    verticalArrangement = Arrangement.spacedBy(screenHeightDp(7.dp))
+                ) {
+                    list.forEach { item ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onItemClick(item) }
+                                .padding(horizontal = screenWidthDp(7.dp), vertical = screenHeightDp(3.dp)),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(screenWidthDp(7.dp))
+                        ) {
+                            // 왼쪽 라벨
+                            Text(
+                                text = item.postType.korean,
+                                style = SpotTheme.typography.regular_500,
+                                color = SpotTheme.colors.B500,
+                                modifier = Modifier.widthIn(min = screenWidthDp(41.dp))
+                            )
+                            // 제목
+                            Text(
+                                text = item.title,
+                                style = SpotTheme.typography.regular_400,
+                                color = SpotTheme.colors.black,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f)
+                            )
+                            // 카운트
+                            Text(
+                                text = "( ${cap(item.commentCount)} )",
+                                style = SpotTheme.typography.small_400,
+                                color = SpotTheme.colors.B500
+                            )
+                        }
                     }
                 }
             }

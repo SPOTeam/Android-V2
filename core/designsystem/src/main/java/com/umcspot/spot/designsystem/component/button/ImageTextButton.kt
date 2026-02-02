@@ -105,7 +105,9 @@ fun MultiButton(
     tintIcon: Boolean = false,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    val isPressed by interactionSource.collectIsPressedAsState()
+    val internalSource = interactionSource ?: remember { MutableInteractionSource() }
+    val isPressed by internalSource.collectIsPressedAsState()
+
     val colors = state.resolveColors(
         enabled = enabled,
         isPressed = isPressed,

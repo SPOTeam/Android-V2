@@ -16,7 +16,7 @@ import com.umcspot.spot.main.R.string.ic_category_desc
 import com.umcspot.spot.main.R.string.ic_mystudy_desc
 import com.umcspot.spot.main.R.string.ic_jjim_desc
 import com.umcspot.spot.main.R.string.ic_mypage_desc
-import com.umcspot.spot.mypage.navigation.Mypage
+import com.umcspot.spot.mypage.main.navigation.MyPage
 import com.umcspot.spot.study.my.navigation.MyStudy
 import com.umcspot.spot.navigation.MainTabRoute
 import com.umcspot.spot.navigation.Route
@@ -49,7 +49,7 @@ enum class MainNavTab(
     MYPAGE(
         icon = mypage_default,
         contentDescription = ic_mypage_desc,
-        route = Mypage
+        route = MyPage
     );
 
     companion object {

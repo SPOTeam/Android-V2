@@ -1,59 +1,46 @@
 package com.umcspot.spot.alert.dto.response
 
 import android.annotation.SuppressLint
-import com.umcspot.spot.model.AlertKind
-import com.umcspot.spot.model.ImageRef
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class AlertResponseDto(
-    @SerialName("alerts")
-    val alerts : List<AlertItem>
+    @SerialName("notifications")
+    val notifications : List<AlertItem>,
+
+    @SerialName("totalCount")
+    val totalCount: Int
 )
 
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class AlertItem(
-    @SerialName("id")
-    val id: Int,
+    @SerialName("notificationId")
+    val notificationId: String,
 
-    @SerialName("kind")
-    val kind: AlertKind,
+    @SerialName("type")
+    val type: String,
 
     @SerialName("title")
     val title: String,
 
-    @SerialName("subtitle")
-    val subtitle: String,
+    @SerialName("body")
+    val body: String,
 
-    @SerialName("studyImageRes")
-    val studyImageRes: ImageRef,
+    @SerialName("imageUrl")
+    val imageUrl: String?,
+
+    @SerialName("referenceType")
+    val referenceType: String,
+
+    @SerialName("referenceId")
+    val referenceId: String,
 
     @SerialName("isRead")
-    val isRead: Boolean = false
-)
+    val isRead: Boolean,
 
-@SuppressLint("UnsafeOptInUsageError")
-@Serializable
-data class AppliedAlertResponseDto(
-    @SerialName("alerts")
-    val alerts : List<AppliedAlertItem>
-)
-
-@SuppressLint("UnsafeOptInUsageError")
-@Serializable
-data class AppliedAlertItem(
-    @SerialName("id")
-    val id: Int,
-
-    @SerialName("title")
-    val title: String,
-
-    @SerialName("subtitle")
-    val subtitle: String,
-
-    @SerialName("studyImageRes")
-    val studyImageRes: ImageRef,
+    @SerialName("createdAt")
+    val createdAt: String,
 )

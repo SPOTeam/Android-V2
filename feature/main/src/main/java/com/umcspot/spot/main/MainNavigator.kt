@@ -11,18 +11,24 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.umcspot.spot.alert.navigation.Alert
-import com.umcspot.spot.alert.navigation.AppliedAlert
 import com.umcspot.spot.alert.navigation.navigateToAlert
-import com.umcspot.spot.alert.navigation.navigateToAppliedAlert
 import com.umcspot.spot.category.navigation.navigateToCategory
 import com.umcspot.spot.feature.board.boardList.navigation.BoardList
 import com.umcspot.spot.feature.board.main.navigation.Board
 import com.umcspot.spot.feature.board.main.navigation.navigateToBoard
-import com.umcspot.spot.home.navigation.navigateToHome
-import com.umcspot.spot.jjim.navigation.navigateToJJim
-import com.umcspot.spot.mypage.navigation.navigateToMypage
 import com.umcspot.spot.feature.board.post.content.navigation.POST_CONTENT_ROUTE
 import com.umcspot.spot.feature.board.post.posting.navigation.Posting
+import com.umcspot.spot.home.navigation.navigateToHome
+import com.umcspot.spot.jjim.navigation.JJim
+import com.umcspot.spot.jjim.navigation.navigateToJJim
+import com.umcspot.spot.mypage.cancelMemberShip.navigation.CancelMemberShip
+import com.umcspot.spot.mypage.editInterestStudy.navigation.EditInterest
+import com.umcspot.spot.mypage.main.navigation.MyPage
+import com.umcspot.spot.mypage.main.navigation.navigateToMyPage
+import com.umcspot.spot.mypage.participating.navigation.ParticipatingStudy
+import com.umcspot.spot.mypage.recruiting.application.navigation.STUDY_APPLICATION_ROUTE
+import com.umcspot.spot.mypage.recruiting.navigation.MyRecruitingStudy
+import com.umcspot.spot.mypage.waiting.navigation.WaitingStudy
 import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.Landing
@@ -35,8 +41,12 @@ import com.umcspot.spot.study.detail.navigation.StudyDetail
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.detail.navigation.navigateToStudyMemoirPost
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
+import com.umcspot.spot.study.preferCategory.navigation.PreferCategory
+import com.umcspot.spot.study.preferCategory.navigation.PreferCategoryFilter
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocation
+import com.umcspot.spot.study.preferLocation.navigation.PreferLocationFilter
 import com.umcspot.spot.study.preferLocation.navigation.navigateToPreferLocationStudy
+import com.umcspot.spot.study.preferLocation.navigation.navigateToPreferLocationStudyFilter
 import com.umcspot.spot.study.recruiting.navigation.Recruiting
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import com.umcspot.spot.study.recruiting.navigation.navigateToRecruitingStudy
@@ -77,10 +87,9 @@ class MainNavigator(
             MainNavTab.CATEGORY -> navController.navigateToCategory(navOptions)
             MainNavTab.MYSTUDY -> navController.navigateToMyStudy(navOptions)
             MainNavTab.JJIM -> navController.navigateToJJim(navOptions)
-            MainNavTab.MYPAGE -> navController.navigateToMypage(navOptions)
+            MainNavTab.MYPAGE -> navController.navigateToMyPage(navOptions)
         }
     }
-
     @Composable
     private fun inAnyGraph(vararg graphs: KClass<*>): Boolean {
         val dest = currentDestination ?: return false
@@ -97,23 +106,18 @@ class MainNavigator(
     fun isInLanding(): Boolean = inAnyGraph(Landing::class, Saving::class)
 
     @Composable
-    fun showBackTopBar(): Boolean = inAnyGraph(
-        Alert::class, AppliedAlert::class, RecruitingFilter::class,
-        SignUp::class, CheckList::class, Posting::class, BoardList::class
-    ) || inAnyGraphRoutes(POST_CONTENT_ROUTE)
+    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, RecruitingFilter::class, PreferLocationFilter::class, PreferCategoryFilter::class,
+        SignUp::class, CheckList::class, Posting::class, BoardList::class, JJim::class, MyPage::class,
+        ParticipatingStudy::class, MyRecruitingStudy::class, WaitingStudy::class, EditInterest::class, CancelMemberShip::class
+    ) || inAnyGraphRoutes(POST_CONTENT_ROUTE) || inAnyGraphRoutes(STUDY_APPLICATION_ROUTE)
 
     @Composable
-    fun showToTopFab(): Boolean = inAnyGraph(
-        Alert::class,
-        AppliedAlert::class,
-        Recruiting::class,
-        PreferLocation::class,
-        BoardList::class
-    )
+    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, Recruiting::class,
+        PreferLocation::class, PreferCategory::class, BoardList::class, JJim::class, ParticipatingStudy::class, MyRecruitingStudy::class, WaitingStudy::class
+    ) || inAnyGraphRoutes(STUDY_APPLICATION_ROUTE)
 
     @Composable
-    fun showMultipleFab(): Boolean =
-        inAnyGraph(BoardList::class, StudyDetail::class)
+    fun showMultipleFab(): Boolean = inAnyGraph(Home::class, BoardList::class, StudyDetail::class)
 
     @Composable
     fun showBottomBar(): Boolean {
@@ -179,12 +183,12 @@ class MainNavigator(
         navController.navigateToRecruitingStudyFilter(navOptions)
     }
 
-    fun navigateToAlert(navOptions: NavOptions? = null) {
-        navController.navigateToAlert(navOptions)
+    fun navigateToPreferLocationStudyFilter(navOptions: NavOptions? = null) {
+        navController.navigateToPreferLocationStudyFilter(navOptions)
     }
 
-    fun navigateToAppliedAlert(navOptions: NavOptions? = null) {
-        navController.navigateToAppliedAlert(navOptions)
+    fun navigateToAlert(navOptions: NavOptions? = null) {
+        navController.navigateToAlert(navOptions)
     }
 
     fun navigateToStudyDetail(studyId: Long, navOptions: NavOptions? = null) {
@@ -201,8 +205,6 @@ class MainNavigator(
         }
         navController.navigateToHome(navOptions)
     }
-
-
 }
 
 @Composable

@@ -8,8 +8,16 @@ import java.nio.charset.Charset
 
 data class LocationRow(
     val code: String,
-    val name: String,
-)
+    val province: String,
+    val district: String,
+    val neighborhood: String,
+) {
+    /** 리스트/검색용 전체 이름 */
+    val fullName: String
+        get() = listOf(province, district, neighborhood)
+            .filter { it.isNotBlank() }
+            .joinToString(" ")
+}
 
 object LocationStore {
     @Volatile private var cache: List<LocationRow>? = null
@@ -20,14 +28,12 @@ object LocationStore {
             return@withContext it
         }
 
-        Log.d("LocationStore", "📂 Loading Location_info.txt from assets...")
+        Log.d("LocationStore", "📂 Loading region_data.tsv from assets...")
 
         val lines = try {
-            context.assets.open("Location_info.txt")
-                .bufferedReader(Charset.forName("EUC-KR"))
-                .use {
-                    it.readLines()
-                }
+            context.assets.open("region_data.tsv")
+                .bufferedReader(Charset.forName("UTF-8")) // 파일 인코딩이 다르면 여기만 변경
+                .use { it.readLines() }
         } catch (e: Exception) {
             Log.e("LocationStore", "❌ Failed to load asset: ${e.message}", e)
             emptyList()
@@ -35,16 +41,29 @@ object LocationStore {
 
         Log.d("LocationStore", "📄 Read ${lines.size} lines")
 
-        val parsed = lines.mapNotNull { line ->
-            val parts = line.split('\t')
-            if (parts.size < 3) return@mapNotNull null
-            val code = parts[0].trim()
-            val name = parts[1].trim()
-            val status = parts[2].trim()
-            if (status != "존재") null else LocationRow(code, name)
-        }
+        // 첫 줄이 헤더(code	province	district	neighborhood)라고 가정
+        val parsed = lines
+            .drop(1) // 헤더 제거
+            .mapNotNull { line ->
+                val parts = line.split('\t')
+                if (parts.size < 4) return@mapNotNull null
 
-        Log.d("LocationStore", "✅ Parsed ${parsed.size} valid rows")
+                val code = parts[0].trim()
+                val province = parts[1].trim()
+                val district = parts[2].trim()
+                val neighborhood = parts[3].trim()
+
+                if (code.isBlank() || neighborhood.isBlank()) return@mapNotNull null
+
+                LocationRow(
+                    code = code,
+                    province = province,
+                    district = district,
+                    neighborhood = neighborhood
+                )
+            }
+
+        Log.d("LocationStore", "✅ Parsed ${parsed.size} rows")
 
         cache = parsed
         parsed
@@ -55,9 +74,21 @@ fun searchLocations(query: String, list: List<LocationRow>, limit: Int = 20): Li
     if (query.isBlank()) return emptyList()
 
     val normalized = query.trim().replace(" ", "").lowercase()
-    val results = list.filter {
-        it.name.replace(" ", "").lowercase().contains(normalized)
-    }.take(limit)
 
-    return results
+    return list
+        .filter {
+            it.fullName.replace(" ", "").lowercase().contains(normalized)
+        }
+        .take(limit)
+}
+
+fun List<LocationRow>.toCodeMap(): Map<String, LocationRow> =
+    associateBy { it.code }
+
+fun mapRegionCodesToFullNames(
+    regionCodes: List<String>,
+    locations: List<LocationRow>
+): List<String> {
+    val map = locations.toCodeMap()
+    return regionCodes.mapNotNull { code -> map[code]?.fullName }
 }

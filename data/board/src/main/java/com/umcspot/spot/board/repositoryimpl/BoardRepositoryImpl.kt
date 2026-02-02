@@ -3,6 +3,7 @@ package com.umcspot.spot.board.repositoryimpl
 import android.util.Log
 import com.umcspot.spot.board.mapper.toDomainList
 import com.umcspot.spot.board.service.BoardService
+import com.umcspot.spot.domain.board.model.board.BestPostResult
 import com.umcspot.spot.domain.board.model.board.BestPostResultList
 import com.umcspot.spot.domain.board.model.board.RecentPostResultList
 import com.umcspot.spot.domain.board.model.postList.PostResultList
@@ -33,6 +34,15 @@ class BoardRepositoryImpl @Inject constructor(
             Log.e("BoardRepository", "getBestBoard failed", e)
         }.recoverCatching {
             bestPostDummies()
+        }
+
+    override suspend fun getBestSinglePost(
+    ): Result<BestPostResult> =
+        runCatching {
+            val lists = boardService.getBestBoard(SortType.RECENT).result.toDomainList()
+            lists.hotPosts[0]
+        }.onFailure { e ->
+            Log.e("BoardRepository", "getBestSingleBoard failed", e)
         }
 
     override suspend fun getFilteredPosts(

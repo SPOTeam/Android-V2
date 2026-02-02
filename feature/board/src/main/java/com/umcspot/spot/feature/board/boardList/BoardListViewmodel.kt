@@ -35,10 +35,8 @@ class BoardListViewModel @Inject constructor(
     val uiState: StateFlow<BoardUiState> = _uiState.asStateFlow()
 
     private val _selected = MutableStateFlow<List<String>>(emptyList())
-    val selected: StateFlow<List<String>> = _selected.asStateFlow()
 
     private val _selectedPost = MutableStateFlow<PostResult?>(null)
-    val selectedPost: StateFlow<PostResult?> = _selectedPost.asStateFlow()
 
     private var currentPostType: PostType? = null
     private val _isLoadingMore = MutableStateFlow(false)
@@ -108,10 +106,6 @@ class BoardListViewModel @Inject constructor(
         _selectedPost.value = post
     }
 
-    fun getPostInfo() : PostResult? {
-        return _selectedPost.value
-    }
-
     fun toggleLike(postResult: PostResult) {
         val current = (_uiState.value.data as? UiState.Success)?.data ?: return
         val target = current.posts.firstOrNull { it.postId == postResult.postId } ?: return
@@ -169,9 +163,5 @@ class BoardListViewModel @Inject constructor(
 
     fun saveScrollPosition(index: Int, offset: Int) {
         scrollPosition = ScrollPosition(index, offset)
-    }
-
-    fun resetScrollPosition() {
-        scrollPosition = ScrollPosition()
     }
 }

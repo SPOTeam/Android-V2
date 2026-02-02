@@ -24,6 +24,10 @@ fun NavController.navigateToSaving(navOptions: NavOptions? = null) {
     navigate(Saving, navOptions)
 }
 
+fun NavController.navigateToLanding(navOptions: NavOptions? = null) {
+    navigate(Landing, navOptions)
+}
+
 fun NavGraphBuilder.signupGraph(
     navigateToSignUp: () -> Unit,
     navigateToCheckList: () -> Unit,

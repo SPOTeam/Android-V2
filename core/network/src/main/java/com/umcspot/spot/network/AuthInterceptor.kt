@@ -1,7 +1,7 @@
 package com.umcspot.spot.network
 
 import androidx.datastore.core.DataStore
-import com.umcspot.spot.datastore.SpotTokenData
+import com.umcspot.spot.datastore.token.SpotTokenData
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor

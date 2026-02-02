@@ -1,8 +1,7 @@
 package com.umcspot.spot.post.repository
 
-import com.umcspot.spot.model.ImageRef
-import com.umcspot.spot.model.PostType
 import com.umcspot.spot.post.model.postDetail.PostDetailResult
+import com.umcspot.spot.post.model.postDetail.ReportPostReason
 import com.umcspot.spot.post.model.postDetail.SendComment
 import com.umcspot.spot.post.model.postDetail.SendCommentResult
 import com.umcspot.spot.post.model.posting.Posting
@@ -17,4 +16,6 @@ interface PostRepository {
     suspend fun postPost(posting : Posting): Result<PostingResult>
     suspend fun editPost(postId: Long, posting: Posting): Result<Unit>
     suspend fun deletePost(postId : Long) : Result<Unit>
+
+    suspend fun reportPost(postId : Long, reason : ReportPostReason) : Result<Unit>
 }

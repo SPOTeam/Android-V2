@@ -1,11 +1,12 @@
 package com.umcspot.spot.study.repository
 
-import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.FeeRange
+import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.MemoirModel
+import com.umcspot.spot.study.model.StudyApplicationResultList
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyDetailModel
 import com.umcspot.spot.study.model.StudyMemberModel
@@ -16,20 +17,34 @@ import com.umcspot.spot.study.model.TodoModel
 import java.io.File
 
 interface StudyRepository {
-    suspend fun getPopularStudies(): Result<StudyResultList>
-    suspend fun getRecommendStudies(): Result<StudyResultList>
+    suspend fun getRecommendedStudies(): Result<StudyResultList>
     suspend fun getRecruitingStudies(
-        sortType: RecruitingStudySort,
-        activityType: ActivityType?,
-        theme: StudyTheme?,
-        feeRange: FeeRange?
+        feeCategory: FeeRange?,
+        categories: List<String>?,
+        isOnline: Boolean?,
+        sortBy: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int
     ): Result<StudyResultList>
 
     suspend fun getPreferLocationStudies(
-        sortType: RecruitingStudySort,
-        activityType: ActivityType?,
-        theme: StudyTheme?,
-        feeRange: FeeRange?
+        recruitingStatus : RecruitingStatus?,
+        feeRange: FeeRange?,
+        categories: List<String>?,
+        sortBy: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int,
+        regionCodes : List<String>?
+    ): Result<StudyResultList>
+
+    suspend fun getPreferCategoryStudies(
+        category : StudyTheme?,
+        recruitingStatus : RecruitingStatus?,
+        feeRange: FeeRange?,
+        isOnline : Boolean?,
+        sortBy: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int,
     ): Result<StudyResultList>
 
     suspend fun createStudy(studyCreateModel: StudyCreateModel, imageFile: File?): Result<Long>
@@ -80,4 +95,43 @@ interface StudyRepository {
 
     suspend fun deleteReviewReaction(studyId: Long, reviewId: Long, reaction: String): Result<Unit?>
 
+
+    suspend fun getCategoryStudies(
+        recruitingStatus: RecruitingStatus?,
+        feeRange: FeeRange?,
+        category: String?,
+        isOnline : Boolean?,
+        sortBy: RecruitingStudySort,
+        cursor: Long?,
+        size: Int,
+    ): Result<StudyResultList>
+
+    suspend fun getLikedStudies(
+        cursor: Long?,
+        size: Int,
+    ): Result<StudyResultList>
+
+    suspend fun getParticipatingStudy(
+        cursor: Long?,
+        size: Int,
+    ): Result<StudyResultList>
+
+    suspend fun getRecruitingStudy(
+        cursor: Long?,
+        size: Int,
+    ): Result<StudyResultList>
+
+    suspend fun getWaitingStudy(
+        cursor: Long?,
+        size: Int,
+    ): Result<StudyResultList>
+
+    suspend fun getStudyApplications(
+        studyId: Long
+    ) : Result<StudyApplicationResultList>
+
+    suspend fun entryAcceptance(
+        applicationId: Long,
+        decision: String
+    ) : Result<Unit>
 }

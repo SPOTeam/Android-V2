@@ -3,9 +3,14 @@ package com.umcspot.spot.user.service
 import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.user.dto.request.UserNameRequestDto
+import com.umcspot.spot.user.dto.request.UserPreferredRegionRequestDto
 import com.umcspot.spot.user.dto.request.UserThemeRequestDto
+import com.umcspot.spot.user.dto.response.MyPageResponseDto
+import com.umcspot.spot.user.dto.response.UserPreferredCategoryResponseDto
+import com.umcspot.spot.user.dto.response.UserPreferredRegionResponseDto
 import com.umcspot.spot.user.dto.response.UserResponseDto
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 
@@ -22,5 +27,26 @@ interface UserService {
     @POST("/api/members/preferred-categories")
     suspend fun setUserTheme(
         @Body request : UserThemeRequestDto
+    ): NullResultResponse
+
+    @POST("/api/members/preferred-regions")
+    suspend fun setUserPreferredRegion(
+        @Body request : UserPreferredRegionRequestDto
+    ): NullResultResponse
+
+    @GET("/api/members/prefer-regions")
+    suspend fun getUserPreferredRegion(
+    ): BaseResponse<UserPreferredRegionResponseDto>
+
+    @GET("/api/members/info")
+    suspend fun getMyPageInfo(
+    ): BaseResponse<MyPageResponseDto>
+
+    @GET("/api/members/prefer-categories")
+    suspend fun getUserPreferredCategory(
+    ): BaseResponse<UserPreferredCategoryResponseDto>
+
+    @DELETE("/api/members/me")
+    suspend fun leaveSpot(
     ): NullResultResponse
 }

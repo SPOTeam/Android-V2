@@ -1,11 +1,12 @@
 package com.umcspot.spot.study.datasource
 
-import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.FeeRange
+import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
+import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.MemoirCreateResponseDto
@@ -13,6 +14,7 @@ import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
 import com.umcspot.spot.study.dto.response.StudyMonthlyScheduleResponseDto
+import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.dto.response.StudyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
@@ -20,15 +22,26 @@ import com.umcspot.spot.study.dto.response.TodoQueryResponseDto
 import java.io.File
 
 interface StudyDataSource {
-    suspend fun getPopularStudies(): BaseResponse<StudyResponseDto>
+    suspend fun getRecommendedStudies(): BaseResponse<StudyResponseDto>
+    suspend fun getRecruitingStudies(feeCategory: FeeRange?, categories: List<String>?, isOnline: Boolean?, sortBy: RecruitingStudySort?, cursor: Long?, size: Int): BaseResponse<StudyResponseDto>
+    suspend fun getPreferLocationStudies(
+        recruitingStatus : RecruitingStatus?,
+        feeCategory: FeeRange?,
+        categories: List<String>?,
+        sortType: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int,
+        regionCodes : List<String>?
+    ): BaseResponse<StudyResponseDto>
 
-    suspend fun getRecommendStudies(): BaseResponse<StudyResponseDto>
-
-    suspend fun getRecruitingStudies(
-        sortType: RecruitingStudySort,
-        activityType: ActivityType,
-        theme: StudyTheme,
-        feeRange: FeeRange
+    suspend fun getPreferCategoryStudies(
+        category : StudyTheme?,
+        recruitingStatus : RecruitingStatus?,
+        feeCategory: FeeRange?,
+        isOnline : Boolean?,
+        sortType: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int,
     ): BaseResponse<StudyResponseDto>
 
     suspend fun createStudy(
@@ -75,4 +88,34 @@ interface StudyDataSource {
     suspend fun postReviewReaction(studyId: Long, reviewId: Long, reaction: String): BaseResponse<Unit?>
 
     suspend fun deleteReviewReaction(studyId: Long, reviewId: Long, reaction: String): BaseResponse<Unit?>
+
+    suspend fun getCategoryStudies(
+        recruitingStatus : RecruitingStatus?,
+        feeCategory: FeeRange?,
+        category: String?,
+        isOnline: Boolean?,
+        sortBy: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyResponseDto>
+
+    suspend fun getLikedStudies(
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyResponseDto>
+
+    suspend fun getMyPageStudy(
+        statuses : List<String>,
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyResponseDto>
+
+    suspend fun getStudyApplications(
+        studyId: Long
+    ): BaseResponse<StudyApplicationResponseDto>
+
+    suspend fun entryAcceptance(
+        applicationId : Long,
+        decision : String
+    ) : NullResultResponse
 }

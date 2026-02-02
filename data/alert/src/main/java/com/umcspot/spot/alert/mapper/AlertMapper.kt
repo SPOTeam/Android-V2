@@ -2,39 +2,30 @@ package com.umcspot.spot.alert.mapper
 
 import com.umcspot.spot.alert.dto.response.AlertItem
 import com.umcspot.spot.alert.dto.response.AlertResponseDto
-import com.umcspot.spot.alert.dto.response.AppliedAlertItem
-import com.umcspot.spot.alert.dto.response.AppliedAlertResponseDto
+import com.umcspot.spot.alert.dto.response.UnReadAlertResponseDto
 import com.umcspot.spot.alert.model.AlertInfo
 import com.umcspot.spot.alert.model.AlertResult
-import com.umcspot.spot.alert.model.AppliedAlertInfo
-import com.umcspot.spot.alert.model.AppliedAlertResult
+import com.umcspot.spot.model.formatCreatedAt
+import com.umcspot.spot.model.toImageRef
 
 
 fun AlertItem.toDomain() : AlertInfo =
     AlertInfo (
-        id = this.id,
-        kind = this.kind,
+        notificationId = this.notificationId.toLong(),
+        type = this.type,
         title = this.title,
-        studyImageRes = this.studyImageRes,
-        subtitle = this.subtitle,
-        isRead = this.isRead
+        body = this.body,
+        imageUrl = this.imageUrl.toImageRef(),
+        referenceType = this.referenceType,
+        referenceId = this.referenceId.toLong(),
+        isRead = this.isRead,
+        createdAt = this.createdAt.formatCreatedAt()
     )
 
 fun AlertResponseDto.toDomainList(): AlertResult =
     AlertResult(
-        alerts = this.alerts.map(AlertItem::toDomain)
+        notifications = this.notifications.map(AlertItem::toDomain),
+        totalCount = this.totalCount
     )
 
-
-fun AppliedAlertItem.toDomain() : AppliedAlertInfo =
-    AppliedAlertInfo (
-        id = this.id,
-        title = this.title,
-        studyImageRes = this.studyImageRes,
-        subtitle = this.subtitle,
-    )
-
-fun AppliedAlertResponseDto.toDomainList(): AppliedAlertResult =
-    AppliedAlertResult(
-        alerts = this.alerts.map(AppliedAlertItem::toDomain)
-    )
+fun UnReadAlertResponseDto.toDomain() : Boolean = this.hasUnreadNotifications

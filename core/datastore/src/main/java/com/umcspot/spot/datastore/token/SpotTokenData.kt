@@ -1,6 +1,8 @@
-@file:OptIn(kotlinx.serialization.InternalSerializationApi::class)
-package com.umcspot.spot.datastore
+@file:OptIn(InternalSerializationApi::class)
 
+package com.umcspot.spot.datastore.token
+
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable
 
 @Serializable

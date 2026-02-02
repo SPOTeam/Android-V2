@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import com.umcspot.spot.home.HomeScreen
 import com.umcspot.spot.model.QuickMenuType
 import com.umcspot.spot.navigation.MainTabRoute
+import com.umcspot.spot.study.model.StudyResult
 import kotlinx.serialization.Serializable
 
 
@@ -18,12 +19,20 @@ fun NavController.navigateToHome(navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.homeGraph(
     contentPadding: PaddingValues,
-    onQuickMenuClick: (QuickMenuType) -> Unit
+    onQuickMenuClick: (QuickMenuType) -> Unit,
+    onPopularClick: () -> Unit,
+    onPopularPostClick: (Long) -> Unit,
+    onStudyClick: (StudyResult) -> Unit,
+    onStudyMoreClick: () -> Unit
 ) {
     composable<Home> {
         HomeScreen(
             contentPadding = contentPadding,
-            onQuickMenuClick = onQuickMenuClick
+            onQuickMenuClick = onQuickMenuClick,
+            onPopularClick = onPopularClick,
+            onPopularPostClick = onPopularPostClick,
+            onStudyClick = onStudyClick,
+            onStudyMoreClick = onStudyMoreClick,
         )
     }
 }

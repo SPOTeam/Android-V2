@@ -55,7 +55,6 @@ fun EmptyAlert(
         Text(
             text = alertTitle,
             style = SpotTheme.typography.h3,
-            fontSize = 30.sp,
             color = SpotTheme.colors.B500,
             textAlign = TextAlign.Center
         )
@@ -67,7 +66,7 @@ fun EmptyAlert(
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(screenHeightDp(53.dp)))
-        content() // ✅ 여기로 버튼 등 추가
+        content()
     }
 }
 

@@ -23,7 +23,7 @@ import com.umcspot.spot.ui.extension.screenWidthDp
 @Composable
 fun SpotSpinner(
     modifier: Modifier = Modifier,
-    size: Dp = 24.dp,
+    size: Dp = screenWidthDp(24.dp),
     speed: Float = 1f,
     isPlaying: Boolean = true,
     iterations: Int = LottieConstants.IterateForever,
@@ -53,7 +53,7 @@ fun SpotSpinner(
         speed = speed,
         dynamicProperties = dynamicProps,
         modifier = modifier
-            .size(screenWidthDp(size))
+            .size(size)
             .semantics {
                 if (contentDescription != null) this.contentDescription = contentDescription
             }

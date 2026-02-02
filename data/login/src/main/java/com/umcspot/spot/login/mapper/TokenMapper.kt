@@ -12,6 +12,7 @@ fun TokenType.toDto() : TokenRequestDto =
 
 fun TokenResponseDto.toDomain() : TokenResult =
     TokenResult (
+        userId = this.userId,
         accessToken = this.accessToken,
         refreshToken = this.refreshToken
     )

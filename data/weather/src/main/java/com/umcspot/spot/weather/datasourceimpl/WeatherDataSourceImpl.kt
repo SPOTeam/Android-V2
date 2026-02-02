@@ -1,8 +1,6 @@
 package com.umcspot.spot.weather.datasourceimpl
 
-import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.weather.datasource.WeatherDataSource
-import com.umcspot.spot.weather.dto.request.WeatherRequestDto
 import com.umcspot.spot.weather.dto.response.WeatherResponseDto
 import com.umcspot.spot.weather.service.WeatherService
 import javax.inject.Inject
@@ -13,8 +11,19 @@ class WeatherDataSourceImpl @Inject constructor(
 ) : WeatherDataSource {
 
     override suspend fun getWeather(
-        request: WeatherRequestDto
-    ): BaseResponse<WeatherResponseDto> =
-        weatherService.getWeather(request)
-
+        serviceKey : String,
+        dataType: String,
+        baseDate : String,
+        baseTime : String,
+        nx : Int,
+        ny : Int
+    ): WeatherResponseDto =
+        weatherService.getWeather(
+            serviceKey = serviceKey,
+            dataType = dataType,
+            baseDate = baseDate,
+            baseTime = baseTime,
+            nx = nx,
+            ny = ny
+        )
 }
