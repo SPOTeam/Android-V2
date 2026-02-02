@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.umcspot.spot.ui.state.UiState
+import com.umcspot.spot.token.repository.TokenRepository
 import com.umcspot.spot.user.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
     private val userRepository: UserRepository,
+    private val tokenRepository: TokenRepository,
     application: Application
 ) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(MyPageState())
@@ -100,11 +102,9 @@ class MyPageViewModel @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e("MyPageViewModel", "loadAppVersion error", e)
-//            _uiState.update {
-//                it.copy(appVersion = UiState.Failure(e.message ?: "앱 버전 조회 실패"))
-//            }
         }
     }
 
+    suspend fun logout() = tokenRepository.spotLogout()
 }
 

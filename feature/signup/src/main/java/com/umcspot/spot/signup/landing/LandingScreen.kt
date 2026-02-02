@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun LandingRoute(
     navigateToSignUp: () -> Unit,
+    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LandingViewModel = hiltViewModel(),
 ) {
@@ -54,10 +55,15 @@ fun LandingRoute(
 
     val snackBarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(Unit) {
+        viewModel.tryAutoLogin()
+    }
+
     LaunchedEffect(viewModel.sideEffect) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
-                is LandingSideEffect.NavigateToHome -> navigateToSignUp()
+                is LandingSideEffect.NavigateToHome -> navigateToHome()
+                is LandingSideEffect.NavigateToSignUp -> navigateToSignUp()
                 is LandingSideEffect.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(effect.message)
                 }

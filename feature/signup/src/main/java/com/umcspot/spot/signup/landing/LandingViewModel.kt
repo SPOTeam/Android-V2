@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NidOAuth
 import com.navercorp.nid.oauth.util.NidOAuthCallback
-import com.umcspot.spot.common.util.runSuspendCatching
 import com.umcspot.spot.model.SocialLoginType
 import com.umcspot.spot.token.repository.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,6 +32,26 @@ class LandingViewModel @Inject constructor(
 
     private val _sideEffect = MutableSharedFlow<LandingSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
+
+    private var autoLoginChecked = false
+
+    fun tryAutoLogin() {
+        if (autoLoginChecked) return
+        autoLoginChecked = true
+
+        if (_uiState.value.isLoading) return
+        _uiState.update { it.copy(isLoading = true) }
+
+        viewModelScope.launch {
+            val result = loginRepository.refreshTokenData()
+            if (result.isSuccess) {
+                _uiState.update { it.copy(isLoading = false) }
+                _sideEffect.emit(LandingSideEffect.NavigateToHome)
+            } else {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
 
     fun startSocialLogin(
         type: SocialLoginType,
@@ -91,13 +110,12 @@ class LandingViewModel @Inject constructor(
 
     private fun requestServerLogin(type: SocialLoginType, accessToken: String) =
         viewModelScope.launch {
-            runSuspendCatching {
-                loginRepository.finishSocialLogin(type = type, accessToken = accessToken)
-            }.onSuccess {
+            val result = loginRepository.finishSocialLogin(type = type, accessToken = accessToken)
+            if (result.isSuccess) {
                 _uiState.update { it.copy(isLoading = false) }
-                _sideEffect.emit(LandingSideEffect.NavigateToHome)
-            }.onFailure { e ->
-                handleLoginError("서버 로그인 실패", e)
+                _sideEffect.emit(LandingSideEffect.NavigateToSignUp)
+            } else {
+                handleLoginError("서버 로그인 실패", result.exceptionOrNull())
             }
         }
 
