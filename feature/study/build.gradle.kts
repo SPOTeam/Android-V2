@@ -10,7 +10,7 @@ dependencies {
     implementation(projects.domain.study)
     implementation(projects.core.designsystem)
     implementation(projects.core.common)
-
+    implementation(libs.kizitonwose.calendar.compose)
     implementation(libs.lottie)
     implementation(libs.lottie.compose)
     implementation(libs.material3.compose)
