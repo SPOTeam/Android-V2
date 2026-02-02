@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.toRoute
 import com.umcspot.spot.alert.navigation.Alert
 import com.umcspot.spot.alert.navigation.AppliedAlert
 import com.umcspot.spot.alert.navigation.navigateToAlert
@@ -36,7 +38,9 @@ import com.umcspot.spot.feature.board.post.posting.navigation.Posting
 import com.umcspot.spot.feature.board.post.posting.navigation.navigateToPostingNew
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
+import com.umcspot.spot.study.detail.model.StudyDetailTab
 import com.umcspot.spot.study.detail.navigation.StudyDetail
+import com.umcspot.spot.study.detail.navigation.StudyMemoirPost
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
 import com.umcspot.spot.study.register.navigation.RegisterStudy
 import kotlinx.collections.immutable.toImmutableList
@@ -52,13 +56,16 @@ fun MainScreen(
 
     var showBackRequestDialog by remember { mutableStateOf(false) }
 
+    var currentStudyDetailTab by rememberSaveable { mutableStateOf(StudyDetailTab.HOME) }
+
     Scaffold(
         topBar = {
             if (!navigator.isInLanding()) {
-                val isRegisterOrDetail = dest?.hasRoute(RegisterStudy::class) == true ||
-                        dest?.hasRoute(StudyDetail::class) == true
+                val isFullPage = dest?.hasRoute(RegisterStudy::class) == true ||
+                        dest?.hasRoute(StudyDetail::class) == true ||
+                        dest?.hasRoute(StudyMemoirPost::class) == true
 
-                if (isRegisterOrDetail) {
+                if (isFullPage) {
                 } else if (navigator.showBackTopBar()) {
                     val title = when {
                         dest?.hasRoute(Alert::class) == true -> "알림"
@@ -87,8 +94,7 @@ fun MainScreen(
                         hasAlert = true,
                         onSearchClick = { /* TODO */ },
                         onAlertClick = { navController.navigateToAlert() },
-                        modifier = Modifier
-                            .statusBarsPadding()
+                        modifier = Modifier.statusBarsPadding()
                     )
                 }
             }
@@ -98,13 +104,21 @@ fun MainScreen(
             FabStack(
                 showToTop = navigator.showToTopFab(),
                 onClickToTop = { scrollToTop?.invoke() },
-                showMultiple = navigator.showMultipleFab(),
+                showMultiple = navigator.showMultipleFab() && (
+                        dest?.hasRoute(BoardList::class) == true ||
+                                (dest?.hasRoute(StudyDetail::class) == true && currentStudyDetailTab == StudyDetailTab.MEMOIR)
+                        ),
                 onClickMultiple = {
                     when {
                         dest?.hasRoute(BoardList::class) == true -> {
                             navigator.navController.navigateToPostingNew()
                         }
-
+                        dest?.hasRoute(StudyDetail::class) == true -> {
+                            val studyId = backStackEntry?.toRoute<StudyDetail>()?.studyId
+                            if (studyId != null) {
+                                navigator.navigateToStudyMemoirPost(studyId)
+                            }
+                        }
                     }
                 },
                 spacing = 12.dp,
@@ -131,7 +145,9 @@ fun MainScreen(
                 .consumeWindowInsets(innerPadding),
             contentPadding =  innerPadding,
             onRegisterScrollToTop = { handler -> scrollToTop = handler },
-            onBackRequest = { showBackRequestDialog = true }
+            onBackRequest = { showBackRequestDialog = true },
+            onStudyTabChanged = { tab -> currentStudyDetailTab = tab },
+            currentStudyDetailTab = currentStudyDetailTab,
         )
     }
 
