@@ -24,6 +24,7 @@ import com.umcspot.spot.feature.board.post.content.navigation.postContentGraph
 import com.umcspot.spot.feature.board.post.posting.navigation.navigateToPostingEdit
 import com.umcspot.spot.feature.board.post.posting.navigation.postingGraph
 import com.umcspot.spot.signup.navigation.signupGraph
+import com.umcspot.spot.study.detail.model.StudyDetailTab
 import com.umcspot.spot.study.detail.navigation.studyDetailGraph
 import com.umcspot.spot.study.my.navigation.myStudyGraph
 import com.umcspot.spot.study.preferLocation.navigation.preferLocationStudyGraph
@@ -38,6 +39,8 @@ fun MainNavHost(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
+    onStudyTabChanged: (StudyDetailTab) -> Unit,
+    currentStudyDetailTab: StudyDetailTab,
     onBackRequest : () -> Unit
 ) {
     val clearStackNavOptions = navOptions {
@@ -156,7 +159,14 @@ fun MainNavHost(
 
         studyDetailGraph(
             contentPadding = contentPadding,
-            onBackClick = { navigator.navigateToMyStudy(clearStackNavOptions) }
+            onDetailBackClick = {
+                navigator.navigateToMyStudy(clearStackNavOptions)
+            },
+            onMemoirPostBackClick = {
+                navigator.popBackStack()
+            },
+            onTabChanged = onStudyTabChanged,
+            currentTab = currentStudyDetailTab
         )
     }
 }
