@@ -1,4 +1,4 @@
-package com.umcspot.spot.datastore
+package com.umcspot.spot.datastore.userId
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
@@ -13,7 +13,7 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 import javax.inject.Inject
 
-class SpotSecureDataStoreSerializer @Inject constructor() : Serializer<SpotTokenData> {
+class SpotUserIdDataStoreSerializer @Inject constructor() : Serializer<SpotUserIdData> {
     companion object {
         private const val KEYSTORE_PROVIDER = "AndroidKeyStore"
         private const val KEY_ALIAS = "data-store-key"
@@ -48,10 +48,10 @@ class SpotSecureDataStoreSerializer @Inject constructor() : Serializer<SpotToken
         keyGenerator.generateKey()
     }
 
-    override val defaultValue: SpotTokenData
-        get() = SpotTokenData()
+    override val defaultValue: SpotUserIdData
+        get() = SpotUserIdData()
 
-    override suspend fun readFrom(input: InputStream): SpotTokenData {
+    override suspend fun readFrom(input: InputStream): SpotUserIdData {
         return try {
             val encryptedDataWithIv = input.readBytes()
             if (encryptedDataWithIv.size < IV_SIZE) {
@@ -68,7 +68,7 @@ class SpotSecureDataStoreSerializer @Inject constructor() : Serializer<SpotToken
 
             val decryptedBytes = cipher.doFinal(encryptedData)
             Json.decodeFromString(
-                deserializer = SpotTokenData.serializer(),
+                deserializer = SpotUserIdData.serializer(),
                 string = decryptedBytes.decodeToString()
             )
         } catch (e: Exception) {
@@ -77,10 +77,10 @@ class SpotSecureDataStoreSerializer @Inject constructor() : Serializer<SpotToken
         }
     }
 
-    override suspend fun writeTo(t: SpotTokenData, output: OutputStream) {
+    override suspend fun writeTo(t: SpotUserIdData, output: OutputStream) {
         try {
             val serializedData = Json.encodeToString(
-                serializer = SpotTokenData.serializer(),
+                serializer = SpotUserIdData.serializer(),
                 value = t
             )
 

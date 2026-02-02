@@ -34,13 +34,24 @@ class AlertViewModel @Inject constructor(
             alertRepository.getAlerts()
                 .onSuccess { result: AlertResult ->
                     val newState: UiState<AlertResult> =
-                        if (result.studies.isEmpty()) UiState.Empty else UiState.Success(result)
+                        if (result.notifications.isEmpty()) UiState.Empty else UiState.Success(result)
 
                     _uiState.update { state -> state.copy(alerts = newState) }
                 }
                 .onFailure { e ->
                     Log.e("AlertViewModel", "loadAlert error", e)
 //                  _uiState.update { state -> state.copy(alerts = UiState.Failure(e.message ?: e.toString())) }
+                }
+        }
+    }
+
+    fun readAlert(notificationId: Long) {
+        viewModelScope.launch {
+            alertRepository.readAlert(notificationId)
+                .onSuccess {
+                    load()
+                }.onFailure {
+                    Log.e("AlertViewModel", "readAlert error", it)
                 }
         }
     }

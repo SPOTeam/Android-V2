@@ -16,6 +16,7 @@ dependencies {
     implementation(projects.feature.board)
     implementation(projects.feature.alert)
 
+    implementation(projects.domain.alert)
     implementation(projects.core.model)
 
     implementation(libs.androidx.splashscreen)

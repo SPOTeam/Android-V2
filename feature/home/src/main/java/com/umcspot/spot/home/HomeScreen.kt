@@ -376,8 +376,7 @@ fun HomeScreenContent(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = screenWidthDp(17.dp))
-            .padding(top = screenHeightDp(18.dp), bottom = screenHeightDp(24.dp)),
+            .padding(horizontal = screenWidthDp(17.dp)),
         state = listState
     ) {
         item {

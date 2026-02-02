@@ -2,7 +2,9 @@ package com.umcspot.spot.designsystem.component.study
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -26,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.ClickSurface
+import com.umcspot.spot.designsystem.component.button.TextButton
+import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ImageRef
@@ -65,7 +70,10 @@ fun StudyListItem(
                     .padding(screenHeightDp(4.dp))
             ) {
                 Row{
-                    Column{
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                    ) {
                         Text(
                             text = item.name,
                             style = SpotTheme.typography.h5,
@@ -80,9 +88,11 @@ fun StudyListItem(
                         )
                     }
                     if (checkAppliedSlot != null) {
-                        Spacer(modifier = Modifier.weight(1f))
-
                         checkAppliedSlot()
+                    }
+
+                    if(meetballSlot != null) {
+                        meetballSlot()
                     }
                 }
 
@@ -101,11 +111,6 @@ fun StudyListItem(
                         iconRes = R.drawable.like_default, count2 = item.likeCount
                     )
                 }
-            }
-            Spacer(modifier = Modifier.weight(1f))
-
-            if (meetballSlot != null) {
-                meetballSlot()
             }
         }
     }
@@ -199,7 +204,7 @@ private fun StudyListItemPreview() {
             item = StudyResult(
                 id = 1,
                 name = "Sample Study",
-                description = "Sample Goal",
+                description = "Sample GoalSample GoalSample GoalSample GoalSample GoalSample Goal",
                 maxMembers = 10,
                 currentMembers = 5,
                 likeCount = 400,
@@ -211,6 +216,36 @@ private fun StudyListItemPreview() {
             ),
             modifier = Modifier.padding(10.dp),
             onClick = {},
+            checkAppliedSlot = {
+                TextButton(
+                    modifier = Modifier
+                        .width(screenWidthDp(60.dp))
+                        .height(screenHeightDp(26.dp)),
+                    text = "신청 확인",
+                    style = SpotTheme.typography.regular_500,
+                    onClick = {},
+                    state = TextButtonState.B500State,
+                    shape = SpotShapes.Hard
+                )
+            }
+//            meetballSlot = {
+//                Box {
+//                    Box(
+//                        modifier = Modifier
+//                            .padding(top = screenHeightDp(4.dp))
+//                            .width(screenWidthDp(24.dp))
+//                            .height(screenWidthDp(22.dp))
+//                            .clip(SpotShapes.Hard),
+//                        contentAlignment = Alignment.Center
+//                    ) {
+//                        Icon(
+//                            painter = painterResource(R.drawable.meetball),
+//                            contentDescription = null,
+//                            modifier = Modifier.size(screenWidthDp(14.dp))
+//                        )
+//                    }
+//                }
+//            }
         )
     }
 }
