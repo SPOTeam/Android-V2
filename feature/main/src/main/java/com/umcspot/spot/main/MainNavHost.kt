@@ -115,7 +115,12 @@ fun MainNavHost(
             onAcceptFilterClick = { navigator.popBackStack() }
         )
 
-        myStudyGraph()
+        myStudyGraph(
+            contentPadding = contentPadding,
+            navigateToStudyDetail = { studyId ->
+                navigator.navController.navigateToStudyDetail(studyId)
+            }
+        )
 
         jjimGraph(
             contentPadding = contentPadding,
