@@ -40,6 +40,7 @@ import com.umcspot.spot.signup.navigation.navigateToSignUp
 import com.umcspot.spot.study.detail.navigation.StudyDetail
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.detail.navigation.navigateToStudyMemoirPost
+import com.umcspot.spot.study.my.navigation.MyStudy
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
 import com.umcspot.spot.study.preferCategory.navigation.PreferCategory
 import com.umcspot.spot.study.preferCategory.navigation.PreferCategoryFilter
@@ -90,6 +91,7 @@ class MainNavigator(
             MainNavTab.MYPAGE -> navController.navigateToMyPage(navOptions)
         }
     }
+
     @Composable
     private fun inAnyGraph(vararg graphs: KClass<*>): Boolean {
         val dest = currentDestination ?: return false
@@ -106,14 +108,37 @@ class MainNavigator(
     fun isInLanding(): Boolean = inAnyGraph(Landing::class, Saving::class)
 
     @Composable
-    fun showBackTopBar(): Boolean = inAnyGraph(Alert::class, RecruitingFilter::class, PreferLocationFilter::class, PreferCategoryFilter::class,
-        SignUp::class, CheckList::class, Posting::class, BoardList::class, JJim::class, MyPage::class,
-        ParticipatingStudy::class, MyRecruitingStudy::class, WaitingStudy::class, EditInterest::class, CancelMemberShip::class
+    fun showBackTopBar(): Boolean = inAnyGraph(
+        Alert::class,
+        RecruitingFilter::class,
+        PreferLocationFilter::class,
+        PreferCategoryFilter::class,
+        SignUp::class,
+        CheckList::class,
+        Posting::class,
+        BoardList::class,
+        JJim::class,
+        MyPage::class,
+        ParticipatingStudy::class,
+        MyRecruitingStudy::class,
+        WaitingStudy::class,
+        EditInterest::class,
+        CancelMemberShip::class,
+        MyStudy::class
     ) || inAnyGraphRoutes(POST_CONTENT_ROUTE) || inAnyGraphRoutes(STUDY_APPLICATION_ROUTE)
 
     @Composable
-    fun showToTopFab(): Boolean = inAnyGraph(Alert::class, Recruiting::class,
-        PreferLocation::class, PreferCategory::class, BoardList::class, JJim::class, ParticipatingStudy::class, MyRecruitingStudy::class, WaitingStudy::class
+    fun showToTopFab(): Boolean = inAnyGraph(
+        Alert::class,
+        Recruiting::class,
+        PreferLocation::class,
+        PreferCategory::class,
+        BoardList::class,
+        JJim::class,
+        ParticipatingStudy::class,
+        MyRecruitingStudy::class,
+        WaitingStudy::class,
+        MyStudy::class
     ) || inAnyGraphRoutes(STUDY_APPLICATION_ROUTE)
 
     @Composable
