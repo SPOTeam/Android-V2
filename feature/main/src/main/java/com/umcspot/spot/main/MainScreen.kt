@@ -52,6 +52,7 @@ import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.detail.model.StudyDetailTab
 import com.umcspot.spot.study.detail.navigation.StudyDetail
 import com.umcspot.spot.study.detail.navigation.StudyMemoirPost
+import com.umcspot.spot.study.my.navigation.MyStudy
 import com.umcspot.spot.study.preferCategory.navigation.PreferCategoryFilter
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocationFilter
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
@@ -99,6 +100,7 @@ fun MainScreen(
                         dest?.hasRoute(Posting::class) == true -> "글쓰기"
                         dest?.hasRoute(BoardList::class) == true -> "스터디 파트너들의 이야기"
                         dest?.hasRoute(JJim::class) == true -> "찜한 스터디"
+                        dest?.hasRoute(MyStudy::class) == true -> "내 스터디"
                         dest?.hasRoute(MyPage::class) == true -> "마이페이지"
                         dest?.hasRoute(ParticipatingStudy::class) == true -> "참여 중인 스터디"
                         dest?.hasRoute(MyRecruitingStudy::class) == true -> "모집 중인 스터디"
