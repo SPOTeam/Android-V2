@@ -14,6 +14,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.toRoute
 import com.umcspot.spot.alert.navigation.Alert
 import com.umcspot.spot.alert.navigation.navigateToAlert
 import com.umcspot.spot.designsystem.component.FloatingMultipleButton
@@ -38,7 +40,6 @@ import com.umcspot.spot.feature.board.post.posting.navigation.navigateToPostingN
 import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.jjim.navigation.JJim
 import com.umcspot.spot.main.component.MainBottomBar
-import com.umcspot.spot.mypage.cancelMemberShip.CancelMemberShipScreen
 import com.umcspot.spot.mypage.cancelMemberShip.navigation.CancelMemberShip
 import com.umcspot.spot.mypage.editInterestStudy.navigation.EditInterest
 import com.umcspot.spot.mypage.main.navigation.MyPage
@@ -48,7 +49,10 @@ import com.umcspot.spot.mypage.recruiting.navigation.MyRecruitingStudy
 import com.umcspot.spot.mypage.waiting.navigation.WaitingStudy
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
+import com.umcspot.spot.study.detail.model.StudyDetailTab
 import com.umcspot.spot.study.detail.navigation.StudyDetail
+import com.umcspot.spot.study.detail.navigation.StudyMemoirPost
+import com.umcspot.spot.study.my.navigation.MyStudy
 import com.umcspot.spot.study.preferCategory.navigation.PreferCategoryFilter
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocationFilter
 import com.umcspot.spot.study.recruiting.navigation.RecruitingFilter
@@ -67,6 +71,8 @@ fun MainScreen(
 
     var showBackRequestDialog by remember { mutableStateOf(false) }
 
+    var currentStudyDetailTab by rememberSaveable { mutableStateOf(StudyDetailTab.HOME) }
+
     val hasUnreadAlert by mainViewModel.hasUnreadAlert.collectAsStateWithLifecycle()
 
     val isHome = dest?.hasRoute(Home::class) == true
@@ -78,10 +84,11 @@ fun MainScreen(
     Scaffold(
         topBar = {
             if (!navigator.isInLanding()) {
-                val isRegisterOrDetail = dest?.hasRoute(RegisterStudy::class) == true ||
-                        dest?.hasRoute(StudyDetail::class) == true
+                val isFullPage = dest?.hasRoute(RegisterStudy::class) == true ||
+                        dest?.hasRoute(StudyDetail::class) == true ||
+                        dest?.hasRoute(StudyMemoirPost::class) == true
 
-                if (isRegisterOrDetail) {
+                if (isFullPage) {
                 } else if (navigator.showBackTopBar()) {
                     val title = when {
                         dest?.hasRoute(Alert::class) == true -> "알림"
@@ -93,6 +100,7 @@ fun MainScreen(
                         dest?.hasRoute(Posting::class) == true -> "글쓰기"
                         dest?.hasRoute(BoardList::class) == true -> "스터디 파트너들의 이야기"
                         dest?.hasRoute(JJim::class) == true -> "찜한 스터디"
+                        dest?.hasRoute(MyStudy::class) == true -> "내 스터디"
                         dest?.hasRoute(MyPage::class) == true -> "마이페이지"
                         dest?.hasRoute(ParticipatingStudy::class) == true -> "참여 중인 스터디"
                         dest?.hasRoute(MyRecruitingStudy::class) == true -> "모집 중인 스터디"
@@ -130,7 +138,10 @@ fun MainScreen(
             FabStack(
                 showToTop = navigator.showToTopFab(),
                 onClickToTop = { scrollToTop?.invoke() },
-                showMultiple = navigator.showMultipleFab(),
+                showMultiple = navigator.showMultipleFab() && (
+                        dest?.hasRoute(BoardList::class) == true ||
+                                (dest?.hasRoute(StudyDetail::class) == true && currentStudyDetailTab == StudyDetailTab.MEMOIR)
+                        ),
                 onClickMultiple = {
                     when {
                         dest?.hasRoute(BoardList::class) == true -> {
@@ -138,6 +149,12 @@ fun MainScreen(
                         }
                         dest?.hasRoute(Home::class) == true -> {
                             navigator.navigateToRegisterStudy()
+                        }
+                        dest?.hasRoute(StudyDetail::class) == true -> {
+                            val studyId = backStackEntry?.toRoute<StudyDetail>()?.studyId
+                            if (studyId != null) {
+                                navigator.navigateToStudyMemoirPost(studyId)
+                            }
                         }
                     }
                 },
@@ -166,6 +183,8 @@ fun MainScreen(
             contentPadding =  innerPadding,
             onRegisterScrollToTop = { handler -> scrollToTop = handler },
             onBackRequest = { showBackRequestDialog = true },
+            onStudyTabChanged = { tab -> currentStudyDetailTab = tab },
+            currentStudyDetailTab = currentStudyDetailTab,
         )
     }
 

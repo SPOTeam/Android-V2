@@ -5,11 +5,22 @@ import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
+import com.umcspot.spot.study.dto.request.TodoCreateRequestDto
 import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
+import com.umcspot.spot.study.dto.response.MemoirCreateResponseDto
+import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
+import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
+import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
+import com.umcspot.spot.study.dto.response.StudyMonthlyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
+import com.umcspot.spot.study.dto.response.StudyScheduleResponseDto
+import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
+import com.umcspot.spot.study.dto.response.TodoQueryResponseDto
 import okhttp3.MultipartBody
+import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -73,12 +84,115 @@ interface StudyService {
         @Query("size") size: Int
     ): BaseResponse<StudyResponseDto>
 
+    // 스터디 생성
     @Multipart
     @POST("/api/studies")
     suspend fun createStudy(
         @Part request: MultipartBody.Part,
         @Part imageFile: MultipartBody.Part?
     ): BaseResponse<CreateStudyResponseDto>
+
+    // 스터디 디테일 조회
+    @GET("/api/studies/{studyId}/info")
+    suspend fun getStudyDetail(
+        @Path("studyId") studyId: Long
+    ): BaseResponse<StudyDetailResponseDto>
+
+    // 스터디 멤버 조회
+    @GET("/api/studies/{studyId}/members")
+    suspend fun getStudyMembers(
+        @Path("studyId") studyId: Long
+    ): BaseResponse<StudyMemberResponseDto>
+
+    // 다가오는 일정 조회
+    @GET("/api/studies/{studyId}/schedules/upcoming")
+    suspend fun getUpcomingSchedules(
+        @Path("studyId") studyId: Long
+    ): BaseResponse<StudyScheduleResponseDto>
+
+    // 해당 날짜 일정 조회
+    @GET("/api/studies/{studyId}/schedules/monthly")
+    suspend fun getMonthlySchedules(
+        @Path("studyId") studyId: Long,
+        @Query("year") year: Int,
+        @Query("month") month: Int
+    ): BaseResponse<StudyMonthlyScheduleResponseDto>
+
+    // 투두 리스트 만들기
+    @POST("/api/studies/{studyId}/todos")
+    suspend fun createTodo(
+        @Path("studyId") studyId: Long,
+        @Body request: TodoCreateRequestDto
+    ): BaseResponse<TodoCreateResponseDto>
+
+    // 투두 리스트 완료
+    @POST("/api/studies/{studyId}/todos/{todoId}/complete")
+    suspend fun completeTodo(
+        @Path("studyId") studyId: Long,
+        @Path("todoId") todoId: Long
+    ): BaseResponse<Unit?>
+
+    // 투두 리스트 미완료
+    @POST("/api/studies/{studyId}/todos/{todoId}/uncomplete")
+    suspend fun uncompleteTodo(
+        @Path("studyId") studyId: Long,
+        @Path("todoId") todoId: Long
+    ): BaseResponse<Unit?>
+
+    // 투두 삭제
+    @DELETE("/api/studies/{studyId}/todos/{todoId}")
+    suspend fun deleteTodo(
+        @Path("studyId") studyId: Long,
+        @Path("todoId") todoId: Long
+    ): BaseResponse<Unit?>
+
+    // 투두 리스트 조회
+    @GET("/api/studies/{studyId}/todos/members/{memberId}")
+    suspend fun getMemberTodos(
+        @Path("studyId") studyId: Long,
+        @Path("memberId") memberId: Long,
+        @Query("date") date: String
+    ): BaseResponse<TodoQueryResponseDto>
+
+    // 스터디 회고록 조회
+    @GET("/api/studies/{studyId}/reviews")
+    suspend fun getStudyMemoirs(
+        @Path("studyId") studyId: Long,
+        @Query("cursor") cursor: Long? = null,
+        @Query("size") size: Int = 10
+    ): BaseResponse<StudyMemoirResponseDto>
+
+    // 스터디 회고록 삭제
+    @DELETE("/api/studies/{studyId}/reviews/{reviewId}")
+    suspend fun deleteMemoir(
+        @Path("studyId") studyId: Long,
+        @Path("reviewId") reviewId: Long
+    ): BaseResponse<Unit?>
+
+    // 회고록 작성
+    @Multipart
+    @POST("/api/studies/{studyId}/reviews")
+    suspend fun postMemoir(
+        @Path("studyId") studyId: Long,
+        @Part request: MultipartBody.Part,
+        @Part imageFile: List<MultipartBody.Part>?
+    ): BaseResponse<MemoirCreateResponseDto>
+
+    // 회고록 반응 추가
+    @POST("/api/studies/{studyId}/reviews/{reviewId}/reactions")
+    suspend fun postReviewReaction(
+        @Path("studyId") studyId: Long,
+        @Path("reviewId") reviewId: Long,
+        @Query("reaction") reaction: String
+    ): BaseResponse<Unit?>
+
+    // 회고록 반응 삭제
+    @DELETE("/api/studies/{studyId}/reviews/{reviewId}/reactions")
+    suspend fun deleteReviewReaction(
+        @Path("studyId") studyId: Long,
+        @Path("reviewId") reviewId: Long,
+        @Query("reaction") reaction: String
+    ): BaseResponse<Unit?>
 
     @GET("/api/studies/me")
     suspend fun getMyPageStudy(
