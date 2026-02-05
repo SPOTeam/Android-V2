@@ -24,6 +24,7 @@ val Y400 = Color(0xFFFD8653)
 val R500 = Color(0xFFF34343)
 val B200 = Color(0xFFD3E1FD)
 val B100 = Color(0xFFEDF4FF)
+val B50 = Color(0xFFF5F9FF)
 
 val Black = Color(0xFF1E1E1E)
 val G500 = Color(0xFF4F4F56)
@@ -53,6 +54,7 @@ val SpotColors.B500: Color get() = primary
 val SpotColors.B400: Color get() = primaryStrong
 val SpotColors.B200: Color get() = primarySoft
 val SpotColors.B100: Color get() = primarySoftest
+val SpotColors.B50: Color get() = primaryFaint
 
 val SpotColors.Y400: Color get() = secondary
 val SpotColors.R500: Color get() = error
@@ -91,6 +93,7 @@ class SpotColors(
     primaryStrong: Color,
     primarySoft: Color,
     primarySoftest: Color,
+    primaryFaint: Color,
     secondary: Color,
     error: Color,
     gray500: Color,
@@ -114,6 +117,7 @@ class SpotColors(
     var primaryStrong by mutableStateOf(primaryStrong); private set
     var primarySoft by mutableStateOf(primarySoft); private set
     var primarySoftest by mutableStateOf(primarySoftest); private set
+    var primaryFaint by mutableStateOf(primaryFaint); private set
 
     var secondary by mutableStateOf(secondary); private set
     var error by mutableStateOf(error); private set
@@ -140,7 +144,7 @@ class SpotColors(
     var isLight by mutableStateOf(isLight)
 
     fun copy() = SpotColors(
-        primary, primaryStrong, primarySoft, primarySoftest,
+        primary, primaryStrong, primarySoft, primarySoftest,primaryFaint,
         secondary, error,
         gray500, gray400, gray300, gray200, gray100, default,
         black, white,
@@ -154,6 +158,7 @@ class SpotColors(
         primaryStrong = colors.primaryStrong
         primarySoft = colors.primarySoft
         primarySoftest = colors.primarySoftest
+        primaryFaint = colors.primaryFaint
 
         secondary = colors.secondary
         error = colors.error
@@ -186,6 +191,7 @@ fun SpotDayColors(): SpotColors = SpotColors(
     primaryStrong = B400,
     primarySoft = B200,
     primarySoftest = B100,
+    primaryFaint = B50,
 
     secondary = Y400,
     error = R500,

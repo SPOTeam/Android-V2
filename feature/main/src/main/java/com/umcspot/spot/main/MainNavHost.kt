@@ -1,5 +1,6 @@
 package com.umcspot.spot.main
 
+import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.PaddingValues
@@ -38,6 +39,7 @@ import com.umcspot.spot.mypage.waiting.navigation.navigateToWaitingStudy
 import com.umcspot.spot.mypage.waiting.navigation.waitingStudyGraph
 import com.umcspot.spot.signup.navigation.navigateToLanding
 import com.umcspot.spot.signup.navigation.signupGraph
+import com.umcspot.spot.study.detail.model.StudyDetailTab
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.detail.navigation.studyDetailGraph
 import com.umcspot.spot.study.my.navigation.myStudyGraph
@@ -58,7 +60,9 @@ fun MainNavHost(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
-    onBackRequest : () -> Unit,
+    onStudyTabChanged: (StudyDetailTab) -> Unit,
+    currentStudyDetailTab: StudyDetailTab,
+    onBackRequest : () -> Unit
 ) {
     val clearStackNavOptions = navOptions {
         popUpTo(0) { inclusive = true }
@@ -111,7 +115,12 @@ fun MainNavHost(
             onAcceptFilterClick = { navigator.popBackStack() }
         )
 
-        myStudyGraph()
+        myStudyGraph(
+            contentPadding = contentPadding,
+            navigateToStudyDetail = { studyId ->
+                navigator.navController.navigateToStudyDetail(studyId)
+            }
+        )
 
         jjimGraph(
             contentPadding = contentPadding,
@@ -277,7 +286,14 @@ fun MainNavHost(
 
         studyDetailGraph(
             contentPadding = contentPadding,
-            onBackClick = { navigator.navigateToMyStudy(clearStackNavOptions) }
+            onDetailBackClick = {
+                navigator.navigateToMyStudy(clearStackNavOptions)
+            },
+            onMemoirPostBackClick = {
+                navigator.popBackStack()
+            },
+            onTabChanged = onStudyTabChanged,
+            currentTab = currentStudyDetailTab
         )
     }
 }
