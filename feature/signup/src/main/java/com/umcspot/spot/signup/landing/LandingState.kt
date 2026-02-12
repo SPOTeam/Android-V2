@@ -1,7 +1,7 @@
 package com.umcspot.spot.signup.landing
 
 data class LandingState(
-    val isLoading: Boolean = false,
+    val successAutoLogin: Boolean = false,
 )
 
 sealed interface LandingSideEffect {

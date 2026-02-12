@@ -21,7 +21,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -71,37 +73,33 @@ fun LandingRoute(
         }
     }
 
-    Scaffold(
-        modifier = modifier,
-        containerColor = SpotTheme.colors.white,
-        contentWindowInsets = WindowInsets.systemBars,
-        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
-    ) { innerPadding ->
-        LandingScreen(
-            contentPadding = innerPadding,
-            isLoading = uiState.isLoading,
-            onKakaoClick = {
-                if (!uiState.isLoading) {
+    if(!uiState.successAutoLogin) {
+        Scaffold(
+            modifier = modifier,
+            containerColor = SpotTheme.colors.white,
+            contentWindowInsets = WindowInsets.systemBars,
+            snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
+        ) { innerPadding ->
+            LandingScreen(
+                contentPadding = innerPadding,
+                onKakaoClick = {
                     activity?.let { act ->
                         viewModel.startSocialLogin(SocialLoginType.KAKAO, act)
                     }
-                }
-            },
-            onNaverClick = {
-                if (!uiState.isLoading) {
+                },
+                onNaverClick = {
                     activity?.let { act ->
                         viewModel.startSocialLogin(SocialLoginType.NAVER, act)
                     }
                 }
-            }
-        )
+            )
+        }
     }
 }
 
 @Composable
 fun LandingScreen(
     contentPadding: PaddingValues,
-    isLoading: Boolean,
     onKakaoClick: () -> Unit,
     onNaverClick: () -> Unit,
     modifier: Modifier = Modifier

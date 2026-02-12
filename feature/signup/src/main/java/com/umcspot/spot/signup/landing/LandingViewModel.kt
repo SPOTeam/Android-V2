@@ -33,22 +33,16 @@ class LandingViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<LandingSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
-    private var autoLoginChecked = false
-
     fun tryAutoLogin() {
-        if (autoLoginChecked) return
-        autoLoginChecked = true
-
-        if (_uiState.value.isLoading) return
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update { it.copy(successAutoLogin = true) }
 
         viewModelScope.launch {
             val result = loginRepository.refreshTokenData()
             if (result.isSuccess) {
-                _uiState.update { it.copy(isLoading = false) }
                 _sideEffect.emit(LandingSideEffect.NavigateToHome)
+                _uiState.update { it.copy(successAutoLogin = false) }
             } else {
-                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update { it.copy(successAutoLogin = false) }
             }
         }
     }
@@ -57,7 +51,7 @@ class LandingViewModel @Inject constructor(
         type: SocialLoginType,
         activity: Activity,
     ) {
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update { it.copy(successAutoLogin = true) }
 
         when (type) {
             SocialLoginType.KAKAO -> loginWithKakao()
@@ -112,7 +106,7 @@ class LandingViewModel @Inject constructor(
         viewModelScope.launch {
             val result = loginRepository.finishSocialLogin(type = type, accessToken = accessToken)
             if (result.isSuccess) {
-                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update { it.copy(successAutoLogin = false) }
                 _sideEffect.emit(LandingSideEffect.NavigateToSignUp)
             } else {
                 handleLoginError("서버 로그인 실패", result.exceptionOrNull())
@@ -123,7 +117,7 @@ class LandingViewModel @Inject constructor(
         val errorMessage = if (e != null) "$msg: ${e.message}" else msg
         Log.e(TAG, errorMessage, e)
 
-        _uiState.update { it.copy(isLoading = false) }
+        _uiState.update { it.copy(successAutoLogin = false) }
         _sideEffect.emit(LandingSideEffect.ShowSnackBar(errorMessage))
     }
 }
