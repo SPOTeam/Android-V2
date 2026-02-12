@@ -9,7 +9,9 @@ import androidx.compose.ui.Modifier
 import com.umcspot.spot.designsystem.theme.SpotTheme
 
 @Composable
-fun StudyDetailBoardScreen() {
+fun StudyDetailBoardScreen(
+    studyId: Long
+) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(text = "게시판 화면입니다.", style = SpotTheme.typography.h5)
     }

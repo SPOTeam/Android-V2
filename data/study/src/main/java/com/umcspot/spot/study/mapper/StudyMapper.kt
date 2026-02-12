@@ -1,8 +1,10 @@
 package com.umcspot.spot.study.mapper
 
+import com.umcspot.spot.model.formatCreatedAt
 import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.model.toImageRef
 import com.umcspot.spot.study.dto.request.StudyRequestDto
+import com.umcspot.spot.study.dto.response.Comment
 import com.umcspot.spot.study.dto.response.MemberDto
 import com.umcspot.spot.study.dto.response.MemoirDto
 import com.umcspot.spot.study.dto.response.ScheduleResponseDto
@@ -10,10 +12,14 @@ import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
 import com.umcspot.spot.study.dto.response.Study
 import com.umcspot.spot.study.dto.response.StudyApplication
 import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
+import com.umcspot.spot.study.dto.response.StudyPost
+import com.umcspot.spot.study.dto.response.StudyPostDetailResponseDto
+import com.umcspot.spot.study.dto.response.StudyPostsResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
 import com.umcspot.spot.study.dto.response.TodoItemDto
 import com.umcspot.spot.study.dto.response.TodoQueryResponseDto
+import com.umcspot.spot.study.model.CommentResult
 import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.MemoirModel
 import com.umcspot.spot.study.model.MemoirReactionCounts
@@ -23,6 +29,9 @@ import com.umcspot.spot.study.model.StudyApplicationResultList
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyDetailModel
 import com.umcspot.spot.study.model.StudyMemberModel
+import com.umcspot.spot.study.model.StudyPostDetailResult
+import com.umcspot.spot.study.model.StudyPostResult
+import com.umcspot.spot.study.model.StudyPostsResultList
 import com.umcspot.spot.study.model.StudyRecentMemoirModel
 import com.umcspot.spot.study.model.StudyResult
 import com.umcspot.spot.study.model.StudyResultList
@@ -157,4 +166,52 @@ fun StudyApplication.toDomain() : StudyApplicationResult =
         nickname = this.nickname,
         description = this.description,
         profileImageUrl = this.profileImageUrl.toImageRef()
+    )
+
+fun StudyPostsResponseDto.toDomainList() : StudyPostsResultList =
+    StudyPostsResultList(
+        studyPostsList = this.posts.map{it.toDomain()},
+        hasNext = this.hasNext,
+        nextCursor = this.nextCursor?.toLong(),
+    )
+
+fun StudyPost.toDomain() : StudyPostResult =
+    StudyPostResult(
+        postId = this.postId.toLong(),
+        title = this.title,
+        content = this.content,
+        isPinned = this.isPinned,
+        isLiked = this.isLiked,
+        likeCount = this.state.likeCount,
+        viewCount = this.state.viewCount,
+        commentCount = this.state.commentCount,
+        createdAt = this.createdAt.formatCreatedAt(),
+    )
+
+fun StudyPostDetailResponseDto.toDomain() : StudyPostDetailResult =
+    StudyPostDetailResult (
+        postId = this.postId.toLong(),
+        title = this.title,
+        content = this.content,
+        isPinned = this.isPinned,
+        isLiked = this.isLiked,
+        writerMemberId = this.writer.memberId,
+        writerNickname = this.writer.nickname,
+        writerProfileUrl = this.writer.profileImageUrl.toImageRef(),
+        likeCount = this.state.likeCount,
+        viewCount = this.state.viewCount,
+        commentCount = this.state.commentCount,
+        createdAt = this.createdAt.formatCreatedAt(),
+        comments = this.comments.map{it.toDomain()}
+    )
+
+fun Comment.toDomain() : CommentResult =
+    CommentResult(
+        commentId = this.commentId.toLong(),
+        content = this.content,
+        isOwner = this.isOwner,
+        commentMemberId = this.writer.memberId,
+        commentNickname = this.writer.nickname,
+        commentProfileUrl = this.writer.profileImageUrl.toImageRef(),
+        createdAt = this.createdAt.formatCreatedAt()
     )

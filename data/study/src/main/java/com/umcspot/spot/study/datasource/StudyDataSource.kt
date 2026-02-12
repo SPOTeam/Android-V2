@@ -15,6 +15,8 @@ import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
 import com.umcspot.spot.study.dto.response.StudyMonthlyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
+import com.umcspot.spot.study.dto.response.StudyPostDetailResponseDto
+import com.umcspot.spot.study.dto.response.StudyPostsResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.dto.response.StudyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
@@ -117,5 +119,36 @@ interface StudyDataSource {
     suspend fun entryAcceptance(
         applicationId : Long,
         decision : String
+    ) : NullResultResponse
+
+    suspend fun getStudyPostsList(
+        studyId : Long,
+        cursor: Long?,
+        size: Int
+    ) : BaseResponse<StudyPostsResponseDto>
+
+    suspend fun getStudyPostDetail(
+        studyId : Long,
+        postId : Long,
+    ) : BaseResponse<StudyPostDetailResponseDto>
+
+    suspend fun studyPostPin(
+        studyId: Long,
+        postId: Long
+    ) : NullResultResponse
+
+    suspend fun studyPostUnPin(
+        studyId: Long,
+        postId: Long
+    ) : NullResultResponse
+
+    suspend fun studyPostLike(
+        studyId: Long,
+        postId: Long
+    ) : NullResultResponse
+
+    suspend fun studyPostUnLike(
+        studyId: Long,
+        postId: Long
     ) : NullResultResponse
 }

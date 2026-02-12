@@ -14,6 +14,8 @@ import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
 import com.umcspot.spot.study.dto.response.StudyMonthlyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
+import com.umcspot.spot.study.dto.response.StudyPostDetailResponseDto
+import com.umcspot.spot.study.dto.response.StudyPostsResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.dto.response.StudyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
@@ -210,5 +212,42 @@ interface StudyService {
     suspend fun entryAcceptance(
         @Path("applicationId") applicationId: Long,
         @Query("decision") decision: String
+    ): NullResultResponse
+
+    @GET("/api/studies/{studyId}/posts")
+    suspend fun getStudyPostsList(
+        @Path("studyId") studyId: Long,
+        @Query("cursor") cursor: Long?,
+        @Query("size") size: Int
+    ): BaseResponse<StudyPostsResponseDto>
+
+    @GET("/api/studies/{studyId}/posts/{postId}")
+    suspend fun getStudyPostDetail(
+        @Path("studyId") studyId: Long,
+        @Path("postId") postId: Long,
+    ): BaseResponse<StudyPostDetailResponseDto>
+
+    @POST("/api/studies/{studyId}/posts/{postId}/pin")
+    suspend fun studyPostPin(
+        @Path("studyId") studyId: Long,
+        @Path("postId") postId: Long,
+    ): NullResultResponse
+
+    @DELETE("/api/studies/{studyId}/posts/{postId}/pin")
+    suspend fun studyPostUnPin(
+        @Path("studyId") studyId: Long,
+        @Path("postId") postId: Long,
+    ): NullResultResponse
+
+    @POST("/api/studies/{studyId}/posts/{postId}/like")
+    suspend fun studyPostLike(
+        @Path("studyId") studyId: Long,
+        @Path("postId") postId: Long,
+    ): NullResultResponse
+
+    @DELETE("/api/studies/{studyId}/posts/{postId}/like")
+    suspend fun studyPostUnLike(
+        @Path("studyId") studyId: Long,
+        @Path("postId") postId: Long,
     ): NullResultResponse
 }

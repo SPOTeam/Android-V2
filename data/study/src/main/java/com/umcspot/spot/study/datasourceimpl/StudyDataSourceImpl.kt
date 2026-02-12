@@ -17,6 +17,8 @@ import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
 import com.umcspot.spot.study.dto.response.StudyMonthlyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
+import com.umcspot.spot.study.dto.response.StudyPostDetailResponseDto
+import com.umcspot.spot.study.dto.response.StudyPostsResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.dto.response.StudyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
@@ -199,4 +201,45 @@ class StudyDataSourceImpl @Inject constructor(
         decision: String
     ): NullResultResponse =
         studyService.entryAcceptance(applicationId,decision)
+
+    override suspend fun getStudyPostsList(
+        studyId: Long,
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyPostsResponseDto> =
+        studyService.getStudyPostsList(studyId, cursor, size)
+
+    override suspend fun getStudyPostDetail(
+        studyId: Long,
+        postId: Long
+    ): BaseResponse<StudyPostDetailResponseDto> =
+        studyService.getStudyPostDetail(studyId,postId)
+
+    override suspend fun studyPostPin(
+        studyId: Long,
+        postId: Long
+    ): NullResultResponse =
+        studyService.studyPostPin(studyId,postId)
+
+
+    override suspend fun studyPostUnPin(
+        studyId: Long,
+        postId: Long
+    ): NullResultResponse =
+        studyService.studyPostUnPin(studyId,postId)
+
+
+    override suspend fun studyPostLike(
+        studyId: Long,
+        postId: Long
+    ): NullResultResponse =
+        studyService.studyPostLike(studyId,postId)
+
+
+    override suspend fun studyPostUnLike(
+        studyId: Long,
+        postId: Long
+    ): NullResultResponse =
+        studyService.studyPostUnLike(studyId,postId)
+
 }

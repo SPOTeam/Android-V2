@@ -10,6 +10,8 @@ import com.umcspot.spot.study.model.StudyApplicationResultList
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyDetailModel
 import com.umcspot.spot.study.model.StudyMemberModel
+import com.umcspot.spot.study.model.StudyPostDetailResult
+import com.umcspot.spot.study.model.StudyPostsResultList
 import com.umcspot.spot.study.model.StudyRecentMemoirModel
 import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.study.model.StudyScheduleModel
@@ -133,5 +135,36 @@ interface StudyRepository {
     suspend fun entryAcceptance(
         applicationId: Long,
         decision: String
+    ) : Result<Unit>
+
+    suspend fun getStudyPostsList(
+        studyId : Long,
+        cursor: Long?,
+        size: Int
+    ) : Result<StudyPostsResultList>
+
+    suspend fun getStudyPostDetail(
+        studyId : Long,
+        postId : Long
+    ) : Result<StudyPostDetailResult>
+
+    suspend fun studyPostPin(
+        studyId: Long,
+        postId: Long
+    ) : Result<Unit>
+
+    suspend fun studyPostUnPin(
+        studyId: Long,
+        postId: Long
+    ) : Result<Unit>
+
+    suspend fun studyPostLike(
+        studyId: Long,
+        postId: Long
+    ) : Result<Unit>
+
+    suspend fun studyPostUnLike(
+        studyId: Long,
+        postId: Long
     ) : Result<Unit>
 }

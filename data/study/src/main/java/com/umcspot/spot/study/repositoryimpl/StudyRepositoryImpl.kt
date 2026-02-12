@@ -16,6 +16,8 @@ import com.umcspot.spot.study.model.StudyApplicationResultList
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyDetailModel
 import com.umcspot.spot.study.model.StudyMemberModel
+import com.umcspot.spot.study.model.StudyPostDetailResult
+import com.umcspot.spot.study.model.StudyPostsResultList
 import com.umcspot.spot.study.model.StudyRecentMemoirModel
 import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.study.model.StudyScheduleModel
@@ -353,5 +355,63 @@ class StudyRepositoryImpl @Inject constructor(
     ): Result<Unit> =
         runCatching {
             studyDataSource.entryAcceptance(applicationId, decision)
+        }
+
+    override suspend fun getStudyPostsList(
+        studyId : Long,
+        cursor: Long?,
+        size: Int
+    ) : Result<StudyPostsResultList> =
+        runCatching {
+            val response = studyDataSource.getStudyPostsList(studyId, cursor, size)
+            response.result.toDomainList()
+        }.onFailure {
+            Log.e("StudyRepository", "getStudyPostsList failed", it)
+        }
+
+    override suspend fun getStudyPostDetail(
+        studyId: Long,
+        postId: Long
+    ): Result<StudyPostDetailResult> =
+        runCatching {
+            val response = studyDataSource.getStudyPostDetail(studyId, postId)
+            response.result.toDomain()
+        }.onFailure {
+            Log.e("StudyRepository", "getStudyPostDetail failed", it)
+        }
+
+    override suspend fun studyPostPin(
+        studyId: Long,
+        postId: Long
+    ): Result<Unit> =
+        runCatching {
+            studyDataSource.studyPostPin(studyId, postId)
+        }
+
+
+    override suspend fun studyPostUnPin(
+        studyId: Long,
+        postId: Long
+    ): Result<Unit> =
+        runCatching {
+            studyDataSource.studyPostUnPin(studyId, postId)
+        }
+
+
+    override suspend fun studyPostLike(
+        studyId: Long,
+        postId: Long
+    ): Result<Unit> =
+        runCatching {
+            studyDataSource.studyPostLike(studyId, postId)
+        }
+
+
+    override suspend fun studyPostUnLike(
+        studyId: Long,
+        postId: Long
+    ): Result<Unit> =
+        runCatching {
+            studyDataSource.studyPostUnLike(studyId, postId)
         }
 }

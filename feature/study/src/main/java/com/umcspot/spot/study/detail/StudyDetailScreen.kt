@@ -181,7 +181,9 @@ private fun StudyDetailScreen(
                         onMemberSelected = onMemberSelected
                     )
 
-                    StudyDetailTab.BOARD -> StudyDetailBoardScreen()
+                    StudyDetailTab.BOARD -> StudyDetailBoardScreen(
+                        studyId = studyId
+                    )
                     StudyDetailTab.MEMOIR -> StudyDetailMemoirScreen(
                         studyId = studyId,
                         memoirs = uiState.memoirState.memoirs,
