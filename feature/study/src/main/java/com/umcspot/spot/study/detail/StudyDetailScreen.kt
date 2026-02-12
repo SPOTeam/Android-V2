@@ -100,6 +100,9 @@ fun StudyDetailRoute(
         },
         onMemoirDelete = { memoirId -> viewModel.deleteMemoir(studyId, memoirId) },
         onMemoirEmojiToggle = viewModel::toggleMemoirReaction,
+        onPostPinToggle = { postId, isPinned ->
+            viewModel.togglePostPin(studyId, postId, isPinned)
+        },
         onBackClick = onBackClick,
         contentPadding = contentPadding,
         lazyListState = lazyListState
@@ -121,6 +124,7 @@ private fun StudyDetailScreen(
     onMemberSelected: (Long) -> Unit,   
     onMemoirDelete: (Long) -> Unit,
     onMemoirEmojiToggle: (Long, Long, String, Boolean) -> Unit,
+    onPostPinToggle: (Long, Boolean) -> Unit,
     onBackClick: () -> Unit,
     contentPadding: PaddingValues,
     lazyListState: LazyListState
@@ -182,7 +186,9 @@ private fun StudyDetailScreen(
                     )
 
                     StudyDetailTab.BOARD -> StudyDetailBoardScreen(
-                        studyId = studyId
+                        posts = uiState.postState.monthlySchedules,
+                        isLoading = uiState.isLoading,
+                        onPinToggle = onPostPinToggle
                     )
                     StudyDetailTab.MEMOIR -> StudyDetailMemoirScreen(
                         studyId = studyId,
