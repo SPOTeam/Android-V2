@@ -1,18 +1,125 @@
 package com.umcspot.spot.study.detail.screen
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.SpotSpinner
+import com.umcspot.spot.designsystem.component.post.PostListItem
+import com.umcspot.spot.designsystem.shapes.SpotShapes
+import com.umcspot.spot.designsystem.theme.B400
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.study.model.StudyPostResult
+import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudyDetailBoardScreen(
-    studyId: Long
+    posts: List<StudyPostResult>,
+    isLoading: Boolean,
+    onPostClick: (Long) -> Unit = {},
+    onLikeClick: (Long, Boolean) -> Unit = { _, _ -> },
+    onPinToggle: (Long, Boolean) -> Unit = { _, _ -> }
 ) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = "게시판 화면입니다.", style = SpotTheme.typography.h5)
+    when {
+        isLoading && posts.isEmpty() -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                SpotSpinner()
+            }
+        }
+
+        posts.isEmpty() -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = "게시글이 없습니다.",
+                    style = SpotTheme.typography.medium_400,
+                    color = SpotTheme.colors.gray400,
+                    modifier = Modifier.padding(vertical = screenHeightDp(20.dp))
+                )
+            }
+        }
+
+        else -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = screenHeightDp(12.dp))
+            ) {
+                posts.forEach { post ->
+                    key(post.postId, post.isPinned) {
+                        val dismissState = rememberSwipeToDismissBoxState(
+                            confirmValueChange = { value ->
+                                if (value == SwipeToDismissBoxValue.EndToStart) {
+                                    onPinToggle(post.postId, post.isPinned)
+                                }
+                                false
+                            }
+                        )
+
+                        SwipeToDismissBox(
+                            state = dismissState,
+                            enableDismissFromStartToEnd = false,
+                            backgroundContent = {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(screenWidthDp(1.dp))
+                                        .fillMaxSize()
+                                        .clip(SpotShapes.Soft)
+                                        .background(SpotTheme.colors.B400)
+                                        .padding(horizontal = screenWidthDp(20.dp)),
+                                    contentAlignment = Alignment.CenterEnd
+                                ) {
+                                    Image(
+                                        painter = painterResource(
+                                            if (post.isPinned) R.drawable.ic_unpin else R.drawable.ic_pin
+                                        ),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(screenWidthDp(14.dp)),
+                                        colorFilter = ColorFilter.tint(SpotTheme.colors.white)
+                                    )
+                                }
+                            },
+                            content = {
+                                PostListItem(
+                                    item = post,
+                                    onLikeClick = { onLikeClick(post.postId, post.isLiked) },
+                                    onClick = { onPostClick(post.postId) }
+                                )
+                            }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(screenHeightDp(5.dp)))
+                    HorizontalDivider(
+                        modifier = Modifier.fillMaxWidth(),
+                        thickness = 1.dp,
+                        color = SpotTheme.colors.gray200
+                    )
+                    Spacer(modifier = Modifier.height(screenHeightDp(5.dp)))
+                }
+            }
+        }
     }
 }

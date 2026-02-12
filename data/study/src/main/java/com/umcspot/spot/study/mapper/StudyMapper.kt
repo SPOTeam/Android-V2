@@ -1,17 +1,18 @@
 package com.umcspot.spot.study.mapper
 
 import com.umcspot.spot.model.formatCreatedAt
-import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.model.toImageRef
+import com.umcspot.spot.study.dto.request.BoardCreateRequestDto
+import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.response.Comment
 import com.umcspot.spot.study.dto.response.MemberDto
 import com.umcspot.spot.study.dto.response.MemoirDto
 import com.umcspot.spot.study.dto.response.ScheduleResponseDto
-import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
 import com.umcspot.spot.study.dto.response.Study
 import com.umcspot.spot.study.dto.response.StudyApplication
 import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
+import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
 import com.umcspot.spot.study.dto.response.StudyPost
 import com.umcspot.spot.study.dto.response.StudyPostDetailResponseDto
 import com.umcspot.spot.study.dto.response.StudyPostsResponseDto
@@ -19,6 +20,7 @@ import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
 import com.umcspot.spot.study.dto.response.TodoItemDto
 import com.umcspot.spot.study.dto.response.TodoQueryResponseDto
+import com.umcspot.spot.study.model.BoardCreateModel
 import com.umcspot.spot.study.model.CommentResult
 import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.MemoirModel
@@ -156,6 +158,12 @@ fun MemoirCreateModel.toData(): MemoirCreateRequestDto = MemoirCreateRequestDto(
     encouragement = this.encouragement,
     isPrivate = this.isPrivate
 )
+
+fun BoardCreateModel.toData(): BoardCreateRequestDto = BoardCreateRequestDto(
+    title = this.title,
+    content = this.content,
+    isPrivate = this.isPrivate
+)
 fun StudyApplicationResponseDto.toDomainList(): StudyApplicationResultList =
     StudyApplicationResultList(applies = this.applies.map {it.toDomain()})
 
@@ -182,9 +190,9 @@ fun StudyPost.toDomain() : StudyPostResult =
         content = this.content,
         isPinned = this.isPinned,
         isLiked = this.isLiked,
-        likeCount = this.state.likeCount,
-        viewCount = this.state.viewCount,
-        commentCount = this.state.commentCount,
+        likeCount = this.stats.likeCount,
+        viewCount = this.stats.viewCount,
+        commentCount = this.stats.commentCount,
         createdAt = this.createdAt.formatCreatedAt(),
     )
 
@@ -198,9 +206,9 @@ fun StudyPostDetailResponseDto.toDomain() : StudyPostDetailResult =
         writerMemberId = this.writer.memberId,
         writerNickname = this.writer.nickname,
         writerProfileUrl = this.writer.profileImageUrl.toImageRef(),
-        likeCount = this.state.likeCount,
-        viewCount = this.state.viewCount,
-        commentCount = this.state.commentCount,
+        likeCount = this.stats.likeCount,
+        viewCount = this.stats.viewCount,
+        commentCount = this.stats.commentCount,
         createdAt = this.createdAt.formatCreatedAt(),
         comments = this.comments.map{it.toDomain()}
     )

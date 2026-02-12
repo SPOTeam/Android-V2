@@ -50,6 +50,7 @@ import com.umcspot.spot.mypage.waiting.navigation.WaitingStudy
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.detail.model.StudyDetailTab
+import com.umcspot.spot.study.detail.navigation.StudyBoardPost
 import com.umcspot.spot.study.detail.navigation.StudyDetail
 import com.umcspot.spot.study.detail.navigation.StudyMemoirPost
 import com.umcspot.spot.study.my.navigation.MyStudy
@@ -86,7 +87,8 @@ fun MainScreen(
             if (!navigator.isInLanding()) {
                 val isFullPage = dest?.hasRoute(RegisterStudy::class) == true ||
                         dest?.hasRoute(StudyDetail::class) == true ||
-                        dest?.hasRoute(StudyMemoirPost::class) == true
+                        dest?.hasRoute(StudyMemoirPost::class) == true ||
+                        dest?.hasRoute(StudyBoardPost::class) == true
 
                 if (isFullPage) {
                 } else if (navigator.showBackTopBar()) {
@@ -140,20 +142,27 @@ fun MainScreen(
                 onClickToTop = { scrollToTop?.invoke() },
                 showMultiple = navigator.showMultipleFab() && (
                         dest?.hasRoute(BoardList::class) == true ||
-                                (dest?.hasRoute(StudyDetail::class) == true && currentStudyDetailTab == StudyDetailTab.MEMOIR)
+                                (dest?.hasRoute(StudyDetail::class) == true && currentStudyDetailTab == StudyDetailTab.MEMOIR) ||
+                                (dest?.hasRoute(StudyDetail::class) == true && currentStudyDetailTab == StudyDetailTab.BOARD)
                         ),
                 onClickMultiple = {
                     when {
                         dest?.hasRoute(BoardList::class) == true -> {
                             navigator.navController.navigateToPostingNew()
                         }
+
                         dest?.hasRoute(Home::class) == true -> {
                             navigator.navigateToRegisterStudy()
                         }
+
                         dest?.hasRoute(StudyDetail::class) == true -> {
                             val studyId = backStackEntry?.toRoute<StudyDetail>()?.studyId
                             if (studyId != null) {
-                                navigator.navigateToStudyMemoirPost(studyId)
+                                if (currentStudyDetailTab == StudyDetailTab.MEMOIR) {
+                                    navigator.navigateToStudyMemoirPost(studyId)
+                                } else if (currentStudyDetailTab == StudyDetailTab.BOARD) {
+                                    navigator.navigateToStudyBoardPost(studyId)
+                                }
                             }
                         }
                     }
@@ -180,7 +189,7 @@ fun MainScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .consumeWindowInsets(innerPadding),
-            contentPadding =  innerPadding,
+            contentPadding = innerPadding,
             onRegisterScrollToTop = { handler -> scrollToTop = handler },
             onBackRequest = { showBackRequestDialog = true },
             onStudyTabChanged = { tab -> currentStudyDetailTab = tab },
@@ -223,10 +232,10 @@ private fun FabStack(
             verticalArrangement = Arrangement.spacedBy(spacing),
             modifier = Modifier.align(Alignment.BottomEnd)
         ) {
-            if(showToTop) {
+            if (showToTop) {
                 FloatingToUpButton(onClick = onClickToTop)
             }
-            if(showMultiple) {
+            if (showMultiple) {
                 FloatingMultipleButton(onClick = onClickMultiple)
             }
         }

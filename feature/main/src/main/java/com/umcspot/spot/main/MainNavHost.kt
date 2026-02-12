@@ -292,8 +292,11 @@ fun MainNavHost(
             onMemoirPostBackClick = {
                 navigator.popBackStack()
             },
+            onBoardPostBackClick = {
+                navigator.popBackStack()
+            },
             onTabChanged = onStudyTabChanged,
-            currentTab = currentStudyDetailTab
+            currentTab = currentStudyDetailTab,
         )
     }
 }

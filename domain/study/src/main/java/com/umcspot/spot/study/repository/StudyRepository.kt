@@ -4,6 +4,7 @@ import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.model.StudyTheme
+import com.umcspot.spot.study.model.BoardCreateModel
 import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.MemoirModel
 import com.umcspot.spot.study.model.StudyApplicationResultList
@@ -91,6 +92,11 @@ interface StudyRepository {
         studyId: Long,
         memoir: MemoirCreateModel,
         imageFiles: List<File>
+    ): Result<Long>
+
+    suspend fun postBoard(
+        studyId: Long,
+        board : BoardCreateModel,
     ): Result<Long>
 
     suspend fun postReviewReaction(studyId: Long, reviewId: Long, reaction: String): Result<Unit?>

@@ -12,6 +12,7 @@ import com.umcspot.spot.study.mapper.toDomain
 import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.MemoirModel
 import com.umcspot.spot.study.mapper.toDomainList
+import com.umcspot.spot.study.model.BoardCreateModel
 import com.umcspot.spot.study.model.StudyApplicationResultList
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyDetailModel
@@ -242,6 +243,24 @@ class StudyRepositoryImpl @Inject constructor(
         }
 
         response.result.reviewId
+    }
+
+    override suspend fun postBoard(
+        studyId: Long,
+        board: BoardCreateModel
+    ): Result<Long> = runCatching {
+        val requestDto = board.toData()
+
+        val response = studyDataSource.postBoard(
+            studyId = studyId,
+            request = requestDto
+        )
+
+        if (!response.isSuccess) {
+            throw Exception(response.message ?: "게시글 작성 실패")
+        }
+
+        response.result.postId.toLong()
     }
 
     override suspend fun postReviewReaction(studyId: Long, reviewId: Long, reaction: String): Result<Unit?> {

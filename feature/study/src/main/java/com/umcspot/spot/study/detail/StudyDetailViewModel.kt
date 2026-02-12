@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umcspot.spot.study.detail.model.StudyDetailSideEffect
 import com.umcspot.spot.study.detail.model.StudyDetailState
+import com.umcspot.spot.study.model.BoardCreateModel
 import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.TodoModel
 import com.umcspot.spot.study.repository.StudyRepository
@@ -20,7 +21,6 @@ import java.io.File
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
-import kotlin.collections.map
 
 @HiltViewModel
 class StudyDetailViewModel @Inject constructor(
@@ -37,9 +37,18 @@ class StudyDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
+            val currentPostCursor = uiState.value.postState.nextCursor
+
             val detailDeferred = async { studyRepository.getStudyDetail(studyId) }
             val membersDeferred = async { studyRepository.getStudyMembers(studyId) }
             val schedulesDeferred = async { studyRepository.getUpcomingSchedules(studyId) }
+            val postsDeferred = async {
+                studyRepository.getStudyPostsList(
+                    studyId = studyId,
+                    cursor = currentPostCursor,
+                    size = 20
+                )
+            }
             val memoirsDeferred = async { studyRepository.getStudyRecentMemoirs(studyId) }
 
 
@@ -62,6 +71,19 @@ class StudyDetailViewModel @Inject constructor(
 
             schedulesDeferred.await().onSuccess { schedules ->
                 _uiState.update { it.copy(homeState = it.homeState.copy(schedules = schedules.toPersistentList())) }
+            }.onFailure { emitError(it) }
+
+            postsDeferred.await().onSuccess { posts ->
+                _uiState.update { state ->
+                    val currentList = if (currentPostCursor == null) emptyList() else state.postState.monthlySchedules
+                    state.copy(
+                        postState = state.postState.copy(
+                            monthlySchedules = (currentList + posts.studyPostsList).toPersistentList(),
+                            hasNext = posts.hasNext,
+                            nextCursor = posts.nextCursor
+                        )
+                    )
+                }
             }.onFailure { emitError(it) }
 
             memoirsDeferred.await().onSuccess { memoirs ->
@@ -217,6 +239,33 @@ class StudyDetailViewModel @Inject constructor(
         }
     }
 
+    fun postBoard(
+        studyId: Long,
+        title: String,
+        content: String,
+        isPrivate: Boolean,
+    ) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+
+            val boardModel = BoardCreateModel(
+                title = title,
+                content = content,
+                isPrivate = isPrivate
+            )
+
+            studyRepository.postBoard(studyId, boardModel)
+                .onSuccess {
+                    _sideEffect.emit(StudyDetailSideEffect.BoardPostSuccess)
+                    fetchStudyHomeDetail(studyId)
+                }
+                .onFailure { emitError(it) }
+
+            _uiState.update { it.copy(isLoading = false) }
+        }
+    }
+
+
     fun toggleMemoirReaction(
         studyId: Long,
         memoirId: Long,
@@ -300,6 +349,29 @@ class StudyDetailViewModel @Inject constructor(
                         .filterNot { it.memoirId == memoirId }
                         .toPersistentList()
                     state.copy(memoirState = state.memoirState.copy(memoirs = updatedList))
+                }
+            }.onFailure { emitError(it) }
+        }
+    }
+
+    fun togglePostPin(studyId: Long, postId: Long, isCurrentlyPinned: Boolean) {
+        viewModelScope.launch {
+            val result = if (isCurrentlyPinned) {
+                studyRepository.studyPostUnPin(studyId, postId)
+            } else {
+                studyRepository.studyPostPin(studyId, postId)
+            }
+
+            result.onSuccess {
+                _uiState.update { state ->
+                    val updatedPosts = state.postState.monthlySchedules
+                        .map { post ->
+                            if (post.postId == postId) post.copy(isPinned = !isCurrentlyPinned) else post
+                        }
+                        .sortedByDescending { it.isPinned }
+                        .toPersistentList()
+
+                    state.copy(postState = state.postState.copy(monthlySchedules = updatedPosts))
                 }
             }.onFailure { emitError(it) }
         }

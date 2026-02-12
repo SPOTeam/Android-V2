@@ -7,9 +7,11 @@ import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.study.datasource.StudyDataSource
+import com.umcspot.spot.study.dto.request.BoardCreateRequestDto
 import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.request.TodoCreateRequestDto
+import com.umcspot.spot.study.dto.response.BoardCreateResponseDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.MemoirCreateResponseDto
 import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
@@ -29,6 +31,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import javax.inject.Inject
+import kotlin.collections.ifEmpty
 
 class StudyDataSourceImpl @Inject constructor(
     private val studyService: StudyService
@@ -146,6 +149,15 @@ class StudyDataSourceImpl @Inject constructor(
             imageFile = imageParts.ifEmpty { null }
         )
     }
+
+    override suspend fun postBoard(
+        studyId: Long,
+        request: BoardCreateRequestDto
+    ): BaseResponse<BoardCreateResponseDto> =
+       studyService.postBoard(
+            studyId = studyId,
+            request = request
+       )
 
     override suspend fun postReviewReaction(studyId: Long, reviewId: Long, reaction: String): BaseResponse<Unit?> {
         return studyService.postReviewReaction(studyId, reviewId, reaction)

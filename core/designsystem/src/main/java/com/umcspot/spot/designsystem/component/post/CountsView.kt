@@ -24,6 +24,7 @@ import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.domain.board.model.postList.PostResult
 import com.umcspot.spot.post.model.postDetail.PostDetailResult
+import com.umcspot.spot.study.model.StudyPostResult
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 
@@ -64,6 +65,26 @@ fun CountView(
         )
         Stat(iconRes = R.drawable.comment, count2 = item.commentCount)
         Stat(iconRes = R.drawable.eye,     count2 = item.viewCount)
+    }
+}
+
+@Composable
+fun CountView(
+    item: StudyPostResult,
+    onLikeClick: (StudyPostResult) -> Unit = {},
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(screenWidthDp(3.dp))
+    ) {
+        Stat(
+            iconRes = R.drawable.thumb_up,
+            count2 = item.likeCount.toLong(),
+            likeChecked = item.isLiked,
+            onLikeClick = { onLikeClick(item) }
+        )
+        Stat(iconRes = R.drawable.comment, count2 = item.commentCount.toLong())
+        Stat(iconRes = R.drawable.eye, count2 = item.viewCount.toLong())
     }
 }
 

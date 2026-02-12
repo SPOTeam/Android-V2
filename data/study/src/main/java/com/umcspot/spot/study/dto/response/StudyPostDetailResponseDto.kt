@@ -26,8 +26,8 @@ data class StudyPostDetailResponseDto (
     @SerialName("writer")
     val writer : Writer,
 
-    @SerialName("state")
-    val state : State,
+    @SerialName("stats")
+    val stats : Stats,
 
     @SerialName("createdAt")
     val createdAt: String,

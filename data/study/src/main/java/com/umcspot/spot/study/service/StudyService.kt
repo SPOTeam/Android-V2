@@ -7,6 +7,8 @@ import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.study.dto.request.TodoCreateRequestDto
 import com.umcspot.spot.network.model.NullResultResponse
+import com.umcspot.spot.study.dto.request.BoardCreateRequestDto
+import com.umcspot.spot.study.dto.response.BoardCreateResponseDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.MemoirCreateResponseDto
 import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
@@ -179,6 +181,12 @@ interface StudyService {
         @Part request: MultipartBody.Part,
         @Part imageFile: List<MultipartBody.Part>?
     ): BaseResponse<MemoirCreateResponseDto>
+
+    @POST("/api/studies/{studyId}/posts")
+    suspend fun postBoard(
+        @Path("studyId") studyId: Long,
+        @Part request: BoardCreateRequestDto,
+    ): BaseResponse<BoardCreateResponseDto>
 
     // 회고록 반응 추가
     @POST("/api/studies/{studyId}/reviews/{reviewId}/reactions")

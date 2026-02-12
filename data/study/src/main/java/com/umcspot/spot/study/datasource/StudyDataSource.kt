@@ -5,16 +5,18 @@ import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
-import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.network.model.NullResultResponse
+import com.umcspot.spot.study.dto.request.BoardCreateRequestDto
+import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.study.dto.request.StudyRequestDto
+import com.umcspot.spot.study.dto.response.BoardCreateResponseDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.MemoirCreateResponseDto
+import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
 import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
 import com.umcspot.spot.study.dto.response.StudyMonthlyScheduleResponseDto
-import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
 import com.umcspot.spot.study.dto.response.StudyPostDetailResponseDto
 import com.umcspot.spot.study.dto.response.StudyPostsResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
@@ -86,6 +88,11 @@ interface StudyDataSource {
         request: MemoirCreateRequestDto,
         imageFiles: List<File>
     ): BaseResponse<MemoirCreateResponseDto>
+
+    suspend fun postBoard(
+        studyId: Long,
+        request: BoardCreateRequestDto,
+    ): BaseResponse<BoardCreateResponseDto>
 
     suspend fun postReviewReaction(studyId: Long, reviewId: Long, reaction: String): BaseResponse<Unit?>
 

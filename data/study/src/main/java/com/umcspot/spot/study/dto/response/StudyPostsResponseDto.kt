@@ -34,8 +34,8 @@ data class StudyPost (
     @SerialName("isLiked")
     val isLiked: Boolean,
 
-    @SerialName("state")
-    val state : State,
+    @SerialName("stats")
+    val stats : Stats,
 
     @SerialName("createdAt")
     val createdAt: String
@@ -43,7 +43,7 @@ data class StudyPost (
 
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
-data class State (
+data class Stats (
     @SerialName("likeCount")
     val likeCount: Int,
 

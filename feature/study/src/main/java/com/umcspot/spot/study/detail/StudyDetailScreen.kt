@@ -134,10 +134,13 @@ private fun StudyDetailScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(SpotTheme.colors.white)
-            .imePadding()
+            .imePadding(),
+        contentPadding = PaddingValues(
+            top = contentPadding.calculateTopPadding(),
+            bottom = contentPadding.calculateBottomPadding() + screenHeightDp(20.dp) // 여유
+        )
     ) {
         item {
-            Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
             BackTopBar(title = "스터디", onBackClick = onBackClick)
 
             AsyncImage(
@@ -162,7 +165,6 @@ private fun StudyDetailScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = screenWidthDp(17.dp)) 
-                    .padding(bottom = contentPadding.calculateBottomPadding() + screenHeightDp(20.dp))
             ) {
                 when (selectedTab) {
                     StudyDetailTab.HOME -> StudyDetailHomeScreen(
@@ -188,7 +190,9 @@ private fun StudyDetailScreen(
                     StudyDetailTab.BOARD -> StudyDetailBoardScreen(
                         posts = uiState.postState.monthlySchedules,
                         isLoading = uiState.isLoading,
-                        onPinToggle = onPostPinToggle
+                        onPinToggle = onPostPinToggle,
+                        onLikeClick = {} as (Long, Boolean) -> Unit,
+                        onPostClick = {}
                     )
                     StudyDetailTab.MEMOIR -> StudyDetailMemoirScreen(
                         studyId = studyId,
