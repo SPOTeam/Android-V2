@@ -42,7 +42,7 @@ data class StudyPlannerState(
 )
 
 data class StudyPostState(
-    val monthlySchedules: ImmutableList<StudyPostResult> = persistentListOf(),
+    val studyPosts: ImmutableList<StudyPostResult> = persistentListOf(),
     val hasNext: Boolean = false,
     val nextCursor: Long? = null
 )

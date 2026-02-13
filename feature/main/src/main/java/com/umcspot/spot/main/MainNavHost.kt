@@ -99,7 +99,7 @@ fun MainNavHost(
             },
             onPopularClick = { navigator.navigateToBoard() },
             onPopularPostClick = { navigator.navController.navigateToPostContent(it) },
-            onStudyClick = {  },
+            onStudyClick = { navigator.navigateToStudyDetail(it) },
             onStudyMoreClick = {  }
         )
         categoryGraph(

@@ -61,15 +61,13 @@ fun StudyBoardPostRoute(
 
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { effect ->
-            if (effect is StudyDetailSideEffect.MemoirPostSuccess) {
+            if (effect is StudyDetailSideEffect.BoardPostSuccess) {
                 onBackClick()
             }
         }
     }
 
     StudyBoardPostScreen(
-        studyId = studyId,
-        isLoading = uiState.isLoading,
         contentPadding = contentPadding,
         onBackClick = onBackClick,
         onPostSubmit = { title, content,isPrivate ->
@@ -84,26 +82,15 @@ fun StudyBoardPostRoute(
 }
 @Composable
 fun StudyBoardPostScreen(
-    studyId: Long,
-    isLoading: Boolean,
     contentPadding: PaddingValues,
     onBackClick: () -> Unit,
     onPostSubmit: (String, String, Boolean) -> Unit
 ) {
-    var selectedImages by remember { mutableStateOf(persistentListOf<Uri>()) }
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
     var isPrivate by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetMultipleContents()
-    ) { uris ->
-        val remainingSlot = 3 - selectedImages.size
-        if (remainingSlot > 0) {
-            selectedImages = (selectedImages + uris.take(remainingSlot)).toPersistentList()
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -215,10 +202,11 @@ fun StudyBoardPostScreen(
             TextButton (
                 modifier = Modifier
                     .width(screenWidthDp(326.dp))
-                    .height(screenHeightDp(27.dp)),
+                    .height(screenHeightDp(47.dp)),
                 text = "완료",
                 enabled = title.isNotBlank() && content.isNotBlank(),
                 state = TextButtonState.B500State,
+                style = SpotTheme.typography.h3,
                 onClick = {
                     onPostSubmit(title, content, isPrivate)
                 }

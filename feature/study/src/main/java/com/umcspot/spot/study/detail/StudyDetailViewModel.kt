@@ -75,10 +75,10 @@ class StudyDetailViewModel @Inject constructor(
 
             postsDeferred.await().onSuccess { posts ->
                 _uiState.update { state ->
-                    val currentList = if (currentPostCursor == null) emptyList() else state.postState.monthlySchedules
+                    val currentList = if (currentPostCursor == null) emptyList() else state.postState.studyPosts
                     state.copy(
                         postState = state.postState.copy(
-                            monthlySchedules = (currentList + posts.studyPostsList).toPersistentList(),
+                            studyPosts = (currentList + posts.studyPostsList).toPersistentList(),
                             hasNext = posts.hasNext,
                             nextCursor = posts.nextCursor
                         )
@@ -364,14 +364,41 @@ class StudyDetailViewModel @Inject constructor(
 
             result.onSuccess {
                 _uiState.update { state ->
-                    val updatedPosts = state.postState.monthlySchedules
+                    val updatedPosts = state.postState.studyPosts
                         .map { post ->
                             if (post.postId == postId) post.copy(isPinned = !isCurrentlyPinned) else post
                         }
                         .sortedByDescending { it.isPinned }
                         .toPersistentList()
 
-                    state.copy(postState = state.postState.copy(monthlySchedules = updatedPosts))
+                    state.copy(postState = state.postState.copy(studyPosts = updatedPosts))
+                }
+            }.onFailure { emitError(it) }
+        }
+    }
+
+    fun togglePostLike(studyId: Long, postId: Long, isCurrentlyLiked: Boolean) {
+        viewModelScope.launch {
+            val result = if (isCurrentlyLiked) {
+                studyRepository.studyPostUnLike(studyId, postId)
+            } else {
+                studyRepository.studyPostLike(studyId, postId)
+            }
+
+            result.onSuccess {
+                _uiState.update { state ->
+                    val updatedPosts = state.postState.studyPosts
+                        .map { post ->
+                            if (post.postId == postId) {
+                                post.copy(
+                                    isLiked = !isCurrentlyLiked,
+                                    likeCount = if (!isCurrentlyLiked) post.likeCount + 1 else post.likeCount - 1
+                                )
+                            } else post
+                        }
+                        .toPersistentList()
+
+                    state.copy(postState = state.postState.copy(studyPosts = updatedPosts))
                 }
             }.onFailure { emitError(it) }
         }

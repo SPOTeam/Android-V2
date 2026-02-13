@@ -103,6 +103,9 @@ fun StudyDetailRoute(
         onPostPinToggle = { postId, isPinned ->
             viewModel.togglePostPin(studyId, postId, isPinned)
         },
+        onPostLikeClick = { postId, isLiked ->
+            viewModel.togglePostLike(studyId, postId, isLiked)
+        },
         onBackClick = onBackClick,
         contentPadding = contentPadding,
         lazyListState = lazyListState
@@ -125,6 +128,7 @@ private fun StudyDetailScreen(
     onMemoirDelete: (Long) -> Unit,
     onMemoirEmojiToggle: (Long, Long, String, Boolean) -> Unit,
     onPostPinToggle: (Long, Boolean) -> Unit,
+    onPostLikeClick: (Long, Boolean) -> Unit,
     onBackClick: () -> Unit,
     contentPadding: PaddingValues,
     lazyListState: LazyListState
@@ -188,10 +192,10 @@ private fun StudyDetailScreen(
                     )
 
                     StudyDetailTab.BOARD -> StudyDetailBoardScreen(
-                        posts = uiState.postState.monthlySchedules,
+                        posts = uiState.postState.studyPosts,
                         isLoading = uiState.isLoading,
                         onPinToggle = onPostPinToggle,
-                        onLikeClick = {} as (Long, Boolean) -> Unit,
+                        onLikeClick = onPostLikeClick,
                         onPostClick = {}
                     )
                     StudyDetailTab.MEMOIR -> StudyDetailMemoirScreen(

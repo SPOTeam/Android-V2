@@ -185,7 +185,7 @@ interface StudyService {
     @POST("/api/studies/{studyId}/posts")
     suspend fun postBoard(
         @Path("studyId") studyId: Long,
-        @Part request: BoardCreateRequestDto,
+        @Body request: BoardCreateRequestDto,
     ): BaseResponse<BoardCreateResponseDto>
 
     // 회고록 반응 추가

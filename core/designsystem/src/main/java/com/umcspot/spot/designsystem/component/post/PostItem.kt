@@ -1,6 +1,7 @@
 package com.umcspot.spot.designsystem.component.post
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -115,12 +116,12 @@ fun PostListItem(
             ) {
                 Text(
                     text = item.title,
+                    modifier = Modifier.weight(1f),
                     style = SpotTheme.typography.h5,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-
-                if(item.isPinned) {
+                if (item.isPinned) {
                     Spacer(Modifier.width(screenWidthDp(4.dp)))
 
                     Image(
