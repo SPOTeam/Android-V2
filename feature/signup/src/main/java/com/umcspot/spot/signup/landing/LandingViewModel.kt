@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NidOAuth
 import com.navercorp.nid.oauth.util.NidOAuthCallback
+import com.umcspot.spot.common.util.runSuspendCatching
 import com.umcspot.spot.model.SocialLoginType
 import com.umcspot.spot.token.repository.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,25 +34,11 @@ class LandingViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<LandingSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
-    fun tryAutoLogin() {
-        _uiState.update { it.copy(successAutoLogin = true) }
-
-        viewModelScope.launch {
-            val result = loginRepository.refreshTokenData()
-            if (result.isSuccess) {
-                _sideEffect.emit(LandingSideEffect.NavigateToHome)
-                _uiState.update { it.copy(successAutoLogin = false) }
-            } else {
-                _uiState.update { it.copy(successAutoLogin = false) }
-            }
-        }
-    }
-
     fun startSocialLogin(
         type: SocialLoginType,
         activity: Activity,
     ) {
-        _uiState.update { it.copy(successAutoLogin = true) }
+        _uiState.update { it.copy(isLoading = true) }
 
         when (type) {
             SocialLoginType.KAKAO -> loginWithKakao()
@@ -104,12 +91,13 @@ class LandingViewModel @Inject constructor(
 
     private fun requestServerLogin(type: SocialLoginType, accessToken: String) =
         viewModelScope.launch {
-            val result = loginRepository.finishSocialLogin(type = type, accessToken = accessToken)
-            if (result.isSuccess) {
-                _uiState.update { it.copy(successAutoLogin = false) }
-                _sideEffect.emit(LandingSideEffect.NavigateToSignUp)
-            } else {
-                handleLoginError("서버 로그인 실패", result.exceptionOrNull())
+            runSuspendCatching {
+                loginRepository.finishSocialLogin(type = type, accessToken = accessToken)
+            }.onSuccess {
+                _uiState.update { it.copy(isLoading = false) }
+                _sideEffect.emit(LandingSideEffect.NavigateToHome)
+            }.onFailure { e ->
+                handleLoginError("서버 로그인 실패", e)
             }
         }
 
@@ -117,7 +105,7 @@ class LandingViewModel @Inject constructor(
         val errorMessage = if (e != null) "$msg: ${e.message}" else msg
         Log.e(TAG, errorMessage, e)
 
-        _uiState.update { it.copy(successAutoLogin = false) }
+        _uiState.update { it.copy(isLoading = false) }
         _sideEffect.emit(LandingSideEffect.ShowSnackBar(errorMessage))
     }
 }

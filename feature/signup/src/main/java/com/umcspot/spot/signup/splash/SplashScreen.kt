@@ -1,4 +1,4 @@
-package com.umcspot.spot.signup.landing
+package com.umcspot.spot.signup.splash
 
 import android.app.Activity
 import androidx.compose.foundation.Image
@@ -42,10 +42,11 @@ import com.umcspot.spot.ui.extension.screenWidthDp
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun LandingRoute(
-    navigateToSignUp: () -> Unit,
+fun SplashRoute(
+    navigateToLanding: () -> Unit,
+    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: LandingViewModel = hiltViewModel(),
+    viewModel: SplashViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val activity = context as? Activity
@@ -54,10 +55,15 @@ fun LandingRoute(
 
     val snackBarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(Unit) {
+        viewModel.tryAutoLogin()
+    }
+
     LaunchedEffect(viewModel.sideEffect) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
-                is LandingSideEffect.NavigateToSignUp -> navigateToSignUp()
+                is LandingSideEffect.NavigateToHome -> navigateToHome()
+                is LandingSideEffect.NavigateToLanding -> navigateToLanding()
                 is LandingSideEffect.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(effect.message)
                 }
@@ -65,78 +71,19 @@ fun LandingRoute(
         }
     }
 
-    Scaffold(
-        modifier = modifier,
-        containerColor = SpotTheme.colors.white,
-        contentWindowInsets = WindowInsets.systemBars,
-        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
-    ) { innerPadding ->
-        LandingScreen(
-            contentPadding = innerPadding,
-            isLoading = uiState.isLoading,
-            onKakaoClick = {
-                if (!uiState.isLoading) {
-                    activity?.let { act ->
-                        viewModel.startSocialLogin(SocialLoginType.KAKAO, act)
-                    }
-                }
-            },
-            onNaverClick = {
-                if (!uiState.isLoading) {
-                    activity?.let { act ->
-                        viewModel.startSocialLogin(SocialLoginType.NAVER, act)
-                    }
-                }
-            }
-        )
-    }
+    SplashScreen()
+
+
 }
 
 @Composable
-fun LandingScreen(
-    contentPadding: PaddingValues,
-    isLoading: Boolean,
-    onKakaoClick: () -> Unit,
-    onNaverClick: () -> Unit,
-    modifier: Modifier = Modifier
+fun SplashScreen(
 ) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(SpotTheme.colors.white)
-            .padding(contentPadding)
-            .padding(horizontal = screenWidthDp(17.dp)),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Image(
-                painter = painterResource(R.drawable.spot_logo),
-                contentDescription = "SPOT 로고",
-                modifier = Modifier.size(screenWidthDp(33.dp)),
-                contentScale = ContentScale.Fit
-            )
-            Spacer(Modifier.height(screenHeightDp(52.dp)))
-            Text(
-                text = "당신의 스터디 파트너\n스팟, SPOT",
-                style = SpotTheme.typography.h2,
-                textAlign = TextAlign.Center,
-                color = SpotTheme.colors.B500,
-            )
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = screenHeightDp(63.dp)),
-            verticalArrangement = Arrangement.spacedBy(screenHeightDp(10.dp))
-        ) {
-            KakaoStartButton(onClick = onKakaoClick)
-            NaverStartButton(onClick = onNaverClick)
-        }
+
     }
 }
