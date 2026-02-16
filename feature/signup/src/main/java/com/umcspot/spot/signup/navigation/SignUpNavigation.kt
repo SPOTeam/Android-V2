@@ -10,6 +10,7 @@ import com.umcspot.spot.signup.landing.LandingRoute
 import com.umcspot.spot.navigation.Route
 import com.umcspot.spot.signup.SignUpRoute
 import com.umcspot.spot.signup.saving.SavingRoute
+import com.umcspot.spot.signup.splash.SplashRoute
 import kotlinx.serialization.Serializable
 
 fun NavController.navigateToSignUp(navOptions: NavOptions? = null) {
@@ -29,16 +30,22 @@ fun NavController.navigateToLanding(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.signupGraph(
+    navigateToLanding: () -> Unit,
     navigateToSignUp: () -> Unit,
     navigateToCheckList: () -> Unit,
     navigateToSaving: () -> Unit,
     navigateToHome: () -> Unit,
     contentPadding: PaddingValues,
 ) {
+    composable<Splash> {
+        SplashRoute(
+            navigateToHome = navigateToHome,
+            navigateToLanding = navigateToLanding
+        )
+    }
     composable<Landing> {
         LandingRoute(
             navigateToSignUp = navigateToSignUp,
-            navigateToHome = navigateToHome
         )
     }
     composable<SignUp> {
@@ -60,6 +67,9 @@ fun NavGraphBuilder.signupGraph(
         )
     }
 }
+
+@Serializable
+data object Splash : Route
 
 @Serializable
 data object Landing : Route

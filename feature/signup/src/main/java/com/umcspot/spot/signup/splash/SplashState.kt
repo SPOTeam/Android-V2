@@ -1,11 +1,11 @@
 package com.umcspot.spot.signup.splash
 
-data class LandingState(
+data class SplashState(
     val successAutoLogin: Boolean = false,
 )
 
-sealed interface LandingSideEffect {
-    data object NavigateToHome : LandingSideEffect
-    data object NavigateToLanding : LandingSideEffect
-    data class ShowSnackBar(val message: String) : LandingSideEffect
+sealed interface SplashSideEffect {
+    data object NavigateToHome : SplashSideEffect
+    data object NavigateToLanding : SplashSideEffect
+    data class ShowSnackBar(val message: String) : SplashSideEffect
 }

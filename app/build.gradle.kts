@@ -9,17 +9,6 @@ plugins {
 android {
     namespace = "com.umcspot.spot"
 
-//    signingConfigs {
-//        getByName("debug") {
-//            val props = gradleLocalProperties(rootDir, providers)
-//
-//            storeFile = file(props.getProperty("DEBUG_STORE_FILE"))
-//            storePassword = props.getProperty("DEBUG_STORE_PASSWORD")
-//            keyAlias = props.getProperty("DEBUG_KEY_ALIAS")
-//            keyPassword = props.getProperty("DEBUG_KEY_PASSWORD")
-//        }
-//    }
-
     buildTypes {
         debug {
             signingConfig = signingConfigs.getByName("debug")

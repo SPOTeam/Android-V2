@@ -80,6 +80,7 @@ fun MainNavHost(
     ) {
 
         signupGraph(
+            navigateToLanding = { navigator.navigateToLanding(clearStackNavOptions) },
             navigateToSignUp = { navigator.navigateToSignUp() },
             navigateToCheckList = { navigator.navigateToCheckList() },
             navigateToSaving = { navigator.navigateToSaving() },
