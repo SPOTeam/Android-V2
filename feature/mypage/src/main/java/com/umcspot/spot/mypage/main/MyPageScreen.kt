@@ -24,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.ProfileImage
 import com.umcspot.spot.designsystem.component.SpotSpinner
@@ -70,6 +72,7 @@ fun MyPageScreen(
     viewmodel : MyPageViewModel = hiltViewModel()
 ) {
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewmodel.load()
@@ -90,7 +93,12 @@ fun MyPageScreen(
         onEditInterestClick = onEditInterestClick,
         onEditInterestLocationClick = onEditInterestLocationClick,
         onCancelMemberShipClick = onCancelMemberShipClick,
-        onLogoutClick = onLogoutClick
+        onLogoutClick = {
+            scope.launch {
+                viewmodel.logout()
+                onLogoutClick()
+            }
+        }
     )
 }
 
