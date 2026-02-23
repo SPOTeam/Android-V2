@@ -9,3 +9,10 @@ data class StudyScheduleModel(
     val endAt: LocalDateTime,
     val isNow: Boolean
 )
+
+data class StudyScheduleCreateModel(
+    val title: String,
+    val locationInfo: String,
+    val startAt: LocalDateTime,
+    val endAt: LocalDateTime
+)

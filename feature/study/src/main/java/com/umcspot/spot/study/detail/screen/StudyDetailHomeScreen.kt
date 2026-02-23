@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.study.detail.component.memoir.StudyDetailMemoirItem
@@ -74,7 +75,10 @@ fun StudyDetailHomeScreen(
                 text = "일정이 없습니다.",
                 style = SpotTheme.typography.medium_400,
                 color = SpotTheme.colors.gray400,
-                modifier = Modifier.padding(vertical = screenHeightDp(20.dp))
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = screenHeightDp(20.dp)),
+                textAlign = TextAlign.Center
             )
         } else {
             Column(verticalArrangement = Arrangement.spacedBy(screenHeightDp(16.dp))) {
@@ -98,7 +102,10 @@ fun StudyDetailHomeScreen(
                 text = "회고록이 없습니다.",
                 style = SpotTheme.typography.medium_400,
                 color = SpotTheme.colors.gray400,
-                modifier = Modifier.padding(vertical = screenHeightDp(20.dp))
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = screenHeightDp(20.dp)),
+                textAlign = TextAlign.Center
             )
         } else {
             LazyRow(

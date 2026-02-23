@@ -8,6 +8,7 @@ import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.study.datasource.StudyDataSource
 import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
+import com.umcspot.spot.study.dto.request.ScheduleCreateRequestDto
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.request.TodoCreateRequestDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
@@ -199,4 +200,10 @@ class StudyDataSourceImpl @Inject constructor(
         decision: String
     ): NullResultResponse =
         studyService.entryAcceptance(applicationId,decision)
+
+    override suspend fun createSchedule(
+        studyId: Long,
+        request: ScheduleCreateRequestDto
+    ): BaseResponse<Unit?> =
+        studyService.createSchedule(studyId, request)
 }

@@ -2,6 +2,7 @@ package com.umcspot.spot.study.mapper
 
 import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.model.toImageRef
+import com.umcspot.spot.study.dto.request.ScheduleCreateRequestDto
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.response.MemberDto
 import com.umcspot.spot.study.dto.response.MemoirDto
@@ -26,6 +27,7 @@ import com.umcspot.spot.study.model.StudyMemberModel
 import com.umcspot.spot.study.model.StudyRecentMemoirModel
 import com.umcspot.spot.study.model.StudyResult
 import com.umcspot.spot.study.model.StudyResultList
+import com.umcspot.spot.study.model.StudyScheduleCreateModel
 import com.umcspot.spot.study.model.StudyScheduleModel
 import com.umcspot.spot.study.model.TodoModel
 import java.time.LocalDateTime
@@ -90,6 +92,13 @@ fun ScheduleResponseDto.toDomain(): StudyScheduleModel = StudyScheduleModel(
     startAt = LocalDateTime.parse(this.startAt, DateTimeFormatter.ISO_DATE_TIME),
     endAt = LocalDateTime.parse(this.endAt, DateTimeFormatter.ISO_DATE_TIME),
     isNow = this.isNow
+)
+
+fun StudyScheduleCreateModel.toData(): ScheduleCreateRequestDto = ScheduleCreateRequestDto(
+    title = this.title,
+    locationInfo = this.locationInfo,
+    startAt = this.startAt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z",
+    endAt = this.endAt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z"
 )
 
 fun MemoirDto.toDetailModel(): MemoirModel = MemoirModel(

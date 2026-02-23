@@ -25,7 +25,9 @@ fun NavGraphBuilder.studyDetailGraph(
     onDetailBackClick: () -> Unit,
     onMemoirPostBackClick: () -> Unit,
     onTabChanged: (StudyDetailTab) -> Unit,
-    currentTab: StudyDetailTab 
+    currentTab: StudyDetailTab,
+    onOpenScheduleBottomSheet: () -> Unit,
+    onDismissBottomSheet: () -> Unit
 ) {
     composable<StudyDetail> { backStackEntry ->
         val detail = backStackEntry.toRoute<StudyDetail>()
@@ -34,7 +36,9 @@ fun NavGraphBuilder.studyDetailGraph(
             studyId = detail.studyId,
             onBackClick = onDetailBackClick,
             onTabChanged = onTabChanged,
-            initialTab = currentTab 
+            initialTab = currentTab,
+            onOpenScheduleBottomSheet = onOpenScheduleBottomSheet,
+            onDismissBottomSheet = onDismissBottomSheet
         )
     }
 

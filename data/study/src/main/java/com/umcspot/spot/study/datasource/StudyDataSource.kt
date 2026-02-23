@@ -7,6 +7,7 @@ import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.network.model.NullResultResponse
+import com.umcspot.spot.study.dto.request.ScheduleCreateRequestDto
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.MemoirCreateResponseDto
@@ -118,4 +119,9 @@ interface StudyDataSource {
         applicationId : Long,
         decision : String
     ) : NullResultResponse
+
+    suspend fun createSchedule(
+        studyId: Long,
+        request: ScheduleCreateRequestDto
+    ): BaseResponse<Unit?>
 }

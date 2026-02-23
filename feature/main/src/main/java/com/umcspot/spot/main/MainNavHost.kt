@@ -1,6 +1,5 @@
 package com.umcspot.spot.main
 
-import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.PaddingValues
@@ -62,7 +61,9 @@ fun MainNavHost(
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
     onStudyTabChanged: (StudyDetailTab) -> Unit,
     currentStudyDetailTab: StudyDetailTab,
-    onBackRequest : () -> Unit
+    onBackRequest : () -> Unit,
+    onOpenScheduleBottomSheet: () -> Unit,
+    onDismissBottomSheet: () -> Unit
 ) {
     val clearStackNavOptions = navOptions {
         popUpTo(0) { inclusive = true }
@@ -293,7 +294,9 @@ fun MainNavHost(
                 navigator.popBackStack()
             },
             onTabChanged = onStudyTabChanged,
-            currentTab = currentStudyDetailTab
+            currentTab = currentStudyDetailTab,
+            onOpenScheduleBottomSheet = onOpenScheduleBottomSheet,
+            onDismissBottomSheet = onDismissBottomSheet
         )
     }
 }

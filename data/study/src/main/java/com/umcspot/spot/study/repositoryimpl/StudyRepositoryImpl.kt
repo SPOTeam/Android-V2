@@ -18,10 +18,12 @@ import com.umcspot.spot.study.model.StudyDetailModel
 import com.umcspot.spot.study.model.StudyMemberModel
 import com.umcspot.spot.study.model.StudyRecentMemoirModel
 import com.umcspot.spot.study.model.StudyResultList
+import com.umcspot.spot.study.model.StudyScheduleCreateModel
 import com.umcspot.spot.study.model.StudyScheduleModel
 import com.umcspot.spot.study.model.TodoModel
 import com.umcspot.spot.study.repository.StudyRepository
 import java.io.File
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class StudyRepositoryImpl @Inject constructor(
@@ -354,4 +356,25 @@ class StudyRepositoryImpl @Inject constructor(
         runCatching {
             studyDataSource.entryAcceptance(applicationId, decision)
         }
+
+    override suspend fun createSchedule(
+        studyId: Long,
+        title: String,
+        location: String,
+        startAt: LocalDateTime,
+        endAt: LocalDateTime
+    ): Result<Unit> = runCatching {
+        val createModel = StudyScheduleCreateModel(
+            title = title,
+            locationInfo = location,
+            startAt = startAt,
+            endAt = endAt
+        )
+        val response = studyDataSource.createSchedule(studyId, createModel.toData())
+
+        if (!response.isSuccess) {
+            throw Exception(response.message ?: "일정 생성 실패")
+        }
+        Unit
+    }
 }

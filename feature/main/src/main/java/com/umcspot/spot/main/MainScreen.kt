@@ -1,21 +1,11 @@
 package com.umcspot.spot.main
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,6 +39,7 @@ import com.umcspot.spot.mypage.recruiting.navigation.MyRecruitingStudy
 import com.umcspot.spot.mypage.waiting.navigation.WaitingStudy
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
+import com.umcspot.spot.study.detail.component.planner.ScheduleBottomSheet
 import com.umcspot.spot.study.detail.model.StudyDetailTab
 import com.umcspot.spot.study.detail.navigation.StudyDetail
 import com.umcspot.spot.study.detail.navigation.StudyMemoirPost
@@ -67,14 +58,22 @@ fun MainScreen(
     val navController = navigator.navController
     val backStackEntry by navController.currentBackStackEntryAsState()
     val dest = backStackEntry?.destination
+
+    val currentStudyId = remember(backStackEntry) {
+        try {
+            backStackEntry?.toRoute<StudyDetail>()?.studyId
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    var isScheduleSheetVisible by remember { mutableStateOf(false) }
+
     var scrollToTop by remember { mutableStateOf<(() -> Unit)?>(null) }
-
     var showBackRequestDialog by remember { mutableStateOf(false) }
-
     var currentStudyDetailTab by rememberSaveable { mutableStateOf(StudyDetailTab.HOME) }
 
     val hasUnreadAlert by mainViewModel.hasUnreadAlert.collectAsStateWithLifecycle()
-
     val isHome = dest?.hasRoute(Home::class) == true
 
     LaunchedEffect(isHome) {
@@ -127,8 +126,7 @@ fun MainScreen(
                         hasAlert = hasUnreadAlert,
                         onSearchClick = { /* TODO */ },
                         onAlertClick = { navController.navigateToAlert() },
-                        modifier = Modifier
-                            .statusBarsPadding()
+                        modifier = Modifier.statusBarsPadding()
                     )
                 }
             }
@@ -185,8 +183,16 @@ fun MainScreen(
             onBackRequest = { showBackRequestDialog = true },
             onStudyTabChanged = { tab -> currentStudyDetailTab = tab },
             currentStudyDetailTab = currentStudyDetailTab,
+            onOpenScheduleBottomSheet = { isScheduleSheetVisible = true },
+            onDismissBottomSheet = { isScheduleSheetVisible = false }
         )
     }
+
+    ScheduleBottomSheet(
+        visible = isScheduleSheetVisible,
+        onDismiss = { isScheduleSheetVisible = false },
+        studyId = currentStudyId
+    )
 
     RejectDialog(
         visible = showBackRequestDialog,
@@ -194,16 +200,12 @@ fun MainScreen(
         modalDes = "지금 나가면, 쓰던 글은 저장되지 않아요",
         okButtonText = "네",
         noButtonText = "아니요",
-        onDismiss = {
-            showBackRequestDialog = false
-        },
+        onDismiss = { showBackRequestDialog = false },
         onClick = {
             showBackRequestDialog = false
             navController.popBackStack()
         },
-        onCancel = {
-            showBackRequestDialog = false
-        }
+        onCancel = { showBackRequestDialog = false }
     )
 }
 
@@ -215,20 +217,14 @@ private fun FabStack(
     onClickMultiple: () -> Unit,
     spacing: Dp = 12.dp,
 ) {
-    Box(
-        modifier = Modifier
-    ) {
+    Box(modifier = Modifier) {
         Column(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(spacing),
             modifier = Modifier.align(Alignment.BottomEnd)
         ) {
-            if(showToTop) {
-                FloatingToUpButton(onClick = onClickToTop)
-            }
-            if(showMultiple) {
-                FloatingMultipleButton(onClick = onClickMultiple)
-            }
+            if(showToTop) FloatingToUpButton(onClick = onClickToTop)
+            if(showMultiple) FloatingMultipleButton(onClick = onClickMultiple)
         }
     }
 }

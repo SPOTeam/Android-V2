@@ -1,5 +1,6 @@
 package com.umcspot.spot.study.detail
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umcspot.spot.study.detail.model.StudyDetailSideEffect
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlin.collections.map
@@ -96,11 +98,15 @@ class StudyDetailViewModel @Inject constructor(
     private fun updateFilteredSchedules() {
         _uiState.update { state ->
             val date = state.plannerState.selectedDate
+            // 필터링: 시작일과 종료일 사이에 선택한 날짜가 있는지 확인
             val filtered = state.plannerState.monthlySchedules.filter { schedule ->
                 val start = schedule.startAt.toLocalDate()
                 val end = schedule.endAt.toLocalDate()
                 !date.isBefore(start) && !date.isAfter(end)
-            }.take(2).toPersistentList()
+            }.toPersistentList() // 우선 .take(2)를 지우고 다 나오는지 확인하세요!
+
+            // 로그를 찍어서 필터링이 되는지 꼭 확인하세요
+            Log.d("PlannerDebug", "선택날짜: $date, 전체개수: ${state.plannerState.monthlySchedules.size}, 필터후: ${filtered.size}")
 
             state.copy(plannerState = state.plannerState.copy(selectedDaySchedules = filtered))
         }
@@ -302,6 +308,43 @@ class StudyDetailViewModel @Inject constructor(
                     state.copy(memoirState = state.memoirState.copy(memoirs = updatedList))
                 }
             }.onFailure { emitError(it) }
+        }
+    }
+
+    fun createSchedule(
+        studyId: Long,
+        title: String,
+        location: String,
+        startAt: LocalDateTime,
+        endAt: LocalDateTime
+    ) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+
+            studyRepository.createSchedule(
+                studyId = studyId,
+                title = title,
+                location = location,
+                startAt = startAt,
+                endAt = endAt
+            ).onSuccess {
+                _sideEffect.emit(StudyDetailSideEffect.ScheduleCreateSuccess)
+
+                // 1. 플래너 탭 데이터 갱신 (캘린더용)
+                val selectedDate = _uiState.value.plannerState.selectedDate
+                fetchMonthlySchedules(
+                    studyId = studyId,
+                    year = selectedDate.year,
+                    month = selectedDate.monthValue
+                )
+
+                // 2. 홈 탭 데이터 갱신 (다가오는 일정용) ★ 이 줄을 추가하세요!
+                fetchStudyHomeDetail(studyId)
+
+            }.onFailure { error ->
+                emitError(error)
+            }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 

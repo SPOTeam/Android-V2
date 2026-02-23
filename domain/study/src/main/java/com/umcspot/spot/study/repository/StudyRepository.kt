@@ -15,6 +15,7 @@ import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.study.model.StudyScheduleModel
 import com.umcspot.spot.study.model.TodoModel
 import java.io.File
+import java.time.LocalDateTime
 
 interface StudyRepository {
     suspend fun getRecommendedStudies(): Result<StudyResultList>
@@ -134,4 +135,12 @@ interface StudyRepository {
         applicationId: Long,
         decision: String
     ) : Result<Unit>
+
+    suspend fun createSchedule(
+        studyId: Long,
+        title: String,
+        location: String,
+        startAt: LocalDateTime,
+        endAt: LocalDateTime
+    ): Result<Unit>
 }

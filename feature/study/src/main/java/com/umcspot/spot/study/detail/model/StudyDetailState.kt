@@ -49,4 +49,5 @@ sealed interface StudyDetailSideEffect {
     data class ShowSnackBar(val message: String) : StudyDetailSideEffect
     object MemoirPostSuccess : StudyDetailSideEffect
     object ReactionSuccess : StudyDetailSideEffect
+    object ScheduleCreateSuccess : StudyDetailSideEffect
 }

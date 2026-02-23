@@ -31,6 +31,7 @@ import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.study.detail.component.common.StudyDetailTabRow
 import com.umcspot.spot.study.detail.component.common.StudyHeaderSection
+import com.umcspot.spot.study.detail.model.StudyDetailSideEffect
 import com.umcspot.spot.study.detail.model.StudyDetailState
 import com.umcspot.spot.study.detail.model.StudyDetailTab
 import com.umcspot.spot.study.detail.screen.StudyDetailBoardScreen
@@ -50,6 +51,8 @@ fun StudyDetailRoute(
     contentPadding: PaddingValues,
     onTabChanged: (StudyDetailTab) -> Unit,
     initialTab: StudyDetailTab,
+    onOpenScheduleBottomSheet: () -> Unit,
+    onDismissBottomSheet: () -> Unit, 
     viewModel: StudyDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -69,6 +72,20 @@ fun StudyDetailRoute(
         onTabChanged(selectedTab)
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collect { effect ->
+            when (effect) {
+                is StudyDetailSideEffect.ScheduleCreateSuccess -> {
+                    onDismissBottomSheet() 
+                }
+                is StudyDetailSideEffect.ShowSnackBar -> {
+                    
+                }
+                else -> {}
+            }
+        }
+    }
+
     DisposableEffect(Unit) {
         onDispose { onTabChanged(StudyDetailTab.HOME) }
     }
@@ -82,6 +99,7 @@ fun StudyDetailRoute(
         onTabSelected = { selectedTab = it },
         onDateSelected = viewModel::updateSelectedDate,
         onMonthChanged = { year, month -> viewModel.fetchMonthlySchedules(studyId, year, month) },
+        onAddingSchedule = onOpenScheduleBottomSheet, 
         onAddingTodo = {
             scope.launch {
                 delay(300)
@@ -114,11 +132,12 @@ private fun StudyDetailScreen(
     onTabSelected: (StudyDetailTab) -> Unit,
     onDateSelected: (LocalDate) -> Unit,
     onMonthChanged: (Int, Int) -> Unit,
+    onAddingSchedule: () -> Unit, 
     onAddingTodo: () -> Unit,
-    onTodoCreate: (Long, String) -> Unit, 
+    onTodoCreate: (Long, String) -> Unit,
     onTodoToggle: (Long, Long, Boolean) -> Unit,
-    onTodoDelete: (Long, Long) -> Unit, 
-    onMemberSelected: (Long) -> Unit,   
+    onTodoDelete: (Long, Long) -> Unit,
+    onMemberSelected: (Long) -> Unit,
     onMemoirDelete: (Long) -> Unit,
     onMemoirEmojiToggle: (Long, Long, String, Boolean) -> Unit,
     onBackClick: () -> Unit,
@@ -141,7 +160,7 @@ private fun StudyDetailScreen(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(screenHeightDp(160.dp)), 
+                    .height(screenHeightDp(160.dp)),
                 contentScale = ContentScale.Crop
             )
 
@@ -157,7 +176,7 @@ private fun StudyDetailScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = screenWidthDp(17.dp)) 
+                    .padding(horizontal = screenWidthDp(17.dp))
                     .padding(bottom = contentPadding.calculateBottomPadding() + screenHeightDp(20.dp))
             ) {
                 when (selectedTab) {
@@ -174,8 +193,8 @@ private fun StudyDetailScreen(
                         members = uiState.homeState.members,
                         onDateSelected = onDateSelected,
                         onMonthChanged = onMonthChanged,
-                        onAddingTodo = onAddingTodo,
-                        onTodoCreate = onTodoCreate, 
+                        onAddingSchedule = onAddingSchedule, 
+                        onTodoCreate = onTodoCreate,
                         onTodoToggle = onTodoToggle,
                         onTodoDelete = onTodoDelete,
                         onMemberSelected = onMemberSelected
