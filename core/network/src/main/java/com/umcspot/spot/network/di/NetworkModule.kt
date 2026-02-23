@@ -4,6 +4,8 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.umcspot.spot.common.BuildConfigFieldProvider
 import com.umcspot.spot.common.WeatherConfigFieldProvider
 import com.umcspot.spot.network.AuthInterceptor
+import com.umcspot.spot.network.TokenAuthenticator
+import com.umcspot.spot.network.service.TokenRefreshService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,11 +36,23 @@ object NetworkModule {
     @SpotApi
     fun providesSpotOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
-        authInterceptor: AuthInterceptor
+        authInterceptor: AuthInterceptor,
+        tokenAuthenticator: TokenAuthenticator
     ): OkHttpClient =
         OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .addInterceptor(authInterceptor)
+            .authenticator(tokenAuthenticator)
+            .build()
+
+    @Provides
+    @Singleton
+    @SpotRefreshApi
+    fun providesSpotRefreshOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor,
+    ): OkHttpClient =
+        OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
             .build()
 
     // ---------- Weather API ----------
@@ -74,7 +88,23 @@ object NetworkModule {
             .addConverterFactory(converterFactory)
             .build()
 
-    @Provides @Singleton @WeatherApi
+    @Provides
+    @Singleton
+    @SpotRefreshApi
+    fun providesSpotRefreshRetrofit(
+        @SpotRefreshApi client: OkHttpClient,
+        converterFactory: Converter.Factory,
+        buildConfigProvider: BuildConfigFieldProvider
+    ): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(buildConfigProvider.get().baseUrl)
+            .client(client)
+            .addConverterFactory(converterFactory)
+            .build()
+
+    @Provides
+    @Singleton
+    @WeatherApi
     fun providesWeatherRetrofit(
         @WeatherApi weatherClient: OkHttpClient,
         converterFactory: Converter.Factory,
@@ -85,4 +115,11 @@ object NetworkModule {
             .client(weatherClient)
             .addConverterFactory(converterFactory)
             .build()
+
+    @Provides
+    @Singleton
+    fun providesTokenRefreshService(
+        @SpotRefreshApi retrofit: Retrofit
+    ): TokenRefreshService =
+        retrofit.create(TokenRefreshService::class.java)
 }

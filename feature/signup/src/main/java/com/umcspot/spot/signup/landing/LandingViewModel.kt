@@ -95,7 +95,7 @@ class LandingViewModel @Inject constructor(
                 loginRepository.finishSocialLogin(type = type, accessToken = accessToken)
             }.onSuccess {
                 _uiState.update { it.copy(isLoading = false) }
-                _sideEffect.emit(LandingSideEffect.NavigateToHome)
+                _sideEffect.emit(LandingSideEffect.NavigateToSignUp)
             }.onFailure { e ->
                 handleLoginError("서버 로그인 실패", e)
             }
