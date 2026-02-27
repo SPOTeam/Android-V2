@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.theme.B200
@@ -64,8 +65,13 @@ fun EmojiOptionPopup(states: List<Boolean>, onToggle: (Int) -> Unit) {
 }
 
 @Composable
-fun MemoirSectionItem(label: String, text: String, maxLines: Int, onLineMeasured: (Int) -> Unit) {
-    if (text.isEmpty() || maxLines <= 0) return
+fun MemoirSectionItem(
+    label: String,
+    text: String,
+    maxLines: Int,
+    onLineMeasured: (Int) -> Unit // 내 텍스트가 실제로 몇 줄인지 부모에게 전달
+) {
+    if (text.isEmpty()) return
     Column(modifier = Modifier.padding(vertical = screenHeightDp(8.dp))) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.size(screenWidthDp(8.dp)).clip(CircleShape).background(B200))
@@ -78,15 +84,20 @@ fun MemoirSectionItem(label: String, text: String, maxLines: Int, onLineMeasured
             style = SpotTheme.typography.medium_400,
             color = SpotTheme.colors.black,
             modifier = Modifier.fillMaxWidth(),
-            maxLines = if (maxLines > 1) maxLines - 1 else 1,
-            onTextLayout = { onLineMeasured(1 + it.lineCount) }
+            maxLines = maxLines,
+            overflow = TextOverflow.Ellipsis,
+            onTextLayout = { result ->
+                onLineMeasured(1 + result.lineCount)
+            }
         )
     }
 }
 
 @Composable
 fun EmojiBadge(iconRes: Int, count: Int, isSelected: Boolean, onClick: () -> Unit) {
+    // count 0이고 선택도 안됐으면 숨김
     if (count <= 0 && !isSelected) return
+
     val visualIconSize = if (iconRes == R.drawable.ic_laugh) screenWidthDp(18.dp) else screenWidthDp(14.dp)
     val backgroundColor = if (isSelected) SpotTheme.colors.B200 else Color.Transparent
 
@@ -98,10 +109,22 @@ fun EmojiBadge(iconRes: Int, count: Int, isSelected: Boolean, onClick: () -> Uni
             .padding(horizontal = screenWidthDp(4.dp), vertical = screenHeightDp(2.dp)),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(modifier = Modifier.size(screenWidthDp(14.dp)), contentAlignment = Alignment.Center) {
-            Image(painter = painterResource(id = iconRes), contentDescription = null, modifier = Modifier.size(visualIconSize), contentScale = ContentScale.Fit)
+        Box(
+            modifier = Modifier.size(screenWidthDp(14.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = iconRes),
+                contentDescription = null,
+                modifier = Modifier.size(visualIconSize),
+                contentScale = ContentScale.Fit
+            )
         }
         Spacer(modifier = Modifier.width(screenWidthDp(2.dp)))
-        Text(text = count.toString(), style = SpotTheme.typography.small_400, color = SpotTheme.colors.B500)
+        Text(
+            text = count.toString(),
+            style = SpotTheme.typography.small_400,
+            color = SpotTheme.colors.B500
+        )
     }
 }

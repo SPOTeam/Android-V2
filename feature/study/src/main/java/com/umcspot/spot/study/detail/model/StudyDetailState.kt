@@ -13,6 +13,7 @@ data class StudyDetailState(
     val homeState: StudyHomeState = StudyHomeState(),
     val plannerState: StudyPlannerState = StudyPlannerState(),
     val memoirState: StudyMemoirState = StudyMemoirState(),
+    val myUserId: String = "",
     val isLoading: Boolean = false
 )
 

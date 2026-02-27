@@ -39,6 +39,22 @@ class StudyDetailViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<StudyDetailSideEffect>()
     val sideEffect: SharedFlow<StudyDetailSideEffect> = _sideEffect.asSharedFlow()
 
+    private var currentUserId: String = ""
+
+    init {
+        loadMyUserId()
+    }
+
+    private fun loadMyUserId() {
+        viewModelScope.launch {
+            runCatching { tokenRepository.getUserId() }
+                .onSuccess { id ->
+                    currentUserId = id
+                    _uiState.update { it.copy(myUserId = id) }
+                }
+        }
+    }
+
     fun fetchStudyHomeDetail(studyId: Long) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -214,12 +230,6 @@ class StudyDetailViewModel @Inject constructor(
         updateFilteredSchedules()
     }
 
-    fun resetScheduleCreateSuccess() {
-        _uiState.update { state ->
-            state.copy(plannerState = state.plannerState.copy(isScheduleCreateSuccess = false))
-        }
-    }
-
     fun createTodo(studyId: Long, content: String) {
         val selectedDate = uiState.value.plannerState.selectedDate
         if (selectedDate.isBefore(LocalDate.now())) return
@@ -233,7 +243,7 @@ class StudyDetailViewModel @Inject constructor(
                 _uiState.update { state ->
                     val newTodo = TodoModel(
                         id = newTodoId,
-                        memberId = state.plannerState.selectedMemberId,
+                        memberId = currentUserId,
                         content = content,
                         isCompleted = false
                     )
@@ -318,19 +328,24 @@ class StudyDetailViewModel @Inject constructor(
         }
     }
 
-    fun toggleMemoirReaction(
-        studyId: Long,
-        memoirId: Long,
-        reactionType: String,
-        isCurrentlySelected: Boolean
-    ) {
+    fun toggleMemoirReaction(studyId: Long, memoirId: Long, reactionType: String) {
+        val memoir = _uiState.value.memoirState.memoirs.find { it.memoirId == memoirId } ?: return
+        val isCurrentlySelected = when (reactionType) {
+            "FIRE" -> memoir.reactions.isFired
+            "HEART" -> memoir.reactions.isHearted
+            "STAR" -> memoir.reactions.isStarred
+            "SMILE" -> memoir.reactions.isSmiled
+            else -> return
+        }
+        updateMemoirUIState(memoirId, reactionType, !isCurrentlySelected) // ✅ 즉시 반영
         viewModelScope.launch {
-            updateMemoirUIState(memoirId, reactionType, !isCurrentlySelected)
+
             val result = if (isCurrentlySelected) {
                 studyRepository.deleteReviewReaction(studyId, memoirId, reactionType)
             } else {
                 studyRepository.postReviewReaction(studyId, memoirId, reactionType)
             }
+
             result.onFailure {
                 updateMemoirUIState(memoirId, reactionType, isCurrentlySelected)
                 emitError(it)
@@ -338,62 +353,90 @@ class StudyDetailViewModel @Inject constructor(
         }
     }
 
+
+
     private fun updateMemoirUIState(memoirId: Long, reactionType: String, isSelected: Boolean) {
         _uiState.update { state ->
             val updatedMemoirs = state.memoirState.memoirs.map { memoir ->
                 if (memoir.memoirId == memoirId) {
                     val diff = if (isSelected) 1 else -1
+
+                    // 1. reactions 객체를 새로 생성
+                    val newReactions = when (reactionType) {
+                        "FIRE" -> memoir.reactions.copy(isFired = isSelected)
+                        "HEART" -> memoir.reactions.copy(isHearted = isSelected)
+                        "STAR" -> memoir.reactions.copy(isStarred = isSelected)
+                        "SMILE" -> memoir.reactions.copy(isSmiled = isSelected)
+                        else -> memoir.reactions
+                    }
+
+                    // 2. reactionCounts 객체를 새로 생성
+                    val newCounts = when (reactionType) {
+                        "FIRE" -> memoir.reactionCounts.copy(fireCount = (memoir.reactionCounts.fireCount + diff).coerceAtLeast(0))
+                        "HEART" -> memoir.reactionCounts.copy(heartCount = (memoir.reactionCounts.heartCount + diff).coerceAtLeast(0))
+                        "STAR" -> memoir.reactionCounts.copy(starCount = (memoir.reactionCounts.starCount + diff).coerceAtLeast(0))
+                        "SMILE" -> memoir.reactionCounts.copy(smileCount = (memoir.reactionCounts.smileCount + diff).coerceAtLeast(0))
+                        else -> memoir.reactionCounts
+                    }
+
+                    // 3. 최상위 memoir 객체를 새로 생성하여 리스트에 교체
                     memoir.copy(
-                        reactions = when (reactionType) {
-                            "FIRE" -> memoir.reactions.copy(isFired = isSelected)
-                            "HEART" -> memoir.reactions.copy(isHearted = isSelected)
-                            "STAR" -> memoir.reactions.copy(isStarred = isSelected)
-                            "SMILE" -> memoir.reactions.copy(isSmiled = isSelected)
-                            else -> memoir.reactions
-                        },
-                        reactionCounts = when (reactionType) {
-                            "FIRE" -> memoir.reactionCounts.copy(fireCount = (memoir.reactionCounts.fireCount + diff).coerceAtLeast(0))
-                            "HEART" -> memoir.reactionCounts.copy(heartCount = (memoir.reactionCounts.heartCount + diff).coerceAtLeast(0))
-                            "STAR" -> memoir.reactionCounts.copy(starCount = (memoir.reactionCounts.starCount + diff).coerceAtLeast(0))
-                            "SMILE" -> memoir.reactionCounts.copy(smileCount = (memoir.reactionCounts.smileCount + diff).coerceAtLeast(0))
-                            else -> memoir.reactionCounts
-                        }
+                        reactions = newReactions,
+                        reactionCounts = newCounts
                     )
                 } else memoir
             }.toPersistentList()
+
             state.copy(memoirState = state.memoirState.copy(memoirs = updatedMemoirs))
         }
     }
 
     fun fetchAllMemoirs(studyId: Long, cursor: Long? = null) {
         viewModelScope.launch {
-            val myMemberId = -1L
-            studyRepository.getFullStudyMemoirs(studyId, cursor, 20).onSuccess { memoirs ->
-                val processedMemoirs = memoirs.map { memoir ->
-                    memoir.copy(isMyMemoir = memoir.memberId == myMemberId)
-                }
-                _uiState.update { state ->
-                    val currentList = if (cursor == null) emptyList() else state.memoirState.memoirs
-                    state.copy(
-                        memoirState = state.memoirState.copy(
-                            memoirs = (currentList + processedMemoirs).toPersistentList()
+            _uiState.update { it.copy(isLoading = true) }
+
+            if (currentUserId.isEmpty()) {
+                currentUserId = tokenRepository.getUserId()
+            }
+
+            studyRepository.getFullStudyMemoirs(studyId, cursor, 20)
+                .onSuccess { memoirs ->
+                    val processedMemoirs = memoirs.map { memoir ->
+                        memoir.copy(isMyMemoir = memoir.memberId.toString() == currentUserId)
+                    }
+
+                    _uiState.update { state ->
+                        val currentList = if (cursor == null) emptyList() else state.memoirState.memoirs
+                        state.copy(
+                            isLoading = false,
+                            memoirState = state.memoirState.copy(
+                                memoirs = (currentList + processedMemoirs).toPersistentList()
+                            )
                         )
-                    )
+                    }
                 }
-            }.onFailure { emitError(it) }
+                .onFailure {
+                    _uiState.update { it.copy(isLoading = false) }
+                    emitError(it)
+                }
         }
     }
 
     fun deleteMemoir(studyId: Long, memoirId: Long) {
         viewModelScope.launch {
-            studyRepository.deleteMemoir(studyId, memoirId).onSuccess {
-                _uiState.update { state ->
-                    val updatedList = state.memoirState.memoirs
-                        .filterNot { it.memoirId == memoirId }
-                        .toPersistentList()
-                    state.copy(memoirState = state.memoirState.copy(memoirs = updatedList))
+            studyRepository.deleteMemoir(studyId, memoirId)
+                .onSuccess {
+                    _uiState.update { state ->
+                        val updatedList = state.memoirState.memoirs
+                            .filterNot { it.memoirId == memoirId }
+                            .toPersistentList()
+
+                        state.copy(
+                            memoirState = state.memoirState.copy(memoirs = updatedList)
+                        )
+                    }
                 }
-            }.onFailure { emitError(it) }
+                .onFailure { emitError(it) }
         }
     }
 

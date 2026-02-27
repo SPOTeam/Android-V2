@@ -2,12 +2,25 @@ package com.umcspot.spot.study.detail
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -58,14 +71,17 @@ fun StudyDetailRoute(
 
     LaunchedEffect(studyId) {
         viewModel.fetchStudyHomeDetail(studyId)
-        val memberId = uiState.plannerState.selectedMemberId.toLongOrNull()
-        if (memberId != null) {
-            viewModel.fetchMemberTodos(studyId, memberId, LocalDate.now())
-        }
     }
 
     LaunchedEffect(selectedTab) {
         onTabChanged(selectedTab)
+        if (selectedTab == StudyDetailTab.MEMOIR) {
+            viewModel.fetchAllMemoirs(studyId)
+        }
+        if (selectedTab == StudyDetailTab.PLANNER) {
+            val date = uiState.plannerState.selectedDate
+            viewModel.fetchMonthlySchedules(studyId, date.year, date.monthValue)
+        }
     }
 
     DisposableEffect(Unit) {
@@ -102,7 +118,9 @@ fun StudyDetailRoute(
                 )
             },
             onMemoirDelete = { memoirId -> viewModel.deleteMemoir(studyId, memoirId) },
-            onMemoirEmojiToggle = viewModel::toggleMemoirReaction,
+            onMemoirEmojiToggle = { sId, mId, type ->
+                viewModel.toggleMemoirReaction(sId, mId, type)
+            },
             onBackClick = onBackClick,
             contentPadding = contentPadding,
             lazyListState = lazyListState
@@ -136,7 +154,7 @@ private fun StudyDetailScreen(
     onTodoDelete: (Long, Long) -> Unit,
     onMemberSelected: (Long) -> Unit,
     onMemoirDelete: (Long) -> Unit,
-    onMemoirEmojiToggle: (Long, Long, String, Boolean) -> Unit,
+    onMemoirEmojiToggle: (Long, Long, String) -> Unit,
     onBackClick: () -> Unit,
     contentPadding: PaddingValues,
     lazyListState: LazyListState
@@ -201,12 +219,13 @@ private fun StudyDetailScreen(
                     )
 
                     StudyDetailTab.BOARD -> StudyDetailBoardScreen()
+
                     StudyDetailTab.MEMOIR -> StudyDetailMemoirScreen(
                         studyId = studyId,
                         memoirs = uiState.memoirState.memoirs,
                         onDeleteMemoir = onMemoirDelete,
-                        onEmojiToggle = { memoirId, type, isSelected ->
-                            onMemoirEmojiToggle(studyId, memoirId, type, isSelected)
+                        onEmojiToggle = { memoirId, type ->
+                            onMemoirEmojiToggle(studyId, memoirId, type)
                         }
                     )
                 }
