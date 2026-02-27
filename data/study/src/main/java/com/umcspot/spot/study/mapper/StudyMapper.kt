@@ -91,7 +91,8 @@ fun ScheduleResponseDto.toDomain(): StudyScheduleModel = StudyScheduleModel(
     title = this.title,
     startAt = LocalDateTime.parse(this.startAt, DateTimeFormatter.ISO_DATE_TIME),
     endAt = LocalDateTime.parse(this.endAt, DateTimeFormatter.ISO_DATE_TIME),
-    isNow = this.isNow
+    isNow = this.isNow,
+    isMine = this.isMine
 )
 
 fun StudyScheduleCreateModel.toData(): ScheduleCreateRequestDto = ScheduleCreateRequestDto(

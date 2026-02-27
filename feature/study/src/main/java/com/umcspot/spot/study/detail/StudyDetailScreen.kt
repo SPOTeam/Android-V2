@@ -2,25 +2,12 @@ package com.umcspot.spot.study.detail
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -31,6 +18,7 @@ import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.study.detail.component.common.StudyDetailTabRow
 import com.umcspot.spot.study.detail.component.common.StudyHeaderSection
+import com.umcspot.spot.study.detail.component.planner.ScheduleBottomSheet
 import com.umcspot.spot.study.detail.model.StudyDetailSideEffect
 import com.umcspot.spot.study.detail.model.StudyDetailState
 import com.umcspot.spot.study.detail.model.StudyDetailTab
@@ -51,14 +39,22 @@ fun StudyDetailRoute(
     contentPadding: PaddingValues,
     onTabChanged: (StudyDetailTab) -> Unit,
     initialTab: StudyDetailTab,
-    onOpenScheduleBottomSheet: () -> Unit,
-    onDismissBottomSheet: () -> Unit, 
     viewModel: StudyDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableStateOf(initialTab) }
     val scope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()
+
+    var showScheduleBottomSheet by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(viewModel) {
+        viewModel.sideEffect.collect { effect ->
+            if (effect is StudyDetailSideEffect.ScheduleCreateSuccess) {
+                showScheduleBottomSheet = false
+            }
+        }
+    }
 
     LaunchedEffect(studyId) {
         viewModel.fetchStudyHomeDetail(studyId)
@@ -72,56 +68,55 @@ fun StudyDetailRoute(
         onTabChanged(selectedTab)
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.sideEffect.collect { effect ->
-            when (effect) {
-                is StudyDetailSideEffect.ScheduleCreateSuccess -> {
-                    onDismissBottomSheet() 
-                }
-                is StudyDetailSideEffect.ShowSnackBar -> {
-                    
-                }
-                else -> {}
-            }
-        }
-    }
-
     DisposableEffect(Unit) {
         onDispose { onTabChanged(StudyDetailTab.HOME) }
     }
 
     BackHandler { onBackClick() }
 
-    StudyDetailScreen(
-        studyId = studyId,
-        uiState = uiState,
-        selectedTab = selectedTab,
-        onTabSelected = { selectedTab = it },
-        onDateSelected = viewModel::updateSelectedDate,
-        onMonthChanged = { year, month -> viewModel.fetchMonthlySchedules(studyId, year, month) },
-        onAddingSchedule = onOpenScheduleBottomSheet, 
-        onAddingTodo = {
-            scope.launch {
-                delay(300)
-                lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount - 1, -300)
+    Box(modifier = Modifier.fillMaxSize()) {
+        StudyDetailScreen(
+            studyId = studyId,
+            uiState = uiState,
+            selectedTab = selectedTab,
+            onTabSelected = { selectedTab = it },
+            onDateSelected = viewModel::updateSelectedDate,
+            onMonthChanged = { year, month -> viewModel.fetchMonthlySchedules(studyId, year, month) },
+            onAddingSchedule = { showScheduleBottomSheet = true },
+            onScheduleDelete = viewModel::deleteSchedule,
+            onScheduleMenuToggle = viewModel::toggleScheduleMenu,
+            onAddingTodo = {
+                scope.launch {
+                    delay(300)
+                    lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount - 1, -300)
+                }
+            },
+            onTodoCreate = viewModel::createTodo,
+            onTodoToggle = viewModel::toggleTodoStatus,
+            onTodoDelete = viewModel::deleteTodo,
+            onMemberSelected = { memberId ->
+                viewModel.fetchMemberTodos(
+                    studyId = studyId,
+                    memberId = memberId,
+                    date = uiState.plannerState.selectedDate
+                )
+            },
+            onMemoirDelete = { memoirId -> viewModel.deleteMemoir(studyId, memoirId) },
+            onMemoirEmojiToggle = viewModel::toggleMemoirReaction,
+            onBackClick = onBackClick,
+            contentPadding = contentPadding,
+            lazyListState = lazyListState
+        )
+
+        ScheduleBottomSheet(
+            visible = showScheduleBottomSheet,
+            onDismiss = { showScheduleBottomSheet = false },
+            studyId = studyId,
+            onCreateSchedule = { title, memo, start, end ->
+                viewModel.createSchedule(studyId, title, memo, start, end)
             }
-        },
-        onTodoCreate = viewModel::createTodo,
-        onTodoToggle = viewModel::toggleTodoStatus,
-        onTodoDelete = viewModel::deleteTodo,
-        onMemberSelected = { memberId ->
-            viewModel.fetchMemberTodos(
-                studyId = studyId,
-                memberId = memberId,
-                date = uiState.plannerState.selectedDate
-            )
-        },
-        onMemoirDelete = { memoirId -> viewModel.deleteMemoir(studyId, memoirId) },
-        onMemoirEmojiToggle = viewModel::toggleMemoirReaction,
-        onBackClick = onBackClick,
-        contentPadding = contentPadding,
-        lazyListState = lazyListState
-    )
+        )
+    }
 }
 
 @Composable
@@ -132,7 +127,9 @@ private fun StudyDetailScreen(
     onTabSelected: (StudyDetailTab) -> Unit,
     onDateSelected: (LocalDate) -> Unit,
     onMonthChanged: (Int, Int) -> Unit,
-    onAddingSchedule: () -> Unit, 
+    onAddingSchedule: () -> Unit,
+    onScheduleDelete: (Long, Long) -> Unit,
+    onScheduleMenuToggle: (Long) -> Unit,
     onAddingTodo: () -> Unit,
     onTodoCreate: (Long, String) -> Unit,
     onTodoToggle: (Long, Long, Boolean) -> Unit,
@@ -193,7 +190,10 @@ private fun StudyDetailScreen(
                         members = uiState.homeState.members,
                         onDateSelected = onDateSelected,
                         onMonthChanged = onMonthChanged,
-                        onAddingSchedule = onAddingSchedule, 
+                        onAddingSchedule = onAddingSchedule,
+                        onScheduleDelete = onScheduleDelete,
+                        onScheduleMenuToggle = onScheduleMenuToggle,
+                        onAddingTodo = onAddingTodo,
                         onTodoCreate = onTodoCreate,
                         onTodoToggle = onTodoToggle,
                         onTodoDelete = onTodoDelete,

@@ -119,6 +119,13 @@ interface StudyService {
         @Query("month") month: Int
     ): BaseResponse<StudyMonthlyScheduleResponseDto>
 
+    // 일정 삭제
+    @DELETE("/api/studies/{studyId}/schedules/{scheduleId}")
+    suspend fun deleteSchedule(
+        @Path("studyId") studyId: Long,
+        @Path("scheduleId") scheduleId: Long
+    ): BaseResponse<Unit?>
+
     // 투두 리스트 만들기
     @POST("/api/studies/{studyId}/todos")
     suspend fun createTodo(

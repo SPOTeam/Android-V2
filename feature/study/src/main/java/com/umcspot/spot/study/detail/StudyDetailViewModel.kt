@@ -6,13 +6,17 @@ import androidx.lifecycle.viewModelScope
 import com.umcspot.spot.study.detail.model.StudyDetailSideEffect
 import com.umcspot.spot.study.detail.model.StudyDetailState
 import com.umcspot.spot.study.model.MemoirCreateModel
+import com.umcspot.spot.study.model.StudyScheduleModel
 import com.umcspot.spot.study.model.TodoModel
 import com.umcspot.spot.study.repository.StudyRepository
+import com.umcspot.spot.token.repository.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -22,18 +26,18 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
-import kotlin.collections.map
 
 @HiltViewModel
 class StudyDetailViewModel @Inject constructor(
-    private val studyRepository: StudyRepository
+    private val studyRepository: StudyRepository,
+    private val tokenRepository: TokenRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(StudyDetailState())
-    val uiState = _uiState.asStateFlow()
+    val uiState: StateFlow<StudyDetailState> = _uiState.asStateFlow()
 
     private val _sideEffect = MutableSharedFlow<StudyDetailSideEffect>()
-    val sideEffect = _sideEffect.asSharedFlow()
+    val sideEffect: SharedFlow<StudyDetailSideEffect> = _sideEffect.asSharedFlow()
 
     fun fetchStudyHomeDetail(studyId: Long) {
         viewModelScope.launch {
@@ -43,7 +47,6 @@ class StudyDetailViewModel @Inject constructor(
             val membersDeferred = async { studyRepository.getStudyMembers(studyId) }
             val schedulesDeferred = async { studyRepository.getUpcomingSchedules(studyId) }
             val memoirsDeferred = async { studyRepository.getStudyRecentMemoirs(studyId) }
-
 
             detailDeferred.await().onSuccess { model ->
                 _uiState.update { it.copy(homeState = it.homeState.copy(
@@ -63,7 +66,13 @@ class StudyDetailViewModel @Inject constructor(
             }.onFailure { emitError(it) }
 
             schedulesDeferred.await().onSuccess { schedules ->
-                _uiState.update { it.copy(homeState = it.homeState.copy(schedules = schedules.toPersistentList())) }
+                val now = LocalDateTime.now()
+                val processedSchedules = schedules.map { schedule ->
+                    val isCurrent = !now.isBefore(schedule.startAt) && !now.isAfter(schedule.endAt)
+                    schedule.copy(isNow = isCurrent)
+                }.toPersistentList()
+
+                _uiState.update { it.copy(homeState = it.homeState.copy(schedules = processedSchedules)) }
             }.onFailure { emitError(it) }
 
             memoirsDeferred.await().onSuccess { memoirs ->
@@ -78,13 +87,123 @@ class StudyDetailViewModel @Inject constructor(
         viewModelScope.launch {
             studyRepository.getMonthlySchedules(studyId, year, month).onSuccess { schedules ->
                 _uiState.update { state ->
-                    val updatedPlanner = state.plannerState.copy(
+                    state.copy(plannerState = state.plannerState.copy(
                         monthlySchedules = schedules.toPersistentList()
-                    )
-                    state.copy(plannerState = updatedPlanner)
+                    ))
                 }
                 updateFilteredSchedules()
+            }.onFailure {
+                Log.e("PlannerDebug", it.message.toString())
             }
+        }
+    }
+
+    fun createSchedule(
+        studyId: Long,
+        title: String,
+        location: String,
+        startAt: LocalDateTime,
+        endAt: LocalDateTime
+    ) {
+        val tempId = System.currentTimeMillis() * -1
+        val tempSchedule = StudyScheduleModel(
+            id = tempId,
+            title = title,
+            startAt = startAt,
+            endAt = endAt,
+            isNow = false,
+            isMine = true
+        )
+
+        _uiState.update { state ->
+            val updatedMonthly = (state.plannerState.monthlySchedules + tempSchedule)
+                .sortedBy { it.startAt }
+                .toPersistentList()
+
+            state.copy(
+                plannerState = state.plannerState.copy(
+                    monthlySchedules = updatedMonthly,
+                    isScheduleCreateSuccess = true
+                )
+            )
+        }
+        updateFilteredSchedules()
+
+        viewModelScope.launch {
+            studyRepository.createSchedule(studyId, title, location, startAt, endAt)
+                .onSuccess {
+                    val date = _uiState.value.plannerState.selectedDate
+                    fetchMonthlySchedules(studyId, date.year, date.monthValue)
+                    fetchStudyHomeDetail(studyId)
+                    _sideEffect.emit(StudyDetailSideEffect.ScheduleCreateSuccess)
+                }
+                .onFailure {
+                    _uiState.update { state ->
+                        val rolledBack = state.plannerState.monthlySchedules.filterNot { it.id == tempId }.toPersistentList()
+                        state.copy(plannerState = state.plannerState.copy(monthlySchedules = rolledBack))
+                    }
+                    updateFilteredSchedules()
+                    emitError(it)
+                }
+        }
+    }
+
+    private fun updateFilteredSchedules() {
+        _uiState.update { state ->
+            val date = state.plannerState.selectedDate
+            val now = LocalDateTime.now()
+
+            val filtered = state.plannerState.monthlySchedules
+                .filter { schedule ->
+                    val start = schedule.startAt.toLocalDate()
+                    val end = schedule.endAt.toLocalDate()
+                    !date.isBefore(start) && !date.isAfter(end)
+                }
+                .map { schedule ->
+                    val isCurrent = !now.isBefore(schedule.startAt) && !now.isAfter(schedule.endAt)
+                    schedule.copy(isNow = isCurrent)
+                }
+                .sortedBy { it.startAt }
+                .toPersistentList()
+
+            state.copy(plannerState = state.plannerState.copy(selectedDaySchedules = filtered))
+        }
+    }
+
+    fun deleteSchedule(studyId: Long, scheduleId: Long) {
+        _uiState.update { state ->
+            val updatedMonthly = state.plannerState.monthlySchedules
+                .filterNot { it.id == scheduleId }
+                .toPersistentList()
+
+            state.copy(
+                plannerState = state.plannerState.copy(
+                    monthlySchedules = updatedMonthly,
+                    expandedScheduleId = -1L
+                )
+            )
+        }
+        updateFilteredSchedules()
+
+        viewModelScope.launch {
+            studyRepository.deleteSchedule(studyId, scheduleId)
+                .onSuccess {
+                    val date = _uiState.value.plannerState.selectedDate
+                    fetchMonthlySchedules(studyId, date.year, date.monthValue)
+                }
+                .onFailure {
+                    Log.e("DeleteDebug", it.message.toString())
+                }
+        }
+    }
+
+    fun toggleScheduleMenu(scheduleId: Long) {
+        _uiState.update { state ->
+            val currentId = state.plannerState.expandedScheduleId
+            val nextId = if (currentId == scheduleId) -1L else scheduleId
+            state.copy(
+                plannerState = state.plannerState.copy(expandedScheduleId = nextId)
+            )
         }
     }
 
@@ -95,28 +214,15 @@ class StudyDetailViewModel @Inject constructor(
         updateFilteredSchedules()
     }
 
-    private fun updateFilteredSchedules() {
+    fun resetScheduleCreateSuccess() {
         _uiState.update { state ->
-            val date = state.plannerState.selectedDate
-            // 필터링: 시작일과 종료일 사이에 선택한 날짜가 있는지 확인
-            val filtered = state.plannerState.monthlySchedules.filter { schedule ->
-                val start = schedule.startAt.toLocalDate()
-                val end = schedule.endAt.toLocalDate()
-                !date.isBefore(start) && !date.isAfter(end)
-            }.toPersistentList() // 우선 .take(2)를 지우고 다 나오는지 확인하세요!
-
-            // 로그를 찍어서 필터링이 되는지 꼭 확인하세요
-            Log.d("PlannerDebug", "선택날짜: $date, 전체개수: ${state.plannerState.monthlySchedules.size}, 필터후: ${filtered.size}")
-
-            state.copy(plannerState = state.plannerState.copy(selectedDaySchedules = filtered))
+            state.copy(plannerState = state.plannerState.copy(isScheduleCreateSuccess = false))
         }
     }
 
     fun createTodo(studyId: Long, content: String) {
         val selectedDate = uiState.value.plannerState.selectedDate
-        val today = LocalDate.now()
-
-        if (selectedDate.isBefore(today)) return
+        if (selectedDate.isBefore(LocalDate.now())) return
 
         viewModelScope.launch {
             studyRepository.createTodo(
@@ -137,9 +243,7 @@ class StudyDetailViewModel @Inject constructor(
                         )
                     )
                 }
-            }.onFailure {
-                emitError(it)
-            }
+            }.onFailure { emitError(it) }
         }
     }
 
@@ -154,7 +258,6 @@ class StudyDetailViewModel @Inject constructor(
             result.onSuccess {
                 _uiState.update { state ->
                     val newList = state.plannerState.todoList.map { todo ->
-
                         if (todo.id == todoId) todo.copy(isCompleted = !isCurrentlyCompleted)
                         else todo
                     }.toPersistentList()
@@ -204,21 +307,13 @@ class StudyDetailViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-
-            val memoirModel = MemoirCreateModel(
-                activity = activity,
-                learned = learned,
-                encouragement = encouragement,
-                isPrivate = isPrivate
-            )
-
+            val memoirModel = MemoirCreateModel(activity, learned, encouragement, isPrivate)
             studyRepository.postMemoir(studyId, memoirModel, imageFiles)
                 .onSuccess {
                     _sideEffect.emit(StudyDetailSideEffect.MemoirPostSuccess)
                     fetchStudyHomeDetail(studyId)
                 }
                 .onFailure { emitError(it) }
-
             _uiState.update { it.copy(isLoading = false) }
         }
     }
@@ -230,20 +325,15 @@ class StudyDetailViewModel @Inject constructor(
         isCurrentlySelected: Boolean
     ) {
         viewModelScope.launch {
-            // 1. 낙관적 업데이트
             updateMemoirUIState(memoirId, reactionType, !isCurrentlySelected)
-
-            // 2. 서버 통신 (Repository API 호출)
             val result = if (isCurrentlySelected) {
                 studyRepository.deleteReviewReaction(studyId, memoirId, reactionType)
             } else {
                 studyRepository.postReviewReaction(studyId, memoirId, reactionType)
             }
-
-            // 3. 실패 시 롤백
-            result.onFailure { error ->
+            result.onFailure {
                 updateMemoirUIState(memoirId, reactionType, isCurrentlySelected)
-                emitError(error)
+                emitError(it)
             }
         }
     }
@@ -253,7 +343,6 @@ class StudyDetailViewModel @Inject constructor(
             val updatedMemoirs = state.memoirState.memoirs.map { memoir ->
                 if (memoir.memoirId == memoirId) {
                     val diff = if (isSelected) 1 else -1
-
                     memoir.copy(
                         reactions = when (reactionType) {
                             "FIRE" -> memoir.reactions.copy(isFired = isSelected)
@@ -278,14 +367,11 @@ class StudyDetailViewModel @Inject constructor(
 
     fun fetchAllMemoirs(studyId: Long, cursor: Long? = null) {
         viewModelScope.launch {
-            // 나중에 실제 memberId
             val myMemberId = -1L
-
             studyRepository.getFullStudyMemoirs(studyId, cursor, 20).onSuccess { memoirs ->
                 val processedMemoirs = memoirs.map { memoir ->
                     memoir.copy(isMyMemoir = memoir.memberId == myMemberId)
                 }
-
                 _uiState.update { state ->
                     val currentList = if (cursor == null) emptyList() else state.memoirState.memoirs
                     state.copy(
@@ -311,44 +397,7 @@ class StudyDetailViewModel @Inject constructor(
         }
     }
 
-    fun createSchedule(
-        studyId: Long,
-        title: String,
-        location: String,
-        startAt: LocalDateTime,
-        endAt: LocalDateTime
-    ) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-
-            studyRepository.createSchedule(
-                studyId = studyId,
-                title = title,
-                location = location,
-                startAt = startAt,
-                endAt = endAt
-            ).onSuccess {
-                _sideEffect.emit(StudyDetailSideEffect.ScheduleCreateSuccess)
-
-                // 1. 플래너 탭 데이터 갱신 (캘린더용)
-                val selectedDate = _uiState.value.plannerState.selectedDate
-                fetchMonthlySchedules(
-                    studyId = studyId,
-                    year = selectedDate.year,
-                    month = selectedDate.monthValue
-                )
-
-                // 2. 홈 탭 데이터 갱신 (다가오는 일정용) ★ 이 줄을 추가하세요!
-                fetchStudyHomeDetail(studyId)
-
-            }.onFailure { error ->
-                emitError(error)
-            }
-            _uiState.update { it.copy(isLoading = false) }
-        }
-    }
-
     private suspend fun emitError(t: Throwable) {
-        _sideEffect.emit(StudyDetailSideEffect.ShowSnackBar(t.message ?: "데이터를 불러오는데 실패했습니다."))
+        _sideEffect.emit(StudyDetailSideEffect.ShowSnackBar(t.message ?: "오류가 발생했습니다."))
     }
 }

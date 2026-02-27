@@ -85,9 +85,14 @@ fun StudyDetailHomeScreen(
                 schedules.forEach { schedule ->
                     val timeRange = "${schedule.startAt.toUiTime()} - ${schedule.endAt.toUiTime()}"
                     StudyDetailScheduleItem(
+                        scheduleId = schedule.id,
                         title = schedule.title,
                         timeRange = timeRange,
-                        isNow = schedule.isNow
+                        isNow = schedule.isNow,
+                        showMenu = false,
+                        isMenuExpanded = false,
+                        onMenuClick = {},
+                        onDeleteClick = {}
                     )
                 }
             }

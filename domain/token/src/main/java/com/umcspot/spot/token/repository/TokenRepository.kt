@@ -8,4 +8,6 @@ interface TokenRepository {
     suspend fun refreshTokenData() : Result<Unit>
 
     suspend fun spotLogout(): Result<Unit>
+
+    suspend fun getUserId(): String
 }

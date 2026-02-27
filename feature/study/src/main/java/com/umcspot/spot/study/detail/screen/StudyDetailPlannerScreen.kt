@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -33,9 +34,9 @@ import com.umcspot.spot.designsystem.component.SpotPlannerCalendar
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.study.detail.component.common.StudyDetailCreateButton
+import com.umcspot.spot.study.detail.component.common.StudyMemberItem
 import com.umcspot.spot.study.detail.component.planner.StudyDetailScheduleItem
 import com.umcspot.spot.study.detail.component.planner.StudyDetailToDoItem
-import com.umcspot.spot.study.detail.component.common.StudyMemberItem
 import com.umcspot.spot.study.detail.mapper.toUiTime
 import com.umcspot.spot.study.detail.model.StudyPlannerState
 import com.umcspot.spot.study.model.StudyMemberModel
@@ -56,18 +57,20 @@ fun StudyDetailPlannerScreen(
     members: ImmutableList<StudyMemberModel>,
     onDateSelected: (LocalDate) -> Unit,
     onMonthChanged: (Int, Int) -> Unit,
-    onAddingSchedule: () -> Unit, // 일정 생성 바텀시트용 콜백 분리
+    onAddingSchedule: () -> Unit,
+    onScheduleDelete: (Long, Long) -> Unit,
+    onScheduleMenuToggle: (Long) -> Unit,
+    onAddingTodo: () -> Unit,
     onTodoCreate: (Long, String) -> Unit,
     onTodoToggle: (Long, Long, Boolean) -> Unit,
     onTodoDelete: (Long, Long) -> Unit,
     onMemberSelected: (Long) -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
-    var isAddingTodo by remember { mutableStateOf(false) } // Todo 입력 필드 활성화 상태
+    var isAddingTodoField by remember { mutableStateOf(false) }
     var newTodoText by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    // 캘린더 관련 설정
     val daysOfWeekList = remember { daysOfWeek(firstDayOfWeek = DayOfWeek.MONDAY) }
     val monthState = rememberCalendarState(
         startMonth = YearMonth.now().minusMonths(12),
@@ -76,28 +79,33 @@ fun StudyDetailPlannerScreen(
         firstDayOfWeek = daysOfWeekList.first()
     )
 
-    // 오늘 이전 날짜는 생성 버튼 비활성화
+    var currentDisplayMonth by remember { mutableStateOf(YearMonth.from(plannerState.selectedDate)) }
+
+    LaunchedEffect(monthState) {
+        snapshotFlow { monthState.firstVisibleMonth }.collect { month ->
+            currentDisplayMonth = month.yearMonth
+            onMonthChanged(month.yearMonth.year, month.yearMonth.monthValue)
+        }
+    }
+
     val isAvailableDate = remember(plannerState.selectedDate) {
-        val today = LocalDate.now()
-        !plannerState.selectedDate.isBefore(today)
+        !plannerState.selectedDate.isBefore(LocalDate.now())
     }
 
-    // 월 변경 감지
-    LaunchedEffect(monthState.firstVisibleMonth) {
-        val ym = monthState.firstVisibleMonth.yearMonth
-        onMonthChanged(ym.year, ym.monthValue)
+    val monthTitle = remember(currentDisplayMonth) {
+        currentDisplayMonth.format(DateTimeFormatter.ofPattern("yyyy년 M월"))
     }
-
-    val monthTitle = plannerState.selectedDate.format(DateTimeFormatter.ofPattern("yyyy년 M월"))
-    val weekNumber = plannerState.selectedDate.get(WeekFields.of(DayOfWeek.MONDAY, 1).weekOfMonth())
-    val weekTitle = "$monthTitle ${weekNumber}주차"
+    val weekTitle = remember(plannerState.selectedDate) {
+        val monthStr = plannerState.selectedDate.format(DateTimeFormatter.ofPattern("yyyy년 M월"))
+        val weekNumber = plannerState.selectedDate.get(WeekFields.of(DayOfWeek.MONDAY, 1).weekOfMonth())
+        "$monthStr ${weekNumber}주차"
+    }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize()
     ) {
-        // 상단 날짜 및 확장 버튼
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -105,11 +113,15 @@ fun StudyDetailPlannerScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = if (isExpanded) monthTitle else weekTitle, style = SpotTheme.typography.h4)
+            Text(
+                text = if (isExpanded) monthTitle else weekTitle,
+                style = SpotTheme.typography.h4,
+                color = SpotTheme.colors.black
+            )
             Icon(
                 painter = painterResource(id = if (isExpanded) R.drawable.arrow_up else R.drawable.arrow_down),
                 contentDescription = null,
-                tint = B500,
+                tint = SpotTheme.colors.B500,
                 modifier = Modifier
                     .size(screenWidthDp(14.dp))
                     .noRippleClickable { isExpanded = !isExpanded }
@@ -118,7 +130,6 @@ fun StudyDetailPlannerScreen(
 
         Spacer(modifier = Modifier.height(screenHeightDp(6.dp)))
 
-        // 캘린더 컴포넌트
         SpotPlannerCalendar(
             isExpanded = isExpanded,
             monthState = monthState,
@@ -128,50 +139,72 @@ fun StudyDetailPlannerScreen(
         )
 
         Spacer(modifier = Modifier.height(screenHeightDp(16.dp)))
-
-        // 선택된 날짜의 일정 목록 (최대 2개 표시 컨셉 유지)
-        plannerState.selectedDaySchedules.forEach { schedule ->
-            StudyDetailScheduleItem(
-                title = schedule.title,
-                timeRange = "${schedule.startAt.toUiTime()} - ${schedule.endAt.toUiTime()}",
-                isNow = schedule.isNow
-            )
-            Spacer(modifier = Modifier.height(screenHeightDp(12.dp)))
-        }
-
         HorizontalDivider(thickness = 0.5.dp, color = SpotTheme.colors.gray300)
         Spacer(modifier = Modifier.height(screenHeightDp(16.dp)))
 
-        // 1. 일정 생성 버튼 (바텀시트 호출)
         StudyDetailCreateButton(
             text = "일정",
             isStudyMember = true,
             enabled = isAvailableDate,
-            onButtonClick = {
-                if (isAvailableDate) onAddingSchedule()
-            }
+            onButtonClick = { if (isAvailableDate) onAddingSchedule() }
         )
 
-        // 2. Todo 생성 버튼 (하단 입력 필드 활성화)
+        Spacer(modifier = Modifier.height(screenHeightDp(12.dp)))
+
+        val displaySchedules = remember(plannerState.selectedDaySchedules) {
+            plannerState.selectedDaySchedules.take(2)
+        }
+
+        if (displaySchedules.isEmpty()) {
+            Text(
+                text = "작성된 일정이 없어요.",
+                style = SpotTheme.typography.regular_400,
+                color = SpotTheme.colors.gray400,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = screenHeightDp(20.dp)),
+                textAlign = TextAlign.Center
+            )
+        } else {
+            displaySchedules.forEach { schedule ->
+                StudyDetailScheduleItem(
+                    scheduleId = schedule.id,
+                    title = schedule.title,
+                    timeRange = "${schedule.startAt.toUiTime()} - ${schedule.endAt.toUiTime()}",
+                    isNow = schedule.isNow,
+                    isMine = schedule.isMine,
+                    showMenu = true,
+                    isMenuExpanded = plannerState.expandedScheduleId == schedule.id,
+                    onMenuClick = { id -> onScheduleMenuToggle(id) },
+                    onDeleteClick = { onScheduleDelete(studyId, schedule.id) }
+                )
+                Spacer(modifier = Modifier.height(screenHeightDp(8.dp)))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(screenHeightDp(16.dp)))
+        HorizontalDivider(thickness = 0.5.dp, color = SpotTheme.colors.gray300)
+        Spacer(modifier = Modifier.height(screenHeightDp(16.dp)))
+
         StudyDetailCreateButton(
             text = "Todo",
             isStudyMember = true,
             enabled = isAvailableDate,
             onButtonClick = {
                 if (isAvailableDate) {
-                    isAddingTodo = true // Todo 입력 필드 노출
+                    isAddingTodoField = true
+                    onAddingTodo()
                 }
             }
         )
 
         Spacer(modifier = Modifier.height(screenHeightDp(12.dp)))
 
-        // 멤버 리스트
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(screenWidthDp(13.dp))
         ) {
-            items(members) { member ->
+            items(items = members, key = { it.id }) { member ->
                 StudyMemberItem(
                     name = member.name,
                     profileUrl = member.profileUrl,
@@ -183,8 +216,7 @@ fun StudyDetailPlannerScreen(
 
         Spacer(modifier = Modifier.height(screenHeightDp(8.dp)))
 
-        // Todo 입력 필드 (isAddingTodo가 true일 때만 노출)
-        if (isAddingTodo) {
+        if (isAddingTodoField) {
             StudyDetailToDoItem(
                 text = newTodoText,
                 isCompleted = false,
@@ -195,21 +227,20 @@ fun StudyDetailPlannerScreen(
                     if (newTodoText.isNotBlank()) {
                         onTodoCreate(studyId, newTodoText)
                         newTodoText = ""
-                        isAddingTodo = false
+                        isAddingTodoField = false
                         keyboardController?.hide()
                     }
                 },
                 onDeleteClick = {
-                    isAddingTodo = false
+                    isAddingTodoField = false
                     newTodoText = ""
                 }
             )
         }
 
-        // 선택된 멤버의 Todo 리스트
         val filteredTodos = plannerState.todoList.filter { it.memberId == plannerState.selectedMemberId }
 
-        if (filteredTodos.isEmpty() && !isAddingTodo) {
+        if (filteredTodos.isEmpty() && !isAddingTodoField) {
             Text(
                 text = "아직 할 일이 작성되지 않았어요.",
                 style = SpotTheme.typography.regular_400,
@@ -224,10 +255,8 @@ fun StudyDetailPlannerScreen(
                 StudyDetailToDoItem(
                     text = todo.content,
                     isCompleted = todo.isCompleted,
-                    isMyToDo = true, // 본인 확인 로직 필요시 추가 수정 가능
-                    onCheckedChange = {
-                        onTodoToggle(studyId, todo.id, todo.isCompleted)
-                    },
+                    isMyToDo = true,
+                    onCheckedChange = { onTodoToggle(studyId, todo.id, todo.isCompleted) },
                     onDeleteClick = { onTodoDelete(studyId, todo.id) }
                 )
             }

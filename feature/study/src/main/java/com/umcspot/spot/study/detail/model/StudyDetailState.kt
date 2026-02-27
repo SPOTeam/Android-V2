@@ -35,7 +35,9 @@ data class StudyPlannerState(
     val monthlySchedules: ImmutableList<StudyScheduleModel> = persistentListOf(),
     val selectedDaySchedules: ImmutableList<StudyScheduleModel> = persistentListOf(),
     val todoList: ImmutableList<TodoModel> = persistentListOf(),
-    val selectedMemberId: String = ""
+    val selectedMemberId: String = "",
+    val expandedScheduleId: Long = -1L,
+    val isScheduleCreateSuccess: Boolean = false
 )
 
 data class StudyMemoirState(

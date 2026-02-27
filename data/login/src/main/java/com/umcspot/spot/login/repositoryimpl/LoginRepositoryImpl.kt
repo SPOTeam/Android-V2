@@ -78,4 +78,9 @@ class LoginRepositoryImpl @Inject constructor(
                 current.copy(userId = "")
             }
         }
+
+
+    override suspend fun getUserId(): String {
+        return spotUserIdDataStore.data.first().userId
+    }
 }

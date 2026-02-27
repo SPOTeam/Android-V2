@@ -143,7 +143,7 @@ class StudyRepositoryImpl @Inject constructor(
     override suspend fun getUpcomingSchedules(studyId: Long): Result<List<StudyScheduleModel>> =
         runCatching {
             val response = studyDataSource.getUpcomingSchedules(studyId)
-            response.result.schedules.map { it.toDomain() }
+            response.result?.schedules?.map { it.toDomain() } ?: emptyList()
         }
 
     override suspend fun getMonthlySchedules(studyId: Long, year: Int, month: Int): Result<List<StudyScheduleModel>> =
@@ -151,6 +151,17 @@ class StudyRepositoryImpl @Inject constructor(
             val response = studyDataSource.getMonthlySchedules(studyId, year, month)
             response.result.schedules.map { it.toDomain() }
         }
+
+    override suspend fun deleteSchedule(studyId: Long, scheduleId: Long): Result<Unit> = runCatching {
+        val response = studyDataSource.deleteSchedule(studyId, scheduleId)
+
+        if (!response.isSuccess) {
+            throw Exception(response.message ?: "일정 삭제 실패")
+        }
+        Unit
+    }.onFailure { e ->
+        Log.e("StudyRepository", "deleteSchedule failed: studyId=$studyId, scheduleId=$scheduleId", e)
+    }
 
     override suspend fun createTodo(
         studyId: Long,

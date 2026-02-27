@@ -62,6 +62,8 @@ interface StudyRepository {
         month: Int
     ): Result<List<StudyScheduleModel>>
 
+    suspend fun deleteSchedule(studyId: Long, scheduleId: Long): Result<Unit>
+
     suspend fun createTodo(
         studyId: Long,
         content: String,
