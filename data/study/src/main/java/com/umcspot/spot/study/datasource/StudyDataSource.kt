@@ -62,6 +62,11 @@ interface StudyDataSource {
         month: Int
     ): BaseResponse<StudyMonthlyScheduleResponseDto>
 
+    suspend fun deleteSchedule(
+        studyId: Long,
+        scheduleId: Long
+    ): BaseResponse<Unit?>
+
     suspend fun createTodo(
         studyId: Long,
         content: String,

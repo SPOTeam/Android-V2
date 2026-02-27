@@ -97,6 +97,12 @@ class StudyDataSourceImpl @Inject constructor(
     ): BaseResponse<StudyMonthlyScheduleResponseDto> =
         studyService.getMonthlySchedules(studyId, year, month)
 
+    override suspend fun deleteSchedule(
+        studyId: Long,
+        scheduleId: Long
+    ): BaseResponse<Unit?> =
+        studyService.deleteSchedule(studyId, scheduleId)
+
     override suspend fun createTodo(
         studyId: Long,
         content: String,

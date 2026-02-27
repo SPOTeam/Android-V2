@@ -62,8 +62,6 @@ fun MainNavHost(
     onStudyTabChanged: (StudyDetailTab) -> Unit,
     currentStudyDetailTab: StudyDetailTab,
     onBackRequest : () -> Unit,
-    onOpenScheduleBottomSheet: () -> Unit,
-    onDismissBottomSheet: () -> Unit
 ) {
     val clearStackNavOptions = navOptions {
         popUpTo(0) { inclusive = true }
@@ -296,8 +294,6 @@ fun MainNavHost(
             },
             onTabChanged = onStudyTabChanged,
             currentTab = currentStudyDetailTab,
-            onOpenScheduleBottomSheet = onOpenScheduleBottomSheet,
-            onDismissBottomSheet = onDismissBottomSheet
         )
     }
 }

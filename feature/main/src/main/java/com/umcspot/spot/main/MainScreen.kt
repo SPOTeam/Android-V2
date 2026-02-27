@@ -39,7 +39,6 @@ import com.umcspot.spot.mypage.recruiting.navigation.MyRecruitingStudy
 import com.umcspot.spot.mypage.waiting.navigation.WaitingStudy
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
-import com.umcspot.spot.study.detail.component.planner.ScheduleBottomSheet
 import com.umcspot.spot.study.detail.model.StudyDetailTab
 import com.umcspot.spot.study.detail.navigation.StudyDetail
 import com.umcspot.spot.study.detail.navigation.StudyMemoirPost
@@ -183,16 +182,8 @@ fun MainScreen(
             onBackRequest = { showBackRequestDialog = true },
             onStudyTabChanged = { tab -> currentStudyDetailTab = tab },
             currentStudyDetailTab = currentStudyDetailTab,
-            onOpenScheduleBottomSheet = { isScheduleSheetVisible = true },
-            onDismissBottomSheet = { isScheduleSheetVisible = false }
         )
     }
-
-    ScheduleBottomSheet(
-        visible = isScheduleSheetVisible,
-        onDismiss = { isScheduleSheetVisible = false },
-        studyId = currentStudyId
-    )
 
     RejectDialog(
         visible = showBackRequestDialog,
