@@ -23,6 +23,7 @@ import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.JJim
 import com.umcspot.spot.jjim.navigation.navigateToJJim
 import com.umcspot.spot.mypage.cancelMemberShip.navigation.CancelMemberShip
+import com.umcspot.spot.mypage.editInterestRegion.navigation.EditRegion
 import com.umcspot.spot.mypage.editInterestStudy.navigation.EditInterest
 import com.umcspot.spot.mypage.main.navigation.MyPage
 import com.umcspot.spot.mypage.main.navigation.navigateToMyPage
@@ -125,6 +126,7 @@ class MainNavigator(
         MyRecruitingStudy::class,
         WaitingStudy::class,
         EditInterest::class,
+        EditRegion::class,
         CancelMemberShip::class,
         MyStudy::class
     ) || inAnyGraphRoutes(POST_CONTENT_ROUTE) || inAnyGraphRoutes(STUDY_APPLICATION_ROUTE)

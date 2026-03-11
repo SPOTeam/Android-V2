@@ -24,6 +24,8 @@ import com.umcspot.spot.jjim.navigation.jjimGraph
 import com.umcspot.spot.model.QuickMenuType
 import com.umcspot.spot.mypage.cancelMemberShip.navigation.cancelMemberShipGraph
 import com.umcspot.spot.mypage.cancelMemberShip.navigation.navigateToCancelMembership
+import com.umcspot.spot.mypage.editInterestRegion.navigation.interestRegionGraph
+import com.umcspot.spot.mypage.editInterestRegion.navigation.navigateToEditInterestRegion
 import com.umcspot.spot.mypage.editInterestStudy.navigation.interestStudyGraph
 import com.umcspot.spot.mypage.editInterestStudy.navigation.navigateToEditInterestStudy
 import com.umcspot.spot.mypage.main.navigation.MyPage
@@ -130,19 +132,15 @@ fun MainNavHost(
         )
 
 
-        /** MyPage **/
         mypageGraph(
             contentPadding = contentPadding,
             onParticipatingClick = { navigator.navController.navigateToParticipatingStudy() },
             onMyRecruitingClick = { navigator.navController.navigateToMyRecruitingStudy() },
             onMyAppliedClick = { navigator.navController.navigateToWaitingStudy() },
             onEditInterestClick = { navigator.navController.navigateToEditInterestStudy() },
-            onEditInterestLocationClick =  {  },
+            onEditInterestLocationClick = { navigator.navController.navigateToEditInterestRegion() },
             onCancelMemberShipClick = { navigator.navController.navigateToCancelMembership() },
             onLogoutClick = {
-                // 1) 로그아웃 처리(데이터 삭제) 트리거
-
-                // 2) Landing으로 이동하면서 스택 클리어
                 navigator.navController.navigateToLanding(clearStackNavOptions)
             }
         )
@@ -183,6 +181,20 @@ fun MainNavHost(
                     restoreState = false
                 }
             ) },
+            moveToMyPage = { navigator.navController.popBackStack() }
+        )
+
+        interestRegionGraph(
+            contentPadding = contentPadding,
+            moveToMyInterestStudy = {
+                navigator.navigateToPreferLocationStudy(
+                    navOptions {
+                        popUpTo<MyPage> { inclusive = false }
+                        launchSingleTop = true
+                        restoreState = false
+                    }
+                )
+            },
             moveToMyPage = { navigator.navController.popBackStack() }
         )
 
