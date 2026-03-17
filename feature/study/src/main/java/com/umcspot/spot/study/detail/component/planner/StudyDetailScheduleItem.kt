@@ -45,87 +45,94 @@ fun StudyDetailScheduleItem(
     onDeleteClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier.fillMaxWidth()) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = SpotTheme.colors.B50, shape = RoundedCornerShape(10.dp))
+            .padding(
+                horizontal = screenWidthDp(12.dp),
+                vertical = screenHeightDp(8.dp)
+            )
+    ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = SpotTheme.colors.B50, shape = RoundedCornerShape(10.dp))
-                .padding(horizontal = screenWidthDp(12.dp), vertical = screenHeightDp(12.dp)), // 패딩 소폭 조정
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = SpotTheme.typography.medium_500,
-                    color = SpotTheme.colors.black
-                )
+            Text(
+                text = title,
+                style = SpotTheme.typography.medium_500,
+                color = SpotTheme.colors.black,
+                modifier = Modifier.weight(1f)
+            )
 
-                Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Box(
+            if (showMenu && isMine) {
+                Box {
+                    Icon(
+                        painter = painterResource(id = R.drawable.meetball),
+                        contentDescription = "일정 옵션",
+                        tint = SpotTheme.colors.gray400,
                         modifier = Modifier
-                            .background(color = SpotTheme.colors.B100, shape = RoundedCornerShape(6.dp))
-                            .padding(horizontal = screenWidthDp(4.dp), vertical = screenHeightDp(1.dp))
-                    ) {
-                        Text(
-                            text = "일시",
-                            style = SpotTheme.typography.small_500,
-                            color = SpotTheme.colors.B500
-                        )
-                    }
-                    Text(
-                        text = timeRange,
-                        style = SpotTheme.typography.regular_500,
-                        color = SpotTheme.colors.gray500
+                            .size(screenWidthDp(20.dp))
+                            .noRippleClickable { onMenuClick(scheduleId) }
                     )
-                }
-            }
-
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(screenHeightDp(8.dp))
-            ) {
-                if (showMenu && isMine) {
-                    Box {
-                        Icon(
-                            painter = painterResource(id = R.drawable.meetball),
-                            contentDescription = "일정 옵션",
-                            tint = SpotTheme.colors.gray400,
-                            modifier = Modifier
-                                .size(screenWidthDp(20.dp))
-                                .noRippleClickable { onMenuClick(scheduleId) }
-                        )
-                        if (isMenuExpanded) {
-                            Popup(
-                                alignment = Alignment.TopEnd,
-                                offset = IntOffset(x = 0, y = 80),
-                                onDismissRequest = { onMenuClick(scheduleId) },
-                                properties = PopupProperties(focusable = true)
-                            ) {
-                                DeleteMenuPopup(onDelete = { onDeleteClick() })
-                            }
+                    if (isMenuExpanded) {
+                        Popup(
+                            alignment = Alignment.TopEnd,
+                            offset = IntOffset(x = 0, y = 60),
+                            onDismissRequest = { onMenuClick(scheduleId) },
+                            properties = PopupProperties(focusable = true)
+                        ) {
+                            DeleteMenuPopup(onDelete = { onDeleteClick() })
                         }
                     }
-                } else if (showMenu && !isMine) {
-                    Spacer(modifier = Modifier.size(screenWidthDp(20.dp)))
                 }
+            } else {
+                Spacer(modifier = Modifier.size(screenWidthDp(20.dp)))
+            }
+        }
 
-                if (isNow) {
-                    Box(
-                        modifier = Modifier
-                            .background(color = SpotTheme.colors.R500, shape = RoundedCornerShape(14.dp))
-                            .padding(horizontal = screenWidthDp(8.dp), vertical = screenHeightDp(2.dp))
-                    ) {
-                        Text(
-                            text = "NOW",
-                            style = SpotTheme.typography.small_500,
-                            color = SpotTheme.colors.white
-                        )
-                    }
+        Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(screenWidthDp(4.dp)),
+                modifier = Modifier.weight(1f)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .background(color = SpotTheme.colors.B100, shape = RoundedCornerShape(6.dp))
+                        .padding(horizontal = screenWidthDp(4.dp), vertical = screenHeightDp(1.dp))
+                ) {
+                    Text(
+                        text = "일시",
+                        style = SpotTheme.typography.small_500,
+                        color = SpotTheme.colors.B500
+                    )
+                }
+                Text(
+                    text = timeRange,
+                    style = SpotTheme.typography.regular_500,
+                    color = SpotTheme.colors.gray500
+                )
+            }
+
+            if (isNow) {
+                Box(
+                    modifier = Modifier
+                        .background(color = SpotTheme.colors.R500, shape = RoundedCornerShape(14.dp))
+                        .padding(horizontal = screenWidthDp(5.dp), vertical = screenHeightDp(1.dp))
+                ) {
+                    Text(
+                        text = "NOW",
+                        style = SpotTheme.typography.small_500,
+                        color = SpotTheme.colors.white
+                    )
                 }
             }
         }

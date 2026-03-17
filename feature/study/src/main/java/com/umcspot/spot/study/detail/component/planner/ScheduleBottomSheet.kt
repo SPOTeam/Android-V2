@@ -239,7 +239,6 @@ fun ScheduleBottomSheet(
                             studyId?.let {
                                 keyboard?.hide()
                                 onCreateSchedule(title, locationMemo, startDateTime, endDateTime)
-                                onDismiss()
                             }
                         },
                         modifier = Modifier
@@ -259,6 +258,7 @@ private fun ScheduleInputField(
     placeholder: String
 ) {
     var isFocused by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()

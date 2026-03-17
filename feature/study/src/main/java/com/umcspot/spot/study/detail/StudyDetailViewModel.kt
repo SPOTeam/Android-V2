@@ -1,6 +1,5 @@
 package com.umcspot.spot.study.detail
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umcspot.spot.study.detail.model.StudyDetailSideEffect
@@ -55,6 +54,7 @@ class StudyDetailViewModel @Inject constructor(
         }
     }
 
+    // ── 스터디 홈 데이터 조회 ──────────────────────────────────
     fun fetchStudyHomeDetail(studyId: Long) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -65,16 +65,18 @@ class StudyDetailViewModel @Inject constructor(
             val memoirsDeferred = async { studyRepository.getStudyRecentMemoirs(studyId) }
 
             detailDeferred.await().onSuccess { model ->
-                _uiState.update { it.copy(homeState = it.homeState.copy(
-                    studyTitle = model.title,
-                    studyDescription = model.description,
-                    thumbnailUrl = model.thumbnailUrl,
-                    categories = model.categories.toPersistentList(),
-                    currentMembers = model.currentMembers,
-                    totalMembers = model.totalMembers,
-                    likeCount = model.likeCount,
-                    hitCount = model.hitCount
-                ))}
+                _uiState.update { state ->
+                    state.copy(homeState = state.homeState.copy(
+                        studyTitle = model.title,
+                        studyDescription = model.description,
+                        thumbnailUrl = model.thumbnailUrl,
+                        categories = model.categories.toPersistentList(),
+                        currentMembers = model.currentMembers,
+                        totalMembers = model.totalMembers,
+                        likeCount = model.likeCount,
+                        hitCount = model.hitCount
+                    ))
+                }
             }.onFailure { emitError(it) }
 
             membersDeferred.await().onSuccess { members ->
@@ -83,12 +85,8 @@ class StudyDetailViewModel @Inject constructor(
 
             schedulesDeferred.await().onSuccess { schedules ->
                 val now = LocalDateTime.now()
-                val processedSchedules = schedules.map { schedule ->
-                    val isCurrent = !now.isBefore(schedule.startAt) && !now.isAfter(schedule.endAt)
-                    schedule.copy(isNow = isCurrent)
-                }.toPersistentList()
-
-                _uiState.update { it.copy(homeState = it.homeState.copy(schedules = processedSchedules)) }
+                val processed = schedules.map { it.copy(isNow = !now.isBefore(it.startAt) && !now.isAfter(it.endAt)) }.toPersistentList()
+                _uiState.update { it.copy(homeState = it.homeState.copy(schedules = processed)) }
             }.onFailure { emitError(it) }
 
             memoirsDeferred.await().onSuccess { memoirs ->
@@ -99,127 +97,85 @@ class StudyDetailViewModel @Inject constructor(
         }
     }
 
+    // ── 일정 관리 (Planner) ──────────────────────────────────
     fun fetchMonthlySchedules(studyId: Long, year: Int, month: Int) {
         viewModelScope.launch {
-            studyRepository.getMonthlySchedules(studyId, year, month).onSuccess { schedules ->
-                _uiState.update { state ->
-                    state.copy(plannerState = state.plannerState.copy(
-                        monthlySchedules = schedules.toPersistentList()
-                    ))
+            studyRepository.getMonthlySchedules(studyId, year, month)
+                .onSuccess { schedules ->
+                    _uiState.update { state ->
+                        state.copy(plannerState = state.plannerState.copy(monthlySchedules = schedules.toPersistentList()))
+                    }
+                    updateFilteredSchedules()
                 }
-                updateFilteredSchedules()
-            }.onFailure {
-                Log.e("PlannerDebug", it.message.toString())
-            }
         }
     }
 
-    fun createSchedule(
-        studyId: Long,
-        title: String,
-        location: String,
-        startAt: LocalDateTime,
-        endAt: LocalDateTime
-    ) {
+    fun createSchedule(studyId: Long, title: String, location: String, startAt: LocalDateTime, endAt: LocalDateTime) {
         val tempId = System.currentTimeMillis() * -1
-        val tempSchedule = StudyScheduleModel(
-            id = tempId,
-            title = title,
-            startAt = startAt,
-            endAt = endAt,
-            isNow = false,
-            isMine = true
-        )
+        val tempSchedule = StudyScheduleModel(tempId, title, startAt, endAt, false, true)
 
         _uiState.update { state ->
-            val updatedMonthly = (state.plannerState.monthlySchedules + tempSchedule)
-                .sortedBy { it.startAt }
-                .toPersistentList()
-
+            val updatedMonthly = (state.plannerState.monthlySchedules + tempSchedule).sortedBy { it.startAt }.toPersistentList()
             state.copy(
                 plannerState = state.plannerState.copy(
                     monthlySchedules = updatedMonthly,
+                    selectedDaySchedules = computeFilteredSchedules(updatedMonthly, state.plannerState.selectedDate),
                     isScheduleCreateSuccess = true
                 )
             )
         }
-        updateFilteredSchedules()
 
         viewModelScope.launch {
+            _sideEffect.emit(StudyDetailSideEffect.ScheduleCreateSuccess)
             studyRepository.createSchedule(studyId, title, location, startAt, endAt)
                 .onSuccess {
                     val date = _uiState.value.plannerState.selectedDate
                     fetchMonthlySchedules(studyId, date.year, date.monthValue)
                     fetchStudyHomeDetail(studyId)
-                    _sideEffect.emit(StudyDetailSideEffect.ScheduleCreateSuccess)
                 }
                 .onFailure {
-                    _uiState.update { state ->
-                        val rolledBack = state.plannerState.monthlySchedules.filterNot { it.id == tempId }.toPersistentList()
-                        state.copy(plannerState = state.plannerState.copy(monthlySchedules = rolledBack))
-                    }
-                    updateFilteredSchedules()
+                    fetchMonthlySchedules(studyId, startAt.year, startAt.monthValue)
                     emitError(it)
                 }
         }
     }
 
+    private fun computeFilteredSchedules(schedules: List<StudyScheduleModel>, selectedDate: LocalDate) =
+        schedules.filter {
+            val start = it.startAt.toLocalDate()
+            val end = it.endAt.toLocalDate()
+            !selectedDate.isBefore(start) && !selectedDate.isAfter(end)
+        }.sortedBy { it.startAt }.toPersistentList()
+
     private fun updateFilteredSchedules() {
         _uiState.update { state ->
-            val date = state.plannerState.selectedDate
-            val now = LocalDateTime.now()
-
-            val filtered = state.plannerState.monthlySchedules
-                .filter { schedule ->
-                    val start = schedule.startAt.toLocalDate()
-                    val end = schedule.endAt.toLocalDate()
-                    !date.isBefore(start) && !date.isAfter(end)
-                }
-                .map { schedule ->
-                    val isCurrent = !now.isBefore(schedule.startAt) && !now.isAfter(schedule.endAt)
-                    schedule.copy(isNow = isCurrent)
-                }
-                .sortedBy { it.startAt }
-                .toPersistentList()
-
-            state.copy(plannerState = state.plannerState.copy(selectedDaySchedules = filtered))
+            state.copy(plannerState = state.plannerState.copy(
+                selectedDaySchedules = computeFilteredSchedules(state.plannerState.monthlySchedules, state.plannerState.selectedDate)
+            ))
         }
     }
 
     fun deleteSchedule(studyId: Long, scheduleId: Long) {
         _uiState.update { state ->
-            val updatedMonthly = state.plannerState.monthlySchedules
-                .filterNot { it.id == scheduleId }
-                .toPersistentList()
-
             state.copy(
                 plannerState = state.plannerState.copy(
-                    monthlySchedules = updatedMonthly,
+                    monthlySchedules = state.plannerState.monthlySchedules.filterNot { it.id == scheduleId }.toPersistentList(),
                     expandedScheduleId = -1L
                 )
             )
         }
         updateFilteredSchedules()
-
         viewModelScope.launch {
             studyRepository.deleteSchedule(studyId, scheduleId)
-                .onSuccess {
-                    val date = _uiState.value.plannerState.selectedDate
-                    fetchMonthlySchedules(studyId, date.year, date.monthValue)
-                }
-                .onFailure {
-                    Log.e("DeleteDebug", it.message.toString())
-                }
+                .onSuccess { fetchStudyHomeDetail(studyId) }
+                .onFailure { emitError(it) }
         }
     }
 
     fun toggleScheduleMenu(scheduleId: Long) {
         _uiState.update { state ->
-            val currentId = state.plannerState.expandedScheduleId
-            val nextId = if (currentId == scheduleId) -1L else scheduleId
-            state.copy(
-                plannerState = state.plannerState.copy(expandedScheduleId = nextId)
-            )
+            val nextId = if (state.plannerState.expandedScheduleId == scheduleId) -1L else scheduleId
+            state.copy(plannerState = state.plannerState.copy(expandedScheduleId = nextId))
         }
     }
 
@@ -230,47 +186,25 @@ class StudyDetailViewModel @Inject constructor(
         updateFilteredSchedules()
     }
 
+    // ── 할 일 (Todo) ──────────────────────────────────
     fun createTodo(studyId: Long, content: String) {
         val selectedDate = uiState.value.plannerState.selectedDate
-        if (selectedDate.isBefore(LocalDate.now())) return
-
         viewModelScope.launch {
-            studyRepository.createTodo(
-                studyId = studyId,
-                content = content,
-                dueDate = selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
-            ).onSuccess { newTodoId ->
-                _uiState.update { state ->
-                    val newTodo = TodoModel(
-                        id = newTodoId,
-                        memberId = currentUserId,
-                        content = content,
-                        isCompleted = false
-                    )
-                    state.copy(
-                        plannerState = state.plannerState.copy(
-                            todoList = (state.plannerState.todoList + newTodo).toPersistentList()
-                        )
-                    )
+            studyRepository.createTodo(studyId, content, selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
+                .onSuccess { newId ->
+                    val newTodo = TodoModel(newId, currentUserId, content, false)
+                    _uiState.update { it.copy(plannerState = it.plannerState.copy(todoList = (it.plannerState.todoList + newTodo).toPersistentList())) }
                 }
-            }.onFailure { emitError(it) }
+                .onFailure { emitError(it) }
         }
     }
 
     fun toggleTodoStatus(studyId: Long, todoId: Long, isCurrentlyCompleted: Boolean) {
         viewModelScope.launch {
-            val result = if (isCurrentlyCompleted) {
-                studyRepository.uncompleteTodo(studyId, todoId)
-            } else {
-                studyRepository.completeTodo(studyId, todoId)
-            }
-
+            val result = if (isCurrentlyCompleted) studyRepository.uncompleteTodo(studyId, todoId) else studyRepository.completeTodo(studyId, todoId)
             result.onSuccess {
                 _uiState.update { state ->
-                    val newList = state.plannerState.todoList.map { todo ->
-                        if (todo.id == todoId) todo.copy(isCompleted = !isCurrentlyCompleted)
-                        else todo
-                    }.toPersistentList()
+                    val newList = state.plannerState.todoList.map { if (it.id == todoId) it.copy(isCompleted = !isCurrentlyCompleted) else it }.toPersistentList()
                     state.copy(plannerState = state.plannerState.copy(todoList = newList))
                 }
             }
@@ -279,14 +213,13 @@ class StudyDetailViewModel @Inject constructor(
 
     fun deleteTodo(studyId: Long, todoId: Long) {
         viewModelScope.launch {
-            studyRepository.deleteTodo(studyId, todoId).onSuccess {
-                _uiState.update { state ->
-                    val updatedTodo = state.plannerState.todoList
-                        .filterNot { it.id == todoId }
-                        .toPersistentList()
-                    state.copy(plannerState = state.plannerState.copy(todoList = updatedTodo))
+            studyRepository.deleteTodo(studyId, todoId)
+                .onSuccess {
+                    _uiState.update { state ->
+                        state.copy(plannerState = state.plannerState.copy(todoList = state.plannerState.todoList.filterNot { it.id == todoId }.toPersistentList()))
+                    }
                 }
-            }.onFailure { emitError(it) }
+                .onFailure { emitError(it) }
         }
     }
 
@@ -295,36 +228,47 @@ class StudyDetailViewModel @Inject constructor(
             studyRepository.getMemberTodos(studyId, memberId, date.toString())
                 .onSuccess { todoList ->
                     _uiState.update { state ->
-                        state.copy(
-                            plannerState = state.plannerState.copy(
-                                selectedMemberId = memberId.toString(),
-                                selectedDate = date,
-                                todoList = todoList.toPersistentList()
-                            )
-                        )
+                        state.copy(plannerState = state.plannerState.copy(selectedMemberId = memberId.toString(), todoList = todoList.toPersistentList()))
                     }
                 }
         }
     }
 
-    fun postMemoir(
-        studyId: Long,
-        activity: String,
-        learned: String,
-        encouragement: String,
-        isPrivate: Boolean,
-        imageFiles: List<File>
-    ) {
+    // ── 회고록 (Memoir) ──────────────────────────────────
+    fun postMemoir(studyId: Long, activity: String, learned: String, encouragement: String, isPrivate: Boolean, imageFiles: List<File>) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            val memoirModel = MemoirCreateModel(activity, learned, encouragement, isPrivate)
-            studyRepository.postMemoir(studyId, memoirModel, imageFiles)
+            studyRepository.postMemoir(studyId, MemoirCreateModel(activity, learned, encouragement, isPrivate), imageFiles)
                 .onSuccess {
                     _sideEffect.emit(StudyDetailSideEffect.MemoirPostSuccess)
+                    fetchAllMemoirs(studyId)
                     fetchStudyHomeDetail(studyId)
                 }
                 .onFailure { emitError(it) }
             _uiState.update { it.copy(isLoading = false) }
+        }
+    }
+
+    fun fetchAllMemoirs(studyId: Long, cursor: Long? = null) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            if (currentUserId.isEmpty()) currentUserId = tokenRepository.getUserId()
+
+            studyRepository.getFullStudyMemoirs(studyId, cursor, 20)
+                .onSuccess { memoirs ->
+                    val processed = memoirs.map { it.copy(isMyMemoir = it.memberId.toString() == currentUserId) }
+                    _uiState.update { state ->
+                        val currentList = if (cursor == null) emptyList() else state.memoirState.memoirs
+                        state.copy(
+                            isLoading = false,
+                            memoirState = state.memoirState.copy(memoirs = (currentList + processed).toPersistentList())
+                        )
+                    }
+                }
+                .onFailure {
+                    _uiState.update { it.copy(isLoading = false) }
+                    emitError(it)
+                }
         }
     }
 
@@ -337,88 +281,46 @@ class StudyDetailViewModel @Inject constructor(
             "SMILE" -> memoir.reactions.isSmiled
             else -> return
         }
-        updateMemoirUIState(memoirId, reactionType, !isCurrentlySelected) // ✅ 즉시 반영
-        viewModelScope.launch {
 
+        updateMemoirReactionUIState(memoirId, reactionType, !isCurrentlySelected)
+
+        viewModelScope.launch {
             val result = if (isCurrentlySelected) {
                 studyRepository.deleteReviewReaction(studyId, memoirId, reactionType)
             } else {
                 studyRepository.postReviewReaction(studyId, memoirId, reactionType)
             }
-
             result.onFailure {
-                updateMemoirUIState(memoirId, reactionType, isCurrentlySelected)
+                updateMemoirReactionUIState(memoirId, reactionType, isCurrentlySelected)
                 emitError(it)
             }
         }
     }
 
-
-
-    private fun updateMemoirUIState(memoirId: Long, reactionType: String, isSelected: Boolean) {
+    private fun updateMemoirReactionUIState(memoirId: Long, reactionType: String, isSelected: Boolean) {
         _uiState.update { state ->
             val updatedMemoirs = state.memoirState.memoirs.map { memoir ->
-                if (memoir.memoirId == memoirId) {
-                    val diff = if (isSelected) 1 else -1
+                if (memoir.memoirId != memoirId) return@map memoir
 
-                    // 1. reactions 객체를 새로 생성
-                    val newReactions = when (reactionType) {
+                val diff = if (isSelected) 1 else -1
+                memoir.copy(
+                    reactions = when (reactionType) {
                         "FIRE" -> memoir.reactions.copy(isFired = isSelected)
                         "HEART" -> memoir.reactions.copy(isHearted = isSelected)
                         "STAR" -> memoir.reactions.copy(isStarred = isSelected)
                         "SMILE" -> memoir.reactions.copy(isSmiled = isSelected)
                         else -> memoir.reactions
-                    }
-
-                    // 2. reactionCounts 객체를 새로 생성
-                    val newCounts = when (reactionType) {
+                    },
+                    reactionCounts = when (reactionType) {
                         "FIRE" -> memoir.reactionCounts.copy(fireCount = (memoir.reactionCounts.fireCount + diff).coerceAtLeast(0))
                         "HEART" -> memoir.reactionCounts.copy(heartCount = (memoir.reactionCounts.heartCount + diff).coerceAtLeast(0))
                         "STAR" -> memoir.reactionCounts.copy(starCount = (memoir.reactionCounts.starCount + diff).coerceAtLeast(0))
                         "SMILE" -> memoir.reactionCounts.copy(smileCount = (memoir.reactionCounts.smileCount + diff).coerceAtLeast(0))
                         else -> memoir.reactionCounts
                     }
-
-                    // 3. 최상위 memoir 객체를 새로 생성하여 리스트에 교체
-                    memoir.copy(
-                        reactions = newReactions,
-                        reactionCounts = newCounts
-                    )
-                } else memoir
+                )
             }.toPersistentList()
-
             state.copy(memoirState = state.memoirState.copy(memoirs = updatedMemoirs))
-        }
-    }
-
-    fun fetchAllMemoirs(studyId: Long, cursor: Long? = null) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-
-            if (currentUserId.isEmpty()) {
-                currentUserId = tokenRepository.getUserId()
-            }
-
-            studyRepository.getFullStudyMemoirs(studyId, cursor, 20)
-                .onSuccess { memoirs ->
-                    val processedMemoirs = memoirs.map { memoir ->
-                        memoir.copy(isMyMemoir = memoir.memberId.toString() == currentUserId)
-                    }
-
-                    _uiState.update { state ->
-                        val currentList = if (cursor == null) emptyList() else state.memoirState.memoirs
-                        state.copy(
-                            isLoading = false,
-                            memoirState = state.memoirState.copy(
-                                memoirs = (currentList + processedMemoirs).toPersistentList()
-                            )
-                        )
-                    }
-                }
-                .onFailure {
-                    _uiState.update { it.copy(isLoading = false) }
-                    emitError(it)
-                }
         }
     }
 
@@ -427,13 +329,9 @@ class StudyDetailViewModel @Inject constructor(
             studyRepository.deleteMemoir(studyId, memoirId)
                 .onSuccess {
                     _uiState.update { state ->
-                        val updatedList = state.memoirState.memoirs
-                            .filterNot { it.memoirId == memoirId }
-                            .toPersistentList()
-
-                        state.copy(
-                            memoirState = state.memoirState.copy(memoirs = updatedList)
-                        )
+                        state.copy(memoirState = state.memoirState.copy(
+                            memoirs = state.memoirState.memoirs.filterNot { it.memoirId == memoirId }.toPersistentList()
+                        ))
                     }
                 }
                 .onFailure { emitError(it) }

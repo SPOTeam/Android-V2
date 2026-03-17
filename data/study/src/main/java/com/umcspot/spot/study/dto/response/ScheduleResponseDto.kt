@@ -12,3 +12,8 @@ data class ScheduleResponseDto(
     @SerialName("isNow") val isNow: Boolean,
     @SerialName("isMine") val isMine: Boolean
 )
+
+@Serializable
+data class ScheduleCreateResponseDto(
+    @SerialName("scheduleId") val scheduleId: Long,
+)

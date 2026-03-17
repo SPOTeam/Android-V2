@@ -2,25 +2,12 @@ package com.umcspot.spot.study.detail
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -58,13 +45,13 @@ fun StudyDetailRoute(
     var selectedTab by rememberSaveable { mutableStateOf(initialTab) }
     val scope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()
-
     var showScheduleBottomSheet by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(viewModel) {
         viewModel.sideEffect.collect { effect ->
-            if (effect is StudyDetailSideEffect.ScheduleCreateSuccess) {
-                showScheduleBottomSheet = false
+            when (effect) {
+                is StudyDetailSideEffect.ScheduleCreateSuccess -> showScheduleBottomSheet = false
+                else -> Unit
             }
         }
     }
@@ -73,14 +60,16 @@ fun StudyDetailRoute(
         viewModel.fetchStudyHomeDetail(studyId)
     }
 
+    // 탭 전환 시 데이터 로드 로직
     LaunchedEffect(selectedTab) {
         onTabChanged(selectedTab)
-        if (selectedTab == StudyDetailTab.MEMOIR) {
-            viewModel.fetchAllMemoirs(studyId)
-        }
-        if (selectedTab == StudyDetailTab.PLANNER) {
-            val date = uiState.plannerState.selectedDate
-            viewModel.fetchMonthlySchedules(studyId, date.year, date.monthValue)
+        when (selectedTab) {
+            StudyDetailTab.MEMOIR -> viewModel.fetchAllMemoirs(studyId)
+            StudyDetailTab.PLANNER -> {
+                val date = uiState.plannerState.selectedDate
+                viewModel.fetchMonthlySchedules(studyId, date.year, date.monthValue)
+            }
+            else -> Unit
         }
     }
 
@@ -104,23 +93,17 @@ fun StudyDetailRoute(
             onAddingTodo = {
                 scope.launch {
                     delay(300)
-                    lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount - 1, -300)
+                    lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount - 1)
                 }
             },
             onTodoCreate = viewModel::createTodo,
             onTodoToggle = viewModel::toggleTodoStatus,
             onTodoDelete = viewModel::deleteTodo,
             onMemberSelected = { memberId ->
-                viewModel.fetchMemberTodos(
-                    studyId = studyId,
-                    memberId = memberId,
-                    date = uiState.plannerState.selectedDate
-                )
+                viewModel.fetchMemberTodos(studyId, memberId, uiState.plannerState.selectedDate)
             },
             onMemoirDelete = { memoirId -> viewModel.deleteMemoir(studyId, memoirId) },
-            onMemoirEmojiToggle = { sId, mId, type ->
-                viewModel.toggleMemoirReaction(sId, mId, type)
-            },
+            onMemoirEmojiToggle = { memoirId, type -> viewModel.toggleMemoirReaction(studyId, memoirId, type) },
             onBackClick = onBackClick,
             contentPadding = contentPadding,
             lazyListState = lazyListState
@@ -154,7 +137,7 @@ private fun StudyDetailScreen(
     onTodoDelete: (Long, Long) -> Unit,
     onMemberSelected: (Long) -> Unit,
     onMemoirDelete: (Long) -> Unit,
-    onMemoirEmojiToggle: (Long, Long, String) -> Unit,
+    onMemoirEmojiToggle: (Long, String) -> Unit, // memoirId, type
     onBackClick: () -> Unit,
     contentPadding: PaddingValues,
     lazyListState: LazyListState
@@ -169,7 +152,6 @@ private fun StudyDetailScreen(
         item {
             Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
             BackTopBar(title = "스터디", onBackClick = onBackClick)
-
             AsyncImage(
                 model = uiState.homeState.thumbnailUrl,
                 contentDescription = null,
@@ -178,7 +160,6 @@ private fun StudyDetailScreen(
                     .height(screenHeightDp(160.dp)),
                 contentScale = ContentScale.Crop
             )
-
             StudyHeaderSection(uiState.homeState)
         }
 
@@ -201,7 +182,6 @@ private fun StudyDetailScreen(
                         schedules = uiState.homeState.schedules,
                         recentMemoirs = uiState.homeState.recentMemoirs
                     )
-
                     StudyDetailTab.PLANNER -> StudyDetailPlannerScreen(
                         studyId = studyId,
                         plannerState = uiState.plannerState,
@@ -217,16 +197,12 @@ private fun StudyDetailScreen(
                         onTodoDelete = onTodoDelete,
                         onMemberSelected = onMemberSelected
                     )
-
                     StudyDetailTab.BOARD -> StudyDetailBoardScreen()
-
                     StudyDetailTab.MEMOIR -> StudyDetailMemoirScreen(
                         studyId = studyId,
                         memoirs = uiState.memoirState.memoirs,
                         onDeleteMemoir = onMemoirDelete,
-                        onEmojiToggle = { memoirId, type ->
-                            onMemoirEmojiToggle(studyId, memoirId, type)
-                        }
+                        onEmojiToggle = onMemoirEmojiToggle
                     )
                 }
             }

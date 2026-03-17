@@ -104,13 +104,13 @@ fun StudyScheduleCreateModel.toData(): ScheduleCreateRequestDto = ScheduleCreate
 
 fun MemoirDto.toDetailModel(): MemoirModel = MemoirModel(
     memoirId = this.memoirId,
-    memberId = this.writer.memberId, 
+    memberId = this.writer.memberId,
     nickname = this.writer.nickname,
     profileImageUrl = this.writer.profileImageUrl ?: "",
     activity = this.content.activity,
     learned = this.content.learned,
     encouragement = this.content.encouragement,
-    imageUrl = this.content.imageUrl,
+    imageUrls = this.content.imageUrls, // 리스트 그대로 전달
     reactionCounts = MemoirReactionCounts(
         fireCount = this.reactionCounts.fireCount,
         heartCount = this.reactionCounts.heartCount,
@@ -124,16 +124,16 @@ fun MemoirDto.toDetailModel(): MemoirModel = MemoirModel(
         isSmiled = this.reactions.isSmiled
     ),
     isPrivate = this.isPrivate,
-    createdAt = this.createdAt, 
+    createdAt = this.createdAt,
     isMyMemoir = false
 )
 
 fun MemoirDto.toDomain(): StudyRecentMemoirModel = StudyRecentMemoirModel(
     id = this.memoirId,
     writerNickname = this.writer.nickname,
-    writerProfileUrl = this.writer.profileImageUrl,
+    writerProfileUrl = this.writer.profileImageUrl ?: "",
     activityContent = this.content.activity,
-    thumbnailUrl = this.content.imageUrl,
+    thumbnailUrl = this.content.imageUrls.firstOrNull() ?: "",
     isPrivate = this.isPrivate
 )
 fun TodoCreateResponseDto.toDomain(): Long {

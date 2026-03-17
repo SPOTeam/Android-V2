@@ -81,13 +81,19 @@ fun StudyDetailPlannerScreen(
 
     var currentDisplayMonth by remember { mutableStateOf(YearMonth.from(plannerState.selectedDate)) }
 
-    LaunchedEffect(monthState) {
-        snapshotFlow { monthState.firstVisibleMonth }.collect { month ->
-            currentDisplayMonth = month.yearMonth
-            onMonthChanged(month.yearMonth.year, month.yearMonth.monthValue)
-        }
-    }
+    var isInitialized by remember { mutableStateOf(false) }
 
+    LaunchedEffect(monthState) {
+        snapshotFlow { monthState.firstVisibleMonth }
+            .collect { month ->
+                currentDisplayMonth = month.yearMonth
+                if (isInitialized) {
+                    onMonthChanged(month.yearMonth.year, month.yearMonth.monthValue)
+                } else {
+                    isInitialized = true
+                }
+            }
+    }
     val isAvailableDate = remember(plannerState.selectedDate) {
         !plannerState.selectedDate.isBefore(LocalDate.now())
     }
@@ -151,9 +157,7 @@ fun StudyDetailPlannerScreen(
 
         Spacer(modifier = Modifier.height(screenHeightDp(12.dp)))
 
-        val displaySchedules = remember(plannerState.selectedDaySchedules) {
-            plannerState.selectedDaySchedules.take(2)
-        }
+        val displaySchedules = plannerState.selectedDaySchedules.take(2)
 
         if (displaySchedules.isEmpty()) {
             Text(

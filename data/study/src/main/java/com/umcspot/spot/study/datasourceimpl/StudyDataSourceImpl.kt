@@ -13,6 +13,7 @@ import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.request.TodoCreateRequestDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.MemoirCreateResponseDto
+import com.umcspot.spot.study.dto.response.ScheduleCreateResponseDto
 import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
@@ -139,16 +140,15 @@ class StudyDataSourceImpl @Inject constructor(
         imageFiles: List<File>
     ): BaseResponse<MemoirCreateResponseDto> {
         val requestPart = request.toMultipartBodyPart("request")
-
         val imageParts = imageFiles.map { file ->
             val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-            MultipartBody.Part.createFormData("imageFile", file.name, requestFile)
+            MultipartBody.Part.createFormData("imageFiles", file.name, requestFile)
         }
 
         return studyService.postMemoir(
             studyId = studyId,
             request = requestPart,
-            imageFile = imageParts.ifEmpty { null }
+            imageFile = if (imageParts.isEmpty()) null else imageParts
         )
     }
 
@@ -210,6 +210,6 @@ class StudyDataSourceImpl @Inject constructor(
     override suspend fun createSchedule(
         studyId: Long,
         request: ScheduleCreateRequestDto
-    ): BaseResponse<Unit?> =
+    ): BaseResponse<ScheduleCreateResponseDto> =
         studyService.createSchedule(studyId, request)
 }
