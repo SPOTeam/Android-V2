@@ -110,7 +110,6 @@ interface StudyRepository {
 
     suspend fun deleteReviewReaction(studyId: Long, reviewId: Long, reaction: String): Result<Unit?>
 
-
     suspend fun getCategoryStudies(
         recruitingStatus: RecruitingStatus?,
         feeRange: FeeRange?,

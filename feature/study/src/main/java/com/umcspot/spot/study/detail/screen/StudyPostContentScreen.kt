@@ -64,9 +64,9 @@ import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ImageRef
 import com.umcspot.spot.model.PostType
 import com.umcspot.spot.model.korean
-import com.umcspot.spot.post.model.postDetail.CommentResult
 import com.umcspot.spot.post.model.postDetail.PostDetailResult
 import com.umcspot.spot.study.detail.viewmodel.StudyPostDetailViewModel
+import com.umcspot.spot.study.model.CommentResult
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 import com.umcspot.spot.ui.state.UiState
@@ -441,8 +441,8 @@ private fun CommentItem(
             .fillMaxWidth()
     ) {
         CommentUserInfo(
-            commentWriterName = comment.nickname,
-            commentWriterImage = comment.profileImageUrl
+            commentWriterName = comment.commentNickname,
+            commentWriterImage = comment.commentProfileUrl
         )
 
         Spacer(Modifier.height(screenHeightDp(7.dp)))
@@ -530,64 +530,6 @@ fun EditDeleteMenu(
                     onReport()
                 }
             )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun preview() {
-    val listState = rememberLazyListState()
-    val dummyComments = List(5) { idx -> CommentResult.dummyComment(idx, 10) }
-
-    SpotTheme {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            // 1) 상세 섹션
-            item(key = "post_header") {
-                PostContentDetailScreen(
-                    post = PostDetailResult.dummyPostDetail(123456, 5),
-                    onLikeClick = {},
-                    onEditClick = {},
-                    onDeleteClick = {},
-                    onReportClick = {}
-                )
-            }
-
-            // 2) 구분선
-            item(key = "divider") {
-                Spacer(Modifier.height(8.dp))
-                HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth(),
-                    thickness = 1.dp,
-                    color = SpotTheme.colors.gray200
-                )
-                Spacer(Modifier.height(8.dp))
-            }
-
-            items(
-                items = dummyComments,
-                key = { it.commentId }
-            ) { comment ->
-                CommentItem(
-                    comment = comment,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 17.dp)
-                )
-                Spacer(Modifier.height(13.dp))
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 17.dp),
-                    thickness = 1.dp,
-                    color = SpotTheme.colors.gray200
-                )
-                Spacer(Modifier.height(13.dp))
-
-            }
         }
     }
 }

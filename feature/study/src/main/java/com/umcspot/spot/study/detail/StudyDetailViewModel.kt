@@ -109,7 +109,8 @@ class StudyDetailViewModel @Inject constructor(
 
             postsDeferred.await().onSuccess { posts ->
                 _uiState.update { state ->
-                    val currentList = if (currentPostCursor == null) emptyList() else state.postState.studyPosts
+                    val currentList =
+                        if (currentPostCursor == null) emptyList() else state.postState.studyPosts
                     state.copy(
                         postState = state.postState.copy(
                             studyPosts = (currentList + posts.studyPostsList).toPersistentList(),
@@ -161,7 +162,13 @@ class StudyDetailViewModel @Inject constructor(
         }
     }
 
-    fun createSchedule(studyId: Long, title: String, location: String, startAt: LocalDateTime, endAt: LocalDateTime) {
+    fun createSchedule(
+        studyId: Long,
+        title: String,
+        location: String,
+        startAt: LocalDateTime,
+        endAt: LocalDateTime
+    ) {
         viewModelScope.launch {
             studyRepository.createSchedule(studyId, title, location, startAt, endAt)
                 .onSuccess {
@@ -186,7 +193,10 @@ class StudyDetailViewModel @Inject constructor(
         _uiState.update { it.copy(plannerState = it.plannerState.copy(isOverlapError = false)) }
     }
 
-    private fun computeFilteredSchedules(schedules: List<StudyScheduleModel>, selectedDate: LocalDate) =
+    private fun computeFilteredSchedules(
+        schedules: List<StudyScheduleModel>,
+        selectedDate: LocalDate
+    ) =
         schedules.filter {
             val start = it.startAt.toLocalDate()
             val end = it.endAt.toLocalDate()
@@ -195,9 +205,14 @@ class StudyDetailViewModel @Inject constructor(
 
     private fun updateFilteredSchedules() {
         _uiState.update { state ->
-            state.copy(plannerState = state.plannerState.copy(
-                selectedDaySchedules = computeFilteredSchedules(state.plannerState.monthlySchedules, state.plannerState.selectedDate)
-            ))
+            state.copy(
+                plannerState = state.plannerState.copy(
+                    selectedDaySchedules = computeFilteredSchedules(
+                        state.plannerState.monthlySchedules,
+                        state.plannerState.selectedDate
+                    )
+                )
+            )
         }
     }
 
@@ -205,7 +220,8 @@ class StudyDetailViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 plannerState = state.plannerState.copy(
-                    monthlySchedules = state.plannerState.monthlySchedules.filterNot { it.id == scheduleId }.toPersistentList(),
+                    monthlySchedules = state.plannerState.monthlySchedules.filterNot { it.id == scheduleId }
+                        .toPersistentList(),
                     expandedScheduleId = -1L
                 )
             )
@@ -220,7 +236,8 @@ class StudyDetailViewModel @Inject constructor(
 
     fun toggleScheduleMenu(scheduleId: Long) {
         _uiState.update { state ->
-            val nextId = if (state.plannerState.expandedScheduleId == scheduleId) -1L else scheduleId
+            val nextId =
+                if (state.plannerState.expandedScheduleId == scheduleId) -1L else scheduleId
             state.copy(plannerState = state.plannerState.copy(expandedScheduleId = nextId))
         }
     }
@@ -245,8 +262,8 @@ class StudyDetailViewModel @Inject constructor(
                     }
                 }
                 .onFailure { emitError(it) }
-            }
         }
+    }
 
     fun refreshAttendanceStatus(studyId: Long, scheduleId: Long) {
         viewModelScope.launch {
@@ -268,10 +285,12 @@ class StudyDetailViewModel @Inject constructor(
             studyRepository.getAttendanceQr(studyId, scheduleId)
                 .onSuccess { model ->
                     _uiState.update { state ->
-                        state.copy(attendanceState = state.attendanceState.copy(
-                            qrCodeImageUrl = model.qrCodeImageUrl,
-                            isAttendanceActive = model.attendanceActive
-                        ))
+                        state.copy(
+                            attendanceState = state.attendanceState.copy(
+                                qrCodeImageUrl = model.qrCodeImageUrl,
+                                isAttendanceActive = model.attendanceActive
+                            )
+                        )
                     }
                 }
                 .onFailure { emitError(it) }
@@ -281,9 +300,11 @@ class StudyDetailViewModel @Inject constructor(
     fun fetchMembersOnly(studyId: Long) {
         viewModelScope.launch {
             studyRepository.getStudyMembers(studyId).onSuccess { members ->
-                _uiState.update { it.copy(
-                    homeState = it.homeState.copy(members = members.toPersistentList())
-                )}
+                _uiState.update {
+                    it.copy(
+                        homeState = it.homeState.copy(members = members.toPersistentList())
+                    )
+                }
             }.onFailure { emitError(it) }
         }
     }
@@ -329,10 +350,12 @@ class StudyDetailViewModel @Inject constructor(
             studyRepository.finishAttendance(studyId, scheduleId)
                 .onSuccess {
                     _uiState.update { state ->
-                        state.copy(attendanceState = state.attendanceState.copy(
-                            isAttendanceActive = false,
-                            qrCodeImageUrl = null
-                        ))
+                        state.copy(
+                            attendanceState = state.attendanceState.copy(
+                                isAttendanceActive = false,
+                                qrCodeImageUrl = null
+                            )
+                        )
                     }
                 }
                 .onFailure { emitError(it) }
@@ -342,7 +365,11 @@ class StudyDetailViewModel @Inject constructor(
     fun createTodo(studyId: Long, content: String) {
         val selectedDate = uiState.value.plannerState.selectedDate
         viewModelScope.launch {
-            studyRepository.createTodo(studyId, content, selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
+            studyRepository.createTodo(
+                studyId,
+                content,
+                selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+            )
                 .onSuccess { newId ->
                     val newTodo = TodoModel(newId, currentUserId, content, false)
                     _uiState.update { it.copy(plannerState = it.plannerState.copy(todoList = (it.plannerState.todoList + newTodo).toPersistentList())) }
@@ -431,6 +458,29 @@ class StudyDetailViewModel @Inject constructor(
         }
     }
 
+    fun fetchAllMemoirs(studyId: Long, cursor: Long? = null) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            if (currentUserId.isEmpty()) currentUserId = tokenRepository.getUserId()
+
+            studyRepository.getFullStudyMemoirs(studyId, cursor, 20)
+                .onSuccess { memoirs ->
+                    val processed = memoirs.map { it.copy(isMyMemoir = it.memberId.toString() == currentUserId) }
+                    _uiState.update { state ->
+                        val currentList = if (cursor == null) emptyList() else state.memoirState.memoirs
+                        state.copy(
+                            isLoading = false,
+                            memoirState = state.memoirState.copy(memoirs = (currentList + processed).toPersistentList())
+                        )
+                    }
+                }
+                .onFailure {
+                    _uiState.update { it.copy(isLoading = false) }
+                    emitError(it)
+                }
+        }
+    }
+
     fun toggleMemoirReaction(studyId: Long, memoirId: Long, reactionType: String) {
         val memoir = _uiState.value.memoirState.memoirs.find { it.memoirId == memoirId } ?: return
         val isCurrentlySelected = when (reactionType) {
@@ -488,7 +538,11 @@ class StudyDetailViewModel @Inject constructor(
         }
     }
 
-    private fun updateMemoirReactionUIState(memoirId: Long, reactionType: String, isSelected: Boolean) {
+    private fun updateMemoirReactionUIState(
+        memoirId: Long,
+        reactionType: String,
+        isSelected: Boolean
+    ) {
         _uiState.update { state ->
             val updatedMemoirs = state.memoirState.memoirs.map { memoir ->
                 if (memoir.memoirId != memoirId) return@map memoir

@@ -83,10 +83,12 @@ fun StudyDetailRoute(
                     showApplyInputDialog = false
                     showApplySuccessDialog = true
                 }
+
                 is StudyDetailSideEffect.ScheduleCreateSuccess -> {
                     showScheduleBottomSheet = false
                     viewModel.clearScheduleError()
                 }
+
                 else -> Unit
             }
         }
@@ -104,6 +106,7 @@ fun StudyDetailRoute(
                 val date = uiState.plannerState.selectedDate
                 viewModel.fetchMonthlySchedules(studyId, date.year, date.monthValue)
             }
+
             else -> Unit
         }
     }
@@ -264,6 +267,7 @@ private fun StudyDetailScreen(
                         isMember = isMember,
                         onAttendanceClick = { id, isNow -> onAttendanceClick(id, isNow) }
                     )
+
                     StudyDetailTab.PLANNER -> StudyDetailPlannerScreen(
                         studyId = studyId,
                         plannerState = uiState.plannerState,
@@ -288,6 +292,7 @@ private fun StudyDetailScreen(
                         onLikeClick = onPostLikeClick,
                         onPostClick = {}
                     )
+
                     StudyDetailTab.MEMOIR -> StudyDetailMemoirScreen(
                         studyId = studyId,
                         memoirs = uiState.memoirState.memoirs,
