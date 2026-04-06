@@ -343,7 +343,7 @@ fun LocationBottomSheet(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun SelectedChips(
+fun SelectedChips(
     items: List<LocationRow>,
     onRemove: (LocationRow) -> Unit
 ) {

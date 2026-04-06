@@ -2,7 +2,9 @@ package com.umcspot.spot.study.mapper
 
 import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.model.toImageRef
+import com.umcspot.spot.study.dto.request.ScheduleCreateRequestDto
 import com.umcspot.spot.study.dto.request.StudyRequestDto
+import com.umcspot.spot.study.dto.response.AttendanceDto
 import com.umcspot.spot.study.dto.response.MemberDto
 import com.umcspot.spot.study.dto.response.MemoirDto
 import com.umcspot.spot.study.dto.response.ScheduleResponseDto
@@ -10,25 +12,34 @@ import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
 import com.umcspot.spot.study.dto.response.Study
 import com.umcspot.spot.study.dto.response.StudyApplication
 import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
+import com.umcspot.spot.study.dto.response.StudyAttendanceQrResponseDto
+import com.umcspot.spot.study.dto.response.StudyAttendanceResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
 import com.umcspot.spot.study.dto.response.TodoItemDto
 import com.umcspot.spot.study.dto.response.TodoQueryResponseDto
+import com.umcspot.spot.study.model.AttendanceStatus
 import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.MemoirModel
 import com.umcspot.spot.study.model.MemoirReactionCounts
 import com.umcspot.spot.study.model.MemoirReactionStatus
 import com.umcspot.spot.study.model.StudyApplicationResult
 import com.umcspot.spot.study.model.StudyApplicationResultList
+import com.umcspot.spot.study.model.StudyAttendanceListModel
+import com.umcspot.spot.study.model.StudyAttendanceModel
+import com.umcspot.spot.study.model.StudyAttendanceQrModel
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyDetailModel
 import com.umcspot.spot.study.model.StudyMemberModel
 import com.umcspot.spot.study.model.StudyRecentMemoirModel
 import com.umcspot.spot.study.model.StudyResult
 import com.umcspot.spot.study.model.StudyResultList
+import com.umcspot.spot.study.model.StudyScheduleCreateModel
 import com.umcspot.spot.study.model.StudyScheduleModel
 import com.umcspot.spot.study.model.TodoModel
+import com.umcspot.spot.study.model.ViewerStatus
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 fun StudyCreateModel.toData(): StudyRequestDto = StudyRequestDto(
@@ -81,7 +92,14 @@ fun StudyDetailResponseDto.toDomain(): StudyDetailModel = StudyDetailModel(
     totalMembers = this.statistics.totalMembers,
     currentMembers = this.statistics.currentMembers,
     likeCount = this.statistics.likeCount,
-    hitCount = this.statistics.hitCount
+    hitCount = this.statistics.hitCount,
+    viewerStatus = when (this.viewerStatus) {
+        "NOT_APPLIED" -> ViewerStatus.NOT_APPLIED
+        "APPLIED" -> ViewerStatus.APPLIED
+        "APPROVED" -> ViewerStatus.APPROVED
+        "OWNER" -> ViewerStatus.OWNER
+        else -> ViewerStatus.UNKNOWN
+    }
 )
 
 fun ScheduleResponseDto.toDomain(): StudyScheduleModel = StudyScheduleModel(
@@ -89,18 +107,27 @@ fun ScheduleResponseDto.toDomain(): StudyScheduleModel = StudyScheduleModel(
     title = this.title,
     startAt = LocalDateTime.parse(this.startAt, DateTimeFormatter.ISO_DATE_TIME),
     endAt = LocalDateTime.parse(this.endAt, DateTimeFormatter.ISO_DATE_TIME),
-    isNow = this.isNow
+    isNow = this.isNow,
+    isMine = this.isMine,
+    isAttendanceStartable = this.isAttendanceStartable
+)
+
+fun StudyScheduleCreateModel.toData(): ScheduleCreateRequestDto = ScheduleCreateRequestDto(
+    title = this.title,
+    locationInfo = this.locationInfo,
+    startAt = this.startAt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z",
+    endAt = this.endAt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z"
 )
 
 fun MemoirDto.toDetailModel(): MemoirModel = MemoirModel(
     memoirId = this.memoirId,
-    memberId = this.writer.memberId, 
+    memberId = this.writer.memberId,
     nickname = this.writer.nickname,
     profileImageUrl = this.writer.profileImageUrl ?: "",
     activity = this.content.activity,
     learned = this.content.learned,
     encouragement = this.content.encouragement,
-    imageUrl = this.content.imageUrl,
+    imageUrls = this.content.imageUrls,
     reactionCounts = MemoirReactionCounts(
         fireCount = this.reactionCounts.fireCount,
         heartCount = this.reactionCounts.heartCount,
@@ -114,16 +141,16 @@ fun MemoirDto.toDetailModel(): MemoirModel = MemoirModel(
         isSmiled = this.reactions.isSmiled
     ),
     isPrivate = this.isPrivate,
-    createdAt = this.createdAt, 
+    createdAt = this.createdAt,
     isMyMemoir = false
 )
 
 fun MemoirDto.toDomain(): StudyRecentMemoirModel = StudyRecentMemoirModel(
     id = this.memoirId,
     writerNickname = this.writer.nickname,
-    writerProfileUrl = this.writer.profileImageUrl,
+    writerProfileUrl = this.writer.profileImageUrl ?: "",
     activityContent = this.content.activity,
-    thumbnailUrl = this.content.imageUrl,
+    thumbnailUrl = this.content.imageUrls.firstOrNull() ?: "",
     isPrivate = this.isPrivate
 )
 fun TodoCreateResponseDto.toDomain(): Long {
@@ -157,4 +184,44 @@ fun StudyApplication.toDomain() : StudyApplicationResult =
         nickname = this.nickname,
         description = this.description,
         profileImageUrl = this.profileImageUrl.toImageRef()
+    )
+
+fun StudyAttendanceResponseDto.toDomain(): StudyAttendanceListModel =
+    StudyAttendanceListModel(
+        attendances = this.attendances.map { it.toDomain() },
+        totalCount = this.totalCount
+    )
+
+fun AttendanceDto.toDomain(): StudyAttendanceModel {
+    val formattedDate = this.attendedAt?.let { rawDate ->
+        try {
+            val parsedDate = ZonedDateTime.parse(rawDate)
+            parsedDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd. HH:mm"))
+        } catch (e: Exception) {
+            try {
+                val parsedLocal = LocalDateTime.parse(rawDate)
+                parsedLocal.format(DateTimeFormatter.ofPattern("yyyy.MM.dd. HH:mm"))
+            } catch (e2: Exception) {
+                rawDate
+            }
+        }
+    }
+
+    return StudyAttendanceModel(
+        memberId = this.member.memberId,
+        name = this.member.memberName,
+        profileUrl = this.member.memberProfileImageUrl,
+        status = when (this.attendanceStatus) {
+            "PRESENT" -> AttendanceStatus.PRESENT
+            "ABSENT" -> AttendanceStatus.ABSENT
+            else -> AttendanceStatus.UNDECIDED
+        },
+        attendedAt = formattedDate
+    )
+}
+
+fun StudyAttendanceQrResponseDto.toDomain(): StudyAttendanceQrModel =
+    StudyAttendanceQrModel(
+        attendanceActive = this.attendanceActive,
+        qrCodeImageUrl = this.qrCodeImageUrl
     )

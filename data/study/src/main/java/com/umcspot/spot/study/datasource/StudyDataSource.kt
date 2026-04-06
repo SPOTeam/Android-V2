@@ -7,14 +7,18 @@ import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.network.model.NullResultResponse
+import com.umcspot.spot.study.dto.request.ScheduleCreateRequestDto
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.MemoirCreateResponseDto
+import com.umcspot.spot.study.dto.response.ScheduleCreateResponseDto
 import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
 import com.umcspot.spot.study.dto.response.StudyMonthlyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
+import com.umcspot.spot.study.dto.response.StudyAttendanceQrResponseDto
+import com.umcspot.spot.study.dto.response.StudyAttendanceResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.dto.response.StudyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
@@ -49,6 +53,11 @@ interface StudyDataSource {
         imageFile: File?
     ): BaseResponse<CreateStudyResponseDto>
 
+    suspend fun applyStudy(
+        studyId: Long,
+        message: String
+    ): NullResultResponse
+
     suspend fun getStudyDetail(studyId: Long): BaseResponse<StudyDetailResponseDto>
 
     suspend fun getStudyMembers(studyId: Long): BaseResponse<StudyMemberResponseDto>
@@ -60,6 +69,11 @@ interface StudyDataSource {
         year: Int,
         month: Int
     ): BaseResponse<StudyMonthlyScheduleResponseDto>
+
+    suspend fun deleteSchedule(
+        studyId: Long,
+        scheduleId: Long
+    ): BaseResponse<Unit?>
 
     suspend fun createTodo(
         studyId: Long,
@@ -118,4 +132,23 @@ interface StudyDataSource {
         applicationId : Long,
         decision : String
     ) : NullResultResponse
+
+    suspend fun createSchedule(
+        studyId: Long,
+        request: ScheduleCreateRequestDto
+    ): BaseResponse<ScheduleCreateResponseDto>
+
+    suspend fun getAttendanceList(
+        studyId: Long,
+        scheduleId: Long
+    ): BaseResponse<StudyAttendanceResponseDto>
+
+    suspend fun startAttendance(studyId: Long, scheduleId: Long): NullResultResponse
+
+    suspend fun finishAttendance(studyId: Long, scheduleId: Long): NullResultResponse
+
+    suspend fun checkAttendance(studyId: Long, scheduleId: Long, token: String): NullResultResponse
+
+    suspend fun getAttendanceQr(studyId: Long, scheduleId: Long): BaseResponse<StudyAttendanceQrResponseDto>
+
 }

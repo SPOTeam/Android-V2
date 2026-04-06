@@ -7,13 +7,18 @@ import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.study.dto.request.TodoCreateRequestDto
 import com.umcspot.spot.network.model.NullResultResponse
+import com.umcspot.spot.study.dto.request.ScheduleCreateRequestDto
+import com.umcspot.spot.study.dto.request.StudyApplyRequestDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.MemoirCreateResponseDto
+import com.umcspot.spot.study.dto.response.ScheduleCreateResponseDto
 import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
 import com.umcspot.spot.study.dto.response.StudyMonthlyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
+import com.umcspot.spot.study.dto.response.StudyAttendanceQrResponseDto
+import com.umcspot.spot.study.dto.response.StudyAttendanceResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.dto.response.StudyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
@@ -92,6 +97,12 @@ interface StudyService {
         @Part imageFile: MultipartBody.Part?
     ): BaseResponse<CreateStudyResponseDto>
 
+    @POST("/api/studies/{studyId}/apply")
+    suspend fun applyStudy(
+        @Path("studyId") studyId: Long,
+        @Body request: StudyApplyRequestDto
+    ): NullResultResponse
+
     // 스터디 디테일 조회
     @GET("/api/studies/{studyId}/info")
     suspend fun getStudyDetail(
@@ -117,6 +128,13 @@ interface StudyService {
         @Query("year") year: Int,
         @Query("month") month: Int
     ): BaseResponse<StudyMonthlyScheduleResponseDto>
+
+    // 일정 삭제
+    @DELETE("/api/studies/{studyId}/schedules/{scheduleId}")
+    suspend fun deleteSchedule(
+        @Path("studyId") studyId: Long,
+        @Path("scheduleId") scheduleId: Long
+    ): BaseResponse<Unit?>
 
     // 투두 리스트 만들기
     @POST("/api/studies/{studyId}/todos")
@@ -211,4 +229,42 @@ interface StudyService {
         @Path("applicationId") applicationId: Long,
         @Query("decision") decision: String
     ): NullResultResponse
+
+    @POST("/api/studies/{studyId}/schedules")
+    suspend fun createSchedule(
+        @Path("studyId") studyId: Long,
+        @Body request: ScheduleCreateRequestDto
+    ): BaseResponse<ScheduleCreateResponseDto>
+
+    @GET("/api/studies/{studyId}/schedules/{scheduleId}/attendance")
+    suspend fun getAttendanceList(
+        @Path("studyId") studyId: Long,
+        @Path("scheduleId") scheduleId: Long
+    ): BaseResponse<StudyAttendanceResponseDto>
+
+    @POST("/api/studies/{studyId}/schedules/{scheduleId}/attendance")
+    suspend fun startAttendance(
+        @Path("studyId") studyId: Long,
+        @Path("scheduleId") scheduleId: Long
+    ): NullResultResponse
+
+    @DELETE("/api/studies/{studyId}/schedules/{scheduleId}/attendance")
+    suspend fun finishAttendance(
+        @Path("studyId") studyId: Long,
+        @Path("scheduleId") scheduleId: Long
+    ): NullResultResponse
+
+    @POST("/api/studies/{studyId}/schedules/{scheduleId}/attendance/check")
+    suspend fun checkAttendance(
+        @Path("studyId") studyId: Long,
+        @Path("scheduleId") scheduleId: Long,
+        @Query("token") token: String
+    ): NullResultResponse
+
+    @GET("/api/studies/{studyId}/schedules/{scheduleId}/attendance/qr")
+    suspend fun getAttendanceQr(
+        @Path("studyId") studyId: Long,
+        @Path("scheduleId") scheduleId: Long
+    ): BaseResponse<StudyAttendanceQrResponseDto>
+
 }

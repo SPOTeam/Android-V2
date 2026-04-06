@@ -12,4 +12,5 @@ dependencies {
     implementation(projects.domain.token)
     implementation(projects.core.designsystem)
     implementation(projects.core.common)
+    implementation(projects.feature.study)
 }

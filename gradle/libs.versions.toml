@@ -104,6 +104,10 @@ datastoreCore = "1.1.7"
 # gson
 gson = "2.10.1"
 
+# camera
+androidx-camera = "1.3.4"
+google-mlkit-barcode = "17.3.0"
+
 [plugins]
 # Gradle Plugins
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
@@ -282,6 +286,15 @@ datastore-core = { group = "androidx.datastore", name = "datastore-core", versio
 #Gson
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
+# Camera
+androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "androidx-camera" }
+androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "androidx-camera" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "androidx-camera" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "androidx-camera" }
+
+# ML Kit Barcode Scanning
+google-mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "google-mlkit-barcode" }
+
 [bundles]
 coil = ["coil", "coil-svg", "coil-gif"]
 firebase = ["firebase-analytics", "firebase-database", "firebase-messaging", "firebase-remoteConfig"]
@@ -296,3 +309,4 @@ accompanist = ["accompanist-insets", "accompanist-permissions", "accompanist-sys
 aws = ["aws-android-sdk-s3", "aws-android-sdk-cognito", "aws-android-sdk-mobile-client"]
 orbit = ["orbit-core", "orbit-viewmodel", "orbit-compose"]
 naver-maps = ["naver-map-compose", "naver-map-location", "google-location", ]
+camerax = ["androidx-camera-core", "androidx-camera-camera2", "androidx-camera-lifecycle", "androidx-camera-view"]

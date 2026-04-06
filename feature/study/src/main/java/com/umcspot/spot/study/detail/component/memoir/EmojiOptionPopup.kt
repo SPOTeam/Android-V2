@@ -3,16 +3,7 @@ package com.umcspot.spot.study.detail.component.memoir
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -23,6 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.theme.B200
@@ -33,13 +25,17 @@ import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 
 @Composable
-fun EmojiOptionPopup(states: List<Boolean>, onToggle: (Int) -> Unit) {
+fun EmojiOptionPopup(
+    modifier: Modifier = Modifier,
+    states: List<Boolean>,
+    onToggle: (Int) -> Unit
+) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .size(width = screenWidthDp(89.dp), height = screenHeightDp(26.dp))
             .background(SpotTheme.colors.white, RoundedCornerShape(screenWidthDp(10.dp)))
             .border(1.dp, SpotTheme.colors.gray200, RoundedCornerShape(screenWidthDp(10.dp)))
-            .padding(horizontal = screenWidthDp(6.dp), vertical = screenHeightDp(4.dp)),
+            .padding(horizontal = screenWidthDp(6.dp)),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -49,6 +45,7 @@ fun EmojiOptionPopup(states: List<Boolean>, onToggle: (Int) -> Unit) {
                 modifier = Modifier
                     .size(screenWidthDp(18.dp))
                     .clip(RoundedCornerShape(screenWidthDp(6.dp)))
+                    // 선택된 이모지 배경색 (B200 사용)
                     .background(if (states[index]) SpotTheme.colors.B200 else Color.Transparent)
                     .noRippleClickable { onToggle(index) },
                 contentAlignment = Alignment.Center
@@ -64,13 +61,28 @@ fun EmojiOptionPopup(states: List<Boolean>, onToggle: (Int) -> Unit) {
 }
 
 @Composable
-fun MemoirSectionItem(label: String, text: String, maxLines: Int, onLineMeasured: (Int) -> Unit) {
-    if (text.isEmpty() || maxLines <= 0) return
-    Column(modifier = Modifier.padding(vertical = screenHeightDp(8.dp))) {
+fun MemoirSectionItem(
+    label: String,
+    text: String,
+    maxLines: Int,
+    onOverflowDetected: (Boolean) -> Unit
+) {
+    if (text.isBlank()) return // 비어있으면 렌더링 X
+
+    Column(modifier = Modifier.padding(vertical = screenHeightDp(6.dp))) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.size(screenWidthDp(8.dp)).clip(CircleShape).background(B200))
+            Box(
+                modifier = Modifier
+                    .size(screenWidthDp(8.dp))
+                    .clip(CircleShape)
+                    .background(SpotTheme.colors.B200) // 디자인 시스템 컬러 사용
+            )
             Spacer(modifier = Modifier.width(screenWidthDp(6.dp)))
-            Text(text = label, style = SpotTheme.typography.regular_500, color = SpotTheme.colors.black)
+            Text(
+                text = label,
+                style = SpotTheme.typography.regular_500,
+                color = SpotTheme.colors.black
+            )
         }
         Spacer(modifier = Modifier.height(screenHeightDp(4.dp)))
         Text(
@@ -78,16 +90,28 @@ fun MemoirSectionItem(label: String, text: String, maxLines: Int, onLineMeasured
             style = SpotTheme.typography.medium_400,
             color = SpotTheme.colors.black,
             modifier = Modifier.fillMaxWidth(),
-            maxLines = if (maxLines > 1) maxLines - 1 else 1,
-            onTextLayout = { onLineMeasured(1 + it.lineCount) }
+            maxLines = maxLines,
+            overflow = TextOverflow.Ellipsis,
+            onTextLayout = { result ->
+                // 실제 텍스트가 잘렸는지 여부를 상위로 전달
+                onOverflowDetected(result.hasVisualOverflow)
+            }
         )
     }
 }
 
 @Composable
-fun EmojiBadge(iconRes: Int, count: Int, isSelected: Boolean, onClick: () -> Unit) {
+fun EmojiBadge(
+    iconRes: Int,
+    count: Int,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    // 💡 개수가 0이고 선택도 안 된 상태면 아예 보여주지 않음 (디자인 규칙)
     if (count <= 0 && !isSelected) return
+
     val visualIconSize = if (iconRes == R.drawable.ic_laugh) screenWidthDp(18.dp) else screenWidthDp(14.dp)
+    // 선택 여부에 따른 배경색 (B200)
     val backgroundColor = if (isSelected) SpotTheme.colors.B200 else Color.Transparent
 
     Row(
@@ -96,12 +120,29 @@ fun EmojiBadge(iconRes: Int, count: Int, isSelected: Boolean, onClick: () -> Uni
             .background(backgroundColor)
             .noRippleClickable { onClick() }
             .padding(horizontal = screenWidthDp(4.dp), vertical = screenHeightDp(2.dp)),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
-        Box(modifier = Modifier.size(screenWidthDp(14.dp)), contentAlignment = Alignment.Center) {
-            Image(painter = painterResource(id = iconRes), contentDescription = null, modifier = Modifier.size(visualIconSize), contentScale = ContentScale.Fit)
+        Box(
+            modifier = Modifier.size(screenWidthDp(14.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = iconRes),
+                contentDescription = null,
+                modifier = Modifier.size(visualIconSize),
+                contentScale = ContentScale.Fit
+            )
         }
-        Spacer(modifier = Modifier.width(screenWidthDp(2.dp)))
-        Text(text = count.toString(), style = SpotTheme.typography.small_400, color = SpotTheme.colors.B500)
+
+        // 💡 숫자가 0보다 클 때만 간격과 텍스트 노출
+        if (count > 0) {
+            Spacer(modifier = Modifier.width(screenWidthDp(2.dp)))
+            Text(
+                text = count.toString(),
+                style = SpotTheme.typography.small_400,
+                color = SpotTheme.colors.B500 // 강조 컬러
+            )
+        }
     }
 }
