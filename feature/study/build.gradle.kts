@@ -18,4 +18,6 @@ dependencies {
     implementation(libs.material3.compose)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.google.material)
+    implementation(libs.bundles.camerax)
+    implementation(libs.google.mlkit.barcode.scanning)
 }
