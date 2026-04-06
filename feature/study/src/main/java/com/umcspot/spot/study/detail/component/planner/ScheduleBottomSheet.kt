@@ -3,25 +3,11 @@ package com.umcspot.spot.study.detail.component.planner
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -29,11 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,8 +33,11 @@ import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B100
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.designsystem.theme.Y400
+import com.umcspot.spot.ui.extension.noRippleClickable
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
+import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -64,6 +49,8 @@ fun ScheduleBottomSheet(
     visible: Boolean,
     onDismiss: () -> Unit,
     studyId: Long?,
+    isOverlapError: Boolean = false,
+    onClearError: () -> Unit,
     onCreateSchedule: (String, String, LocalDateTime, LocalDateTime) -> Unit
 ) {
     if (!visible) return
@@ -80,9 +67,18 @@ fun ScheduleBottomSheet(
 
     val startDateTime = LocalDateTime.of(startDate, startTime)
     val endDateTime = LocalDateTime.of(endDate, endTime)
-    val isEnabled = title.isNotBlank() && !endDateTime.isBefore(startDateTime)
+
+    val isTimeValid = !endDateTime.isBefore(startDateTime)
+    val isEnabled = title.isNotBlank() && isTimeValid && !isOverlapError
 
     val navBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
+    LaunchedEffect(isOverlapError) {
+        if (isOverlapError) {
+            delay(3000L)
+            onClearError()
+        }
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -102,10 +98,7 @@ fun ScheduleBottomSheet(
                 modifier = Modifier
                     .matchParentSize()
                     .background(SpotTheme.colors.black.copy(alpha = 0.4f))
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { onDismiss() }
+                    .noRippleClickable { onDismiss() }
             )
 
             Column(
@@ -146,6 +139,7 @@ fun ScheduleBottomSheet(
                     modifier = Modifier
                         .weight(1f)
                         .verticalScroll(rememberScrollState())
+                        .animateContentSize()
                 ) {
                     Spacer(Modifier.height(screenHeightDp(24.dp)))
                     Text(
@@ -181,22 +175,10 @@ fun ScheduleBottomSheet(
                         date = startDate,
                         time = startTime,
                         onDateClick = {
-                            DatePickerDialog(
-                                context,
-                                { _, y, m, d -> startDate = LocalDate.of(y, m + 1, d) },
-                                startDate.year,
-                                startDate.monthValue - 1,
-                                startDate.dayOfMonth
-                            ).show()
+                            DatePickerDialog(context, { _, y, m, d -> startDate = LocalDate.of(y, m + 1, d) }, startDate.year, startDate.monthValue - 1, startDate.dayOfMonth).show()
                         },
                         onTimeClick = {
-                            TimePickerDialog(
-                                context,
-                                { _, h, min -> startTime = LocalTime.of(h, min) },
-                                startTime.hour,
-                                startTime.minute,
-                                false
-                            ).show()
+                            TimePickerDialog(context, { _, h, min -> startTime = LocalTime.of(h, min) }, startTime.hour, startTime.minute, false).show()
                         }
                     )
 
@@ -207,31 +189,40 @@ fun ScheduleBottomSheet(
                         date = endDate,
                         time = endTime,
                         onDateClick = {
-                            DatePickerDialog(
-                                context,
-                                { _, y, m, d -> endDate = LocalDate.of(y, m + 1, d) },
-                                endDate.year,
-                                endDate.monthValue - 1,
-                                endDate.dayOfMonth
-                            ).show()
+                            DatePickerDialog(context, { _, y, m, d -> endDate = LocalDate.of(y, m + 1, d) }, endDate.year, endDate.monthValue - 1, endDate.dayOfMonth).show()
                         },
                         onTimeClick = {
-                            TimePickerDialog(
-                                context,
-                                { _, h, min -> endTime = LocalTime.of(h, min) },
-                                endTime.hour,
-                                endTime.minute,
-                                false
-                            ).show()
+                            TimePickerDialog(context, { _, h, min -> endTime = LocalTime.of(h, min) }, endTime.hour, endTime.minute, false).show()
                         }
                     )
                 }
 
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = navBarPadding)
                 ) {
+                    if (isOverlapError) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.error),
+                                contentDescription = null,
+                                tint = SpotTheme.colors.Y400,
+                                modifier = Modifier.size(screenWidthDp(16.dp))
+                            )
+                            Spacer(Modifier.width(screenWidthDp(4.dp)))
+                            Text(
+                                text = "기존 일정이 있는 시간대에는 일정 생성이 불가합니다.",
+                                style = SpotTheme.typography.regular_500,
+                                color = SpotTheme.colors.black
+                            )
+                        }
+                        Spacer(Modifier.height(screenHeightDp(15.dp)))
+                    }
+
                     SpotActivationButton(
                         buttonText = "추가",
                         isEnabled = isEnabled,
