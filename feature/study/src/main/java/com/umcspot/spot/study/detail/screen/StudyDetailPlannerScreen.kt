@@ -55,11 +55,12 @@ fun StudyDetailPlannerScreen(
     studyId: Long,
     plannerState: StudyPlannerState,
     members: ImmutableList<StudyMemberModel>,
+    isOwner: Boolean,
+    isMember: Boolean,
+    onAttendanceClick: (Long, Boolean) -> Unit,
     onDateSelected: (LocalDate) -> Unit,
     onMonthChanged: (Int, Int) -> Unit,
     onAddingSchedule: () -> Unit,
-    onScheduleDelete: (Long, Long) -> Unit,
-    onScheduleMenuToggle: (Long) -> Unit,
     onAddingTodo: () -> Unit,
     onTodoCreate: (Long, String) -> Unit,
     onTodoToggle: (Long, Long, Boolean) -> Unit,
@@ -80,7 +81,6 @@ fun StudyDetailPlannerScreen(
     )
 
     var currentDisplayMonth by remember { mutableStateOf(YearMonth.from(plannerState.selectedDate)) }
-
     var isInitialized by remember { mutableStateOf(false) }
 
     LaunchedEffect(monthState) {
@@ -94,6 +94,7 @@ fun StudyDetailPlannerScreen(
                 }
             }
     }
+
     val isAvailableDate = remember(plannerState.selectedDate) {
         !plannerState.selectedDate.isBefore(LocalDate.now())
     }
@@ -150,9 +151,11 @@ fun StudyDetailPlannerScreen(
 
         StudyDetailCreateButton(
             text = "일정",
-            isStudyMember = true,
-            enabled = isAvailableDate,
-            onButtonClick = { if (isAvailableDate) onAddingSchedule() }
+            isStudyMember = isMember,
+            enabled = isAvailableDate && isOwner,
+            onButtonClick = {
+                if (isAvailableDate && isOwner) onAddingSchedule()
+            }
         )
 
         Spacer(modifier = Modifier.height(screenHeightDp(12.dp)))
@@ -160,42 +163,34 @@ fun StudyDetailPlannerScreen(
         val displaySchedules = plannerState.selectedDaySchedules.take(2)
 
         if (displaySchedules.isEmpty()) {
-            Text(
-                text = "작성된 일정이 없어요.",
-                style = SpotTheme.typography.regular_400,
-                color = SpotTheme.colors.gray400,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = screenHeightDp(20.dp)),
-                textAlign = TextAlign.Center
-            )
+            Spacer(modifier = Modifier.height(screenHeightDp(4.dp)))
         } else {
             displaySchedules.forEach { schedule ->
+                val timeRange = "${schedule.startAt.toUiTime()} - ${schedule.endAt.toUiTime()}"
                 StudyDetailScheduleItem(
                     scheduleId = schedule.id,
                     title = schedule.title,
-                    timeRange = "${schedule.startAt.toUiTime()} - ${schedule.endAt.toUiTime()}",
+                    timeRange = timeRange,
                     isNow = schedule.isNow,
-                    isMine = schedule.isMine,
-                    showMenu = true,
-                    isMenuExpanded = plannerState.expandedScheduleId == schedule.id,
-                    onMenuClick = { id -> onScheduleMenuToggle(id) },
-                    onDeleteClick = { onScheduleDelete(studyId, schedule.id) }
+                    isHost = schedule.isMine,
+                    onScheduleClick = { id ->
+                        if (isMember) onAttendanceClick(id, schedule.isNow)
+                    }
                 )
-                Spacer(modifier = Modifier.height(screenHeightDp(8.dp)))
+                Spacer(modifier = Modifier.height(screenHeightDp(16.dp)))
             }
         }
 
-        Spacer(modifier = Modifier.height(screenHeightDp(16.dp)))
         HorizontalDivider(thickness = 0.5.dp, color = SpotTheme.colors.gray300)
         Spacer(modifier = Modifier.height(screenHeightDp(16.dp)))
 
+        // Todo 생성 버튼 - 멤버만 활성화
         StudyDetailCreateButton(
             text = "Todo",
-            isStudyMember = true,
-            enabled = isAvailableDate,
+            isStudyMember = isMember,
+            enabled = isAvailableDate && isMember,
             onButtonClick = {
-                if (isAvailableDate) {
+                if (isAvailableDate && isMember) {
                     isAddingTodoField = true
                     onAddingTodo()
                 }
@@ -242,7 +237,9 @@ fun StudyDetailPlannerScreen(
             )
         }
 
-        val filteredTodos = plannerState.todoList.filter { it.memberId == plannerState.selectedMemberId }
+        val filteredTodos = plannerState.todoList.filter {
+            it.memberId == plannerState.selectedMemberId
+        }
 
         if (filteredTodos.isEmpty() && !isAddingTodoField) {
             Text(
@@ -265,6 +262,7 @@ fun StudyDetailPlannerScreen(
                 )
             }
         }
+
         Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
     }
 }

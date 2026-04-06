@@ -8,7 +8,8 @@ data class StudyScheduleModel(
     val startAt: LocalDateTime,
     val endAt: LocalDateTime,
     val isNow: Boolean,
-    val isMine: Boolean
+    val isMine: Boolean,
+    val isAttendanceStartable: Boolean
 )
 
 data class StudyScheduleCreateModel(

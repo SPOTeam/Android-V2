@@ -1,6 +1,9 @@
 package com.umcspot.spot.study.detail
 
+import android.Manifest
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -15,17 +19,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
+import com.umcspot.spot.designsystem.component.button.SpotActivationButton
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.study.component.SpotStudyApplyDialog
+import com.umcspot.spot.study.component.SpotStudyDialog
 import com.umcspot.spot.study.detail.component.common.StudyDetailTabRow
 import com.umcspot.spot.study.detail.component.common.StudyHeaderSection
 import com.umcspot.spot.study.detail.component.planner.ScheduleBottomSheet
-import com.umcspot.spot.study.detail.model.StudyDetailSideEffect
-import com.umcspot.spot.study.detail.model.StudyDetailState
-import com.umcspot.spot.study.detail.model.StudyDetailTab
-import com.umcspot.spot.study.detail.screen.StudyDetailBoardScreen
-import com.umcspot.spot.study.detail.screen.StudyDetailHomeScreen
-import com.umcspot.spot.study.detail.screen.StudyDetailMemoirScreen
-import com.umcspot.spot.study.detail.screen.StudyDetailPlannerScreen
+import com.umcspot.spot.study.detail.component.planner.ScheduleDetailBottomSheet
+import com.umcspot.spot.study.detail.model.*
+import com.umcspot.spot.study.detail.screen.*
+import com.umcspot.spot.study.detail.screen.camera.QrScannerScreen
+import com.umcspot.spot.study.model.ViewerStatus
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 import kotlinx.coroutines.delay
@@ -36,6 +41,7 @@ import java.time.LocalDate
 fun StudyDetailRoute(
     studyId: Long,
     onBackClick: () -> Unit,
+    onAttendanceClick: (Long) -> Unit,
     contentPadding: PaddingValues,
     onTabChanged: (StudyDetailTab) -> Unit,
     initialTab: StudyDetailTab,
@@ -45,12 +51,36 @@ fun StudyDetailRoute(
     var selectedTab by rememberSaveable { mutableStateOf(initialTab) }
     val scope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()
+
+    val isOwner = uiState.homeState.viewerStatus == ViewerStatus.OWNER
+    val isMember = uiState.homeState.viewerStatus == ViewerStatus.APPROVED || isOwner
+    
     var showScheduleBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var showScheduleDetailBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var selectedScheduleId by remember { mutableStateOf<Long?>(null) }
+    var selectedScheduleIsNow by remember { mutableStateOf(false) }
+    
+    var isScannerOpen by remember { mutableStateOf(false) }
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) isScannerOpen = true
+    }
+    
+    var showApplyInputDialog by remember { mutableStateOf(false) }
+    var showApplySuccessDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(viewModel) {
         viewModel.sideEffect.collect { effect ->
             when (effect) {
-                is StudyDetailSideEffect.ScheduleCreateSuccess -> showScheduleBottomSheet = false
+                is StudyDetailSideEffect.ApplySuccess -> {
+                    showApplyInputDialog = false
+                    showApplySuccessDialog = true
+                }
+                is StudyDetailSideEffect.ScheduleCreateSuccess -> {
+                    showScheduleBottomSheet = false
+                    viewModel.clearScheduleError()
+                }
                 else -> Unit
             }
         }
@@ -60,7 +90,6 @@ fun StudyDetailRoute(
         viewModel.fetchStudyHomeDetail(studyId)
     }
 
-    // 탭 전환 시 데이터 로드 로직
     LaunchedEffect(selectedTab) {
         onTabChanged(selectedTab)
         when (selectedTab) {
@@ -79,52 +108,143 @@ fun StudyDetailRoute(
 
     BackHandler { onBackClick() }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(SpotTheme.colors.white)) {
+
         StudyDetailScreen(
             studyId = studyId,
             uiState = uiState,
             selectedTab = selectedTab,
+            isOwner = isOwner,
+            isMember = isMember,
+            onAttendanceClick = { scheduleId, isNow ->
+                if (!isMember) return@StudyDetailScreen
+                if (isOwner) {
+                    onAttendanceClick(scheduleId)
+                } else {
+                    selectedScheduleId = scheduleId
+                    selectedScheduleIsNow = isNow
+                    showScheduleDetailBottomSheet = true
+                }
+            },
             onTabSelected = { selectedTab = it },
             onDateSelected = viewModel::updateSelectedDate,
-            onMonthChanged = { year, month -> viewModel.fetchMonthlySchedules(studyId, year, month) },
-            onAddingSchedule = { showScheduleBottomSheet = true },
+            onMonthChanged = { y, m -> viewModel.fetchMonthlySchedules(studyId, y, m) },
+            onAddingSchedule = { if (isOwner) showScheduleBottomSheet = true },
             onScheduleDelete = viewModel::deleteSchedule,
             onScheduleMenuToggle = viewModel::toggleScheduleMenu,
             onAddingTodo = {
-                scope.launch {
-                    delay(300)
-                    lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount - 1)
+                if (isMember) {
+                    scope.launch {
+                        delay(300)
+                        lazyListState.animateScrollToItem(
+                            lazyListState.layoutInfo.totalItemsCount - 1
+                        )
+                    }
                 }
             },
             onTodoCreate = viewModel::createTodo,
             onTodoToggle = viewModel::toggleTodoStatus,
             onTodoDelete = viewModel::deleteTodo,
-            onMemberSelected = { memberId ->
-                viewModel.fetchMemberTodos(studyId, memberId, uiState.plannerState.selectedDate)
+            onMemberSelected = { id ->
+                viewModel.fetchMemberTodos(studyId, id, uiState.plannerState.selectedDate)
             },
-            onMemoirDelete = { memoirId -> viewModel.deleteMemoir(studyId, memoirId) },
-            onMemoirEmojiToggle = { memoirId, type -> viewModel.toggleMemoirReaction(studyId, memoirId, type) },
+            onMemoirDelete = { id -> viewModel.deleteMemoir(studyId, id) },
+            onMemoirEmojiToggle = { id, type -> viewModel.toggleMemoirReaction(studyId, id, type) },
+            onApplyClick = { showApplyInputDialog = true },
             onBackClick = onBackClick,
             contentPadding = contentPadding,
             lazyListState = lazyListState
         )
 
+        if (!uiState.isLoading) {
+            val status = uiState.homeState.viewerStatus
+            if (status == ViewerStatus.NOT_APPLIED || status == ViewerStatus.APPLIED) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .background(SpotTheme.colors.white)
+                        .padding(horizontal = screenWidthDp(17.dp))
+                        .padding(bottom = contentPadding.calculateBottomPadding() + 12.dp)
+                        .imePadding()
+                ) {
+                    SpotActivationButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        buttonText = if (status == ViewerStatus.APPLIED) "승인 대기 중" else "신청하기",
+                        isEnabled = status == ViewerStatus.NOT_APPLIED,
+                        onClick = {
+                            if (status == ViewerStatus.NOT_APPLIED) showApplyInputDialog = true
+                        }
+                    )
+                }
+            }
+        }
+
+        if (isScannerOpen) {
+            QrScannerScreen(
+                onQrScanned = { token ->
+                    isScannerOpen = false
+                    
+                },
+                onClose = { isScannerOpen = false }
+            )
+        }
+
+        ScheduleDetailBottomSheet(
+            visible = showScheduleDetailBottomSheet,
+            onDismiss = { showScheduleDetailBottomSheet = false },
+            isNow = selectedScheduleIsNow,
+            onAttendanceClick = {
+                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            },
+            onDeleteClick = {
+                selectedScheduleId?.let { id ->
+                    viewModel.deleteSchedule(studyId, id)
+                }
+            }
+        )
+
         ScheduleBottomSheet(
             visible = showScheduleBottomSheet,
-            onDismiss = { showScheduleBottomSheet = false },
+            onDismiss = {
+                showScheduleBottomSheet = false
+                viewModel.clearScheduleError()
+            },
             studyId = studyId,
+            isOverlapError = uiState.plannerState.isOverlapError,
+            onClearError = { viewModel.clearScheduleError() },
             onCreateSchedule = { title, memo, start, end ->
                 viewModel.createSchedule(studyId, title, memo, start, end)
             }
         )
+
+        if (showApplyInputDialog) {
+            SpotStudyApplyDialog(
+                onDismissRequest = { showApplyInputDialog = false },
+                onApplySubmit = { message -> viewModel.applyStudy(studyId, message) }
+            )
+        }
+
+        if (showApplySuccessDialog) {
+            SpotStudyDialog(
+                onDismissRequest = { showApplySuccessDialog = false },
+                title = "신청 완료",
+                description = "스터디를 신청 완료했어요!\n수락 여부는 알람 탭에서 확인 가능해요.",
+                buttonText = "확인",
+                showCheckIcon = true,
+                onButtonClick = { showApplySuccessDialog = false }
+            )
+        }
     }
 }
-
 @Composable
 private fun StudyDetailScreen(
     studyId: Long,
     uiState: StudyDetailState,
     selectedTab: StudyDetailTab,
+    isOwner: Boolean,
+    isMember: Boolean,
+    onAttendanceClick: (Long, Boolean) -> Unit, 
     onTabSelected: (StudyDetailTab) -> Unit,
     onDateSelected: (LocalDate) -> Unit,
     onMonthChanged: (Int, Int) -> Unit,
@@ -137,17 +257,15 @@ private fun StudyDetailScreen(
     onTodoDelete: (Long, Long) -> Unit,
     onMemberSelected: (Long) -> Unit,
     onMemoirDelete: (Long) -> Unit,
-    onMemoirEmojiToggle: (Long, String) -> Unit, // memoirId, type
+    onMemoirEmojiToggle: (Long, String) -> Unit,
+    onApplyClick: () -> Unit,
     onBackClick: () -> Unit,
     contentPadding: PaddingValues,
     lazyListState: LazyListState
 ) {
     LazyColumn(
         state = lazyListState,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(SpotTheme.colors.white)
-            .imePadding()
+        modifier = Modifier.fillMaxSize().imePadding()
     ) {
         item {
             Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
@@ -162,35 +280,42 @@ private fun StudyDetailScreen(
             )
             StudyHeaderSection(uiState.homeState)
         }
-
         item {
             StudyDetailTabRow(selectedTab = selectedTab, onTabSelected = onTabSelected)
             Spacer(modifier = Modifier.height(screenHeightDp(18.dp)))
         }
 
         item {
+            val bottomPadding = if (
+                uiState.homeState.viewerStatus == ViewerStatus.NOT_APPLIED ||
+                uiState.homeState.viewerStatus == ViewerStatus.APPLIED
+            ) 100.dp else 20.dp
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = screenWidthDp(17.dp))
-                    .padding(bottom = contentPadding.calculateBottomPadding() + screenHeightDp(20.dp))
+                    .padding(bottom = contentPadding.calculateBottomPadding() + bottomPadding)
             ) {
                 when (selectedTab) {
                     StudyDetailTab.HOME -> StudyDetailHomeScreen(
                         description = uiState.homeState.studyDescription,
                         members = uiState.homeState.members,
                         schedules = uiState.homeState.schedules,
-                        recentMemoirs = uiState.homeState.recentMemoirs
+                        recentMemoirs = uiState.homeState.recentMemoirs,
+                        isMember = isMember,
+                        onAttendanceClick = { id, isNow -> onAttendanceClick(id, isNow) }
                     )
                     StudyDetailTab.PLANNER -> StudyDetailPlannerScreen(
                         studyId = studyId,
                         plannerState = uiState.plannerState,
                         members = uiState.homeState.members,
+                        isOwner = isOwner,
+                        isMember = isMember,
+                        onAttendanceClick = { id, isNow -> onAttendanceClick(id, isNow) },
                         onDateSelected = onDateSelected,
                         onMonthChanged = onMonthChanged,
                         onAddingSchedule = onAddingSchedule,
-                        onScheduleDelete = onScheduleDelete,
-                        onScheduleMenuToggle = onScheduleMenuToggle,
                         onAddingTodo = onAddingTodo,
                         onTodoCreate = onTodoCreate,
                         onTodoToggle = onTodoToggle,

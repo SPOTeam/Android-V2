@@ -10,7 +10,8 @@ data class StudyDetailResponseDto(
     @SerialName("description") val description: String,
     @SerialName("thumbnailUrl") val thumbnailUrl: String?,
     @SerialName("categories") val categories: List<String>,
-    @SerialName("statistics") val statistics: StudyStatisticsDto
+    @SerialName("statistics") val statistics: StudyStatisticsDto,
+    @SerialName("viewerStatus") val viewerStatus: String
 )
 
 @Serializable

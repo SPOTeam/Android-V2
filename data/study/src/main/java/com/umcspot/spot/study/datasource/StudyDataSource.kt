@@ -17,6 +17,8 @@ import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
 import com.umcspot.spot.study.dto.response.StudyMonthlyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
+import com.umcspot.spot.study.dto.response.StudyAttendanceQrResponseDto
+import com.umcspot.spot.study.dto.response.StudyAttendanceResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.dto.response.StudyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
@@ -50,6 +52,11 @@ interface StudyDataSource {
         request: StudyRequestDto,
         imageFile: File?
     ): BaseResponse<CreateStudyResponseDto>
+
+    suspend fun applyStudy(
+        studyId: Long,
+        message: String
+    ): NullResultResponse
 
     suspend fun getStudyDetail(studyId: Long): BaseResponse<StudyDetailResponseDto>
 
@@ -130,4 +137,18 @@ interface StudyDataSource {
         studyId: Long,
         request: ScheduleCreateRequestDto
     ): BaseResponse<ScheduleCreateResponseDto>
+
+    suspend fun getAttendanceList(
+        studyId: Long,
+        scheduleId: Long
+    ): BaseResponse<StudyAttendanceResponseDto>
+
+    suspend fun startAttendance(studyId: Long, scheduleId: Long): NullResultResponse
+
+    suspend fun finishAttendance(studyId: Long, scheduleId: Long): NullResultResponse
+
+    suspend fun checkAttendance(studyId: Long, scheduleId: Long, token: String): NullResultResponse
+
+    suspend fun getAttendanceQr(studyId: Long, scheduleId: Long): BaseResponse<StudyAttendanceQrResponseDto>
+
 }

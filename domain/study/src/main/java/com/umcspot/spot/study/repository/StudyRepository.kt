@@ -7,6 +7,8 @@ import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.MemoirModel
 import com.umcspot.spot.study.model.StudyApplicationResultList
+import com.umcspot.spot.study.model.StudyAttendanceListModel
+import com.umcspot.spot.study.model.StudyAttendanceQrModel
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyDetailModel
 import com.umcspot.spot.study.model.StudyMemberModel
@@ -49,6 +51,8 @@ interface StudyRepository {
     ): Result<StudyResultList>
 
     suspend fun createStudy(studyCreateModel: StudyCreateModel, imageFile: File?): Result<Long>
+
+    suspend fun applyStudy(studyId: Long, message: String): Result<Unit>
 
     suspend fun getStudyDetail(studyId: Long): Result<StudyDetailModel>
 
@@ -145,4 +149,17 @@ interface StudyRepository {
         startAt: LocalDateTime,
         endAt: LocalDateTime
     ): Result<Unit>
+
+    suspend fun getAttendanceList(
+        studyId: Long,
+        scheduleId: Long
+    ): Result<StudyAttendanceListModel>
+
+    suspend fun getAttendanceQr(studyId: Long, scheduleId: Long): Result<StudyAttendanceQrModel>
+
+    suspend fun startAttendance(studyId: Long, scheduleId: Long): Result<Unit>
+
+    suspend fun finishAttendance(studyId: Long, scheduleId: Long): Result<Unit>
+
+    suspend fun checkAttendance(studyId: Long, scheduleId: Long, token: String): Result<Unit>
 }

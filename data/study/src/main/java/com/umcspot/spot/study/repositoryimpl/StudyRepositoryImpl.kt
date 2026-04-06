@@ -13,6 +13,8 @@ import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.MemoirModel
 import com.umcspot.spot.study.mapper.toDomainList
 import com.umcspot.spot.study.model.StudyApplicationResultList
+import com.umcspot.spot.study.model.StudyAttendanceListModel
+import com.umcspot.spot.study.model.StudyAttendanceQrModel
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyDetailModel
 import com.umcspot.spot.study.model.StudyMemberModel
@@ -126,6 +128,15 @@ class StudyRepositoryImpl @Inject constructor(
         }
 
         response.result.studyId
+    }
+
+    override suspend fun applyStudy(studyId: Long, message: String): Result<Unit> = runCatching {
+        val response = studyDataSource.applyStudy(studyId, message)
+        if (response.isSuccess) {
+            Unit
+        } else {
+            throw Exception(response.message ?: "신청에 실패했습니다.")
+        }
     }
 
     override suspend fun getStudyDetail(studyId: Long): Result<StudyDetailModel> =
@@ -388,4 +399,54 @@ class StudyRepositoryImpl @Inject constructor(
         }
         Unit
     }
+
+    override suspend fun getAttendanceList(
+        studyId: Long,
+        scheduleId: Long
+    ): Result<StudyAttendanceListModel> = runCatching {
+        val response = studyDataSource.getAttendanceList(studyId, scheduleId)
+        if (!response.isSuccess) throw Exception(response.message ?: "출석 목록 조회 실패")
+
+        response.result.toDomain()
+    }.onFailure { e ->
+        Log.e("StudyRepository", "getAttendanceList failed: studyId=$studyId, scheduleId=$scheduleId", e)
+
+    }
+
+    override suspend fun startAttendance(studyId: Long, scheduleId: Long): Result<Unit> = runCatching {
+        val response = studyDataSource.startAttendance(studyId, scheduleId)
+        if (!response.isSuccess) {
+            throw Exception(response.message ?: "출석체크 시작 실패")
+        }
+        Unit
+    }.onFailure { e ->
+        Log.e("StudyRepository", "startAttendance failed: studyId=$studyId, scheduleId=$scheduleId", e)
+    }
+
+    override suspend fun finishAttendance(studyId: Long, scheduleId: Long): Result<Unit> = runCatching {
+        val response = studyDataSource.finishAttendance(studyId, scheduleId)
+        if (!response.isSuccess) {
+            throw Exception(response.message ?: "출석체크 종료 실패")
+        }
+        Unit
+    }.onFailure { e ->
+        Log.e("StudyRepository", "finishAttendance failed: studyId=$studyId, scheduleId=$scheduleId", e)
+    }
+
+    override suspend fun checkAttendance(studyId: Long, scheduleId: Long, token: String): Result<Unit> = runCatching {
+        val response = studyDataSource.checkAttendance(studyId, scheduleId, token)
+        if (!response.isSuccess) {
+            throw Exception(response.message ?: "출석 처리 실패")
+        }
+        Unit
+    }.onFailure { e ->
+        Log.e("StudyRepository", "checkAttendance failed: studyId=$studyId, scheduleId=$scheduleId", e)
+    }
+
+    override suspend fun getAttendanceQr(studyId: Long, scheduleId: Long): Result<StudyAttendanceQrModel> =
+        runCatching {
+            val response = studyDataSource.getAttendanceQr(studyId, scheduleId)
+            if (!response.isSuccess) throw Exception(response.message ?: "QR 조회 실패")
+            response.result.toDomain()
+        }
 }

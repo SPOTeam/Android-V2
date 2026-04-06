@@ -33,7 +33,9 @@ fun StudyDetailHomeScreen(
     description: String,
     members: ImmutableList<StudyMemberModel>,
     schedules: ImmutableList<StudyScheduleModel>,
-    recentMemoirs: ImmutableList<StudyRecentMemoirModel>
+    recentMemoirs: ImmutableList<StudyRecentMemoirModel>,
+    isMember: Boolean,
+    onAttendanceClick: (Long, Boolean) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Box(
@@ -70,6 +72,7 @@ fun StudyDetailHomeScreen(
 
         Text(text = "다가오는 일정", style = SpotTheme.typography.h4, color = SpotTheme.colors.black)
         Spacer(modifier = Modifier.height(screenHeightDp(8.dp)))
+
         if (schedules.isEmpty()) {
             Text(
                 text = "일정이 없습니다.",
@@ -89,41 +92,42 @@ fun StudyDetailHomeScreen(
                         title = schedule.title,
                         timeRange = timeRange,
                         isNow = schedule.isNow,
-                        showMenu = false,
-                        isMenuExpanded = false,
-                        onMenuClick = {},
-                        onDeleteClick = {}
+                        isHost = schedule.isMine,
+                        onScheduleClick = { id ->
+                            if (isMember) onAttendanceClick(id, schedule.isNow)
+                        }
                     )
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(screenHeightDp(32.dp)))
+            Spacer(modifier = Modifier.height(screenHeightDp(32.dp)))
 
-        Text(text = "최근 회고록", style = SpotTheme.typography.h4, color = SpotTheme.colors.black)
-        Spacer(modifier = Modifier.height(screenHeightDp(8.dp)))
-        if (recentMemoirs.isEmpty()) {
-            Text(
-                text = "회고록이 없습니다.",
-                style = SpotTheme.typography.medium_400,
-                color = SpotTheme.colors.gray400,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = screenHeightDp(20.dp)),
-                textAlign = TextAlign.Center
-            )
-        } else {
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(screenWidthDp(8.dp)),
-            ) {
-                items(items = recentMemoirs, key = { it.id }) { memoir ->
-                    StudyDetailMemoirItem(
-                        thumbnailUrl = memoir.thumbnailUrl,
-                        description = if (memoir.isPrivate) "이 글은 스터디원에게만 노출됩니다." else memoir.activityContent,
-                        writerName = memoir.writerNickname,
-                        authorProfileUrl = memoir.writerProfileUrl
-                    )
+            Text(text = "최근 회고록", style = SpotTheme.typography.h4, color = SpotTheme.colors.black)
+            Spacer(modifier = Modifier.height(screenHeightDp(8.dp)))
+
+            if (recentMemoirs.isEmpty()) {
+                Text(
+                    text = "회고록이 없습니다.",
+                    style = SpotTheme.typography.medium_400,
+                    color = SpotTheme.colors.gray400,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = screenHeightDp(20.dp)),
+                    textAlign = TextAlign.Center
+                )
+            } else {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(screenWidthDp(8.dp))
+                ) {
+                    items(items = recentMemoirs, key = { it.id }) { memoir ->
+                        StudyDetailMemoirItem(
+                            thumbnailUrl = memoir.thumbnailUrl,
+                            description = if (memoir.isPrivate) "이 글은 스터디원에게만 노출됩니다." else memoir.activityContent,
+                            writerName = memoir.writerNickname,
+                            authorProfileUrl = memoir.writerProfileUrl
+                        )
+                    }
                 }
             }
         }

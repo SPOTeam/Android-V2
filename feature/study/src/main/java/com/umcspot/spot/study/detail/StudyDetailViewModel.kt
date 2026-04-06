@@ -5,13 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.umcspot.spot.study.detail.model.StudyDetailSideEffect
 import com.umcspot.spot.study.detail.model.StudyDetailState
 import com.umcspot.spot.study.model.MemoirCreateModel
+import com.umcspot.spot.study.model.StudyAttendanceListModel
 import com.umcspot.spot.study.model.StudyScheduleModel
 import com.umcspot.spot.study.model.TodoModel
+import com.umcspot.spot.study.model.ViewerStatus
 import com.umcspot.spot.study.repository.StudyRepository
 import com.umcspot.spot.token.repository.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -66,27 +69,32 @@ class StudyDetailViewModel @Inject constructor(
 
             detailDeferred.await().onSuccess { model ->
                 _uiState.update { state ->
-                    state.copy(homeState = state.homeState.copy(
-                        studyTitle = model.title,
-                        studyDescription = model.description,
-                        thumbnailUrl = model.thumbnailUrl,
-                        categories = model.categories.toPersistentList(),
-                        currentMembers = model.currentMembers,
-                        totalMembers = model.totalMembers,
-                        likeCount = model.likeCount,
-                        hitCount = model.hitCount
-                    ))
+                    state.copy(
+                        homeState = state.homeState.copy(
+                            studyTitle = model.title,
+                            studyDescription = model.description,
+                            thumbnailUrl = model.thumbnailUrl,
+                            categories = model.categories.toPersistentList(),
+                            currentMembers = model.currentMembers,
+                            totalMembers = model.totalMembers,
+                            likeCount = model.likeCount,
+                            hitCount = model.hitCount,
+                            viewerStatus = model.viewerStatus,
+                            isJoined = model.viewerStatus == ViewerStatus.APPROVED || model.viewerStatus == ViewerStatus.OWNER,
+                            isHost = model.viewerStatus == ViewerStatus.OWNER
+                        )
+                    )
                 }
             }.onFailure { emitError(it) }
 
             membersDeferred.await().onSuccess { members ->
-                _uiState.update { it.copy(homeState = it.homeState.copy(members = members.toPersistentList())) }
+                _uiState.update { state ->
+                    state.copy(homeState = state.homeState.copy(members = members.toPersistentList()))
+                }
             }.onFailure { emitError(it) }
 
             schedulesDeferred.await().onSuccess { schedules ->
-                val now = LocalDateTime.now()
-                val processed = schedules.map { it.copy(isNow = !now.isBefore(it.startAt) && !now.isAfter(it.endAt)) }.toPersistentList()
-                _uiState.update { it.copy(homeState = it.homeState.copy(schedules = processed)) }
+                _uiState.update { it.copy(homeState = it.homeState.copy(schedules = schedules.toPersistentList())) }
             }.onFailure { emitError(it) }
 
             memoirsDeferred.await().onSuccess { memoirs ->
@@ -94,6 +102,26 @@ class StudyDetailViewModel @Inject constructor(
             }.onFailure { emitError(it) }
 
             _uiState.update { it.copy(isLoading = false) }
+        }
+    }
+
+    fun applyStudy(studyId: Long, message: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            studyRepository.applyStudy(studyId, message)
+                .onSuccess {
+                    _uiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            homeState = state.homeState.copy(viewerStatus = ViewerStatus.APPLIED)
+                        )
+                    }
+                    _sideEffect.emit(StudyDetailSideEffect.ApplySuccess)
+                }
+                .onFailure { t ->
+                    _uiState.update { it.copy(isLoading = false) }
+                    emitError(t)
+                }
         }
     }
 
@@ -111,33 +139,28 @@ class StudyDetailViewModel @Inject constructor(
     }
 
     fun createSchedule(studyId: Long, title: String, location: String, startAt: LocalDateTime, endAt: LocalDateTime) {
-        val tempId = System.currentTimeMillis() * -1
-        val tempSchedule = StudyScheduleModel(tempId, title, startAt, endAt, false, true)
-
-        _uiState.update { state ->
-            val updatedMonthly = (state.plannerState.monthlySchedules + tempSchedule).sortedBy { it.startAt }.toPersistentList()
-            state.copy(
-                plannerState = state.plannerState.copy(
-                    monthlySchedules = updatedMonthly,
-                    selectedDaySchedules = computeFilteredSchedules(updatedMonthly, state.plannerState.selectedDate),
-                    isScheduleCreateSuccess = true
-                )
-            )
-        }
-
         viewModelScope.launch {
-            _sideEffect.emit(StudyDetailSideEffect.ScheduleCreateSuccess)
             studyRepository.createSchedule(studyId, title, location, startAt, endAt)
                 .onSuccess {
                     val date = _uiState.value.plannerState.selectedDate
                     fetchMonthlySchedules(studyId, date.year, date.monthValue)
                     fetchStudyHomeDetail(studyId)
+                    _sideEffect.emit(StudyDetailSideEffect.ScheduleCreateSuccess)
                 }
-                .onFailure {
-                    fetchMonthlySchedules(studyId, startAt.year, startAt.monthValue)
-                    emitError(it)
+                .onFailure { t ->
+                    val errorMessage = t.message ?: ""
+                    if (errorMessage.contains("SCHEDULE4001") || errorMessage.contains("이미 일정이 존재")) {
+                        _uiState.update { it.copy(plannerState = it.plannerState.copy(isOverlapError = true)) }
+                    } else {
+                        _uiState.update { it.copy(plannerState = it.plannerState.copy(isOverlapError = true)) }
+                        emitError(t)
+                    }
                 }
         }
+    }
+
+    fun clearScheduleError() {
+        _uiState.update { it.copy(plannerState = it.plannerState.copy(isOverlapError = false)) }
     }
 
     private fun computeFilteredSchedules(schedules: List<StudyScheduleModel>, selectedDate: LocalDate) =
@@ -184,6 +207,113 @@ class StudyDetailViewModel @Inject constructor(
             state.copy(plannerState = state.plannerState.copy(selectedDate = date))
         }
         updateFilteredSchedules()
+    }
+
+    fun fetchAttendanceList(studyId: Long, scheduleId: Long) {
+        viewModelScope.launch {
+            studyRepository.getAttendanceList(studyId, scheduleId)
+                .onSuccess { model: StudyAttendanceListModel ->
+                    _uiState.update { state ->
+                        state.copy(
+                            attendanceState = state.attendanceState.copy(
+                                attendanceList = model.attendances.toPersistentList()
+                            )
+                        )
+                    }
+                }
+                .onFailure { emitError(it) }
+        }
+    }
+
+    fun refreshAttendanceStatus(studyId: Long, scheduleId: Long) {
+        viewModelScope.launch {
+            studyRepository.getAttendanceList(studyId, scheduleId)
+                .onSuccess { model ->
+                    _uiState.update { state ->
+                        state.copy(
+                            attendanceState = state.attendanceState.copy(
+                                attendanceList = model.attendances.toPersistentList()
+                            )
+                        )
+                    }
+                }
+        }
+    }
+
+    fun fetchAttendanceQr(studyId: Long, scheduleId: Long) {
+        viewModelScope.launch {
+            studyRepository.getAttendanceQr(studyId, scheduleId)
+                .onSuccess { model ->
+                    _uiState.update { state ->
+                        state.copy(attendanceState = state.attendanceState.copy(
+                            qrCodeImageUrl = model.qrCodeImageUrl,
+                            isAttendanceActive = model.attendanceActive
+                        ))
+                    }
+                }
+                .onFailure { emitError(it) }
+        }
+    }
+
+    fun fetchMembersOnly(studyId: Long) {
+        viewModelScope.launch {
+            studyRepository.getStudyMembers(studyId).onSuccess { members ->
+                _uiState.update { it.copy(
+                    homeState = it.homeState.copy(members = members.toPersistentList())
+                )}
+            }.onFailure { emitError(it) }
+        }
+    }
+
+    fun startAttendance(studyId: Long, scheduleId: Long) {
+        viewModelScope.launch {
+            studyRepository.startAttendance(studyId, scheduleId)
+                .onSuccess {
+                    _uiState.update { state ->
+                        state.copy(
+                            attendanceState = state.attendanceState.copy(
+                                isAttendanceActive = true
+                            )
+                        )
+                    }
+                    fetchAttendanceList(studyId, scheduleId)
+
+                    repeat(5) { attempt ->
+                        val qrResult = studyRepository.getAttendanceQr(studyId, scheduleId)
+                        qrResult.onSuccess { model ->
+                            _uiState.update { state ->
+                                state.copy(
+                                    attendanceState = state.attendanceState.copy(
+                                        qrCodeImageUrl = model.qrCodeImageUrl
+                                    )
+                                )
+                            }
+                        }
+                        if (_uiState.value.attendanceState.qrCodeImageUrl != null) return@repeat
+                        delay(1000L * (attempt + 1))
+                    }
+
+                    if (_uiState.value.attendanceState.qrCodeImageUrl == null) {
+                        emitError(Throwable("QR코드를 불러오지 못했습니다. 다시 시도해주세요."))
+                    }
+                }
+                .onFailure { emitError(it) }
+        }
+    }
+
+    fun finishAttendance(studyId: Long, scheduleId: Long) {
+        viewModelScope.launch {
+            studyRepository.finishAttendance(studyId, scheduleId)
+                .onSuccess {
+                    _uiState.update { state ->
+                        state.copy(attendanceState = state.attendanceState.copy(
+                            isAttendanceActive = false,
+                            qrCodeImageUrl = null
+                        ))
+                    }
+                }
+                .onFailure { emitError(it) }
+        }
     }
 
     // ── 할 일 (Todo) ──────────────────────────────────

@@ -1,4 +1,4 @@
-package com.umcspot.spot.study.detail.screen
+package com.umcspot.spot.study.detail.screen.post
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult

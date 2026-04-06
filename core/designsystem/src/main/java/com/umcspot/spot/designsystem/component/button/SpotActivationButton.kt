@@ -46,7 +46,7 @@ fun SpotActivationButton(
             )
             .background(color = backgroundColor) 
             .noRippleClickable(onClick = { if (isEnabled) onClick() })
-            .padding(vertical = screenHeightDp(10.dp)),
+            .padding(vertical = screenHeightDp(9.dp)),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {

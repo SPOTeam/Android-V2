@@ -9,6 +9,7 @@ import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.study.datasource.StudyDataSource
 import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.study.dto.request.ScheduleCreateRequestDto
+import com.umcspot.spot.study.dto.request.StudyApplyRequestDto
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.request.TodoCreateRequestDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
@@ -19,6 +20,8 @@ import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
 import com.umcspot.spot.study.dto.response.StudyMonthlyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
+import com.umcspot.spot.study.dto.response.StudyAttendanceQrResponseDto
+import com.umcspot.spot.study.dto.response.StudyAttendanceResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.dto.response.StudyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
@@ -80,6 +83,13 @@ class StudyDataSourceImpl @Inject constructor(
             MultipartBody.Part.createFormData("imageFile", file.name, requestBody)
         }
         return studyService.createStudy(requestPart, imagePart)
+    }
+
+    override suspend fun applyStudy(studyId: Long, message: String): NullResultResponse {
+        return studyService.applyStudy(
+            studyId = studyId,
+            request = StudyApplyRequestDto(message = message)
+        )
     }
 
     override suspend fun getStudyDetail(studyId: Long): BaseResponse<StudyDetailResponseDto> =
@@ -212,4 +222,22 @@ class StudyDataSourceImpl @Inject constructor(
         request: ScheduleCreateRequestDto
     ): BaseResponse<ScheduleCreateResponseDto> =
         studyService.createSchedule(studyId, request)
+
+    override suspend fun getAttendanceList(
+        studyId: Long,
+        scheduleId: Long
+    ): BaseResponse<StudyAttendanceResponseDto> =
+        studyService.getAttendanceList(studyId, scheduleId)
+
+    override suspend fun startAttendance(studyId: Long, scheduleId: Long): NullResultResponse =
+        studyService.startAttendance(studyId, scheduleId)
+
+    override suspend fun finishAttendance(studyId: Long, scheduleId: Long): NullResultResponse =
+        studyService.finishAttendance(studyId, scheduleId)
+
+    override suspend fun checkAttendance(studyId: Long, scheduleId: Long, token: String): NullResultResponse =
+        studyService.checkAttendance(studyId, scheduleId, token)
+
+    override suspend fun getAttendanceQr(studyId: Long, scheduleId: Long): BaseResponse<StudyAttendanceQrResponseDto> =
+        studyService.getAttendanceQr(studyId, scheduleId)
 }
