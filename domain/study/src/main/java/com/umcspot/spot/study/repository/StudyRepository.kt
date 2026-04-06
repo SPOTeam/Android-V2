@@ -8,6 +8,8 @@ import com.umcspot.spot.study.model.BoardCreateModel
 import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.MemoirModel
 import com.umcspot.spot.study.model.StudyApplicationResultList
+import com.umcspot.spot.study.model.StudyAttendanceListModel
+import com.umcspot.spot.study.model.StudyAttendanceQrModel
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyDetailModel
 import com.umcspot.spot.study.model.StudyMemberModel
@@ -18,6 +20,7 @@ import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.study.model.StudyScheduleModel
 import com.umcspot.spot.study.model.TodoModel
 import java.io.File
+import java.time.LocalDateTime
 
 interface StudyRepository {
     suspend fun getRecommendedStudies(): Result<StudyResultList>
@@ -52,6 +55,8 @@ interface StudyRepository {
 
     suspend fun createStudy(studyCreateModel: StudyCreateModel, imageFile: File?): Result<Long>
 
+    suspend fun applyStudy(studyId: Long, message: String): Result<Unit>
+
     suspend fun getStudyDetail(studyId: Long): Result<StudyDetailModel>
 
     suspend fun getStudyMembers(studyId: Long): Result<List<StudyMemberModel>>
@@ -63,6 +68,8 @@ interface StudyRepository {
         year: Int,
         month: Int
     ): Result<List<StudyScheduleModel>>
+
+    suspend fun deleteSchedule(studyId: Long, scheduleId: Long): Result<Unit>
 
     suspend fun createTodo(
         studyId: Long,
@@ -142,6 +149,27 @@ interface StudyRepository {
         applicationId: Long,
         decision: String
     ) : Result<Unit>
+
+    suspend fun createSchedule(
+        studyId: Long,
+        title: String,
+        location: String,
+        startAt: LocalDateTime,
+        endAt: LocalDateTime
+    ): Result<Unit>
+
+    suspend fun getAttendanceList(
+        studyId: Long,
+        scheduleId: Long
+    ): Result<StudyAttendanceListModel>
+
+    suspend fun getAttendanceQr(studyId: Long, scheduleId: Long): Result<StudyAttendanceQrModel>
+
+    suspend fun startAttendance(studyId: Long, scheduleId: Long): Result<Unit>
+
+    suspend fun finishAttendance(studyId: Long, scheduleId: Long): Result<Unit>
+
+    suspend fun checkAttendance(studyId: Long, scheduleId: Long, token: String): Result<Unit>
 
     suspend fun getStudyPostsList(
         studyId : Long,

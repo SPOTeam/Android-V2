@@ -41,6 +41,7 @@ import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.jjim.navigation.JJim
 import com.umcspot.spot.main.component.MainBottomBar
 import com.umcspot.spot.mypage.cancelMemberShip.navigation.CancelMemberShip
+import com.umcspot.spot.mypage.editInterestRegion.navigation.EditRegion
 import com.umcspot.spot.mypage.editInterestStudy.navigation.EditInterest
 import com.umcspot.spot.mypage.main.navigation.MyPage
 import com.umcspot.spot.mypage.participating.navigation.ParticipatingStudy
@@ -50,6 +51,7 @@ import com.umcspot.spot.mypage.waiting.navigation.WaitingStudy
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.detail.model.StudyDetailTab
+import com.umcspot.spot.study.detail.navigation.StudyAttendance
 import com.umcspot.spot.study.detail.navigation.StudyBoardPost
 import com.umcspot.spot.study.detail.navigation.StudyDetail
 import com.umcspot.spot.study.detail.navigation.StudyMemoirPost
@@ -68,14 +70,22 @@ fun MainScreen(
     val navController = navigator.navController
     val backStackEntry by navController.currentBackStackEntryAsState()
     val dest = backStackEntry?.destination
+
+    val currentStudyId = remember(backStackEntry) {
+        try {
+            backStackEntry?.toRoute<StudyDetail>()?.studyId
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    var isScheduleSheetVisible by remember { mutableStateOf(false) }
+
     var scrollToTop by remember { mutableStateOf<(() -> Unit)?>(null) }
-
     var showBackRequestDialog by remember { mutableStateOf(false) }
-
     var currentStudyDetailTab by rememberSaveable { mutableStateOf(StudyDetailTab.HOME) }
 
     val hasUnreadAlert by mainViewModel.hasUnreadAlert.collectAsStateWithLifecycle()
-
     val isHome = dest?.hasRoute(Home::class) == true
 
     LaunchedEffect(isHome) {
@@ -88,7 +98,8 @@ fun MainScreen(
                 val isFullPage = dest?.hasRoute(RegisterStudy::class) == true ||
                         dest?.hasRoute(StudyDetail::class) == true ||
                         dest?.hasRoute(StudyMemoirPost::class) == true ||
-                        dest?.hasRoute(StudyBoardPost::class) == true
+                        dest?.hasRoute(StudyBoardPost::class) == true ||
+                        dest?.hasRoute(StudyAttendance::class) == true
 
                 if (isFullPage) {
                 } else if (navigator.showBackTopBar()) {
@@ -108,6 +119,7 @@ fun MainScreen(
                         dest?.hasRoute(MyRecruitingStudy::class) == true -> "모집 중인 스터디"
                         dest?.hasRoute(WaitingStudy::class) == true -> "대기 중인 스터디"
                         dest?.hasRoute(EditInterest::class) == true -> "관심 분야"
+                        dest?.hasRoute(EditRegion::class) == true -> "관심 지역"
                         dest?.hasRoute(CancelMemberShip::class) == true -> "회원 탈퇴"
                         dest?.routeMatches(POST_CONTENT_ROUTE) == true -> "스터디 파트너들의 이야기"
                         dest?.routeMatches(STUDY_APPLICATION_ROUTE) == true -> "신청 확인"
@@ -129,8 +141,7 @@ fun MainScreen(
                         hasAlert = hasUnreadAlert,
                         onSearchClick = { /* TODO */ },
                         onAlertClick = { navController.navigateToAlert() },
-                        modifier = Modifier
-                            .statusBarsPadding()
+                        modifier = Modifier.statusBarsPadding()
                     )
                 }
             }
@@ -150,11 +161,9 @@ fun MainScreen(
                         dest?.hasRoute(BoardList::class) == true -> {
                             navigator.navController.navigateToPostingNew()
                         }
-
                         dest?.hasRoute(Home::class) == true -> {
                             navigator.navigateToRegisterStudy()
                         }
-
                         dest?.hasRoute(StudyDetail::class) == true -> {
                             val studyId = backStackEntry?.toRoute<StudyDetail>()?.studyId
                             if (studyId != null) {
@@ -203,16 +212,12 @@ fun MainScreen(
         modalDes = "지금 나가면, 쓰던 글은 저장되지 않아요",
         okButtonText = "네",
         noButtonText = "아니요",
-        onDismiss = {
-            showBackRequestDialog = false
-        },
+        onDismiss = { showBackRequestDialog = false },
         onClick = {
             showBackRequestDialog = false
             navController.popBackStack()
         },
-        onCancel = {
-            showBackRequestDialog = false
-        }
+        onCancel = { showBackRequestDialog = false }
     )
 }
 
@@ -224,20 +229,14 @@ private fun FabStack(
     onClickMultiple: () -> Unit,
     spacing: Dp = 12.dp,
 ) {
-    Box(
-        modifier = Modifier
-    ) {
+    Box(modifier = Modifier) {
         Column(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(spacing),
             modifier = Modifier.align(Alignment.BottomEnd)
         ) {
-            if (showToTop) {
-                FloatingToUpButton(onClick = onClickToTop)
-            }
-            if (showMultiple) {
-                FloatingMultipleButton(onClick = onClickMultiple)
-            }
+            if(showToTop) FloatingToUpButton(onClick = onClickToTop)
+            if(showMultiple) FloatingMultipleButton(onClick = onClickMultiple)
         }
     }
 }

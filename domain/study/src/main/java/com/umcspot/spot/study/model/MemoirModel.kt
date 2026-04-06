@@ -8,7 +8,7 @@ data class MemoirModel(
     val activity: String,
     val learned: String,
     val encouragement: String,
-    val imageUrl: String?,
+    val imageUrls: List<String> = emptyList(),
     val reactionCounts: MemoirReactionCounts,
     val reactions: MemoirReactionStatus,
     val isPrivate: Boolean,

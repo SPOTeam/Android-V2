@@ -25,6 +25,8 @@ import com.umcspot.spot.jjim.navigation.jjimGraph
 import com.umcspot.spot.model.QuickMenuType
 import com.umcspot.spot.mypage.cancelMemberShip.navigation.cancelMemberShipGraph
 import com.umcspot.spot.mypage.cancelMemberShip.navigation.navigateToCancelMembership
+import com.umcspot.spot.mypage.editInterestRegion.navigation.interestRegionGraph
+import com.umcspot.spot.mypage.editInterestRegion.navigation.navigateToEditInterestRegion
 import com.umcspot.spot.mypage.editInterestStudy.navigation.interestStudyGraph
 import com.umcspot.spot.mypage.editInterestStudy.navigation.navigateToEditInterestStudy
 import com.umcspot.spot.mypage.main.navigation.MyPage
@@ -40,6 +42,7 @@ import com.umcspot.spot.mypage.waiting.navigation.waitingStudyGraph
 import com.umcspot.spot.signup.navigation.navigateToLanding
 import com.umcspot.spot.signup.navigation.signupGraph
 import com.umcspot.spot.study.detail.model.StudyDetailTab
+import com.umcspot.spot.study.detail.navigation.StudyAttendance
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.detail.navigation.studyDetailGraph
 import com.umcspot.spot.study.my.navigation.myStudyGraph
@@ -80,6 +83,7 @@ fun MainNavHost(
     ) {
 
         signupGraph(
+            navigateToLanding = { navigator.navigateToLanding(clearStackNavOptions) },
             navigateToSignUp = { navigator.navigateToSignUp() },
             navigateToCheckList = { navigator.navigateToCheckList() },
             navigateToSaving = { navigator.navigateToSaving() },
@@ -130,19 +134,15 @@ fun MainNavHost(
         )
 
 
-        /** MyPage **/
         mypageGraph(
             contentPadding = contentPadding,
             onParticipatingClick = { navigator.navController.navigateToParticipatingStudy() },
             onMyRecruitingClick = { navigator.navController.navigateToMyRecruitingStudy() },
             onMyAppliedClick = { navigator.navController.navigateToWaitingStudy() },
             onEditInterestClick = { navigator.navController.navigateToEditInterestStudy() },
-            onEditInterestLocationClick =  {  },
+            onEditInterestLocationClick = { navigator.navController.navigateToEditInterestRegion() },
             onCancelMemberShipClick = { navigator.navController.navigateToCancelMembership() },
             onLogoutClick = {
-                // 1) 로그아웃 처리(데이터 삭제) 트리거
-
-                // 2) Landing으로 이동하면서 스택 클리어
                 navigator.navController.navigateToLanding(clearStackNavOptions)
             }
         )
@@ -183,6 +183,20 @@ fun MainNavHost(
                     restoreState = false
                 }
             ) },
+            moveToMyPage = { navigator.navController.popBackStack() }
+        )
+
+        interestRegionGraph(
+            contentPadding = contentPadding,
+            moveToMyInterestStudy = {
+                navigator.navigateToPreferLocationStudy(
+                    navOptions {
+                        popUpTo<MyPage> { inclusive = false }
+                        launchSingleTop = true
+                        restoreState = false
+                    }
+                )
+            },
             moveToMyPage = { navigator.navController.popBackStack() }
         )
 
@@ -292,11 +306,17 @@ fun MainNavHost(
             onMemoirPostBackClick = {
                 navigator.popBackStack()
             },
-            onBoardPostBackClick = {
+            onAttendanceBackClick = {
                 navigator.popBackStack()
             },
+            onAttendanceClick = { studyId, scheduleId ->
+                navigator.navController.navigate(StudyAttendance(studyId, scheduleId))
+            },
+            onBoardPostBackClick = {
+                navigator.popBackStack()
+            },Z
             onTabChanged = onStudyTabChanged,
-            currentTab = currentStudyDetailTab,
+            currentTab = currentStudyDetailTab
         )
     }
 }

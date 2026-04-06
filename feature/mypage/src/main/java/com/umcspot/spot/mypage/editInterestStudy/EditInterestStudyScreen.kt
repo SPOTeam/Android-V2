@@ -139,7 +139,7 @@ fun EditInterestStudyScreen(
 
         AcceptDialog(
             visible = showDialog,
-            modalTitle = "",
+            modalTitle = "수정 완료",
             modalDes = "수정이 완료되었어요.\n새로운 관심 분야에 맞는 스터디를 확인해보세요.",
             okButtonText = "내 관심 스터디 보기",
             noButtonText = null,

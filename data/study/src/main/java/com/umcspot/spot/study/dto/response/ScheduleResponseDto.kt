@@ -9,5 +9,12 @@ data class ScheduleResponseDto(
     @SerialName("title") val title: String,
     @SerialName("startAt") val startAt: String,
     @SerialName("endAt") val endAt: String,
-    @SerialName("isNow") val isNow: Boolean
+    @SerialName("isNow") val isNow: Boolean,
+    @SerialName("isMine") val isMine: Boolean,
+    @SerialName("isAttendanceStartable") val isAttendanceStartable: Boolean
+)
+
+@Serializable
+data class ScheduleCreateResponseDto(
+    @SerialName("scheduleId") val scheduleId: Long,
 )

@@ -9,3 +9,7 @@ annotation class SpotApi
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class WeatherApi
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class SpotRefreshApi

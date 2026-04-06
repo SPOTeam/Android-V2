@@ -16,17 +16,17 @@ data class MemoirDto(
     @SerialName("reviewId") val memoirId: Long,
     @SerialName("writer") val writer: MemoirWriterDto,
     @SerialName("content") val content: MemoirContentDto,
-    @SerialName("reactionCounts") val reactionCounts: MemoirReactionCountsDto, 
-    @SerialName("reactions") val reactions: MemoirReactionStatusDto,           
+    @SerialName("reactionCounts") val reactionCounts: MemoirReactionCountsDto,
+    @SerialName("reactions") val reactions: MemoirReactionStatusDto,
     @SerialName("isPrivate") val isPrivate: Boolean,
-    @SerialName("createdAt") val createdAt: String                             
+    @SerialName("createdAt") val createdAt: String
 )
 
 @Serializable
 data class MemoirWriterDto(
     @SerialName("memberId") val memberId: Long,
     @SerialName("nickname") val nickname: String,
-    @SerialName("profileImageUrl") val profileImageUrl: String?
+    @SerialName("profileImageUrl") val profileImageUrl: String? = null
 )
 
 @Serializable
@@ -34,7 +34,7 @@ data class MemoirContentDto(
     @SerialName("activity") val activity: String,
     @SerialName("learned") val learned: String,
     @SerialName("encouragement") val encouragement: String,
-    @SerialName("imageUrl") val imageUrl: String?
+    @SerialName("imageUrls") val imageUrls: List<String> = emptyList()
 )
 
 @Serializable

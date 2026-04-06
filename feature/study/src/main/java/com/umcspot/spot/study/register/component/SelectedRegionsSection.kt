@@ -1,6 +1,5 @@
 package com.umcspot.spot.study.register.component
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -10,9 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -22,7 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.umcspot.spot.common.location.LocationRow
 import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.theme.B500
+import com.umcspot.spot.designsystem.component.location.RegionItem
 import com.umcspot.spot.designsystem.theme.Black
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
@@ -43,6 +40,7 @@ fun SelectedRegionsSection(
         selectedRegions.forEach { region ->
             RegionItem(
                 regionName = region.fullName,
+                isReadOnly = false,
                 onRemoveClick = { onRemoveClick(region) }
             )
         }
@@ -53,47 +51,7 @@ fun SelectedRegionsSection(
     }
 }
 
-@Composable
-private fun RegionItem(
-    regionName: String,
-    onRemoveClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = SpotTheme.colors.B500,
-                shape = RoundedCornerShape(10.dp)
-            )
-            .padding(horizontal = screenHeightDp(10.dp)),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_location),
-                contentDescription = "지역",
-                tint = SpotTheme.colors.B500,
-                modifier = Modifier.size(screenWidthDp(18.dp))
-            )
-            Spacer(modifier = Modifier.size(screenWidthDp(8.dp)))
-            Text(
-                text = regionName,
-                style = SpotTheme.typography.h5,
-                color = SpotTheme.colors.B500
-            )
-        }
-        IconButton(onClick = onRemoveClick) {
-            Icon(
-                painter = painterResource(id = R.drawable.dismiss),
-                contentDescription = "삭제",
-                tint = SpotTheme.colors.B500,
-                modifier = Modifier.size(screenWidthDp(18.dp))
-            )
-        }
-    }
-}
+
 
 @Composable
 private fun AddRegionButton(

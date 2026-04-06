@@ -23,6 +23,7 @@ import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.JJim
 import com.umcspot.spot.jjim.navigation.navigateToJJim
 import com.umcspot.spot.mypage.cancelMemberShip.navigation.CancelMemberShip
+import com.umcspot.spot.mypage.editInterestRegion.navigation.EditRegion
 import com.umcspot.spot.mypage.editInterestStudy.navigation.EditInterest
 import com.umcspot.spot.mypage.main.navigation.MyPage
 import com.umcspot.spot.mypage.main.navigation.navigateToMyPage
@@ -34,7 +35,9 @@ import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.Landing
 import com.umcspot.spot.signup.navigation.Saving
 import com.umcspot.spot.signup.navigation.SignUp
+import com.umcspot.spot.signup.navigation.Splash
 import com.umcspot.spot.signup.navigation.navigateToCheckList
+import com.umcspot.spot.signup.navigation.navigateToLanding
 import com.umcspot.spot.signup.navigation.navigateToSaving
 import com.umcspot.spot.signup.navigation.navigateToSignUp
 import com.umcspot.spot.study.detail.navigation.StudyDetail
@@ -64,7 +67,7 @@ class MainNavigator(
             navController
                 .currentBackStackEntryAsState().value?.destination
 
-    val startDestination = Landing
+    val startDestination = Splash
 
     val currentTab: MainNavTab?
         @Composable get() =
@@ -106,7 +109,7 @@ class MainNavigator(
     }
 
     @Composable
-    fun isInLanding(): Boolean = inAnyGraph(Landing::class, Saving::class)
+    fun isInLanding(): Boolean = inAnyGraph(Splash::class, Landing::class, Saving::class)
 
     @Composable
     fun showBackTopBar(): Boolean = inAnyGraph(
@@ -124,6 +127,7 @@ class MainNavigator(
         MyRecruitingStudy::class,
         WaitingStudy::class,
         EditInterest::class,
+        EditRegion::class,
         CancelMemberShip::class,
         MyStudy::class
     ) || inAnyGraphRoutes(POST_CONTENT_ROUTE) || inAnyGraphRoutes(STUDY_APPLICATION_ROUTE)
@@ -169,6 +173,9 @@ class MainNavigator(
         navController.popBackStack()
     }
 
+    fun navigateToLanding(navOptions: NavOptions? = null) {
+        navController.navigateToLanding(navOptions)
+    }
     fun navigateToSignUp(navOptions: NavOptions? = null) {
         navController.navigateToSignUp(navOptions)
     }
