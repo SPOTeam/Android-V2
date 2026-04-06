@@ -41,6 +41,7 @@ import com.umcspot.spot.mypage.waiting.navigation.WaitingStudy
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.detail.model.StudyDetailTab
+import com.umcspot.spot.study.detail.navigation.StudyAttendance
 import com.umcspot.spot.study.detail.navigation.StudyDetail
 import com.umcspot.spot.study.detail.navigation.StudyMemoirPost
 import com.umcspot.spot.study.my.navigation.MyStudy
@@ -85,7 +86,8 @@ fun MainScreen(
             if (!navigator.isInLanding()) {
                 val isFullPage = dest?.hasRoute(RegisterStudy::class) == true ||
                         dest?.hasRoute(StudyDetail::class) == true ||
-                        dest?.hasRoute(StudyMemoirPost::class) == true
+                        dest?.hasRoute(StudyMemoirPost::class) == true ||
+                        dest?.hasRoute(StudyAttendance::class) == true
 
                 if (isFullPage) {
                 } else if (navigator.showBackTopBar()) {

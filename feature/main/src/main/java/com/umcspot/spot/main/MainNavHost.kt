@@ -41,6 +41,7 @@ import com.umcspot.spot.mypage.waiting.navigation.waitingStudyGraph
 import com.umcspot.spot.signup.navigation.navigateToLanding
 import com.umcspot.spot.signup.navigation.signupGraph
 import com.umcspot.spot.study.detail.model.StudyDetailTab
+import com.umcspot.spot.study.detail.navigation.StudyAttendance
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.detail.navigation.studyDetailGraph
 import com.umcspot.spot.study.my.navigation.myStudyGraph
@@ -303,6 +304,12 @@ fun MainNavHost(
             },
             onMemoirPostBackClick = {
                 navigator.popBackStack()
+            },
+            onAttendanceBackClick = {
+                navigator.popBackStack()
+            },
+            onAttendanceClick = { studyId, scheduleId ->
+                navigator.navController.navigate(StudyAttendance(studyId, scheduleId))
             },
             onTabChanged = onStudyTabChanged,
             currentTab = currentStudyDetailTab,
