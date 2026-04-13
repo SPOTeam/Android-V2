@@ -1,12 +1,13 @@
-package com.umcspot.spot.mypage.main
+package com.umcspot.spot.mypage
 
 import android.app.Application
+import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.umcspot.spot.ui.state.UiState
 import com.umcspot.spot.token.repository.TokenRepository
+import com.umcspot.spot.ui.state.UiState
 import com.umcspot.spot.user.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +41,6 @@ class MyPageViewModel @Inject constructor(
                 }
                 .onFailure { e ->
                     Log.e("HomeViewModel", "loadMyPageInfo error", e)
-//                    _uiState.update { it.copy(weatherInfo = UiState.Failure(e.message ?: "날씨 불러오기 실패")) }
                 }
         }
     }
@@ -60,7 +60,6 @@ class MyPageViewModel @Inject constructor(
                 }
                 .onFailure { e ->
                     Log.e("HomeViewModel", "loadPreferredRegion error", e)
-//                    _uiState.update { it.copy(popularPostInfo = UiState.Failure(e.message ?: "인기 정보 실패")) }
                 }
         }
 
@@ -72,7 +71,6 @@ class MyPageViewModel @Inject constructor(
                 }
                 .onFailure { e ->
                     Log.e("HomeViewModel", "loadPreferCategories error", e)
-//                    _uiState.update { it.copy(recommendStudies = UiState.Failure(e.message ?: "추천 스터디 실패")) }
                 }
         }
     }
@@ -88,7 +86,7 @@ class MyPageViewModel @Inject constructor(
             val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 pm.getPackageInfo(
                     pkgName,
-                    android.content.pm.PackageManager.PackageInfoFlags.of(0)
+                    PackageManager.PackageInfoFlags.of(0)
                 )
             } else {
                 @Suppress("DEPRECATION")
@@ -107,4 +105,3 @@ class MyPageViewModel @Inject constructor(
 
     suspend fun logout() = tokenRepository.spotLogout()
 }
-

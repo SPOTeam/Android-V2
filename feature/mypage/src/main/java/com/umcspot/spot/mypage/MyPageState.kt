@@ -1,4 +1,4 @@
-package com.umcspot.spot.mypage.main
+package com.umcspot.spot.mypage
 
 import com.umcspot.spot.ui.state.UiState
 import com.umcspot.spot.user.model.MyPageResult
