@@ -1,4 +1,3 @@
-// HomeViewModel.kt (핵심만)
 package com.umcspot.spot.home
 
 import android.annotation.SuppressLint
@@ -22,14 +21,13 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
     private val boardRepository: BoardRepository,
-    private val studyRepository : StudyRepository
+    private val studyRepository: StudyRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeState())
     val uiState: StateFlow<HomeState> = _uiState
 
     companion object {
-        // 서울시청 fallback 좌표 : 서울 시청
         private const val FALLBACK_LONGITUDE = 126.9780
         private const val FALLBACK_LATITUDE = 37.5668
     }
@@ -40,7 +38,6 @@ class HomeViewModel @Inject constructor(
             .addOnSuccessListener { loc ->
                 val latitude = loc?.latitude ?: FALLBACK_LATITUDE
                 val longitude = loc?.longitude ?: FALLBACK_LONGITUDE
-
                 load(latitude, longitude)
             }
             .addOnFailureListener { e ->
@@ -49,14 +46,13 @@ class HomeViewModel @Inject constructor(
             }
     }
 
-    fun load(latitude : Double = FALLBACK_LATITUDE, longitude : Double = FALLBACK_LONGITUDE) {
+    fun load(latitude: Double = FALLBACK_LATITUDE, longitude: Double = FALLBACK_LONGITUDE) {
         loadWeather(latitude, longitude)
         loadPosts()
     }
 
-    fun loadWeather(latitude : Double, longitude : Double) {
+    private fun loadWeather(latitude: Double, longitude: Double) {
         _uiState.update { it.copy(weatherInfo = UiState.Loading) }
-
         viewModelScope.launch {
             weatherRepository.getWeather(latitude, longitude)
                 .onSuccess { weather ->
@@ -64,12 +60,11 @@ class HomeViewModel @Inject constructor(
                 }
                 .onFailure { e ->
                     Log.e("HomeViewModel", "loadWeather error", e)
-//                    _uiState.update { it.copy(weatherInfo = UiState.Failure(e.message ?: "날씨 불러오기 실패")) }
                 }
         }
     }
 
-    fun loadPosts() {
+    private fun loadPosts() {
         _uiState.update {
             it.copy(
                 popularPostInfo = UiState.Loading,
@@ -78,7 +73,6 @@ class HomeViewModel @Inject constructor(
             )
         }
 
-        // 실시간 인기글
         viewModelScope.launch {
             boardRepository.getBestSinglePost()
                 .onSuccess { info ->
@@ -86,11 +80,9 @@ class HomeViewModel @Inject constructor(
                 }
                 .onFailure { e ->
                     Log.e("HomeViewModel", "loadBestSinglePost error", e)
-//                    _uiState.update { it.copy(popularPostInfo = UiState.Failure(e.message ?: "인기 정보 실패")) }
                 }
         }
 
-        // 지금 가장 인기있는 스터디
         viewModelScope.launch {
             studyRepository.getRecruitingStudies(
                 feeCategory = null,
@@ -102,12 +94,10 @@ class HomeViewModel @Inject constructor(
             ).onSuccess { list ->
                 _uiState.update { it.copy(popularStudies = UiState.Success(list)) }
             }.onFailure { e ->
-                Log.e("HomeViewModel", "loadRecruitingStudies  error", e)
-//              _uiState.update { it.copy(popularStudies = UiState.Failure(e.message ?: "인기 스터디 실패")) }
+                Log.e("HomeViewModel", "loadRecruitingStudies error", e)
             }
         }
 
-        // 전공/진로학습 스터디 이건 어때요
         viewModelScope.launch {
             studyRepository.getRecommendedStudies()
                 .onSuccess { list ->
@@ -115,15 +105,12 @@ class HomeViewModel @Inject constructor(
                 }
                 .onFailure { e ->
                     Log.e("HomeViewModel", "loadRecommendedStudies error", e)
-
-//                    _uiState.update { it.copy(recommendStudies = UiState.Failure(e.message ?: "추천 스터디 실패")) }
                 }
         }
     }
 
     fun reLoadRecommendedStudies() {
         _uiState.update { it.copy(recommendStudies = UiState.Loading) }
-
         viewModelScope.launch {
             studyRepository.getRecommendedStudies()
                 .onSuccess { list ->
@@ -131,9 +118,7 @@ class HomeViewModel @Inject constructor(
                 }
                 .onFailure { e ->
                     Log.e("HomeViewModel", "reLoadRecommendedStudies error", e)
-                    // _uiState.update { it.copy(recommendStudies = UiState.Failure(e.message ?: "추천 스터디 실패")) }
                 }
         }
     }
 }
-
