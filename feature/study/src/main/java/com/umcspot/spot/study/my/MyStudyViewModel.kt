@@ -20,7 +20,8 @@ class MyStudyViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(MyStudyState())
     val uiState = _uiState.asStateFlow()
 
-    init {
+    fun refresh() {
+        _uiState.update { MyStudyState() }
         loadMoreStudies()
     }
 
@@ -43,11 +44,13 @@ class MyStudyViewModel @Inject constructor(
                     }
                 }
                 .onFailure { t ->
-                    _uiState.update { it.copy(
-                        isLoading = false,
-                        isError = true,
-                        errorMessage = t.message
-                    ) }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isError = true,
+                            errorMessage = t.message
+                        )
+                    }
                 }
         }
     }
