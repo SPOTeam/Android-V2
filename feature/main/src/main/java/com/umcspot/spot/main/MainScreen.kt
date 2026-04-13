@@ -55,6 +55,7 @@ import com.umcspot.spot.study.detail.navigation.StudyAttendance
 import com.umcspot.spot.study.detail.navigation.StudyBoardPost
 import com.umcspot.spot.study.detail.navigation.StudyDetail
 import com.umcspot.spot.study.detail.navigation.StudyMemoirPost
+import com.umcspot.spot.study.detail.navigation.StudyPostContent
 import com.umcspot.spot.study.my.navigation.MyStudy
 import com.umcspot.spot.study.preferCategory.navigation.PreferCategoryFilter
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocationFilter
@@ -122,6 +123,7 @@ fun MainScreen(
                         dest?.hasRoute(EditRegion::class) == true -> "관심 지역"
                         dest?.hasRoute(CancelMemberShip::class) == true -> "회원 탈퇴"
                         dest?.routeMatches(POST_CONTENT_ROUTE) == true -> "스터디 파트너들의 이야기"
+                        dest?.hasRoute(StudyPostContent::class) == true -> "스터디 파트너들의 이야기"
                         dest?.routeMatches(STUDY_APPLICATION_ROUTE) == true -> "신청 확인"
                         else -> ""
                     }

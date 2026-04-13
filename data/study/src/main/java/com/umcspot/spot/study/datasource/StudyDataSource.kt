@@ -9,11 +9,13 @@ import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.study.dto.request.ScheduleCreateRequestDto
 import com.umcspot.spot.study.dto.request.BoardCreateRequestDto
+import com.umcspot.spot.study.dto.request.StudyPostCommentRequestDto
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.response.BoardCreateResponseDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.MemoirCreateResponseDto
 import com.umcspot.spot.study.dto.response.ScheduleCreateResponseDto
+import com.umcspot.spot.study.dto.response.SendStudyPostCommentResponseDto
 import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
@@ -172,6 +174,12 @@ interface StudyDataSource {
         studyId: Long,
         postId: Long
     ) : NullResultResponse
+
+    suspend fun createStudyPostComment(
+        studyId: Long,
+        postId: Long,
+        request: StudyPostCommentRequestDto
+    ): BaseResponse<SendStudyPostCommentResponseDto>
 
     suspend fun createSchedule(
         studyId: Long,

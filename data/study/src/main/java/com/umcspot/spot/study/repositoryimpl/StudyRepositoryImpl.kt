@@ -9,6 +9,7 @@ import com.umcspot.spot.study.datasource.StudyDataSource
 import com.umcspot.spot.study.mapper.toData
 import com.umcspot.spot.study.mapper.toDetailModel
 import com.umcspot.spot.study.mapper.toDomain
+import com.umcspot.spot.study.dto.request.StudyPostCommentRequestDto
 import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.MemoirModel
 import com.umcspot.spot.study.mapper.toDomainList
@@ -498,7 +499,11 @@ class StudyRepositoryImpl @Inject constructor(
         postId: Long
     ): Result<Unit> =
         runCatching {
-            studyDataSource.studyPostPin(studyId, postId)
+            val response = studyDataSource.studyPostPin(studyId, postId)
+            if (!response.isSuccess) {
+                throw Exception(response.message.ifBlank { "게시글 고정에 실패했습니다." })
+            }
+            Unit
         }
 
 
@@ -507,7 +512,11 @@ class StudyRepositoryImpl @Inject constructor(
         postId: Long
     ): Result<Unit> =
         runCatching {
-            studyDataSource.studyPostUnPin(studyId, postId)
+            val response = studyDataSource.studyPostUnPin(studyId, postId)
+            if (!response.isSuccess) {
+                throw Exception(response.message.ifBlank { "게시글 고정 해제에 실패했습니다." })
+            }
+            Unit
         }
 
 
@@ -516,7 +525,11 @@ class StudyRepositoryImpl @Inject constructor(
         postId: Long
     ): Result<Unit> =
         runCatching {
-            studyDataSource.studyPostLike(studyId, postId)
+            val response = studyDataSource.studyPostLike(studyId, postId)
+            if (!response.isSuccess) {
+                throw Exception(response.message.ifBlank { "게시글 좋아요에 실패했습니다." })
+            }
+            Unit
         }
 
 
@@ -525,6 +538,29 @@ class StudyRepositoryImpl @Inject constructor(
         postId: Long
     ): Result<Unit> =
         runCatching {
-            studyDataSource.studyPostUnLike(studyId, postId)
+            val response = studyDataSource.studyPostUnLike(studyId, postId)
+            if (!response.isSuccess) {
+                throw Exception(response.message.ifBlank { "게시글 좋아요 취소에 실패했습니다." })
+            }
+            Unit
+        }
+
+    override suspend fun createStudyPostComment(
+        studyId: Long,
+        postId: Long,
+        content: String
+    ): Result<Unit> =
+        runCatching {
+            val response = studyDataSource.createStudyPostComment(
+                studyId = studyId,
+                postId = postId,
+                request = StudyPostCommentRequestDto(content = content)
+            )
+            if (!response.isSuccess) {
+                throw Exception(response.message.ifBlank { "댓글 작성에 실패했습니다." })
+            }
+            Unit
+        }.onFailure {
+            Log.e("StudyRepository", "createStudyPostComment failed", it)
         }
 }

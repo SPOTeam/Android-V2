@@ -2,6 +2,7 @@ package com.umcspot.spot.study.detail.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -39,6 +40,7 @@ import com.umcspot.spot.ui.extension.screenWidthDp
 fun StudyDetailBoardScreen(
     posts: List<StudyPostResult>,
     isLoading: Boolean,
+    canPin: Boolean,
     onPostClick: (Long) -> Unit = {},
     onLikeClick: (Long, Boolean) -> Unit = { _, _ -> },
     onPinToggle: (Long, Boolean) -> Unit = { _, _ -> }
@@ -52,12 +54,25 @@ fun StudyDetailBoardScreen(
 
         posts.isEmpty() -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(
-                    text = "게시글이 없습니다.",
-                    style = SpotTheme.typography.medium_400,
-                    color = SpotTheme.colors.gray400,
-                    modifier = Modifier.padding(vertical = screenHeightDp(20.dp))
-                )
+                Spacer(modifier = Modifier.height(screenHeightDp(300.dp)))
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.document),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(SpotTheme.colors.gray400),
+                        modifier = Modifier.size(screenWidthDp(33.dp))
+                    )
+                    Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
+                    Text(
+                        text = "아직 올라온 글이 없어요!",
+                        style = SpotTheme.typography.medium_400,
+                        color = SpotTheme.colors.gray400
+                    )
+                }
             }
         }
 
@@ -65,13 +80,12 @@ fun StudyDetailBoardScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = screenHeightDp(12.dp))
             ) {
                 posts.forEach { post ->
                     key(post.postId, post.isPinned) {
                         val dismissState = rememberSwipeToDismissBoxState(
                             confirmValueChange = { value ->
-                                if (value == SwipeToDismissBoxValue.EndToStart) {
+                                if (canPin && value == SwipeToDismissBoxValue.EndToStart) {
                                     onPinToggle(post.postId, post.isPinned)
                                 }
                                 false
@@ -81,24 +95,27 @@ fun StudyDetailBoardScreen(
                         SwipeToDismissBox(
                             state = dismissState,
                             enableDismissFromStartToEnd = false,
+                            enableDismissFromEndToStart = canPin,
                             backgroundContent = {
-                                Box(
-                                    modifier = Modifier
-                                        .padding(screenWidthDp(1.dp))
-                                        .fillMaxSize()
-                                        .clip(SpotShapes.Soft)
-                                        .background(SpotTheme.colors.B400)
-                                        .padding(horizontal = screenWidthDp(20.dp)),
-                                    contentAlignment = Alignment.CenterEnd
-                                ) {
-                                    Image(
-                                        painter = painterResource(
-                                            if (post.isPinned) R.drawable.ic_unpin else R.drawable.ic_pin
-                                        ),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(screenWidthDp(14.dp)),
-                                        colorFilter = ColorFilter.tint(SpotTheme.colors.white)
-                                    )
+                                if (canPin) {
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(screenWidthDp(1.dp))
+                                            .fillMaxSize()
+                                            .clip(SpotShapes.Soft)
+                                            .background(SpotTheme.colors.B400)
+                                            .padding(horizontal = screenWidthDp(20.dp)),
+                                        contentAlignment = Alignment.CenterEnd
+                                    ) {
+                                        Image(
+                                            painter = painterResource(
+                                                if (post.isPinned) R.drawable.ic_unpin else R.drawable.ic_pin
+                                            ),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(screenWidthDp(14.dp)),
+                                            colorFilter = ColorFilter.tint(SpotTheme.colors.white)
+                                        )
+                                    }
                                 }
                             },
                             content = {

@@ -8,6 +8,7 @@ data class StudyPostDetailResult(
     val title: String,
     val content: String,
     val isPinned : Boolean,
+    val isOwner : Boolean,
     val isLiked : Boolean,
 
     val writerMemberId : Long,

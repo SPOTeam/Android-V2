@@ -43,6 +43,7 @@ import com.umcspot.spot.signup.navigation.navigateToLanding
 import com.umcspot.spot.signup.navigation.signupGraph
 import com.umcspot.spot.study.detail.model.StudyDetailTab
 import com.umcspot.spot.study.detail.navigation.StudyAttendance
+import com.umcspot.spot.study.detail.navigation.StudyPostContent
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.detail.navigation.studyDetailGraph
 import com.umcspot.spot.study.my.navigation.myStudyGraph
@@ -312,7 +313,13 @@ fun MainNavHost(
             onAttendanceClick = { studyId, scheduleId ->
                 navigator.navController.navigate(StudyAttendance(studyId, scheduleId))
             },
+            onBoardPostClick = { studyId, postId ->
+                navigator.navController.navigate(StudyPostContent(studyId, postId))
+            },
             onBoardPostBackClick = {
+                navigator.popBackStack()
+            },
+            onPostContentBackClick = {
                 navigator.popBackStack()
             },
             onTabChanged = onStudyTabChanged,

@@ -4,14 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umcspot.spot.study.detail.model.StudyDetailSideEffect
 import com.umcspot.spot.study.detail.model.StudyDetailState
+import com.umcspot.spot.study.detail.model.StudyPostEditorState
 import com.umcspot.spot.study.model.BoardCreateModel
 import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.StudyAttendanceListModel
+import com.umcspot.spot.study.model.StudyPostDetailResult
 import com.umcspot.spot.study.model.StudyScheduleModel
 import com.umcspot.spot.study.model.TodoModel
 import com.umcspot.spot.study.model.ViewerStatus
 import com.umcspot.spot.study.repository.StudyRepository
 import com.umcspot.spot.token.repository.TokenRepository
+import com.umcspot.spot.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.async
@@ -43,6 +46,9 @@ class StudyDetailViewModel @Inject constructor(
     val sideEffect: SharedFlow<StudyDetailSideEffect> = _sideEffect.asSharedFlow()
 
     private var currentUserId: String = ""
+    private var currentDetailStudyId: Long? = null
+    private var currentDetailPostId: Long? = null
+    private val inFlightDetailLikes = mutableSetOf<Long>()
 
     init {
         loadMyUserId()
@@ -63,18 +69,9 @@ class StudyDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val currentPostCursor = uiState.value.postState.nextCursor
-
             val detailDeferred = async { studyRepository.getStudyDetail(studyId) }
             val membersDeferred = async { studyRepository.getStudyMembers(studyId) }
             val schedulesDeferred = async { studyRepository.getUpcomingSchedules(studyId) }
-            val postsDeferred = async {
-                studyRepository.getStudyPostsList(
-                    studyId = studyId,
-                    cursor = currentPostCursor,
-                    size = 20
-                )
-            }
             val memoirsDeferred = async { studyRepository.getStudyRecentMemoirs(studyId) }
 
             detailDeferred.await().onSuccess { model ->
@@ -105,20 +102,6 @@ class StudyDetailViewModel @Inject constructor(
 
             schedulesDeferred.await().onSuccess { schedules ->
                 _uiState.update { it.copy(homeState = it.homeState.copy(schedules = schedules.toPersistentList())) }
-            }.onFailure { emitError(it) }
-
-            postsDeferred.await().onSuccess { posts ->
-                _uiState.update { state ->
-                    val currentList =
-                        if (currentPostCursor == null) emptyList() else state.postState.studyPosts
-                    state.copy(
-                        postState = state.postState.copy(
-                            studyPosts = (currentList + posts.studyPostsList).toPersistentList(),
-                            hasNext = posts.hasNext,
-                            nextCursor = posts.nextCursor
-                        )
-                    )
-                }
             }.onFailure { emitError(it) }
 
             memoirsDeferred.await().onSuccess { memoirs ->
@@ -498,8 +481,22 @@ class StudyDetailViewModel @Inject constructor(
         content: String,
         isPrivate: Boolean,
     ) {
+        _uiState.update {
+            it.copy(
+                postEditorState = it.postEditorState.copy(
+                    title = title,
+                    content = content,
+                    isPrivate = isPrivate
+                )
+            )
+        }
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    postEditorState = it.postEditorState.copy(isSubmitting = true)
+                )
+            }
 
             val boardModel = BoardCreateModel(
                 title = title,
@@ -509,15 +506,92 @@ class StudyDetailViewModel @Inject constructor(
 
             studyRepository.postBoard(studyId, boardModel)
                 .onSuccess {
+                    _uiState.update { state ->
+                        state.copy(postEditorState = StudyPostEditorState())
+                    }
                     _sideEffect.emit(StudyDetailSideEffect.BoardPostSuccess)
                     fetchStudyHomeDetail(studyId)
                 }
                 .onFailure { emitError(it) }
 
-            _uiState.update { it.copy(isLoading = false) }
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    postEditorState = it.postEditorState.copy(isSubmitting = false)
+                )
+            }
         }
     }
 
+    fun fetchStudyBoardPosts(studyId: Long, refresh: Boolean = false) {
+        viewModelScope.launch {
+            val currentState = _uiState.value.postState
+            val cursor = if (refresh) null else currentState.nextCursor
+
+            if (!refresh && !currentState.hasNext && currentState.studyPosts.isNotEmpty()) return@launch
+
+            _uiState.update { it.copy(isLoading = true) }
+
+            studyRepository.getStudyPostsList(
+                studyId = studyId,
+                cursor = cursor,
+                size = 20
+            ).onSuccess { posts ->
+                _uiState.update { state ->
+                    val baseList = if (refresh || cursor == null) emptyList() else state.postState.studyPosts
+                    state.copy(
+                        postState = state.postState.copy(
+                            studyPosts = (baseList + posts.studyPostsList).toPersistentList(),
+                            hasNext = posts.hasNext,
+                            nextCursor = posts.nextCursor
+                        ),
+                        isLoading = false
+                    )
+                }
+            }.onFailure {
+                _uiState.update { state -> state.copy(isLoading = false) }
+                emitError(it)
+            }
+        }
+    }
+
+    fun updatePostTitle(title: String) {
+        _uiState.update {
+            it.copy(postEditorState = it.postEditorState.copy(title = title))
+        }
+    }
+
+    fun updatePostContent(content: String) {
+        _uiState.update {
+            it.copy(postEditorState = it.postEditorState.copy(content = content))
+        }
+    }
+
+    fun togglePostPrivate() {
+        _uiState.update {
+            it.copy(postEditorState = it.postEditorState.copy(isPrivate = !it.postEditorState.isPrivate))
+        }
+    }
+
+    fun resetPostEditor() {
+        _uiState.update {
+            it.copy(postEditorState = StudyPostEditorState())
+        }
+    }
+
+    fun submitPostFromEditor(studyId: Long) {
+        val editor = _uiState.value.postEditorState
+        val title = editor.title.trim()
+        val content = editor.content.trim()
+        if (title.isBlank() || content.isBlank() || editor.isSubmitting) return
+
+        postBoard(
+            studyId = studyId,
+            title = title,
+            content = content,
+            isPrivate = editor.isPrivate
+        )
+    }
 
     fun toggleMemoirReaction(
         studyId: Long,
@@ -633,6 +707,128 @@ class StudyDetailViewModel @Inject constructor(
         }
     }
 
+    fun fetchStudyPostDetail(studyId: Long, postId: Long) {
+        currentDetailStudyId = studyId
+        currentDetailPostId = postId
+        _uiState.update { it.copy(postDetailState = UiState.Loading) }
+
+        viewModelScope.launch {
+            studyRepository.getStudyPostDetail(studyId, postId)
+                .onSuccess { detail ->
+                    _uiState.update { it.copy(postDetailState = UiState.Success(detail)) }
+                }
+                .onFailure { t ->
+                    _uiState.update {
+                        it.copy(postDetailState = UiState.Failure(t.message ?: "게시글을 불러오지 못했습니다."))
+                    }
+                    emitError(t)
+                }
+        }
+    }
+
+    fun clearStudyPostDetail() {
+        currentDetailStudyId = null
+        currentDetailPostId = null
+        _uiState.update { it.copy(postDetailState = UiState.Empty) }
+    }
+
+    fun toggleStudyPostDetailLike() {
+        val currentDetail = (_uiState.value.postDetailState as? UiState.Success)?.data ?: return
+        val studyId = currentDetailStudyId ?: return
+        val postId = currentDetailPostId ?: currentDetail.postId
+
+        if (!inFlightDetailLikes.add(postId)) return
+
+        val wasLiked = currentDetail.isLiked
+        val nowLiked = !wasLiked
+        val delta = if (nowLiked) 1 else -1
+
+        applyDetailLikeLocal(isLiked = nowLiked, delta = delta)
+        syncPostListLikeState(postId = postId, isLiked = nowLiked, delta = delta)
+
+        viewModelScope.launch {
+            try {
+                val result = if (nowLiked) {
+                    studyRepository.studyPostLike(studyId, postId)
+                } else {
+                    studyRepository.studyPostUnLike(studyId, postId)
+                }
+
+                result.onFailure {
+                    applyDetailLikeLocal(isLiked = wasLiked, delta = -delta)
+                    syncPostListLikeState(postId = postId, isLiked = wasLiked, delta = -delta)
+                    emitError(it)
+                }
+            } finally {
+                inFlightDetailLikes.remove(postId)
+            }
+        }
+    }
+
+    fun sendStudyPostComment(studyId: Long, postId: Long, content: String) {
+        val trimmed = content.trim()
+        if (trimmed.isBlank()) return
+        val viewerStatus = _uiState.value.homeState.viewerStatus
+        val isDefinitelyNonMember =
+            viewerStatus == ViewerStatus.NOT_APPLIED || viewerStatus == ViewerStatus.APPLIED
+        if (isDefinitelyNonMember) return
+
+        viewModelScope.launch {
+            studyRepository.createStudyPostComment(
+                studyId = studyId,
+                postId = postId,
+                content = trimmed
+            ).onSuccess {
+                fetchStudyPostDetail(studyId, postId)
+                syncPostListCommentCount(postId, 1)
+            }.onFailure { emitError(it) }
+        }
+    }
+
+    private fun applyDetailLikeLocal(isLiked: Boolean, delta: Int) {
+        _uiState.update { state ->
+            val successState = state.postDetailState as? UiState.Success ?: return@update state
+            val updatedDetail: StudyPostDetailResult = successState.data.copy(
+                isLiked = isLiked,
+                likeCount = (successState.data.likeCount + delta).coerceAtLeast(0)
+            )
+            state.copy(postDetailState = UiState.Success(updatedDetail))
+        }
+    }
+
+    private fun syncPostListLikeState(postId: Long, isLiked: Boolean, delta: Int) {
+        _uiState.update { state ->
+            val updatedPosts = state.postState.studyPosts
+                .map { post ->
+                    if (post.postId == postId) {
+                        post.copy(
+                            isLiked = isLiked,
+                            likeCount = (post.likeCount + delta).coerceAtLeast(0)
+                        )
+                    } else {
+                        post
+                    }
+                }
+                .toPersistentList()
+
+            state.copy(postState = state.postState.copy(studyPosts = updatedPosts))
+        }
+    }
+
+    private fun syncPostListCommentCount(postId: Long, delta: Int) {
+        _uiState.update { state ->
+            val updatedPosts = state.postState.studyPosts
+                .map { post ->
+                    if (post.postId == postId) {
+                        post.copy(commentCount = (post.commentCount + delta).coerceAtLeast(0))
+                    } else {
+                        post
+                    }
+                }
+                .toPersistentList()
+            state.copy(postState = state.postState.copy(studyPosts = updatedPosts))
+        }
+    }
     private suspend fun emitError(t: Throwable) {
         _sideEffect.emit(StudyDetailSideEffect.ShowSnackBar(t.message ?: "오류가 발생했습니다."))
     }

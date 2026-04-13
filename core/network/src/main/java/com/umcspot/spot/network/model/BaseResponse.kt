@@ -2,6 +2,7 @@ package com.umcspot.spot.network.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
 @Serializable
 data class BaseResponse<T>(

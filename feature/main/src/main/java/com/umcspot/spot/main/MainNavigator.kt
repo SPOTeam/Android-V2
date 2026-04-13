@@ -41,6 +41,7 @@ import com.umcspot.spot.signup.navigation.navigateToLanding
 import com.umcspot.spot.signup.navigation.navigateToSaving
 import com.umcspot.spot.signup.navigation.navigateToSignUp
 import com.umcspot.spot.study.detail.navigation.StudyDetail
+import com.umcspot.spot.study.detail.navigation.StudyPostContent
 import com.umcspot.spot.study.detail.navigation.navigateToStudyBoardPost
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.detail.navigation.navigateToStudyMemoirPost
@@ -129,7 +130,8 @@ class MainNavigator(
         EditInterest::class,
         EditRegion::class,
         CancelMemberShip::class,
-        MyStudy::class
+        MyStudy::class,
+        StudyPostContent::class
     ) || inAnyGraphRoutes(POST_CONTENT_ROUTE) || inAnyGraphRoutes(STUDY_APPLICATION_ROUTE)
 
     @Composable

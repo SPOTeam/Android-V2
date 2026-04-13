@@ -16,7 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.component.button.SpotActivationButton
@@ -48,6 +51,7 @@ fun StudyDetailRoute(
     studyId: Long,
     onBackClick: () -> Unit,
     onAttendanceClick: (Long) -> Unit,
+    onBoardPostClick: (Long) -> Unit,
     contentPadding: PaddingValues,
     onTabChanged: (StudyDetailTab) -> Unit,
     initialTab: StudyDetailTab,
@@ -98,6 +102,27 @@ fun StudyDetailRoute(
         viewModel.fetchStudyHomeDetail(studyId)
     }
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(studyId, selectedTab) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event != Lifecycle.Event.ON_RESUME) return@LifecycleEventObserver
+
+            when (selectedTab) {
+                StudyDetailTab.HOME -> viewModel.fetchStudyHomeDetail(studyId)
+                StudyDetailTab.PLANNER -> {
+                    val date = uiState.plannerState.selectedDate
+                    viewModel.fetchMonthlySchedules(studyId, date.year, date.monthValue)
+                }
+                StudyDetailTab.BOARD -> viewModel.fetchStudyBoardPosts(studyId, refresh = true)
+                StudyDetailTab.MEMOIR -> viewModel.fetchAllMemoirs(studyId)
+            }
+        }
+
+        val lifecycle = lifecycleOwner.lifecycle
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
+    }
+
     LaunchedEffect(selectedTab) {
         onTabChanged(selectedTab)
         when (selectedTab) {
@@ -105,6 +130,9 @@ fun StudyDetailRoute(
             StudyDetailTab.PLANNER -> {
                 val date = uiState.plannerState.selectedDate
                 viewModel.fetchMonthlySchedules(studyId, date.year, date.monthValue)
+            }
+            StudyDetailTab.BOARD -> {
+                viewModel.fetchStudyBoardPosts(studyId, refresh = uiState.postState.studyPosts.isEmpty())
             }
 
             else -> Unit
@@ -166,6 +194,7 @@ fun StudyDetailRoute(
             onPostLikeClick = { postId, isLiked ->
                 viewModel.togglePostLike(studyId, postId, isLiked)
             },
+            onPostClick = onBoardPostClick,
             onBackClick = onBackClick,
             contentPadding = contentPadding,
             lazyListState = lazyListState
@@ -221,6 +250,7 @@ private fun StudyDetailScreen(
     onApplyClick: () -> Unit,
     onPostPinToggle: (Long, Boolean) -> Unit,
     onPostLikeClick: (Long, Boolean) -> Unit,
+    onPostClick: (Long) -> Unit,
     onBackClick: () -> Unit,
     contentPadding: PaddingValues,
     lazyListState: LazyListState
@@ -288,9 +318,12 @@ private fun StudyDetailScreen(
                     StudyDetailTab.BOARD -> StudyDetailBoardScreen(
                         posts = uiState.postState.studyPosts,
                         isLoading = uiState.isLoading,
+                        canPin = isOwner,
                         onPinToggle = onPostPinToggle,
-                        onLikeClick = onPostLikeClick,
-                        onPostClick = {}
+                        onLikeClick = { postId, isLiked ->
+                            if (isMember) onPostLikeClick(postId, isLiked)
+                        },
+                        onPostClick = onPostClick
                     )
 
                     StudyDetailTab.MEMOIR -> StudyDetailMemoirScreen(

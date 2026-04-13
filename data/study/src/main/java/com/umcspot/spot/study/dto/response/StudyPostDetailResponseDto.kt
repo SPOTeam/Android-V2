@@ -20,11 +20,14 @@ data class StudyPostDetailResponseDto (
     @SerialName("isPinned")
     val isPinned : Boolean,
 
+    @SerialName("isOwner")
+    val isOwner: Boolean,
+
     @SerialName("isLiked")
     val isLiked: Boolean,
 
     @SerialName("writer")
-    val writer : Writer,
+    val writer : Writer?,
 
     @SerialName("stats")
     val stats : Stats,
@@ -38,8 +41,8 @@ data class StudyPostDetailResponseDto (
 
 @Serializable
 data class Writer(
-    @SerialName("memberId")
-    val memberId: Long,
+    @SerialName("writerId")
+    val writerId: Long,
 
     @SerialName("nickname")
     val nickname: String,
@@ -61,7 +64,7 @@ data class Comment (
     val isOwner : Boolean,
 
     @SerialName("writer")
-    val writer : Writer,
+    val writer : Writer?,
 
     @SerialName("createdAt")
     val createdAt : String

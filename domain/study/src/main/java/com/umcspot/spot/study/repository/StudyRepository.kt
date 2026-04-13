@@ -200,4 +200,10 @@ interface StudyRepository {
         studyId: Long,
         postId: Long
     ) : Result<Unit>
+
+    suspend fun createStudyPostComment(
+        studyId: Long,
+        postId: Long,
+        content: String
+    ): Result<Unit>
 }

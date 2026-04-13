@@ -10,10 +10,12 @@ import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.study.dto.request.ScheduleCreateRequestDto
 import com.umcspot.spot.study.dto.request.StudyApplyRequestDto
 import com.umcspot.spot.study.dto.request.BoardCreateRequestDto
-import com.umcspot.spot.study.dto.response.BoardCreateResponseDto
+import com.umcspot.spot.study.dto.request.StudyPostCommentRequestDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.MemoirCreateResponseDto
 import com.umcspot.spot.study.dto.response.ScheduleCreateResponseDto
+import com.umcspot.spot.study.dto.response.BoardCreateResponseDto
+import com.umcspot.spot.study.dto.response.SendStudyPostCommentResponseDto
 import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
@@ -313,4 +315,11 @@ interface StudyService {
         @Path("studyId") studyId: Long,
         @Path("postId") postId: Long,
     ): NullResultResponse
+
+    @POST("/api/studies/{studyId}/posts/{postId}/comments")
+    suspend fun createStudyPostComment(
+        @Path("studyId") studyId: Long,
+        @Path("postId") postId: Long,
+        @Body request: StudyPostCommentRequestDto
+    ): BaseResponse<SendStudyPostCommentResponseDto>
 }

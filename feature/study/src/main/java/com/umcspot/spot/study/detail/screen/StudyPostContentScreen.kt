@@ -21,12 +21,12 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,19 +35,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
-import coil.request.ImageRequest.Builder
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.SpotSpinner
 import com.umcspot.spot.designsystem.component.comment.CommentField
@@ -58,15 +52,13 @@ import com.umcspot.spot.designsystem.component.post.CommentUserInfo
 import com.umcspot.spot.designsystem.component.post.CountView
 import com.umcspot.spot.designsystem.component.post.UserInfo
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.R500
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.model.ImageRef
-import com.umcspot.spot.model.PostType
-import com.umcspot.spot.model.korean
-import com.umcspot.spot.post.model.postDetail.PostDetailResult
-import com.umcspot.spot.study.detail.viewmodel.StudyPostDetailViewModel
+import com.umcspot.spot.study.detail.StudyDetailViewModel
 import com.umcspot.spot.study.model.CommentResult
+import com.umcspot.spot.study.model.StudyPostDetailResult
+import com.umcspot.spot.study.model.StudyPostResult
+import com.umcspot.spot.study.model.ViewerStatus
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 import com.umcspot.spot.ui.state.UiState
@@ -75,33 +67,38 @@ import kotlinx.coroutines.delay
 @Composable
 fun StudyPostContentScreen(
     contentPadding: PaddingValues,
+    studyId: Long,
     postId: Long,
     onDeleteClick: () -> Unit,
-    onEditClick:(Long) -> Unit,
-    viewModel: StudyPostDetailViewModel = hiltViewModel(),
-
-    ) {
+    onEditClick: (Long) -> Unit,
+    onSendComment: (Long, String) -> Unit = { _, _ -> },
+    onDeletePost: (Long, Long) -> Unit = { _, _ -> },
+    onReportPost: (Long, Long, String) -> Unit = { _, _, _ -> },
+    viewModel: StudyDetailViewModel = hiltViewModel()
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showReportRequestDialog by remember { mutableStateOf(false) }
     var showDeleteRequestDialog by remember { mutableStateOf(false) }
     var showAcceptRequestDialog by remember { mutableStateOf(false) }
 
     var reason by rememberSaveable { mutableStateOf("") }
+    var commentText by rememberSaveable { mutableStateOf("") }
+    var isCommentFocused by remember { mutableStateOf(false) }
 
     val topPad = contentPadding.calculateTopPadding()
     val bottomPad = contentPadding.calculateBottomPadding()
-
-    var commentText by rememberSaveable { mutableStateOf("") }
 
     val listState = rememberSaveable(postId, saver = LazyListState.Saver) {
         LazyListState()
     }
 
-    var isCommentFocused by remember { mutableStateOf(false) }
-
-    LaunchedEffect(postId) {
-        viewModel.load(postId)
+    LaunchedEffect(studyId, postId) {
+        viewModel.fetchStudyPostDetail(studyId, postId)
         commentText = ""
+    }
+
+    DisposableEffect(Unit) {
+        onDispose { viewModel.clearStudyPostDetail() }
     }
 
     val focusManager = LocalFocusManager.current
@@ -119,7 +116,7 @@ fun StudyPostContentScreen(
                 keyboardController?.hide()
             }
     ) {
-        when (val state = uiState.data) {
+        when (val state = uiState.postDetailState) {
             is UiState.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -131,27 +128,32 @@ fun StudyPostContentScreen(
 
             is UiState.Failure -> {
                 Text(
-                    "에러: ${state.msg}",
+                    text = "에러: ${state.msg}",
                     color = Color.Red,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
 
             is UiState.Empty -> {
-                Text("데이터가 없습니다.", color = Color.Gray, modifier = Modifier.align(Alignment.Center))
+                Text(
+                    text = "데이터가 없습니다.",
+                    color = Color.Gray,
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
 
             is UiState.Success -> {
                 val post = state.data
-                val commentBarHeight = screenHeightDp(44.dp)
+                val canWriteComment = uiState.homeState.viewerStatus == ViewerStatus.APPROVED ||
+                    uiState.homeState.viewerStatus == ViewerStatus.OWNER ||
+                    post.isOwner
+                val commentBarHeight = if (canWriteComment) screenHeightDp(44.dp) else 0.dp
 
                 LaunchedEffect(isCommentFocused, post.comments.size) {
                     if (isCommentFocused) {
                         val lastIndex = 2 + post.comments.size - 1
                         val target = lastIndex.coerceAtLeast(0)
-
                         delay(300)
-
                         listState.animateScrollToItem(target)
                     }
                 }
@@ -164,16 +166,11 @@ fun StudyPostContentScreen(
                     item(key = "post_header") {
                         PostContentDetailScreen(
                             post = post,
-                            onLikeClick = { postViewModel.toggleLike() },
-                            onEditClick = {
-                                onEditClick(post.postId)
-                            },
-                            onDeleteClick = {
-                                showDeleteRequestDialog = true
-                            },
-                            onReportClick = {
-                                showReportRequestDialog = true
-                            }
+                            isOwner = post.isOwner,
+                            onLikeClick = { viewModel.toggleStudyPostDetailLike() },
+                            onEditClick = { onEditClick(post.postId) },
+                            onDeleteClick = { showDeleteRequestDialog = true },
+                            onReportClick = { showReportRequestDialog = true }
                         )
                     }
 
@@ -189,7 +186,7 @@ fun StudyPostContentScreen(
 
                     items(
                         items = post.comments,
-                        key = { it.commentId },
+                        key = { it.commentId }
                     ) { comment ->
                         CommentItem(
                             comment = comment,
@@ -209,31 +206,36 @@ fun StudyPostContentScreen(
                     }
                 }
 
-                CommentField(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(horizontal = screenWidthDp(17.dp))
-                        .padding(bottom = screenHeightDp(8.dp)),
-                    canWrite = true,
-                    comment = commentText,
-                    onCommentChange = { commentText = it },
-                    onSendComment = { text ->
-                        postViewModel.sendComment(text)
-                    },
-                    onFocusChanged = { focused -> isCommentFocused = focused }
-                )
+                if (canWriteComment) {
+                    CommentField(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(horizontal = screenWidthDp(17.dp))
+                            .padding(bottom = screenHeightDp(8.dp)),
+                        canWrite = true,
+                        comment = commentText,
+                        onCommentChange = { commentText = it },
+                        onSendComment = { text ->
+                            val trimmed = text.trim()
+                            if (trimmed.isNotEmpty()) {
+                                viewModel.sendStudyPostComment(studyId, post.postId, trimmed)
+                                onSendComment(post.postId, trimmed)
+                                commentText = ""
+                            }
+                        },
+                        onFocusChanged = { focused -> isCommentFocused = focused }
+                    )
+                }
 
                 DeleteDialog(
                     visible = showDeleteRequestDialog,
-                    modalTitle = "이 글을 삭제하시겠어요?",
-                    modalDes = "한 번 삭제한 글은 되돌릴 수 없어요.",
+                    modalTitle = "게시글을 삭제하시겠어요?",
+                    modalDes = "한 번 삭제한 게시글은 되돌릴 수 없어요.",
                     okButtonText = "삭제",
-                    onDismiss = {
-                        showDeleteRequestDialog = false
-                    },
+                    onDismiss = { showDeleteRequestDialog = false },
                     onClick = {
                         showDeleteRequestDialog = false
-                        postViewModel.deletePost()
+                        onDeletePost(studyId, post.postId)
                         onDeleteClick()
                     }
                 )
@@ -241,22 +243,22 @@ fun StudyPostContentScreen(
                 ReportDialog(
                     visible = showReportRequestDialog,
                     modalTitle = "게시글을 신고하시겠습니까?",
-                    modalDes = "신고 이유를 작성해주세요.\nSPOT 내부 검토 후, 빠르게 처리합니다.",
+                    modalDes = "신고 사유를 작성해주세요.\nSPOT 팀이 검토 후 빠르게 처리합니다.",
                     reason = reason,
                     onReasonChange = { reason = it },
                     okButtonText = "완료",
                     onDismiss = { showReportRequestDialog = false },
-                    onClick = { typed ->
+                    onClick = { typedReason ->
                         showReportRequestDialog = false
                         showAcceptRequestDialog = true
-                        postViewModel.reportPost(reason)
+                        onReportPost(studyId, post.postId, typedReason)
                     }
                 )
 
                 AcceptDialog(
                     visible = showAcceptRequestDialog,
                     modalTitle = "신고 완료",
-                    modalDes = "게시글 신고가 완료되었어요.\n쾌적한 서비스 이용을 위해 항상 노력하겠습니다.",
+                    modalDes = "게시글 신고가 완료되었습니다.\n쾌적한 서비스 이용을 위해 항상 노력하겠습니다.",
                     okButtonText = "확인",
                     noButtonText = null,
                     onDismiss = { showAcceptRequestDialog = false },
@@ -270,7 +272,8 @@ fun StudyPostContentScreen(
 @Composable
 fun PostContentDetailScreen(
     modifier: Modifier = Modifier,
-    post: PostDetailResult,
+    post: StudyPostDetailResult,
+    isOwner: Boolean,
     onLikeClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
@@ -286,20 +289,16 @@ fun PostContentDetailScreen(
         verticalArrangement = Arrangement.Top
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             UserInfo(
-                postWriterName = post.nickname,
-                postWriterImage = post.profileImageUrl,
+                postWriterName = post.writerNickname,
+                postWriterImage = post.writerProfileUrl,
                 postWriteAt = post.createdAt
             )
 
-            Box(
-                modifier = Modifier
-                    .size(screenWidthDp(33.dp))
-            ) {
+            Box(modifier = Modifier.size(screenWidthDp(33.dp))) {
                 Image(
                     painter = painterResource(R.drawable.meetball),
                     contentDescription = null,
@@ -309,14 +308,13 @@ fun PostContentDetailScreen(
                         .clickable { menuExpanded = true }
                 )
 
-                // 팝업 메뉴
                 EditDeleteMenu(
-                    isOwner = post.isOwner,
+                    isOwner = isOwner,
                     expanded = menuExpanded,
                     onDismiss = { menuExpanded = false },
-                    onEdit = { onEditClick() },
-                    onDelete = { onDeleteClick() },
-                    onReport = { onReportClick() }
+                    onEdit = onEditClick,
+                    onDelete = onDeleteClick,
+                    onReport = onReportClick
                 )
             }
         }
@@ -324,16 +322,24 @@ fun PostContentDetailScreen(
         Spacer(Modifier.height(screenHeightDp(12.dp)))
 
         PostDetailScreen(
-            post.postType,
-            post.title,
-            post.imageUrl,
-            post.content,
+            title = post.title,
+            content = post.content
         )
 
         Spacer(Modifier.height(screenHeightDp(20.dp)))
 
         CountView(
-            item = post,
+            item = StudyPostResult(
+                postId = post.postId,
+                title = post.title,
+                content = post.content,
+                isPinned = post.isPinned,
+                isLiked = post.isLiked,
+                likeCount = post.likeCount,
+                viewCount = post.viewCount,
+                commentCount = post.commentCount,
+                createdAt = post.createdAt
+            ),
             onLikeClick = { onLikeClick() }
         )
     }
@@ -341,84 +347,16 @@ fun PostContentDetailScreen(
 
 @Composable
 fun PostDetailScreen(
-    postType: PostType,
     title: String,
-    image: ImageRef,
     content: String
 ) {
-    val context = LocalContext.current
-
-    Column(
-        modifier = Modifier.wrapContentSize()
-    ) {
-        Text(
-            text = "# ${postType.korean}",
-            style = SpotTheme.typography.small_500,
-            color = SpotTheme.colors.B500
-        )
-
-        Spacer(Modifier.height(screenHeightDp(4.dp)))
-
+    Column(modifier = Modifier.wrapContentSize()) {
         Text(
             text = title,
             style = SpotTheme.typography.h5,
             maxLines = Int.MAX_VALUE,
             softWrap = true
         )
-        when (image) {
-            ImageRef.None -> Unit
-
-            is ImageRef.Url -> {
-                Spacer(Modifier.height(screenHeightDp(20.dp)))
-                AsyncImage(
-                    model = Builder(context)
-                        .data(image.url)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(SpotShapes.Hard)
-                )
-            }
-
-            is ImageRef.Name -> {
-                val resId = remember(image.name) {
-                    context.resources.getIdentifier(
-                        image.name,
-                        "drawable",
-                        context.packageName
-                    )
-                }
-                if (resId != 0) {
-                    Spacer(Modifier.height(screenHeightDp(20.dp)))
-                    Image(
-                        painter = painterResource(id = resId),
-                        contentDescription = null,
-                        contentScale = ContentScale.FillWidth,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(SpotShapes.Hard)
-                    )
-                }
-            }
-
-            is ImageRef.LocalUri -> {
-                Spacer(Modifier.height(screenHeightDp(20.dp)))
-                AsyncImage(
-                    model = Builder(context)
-                        .data(image.uri)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(SpotShapes.Hard)
-                )
-            }
-        }
 
         Spacer(Modifier.height(screenHeightDp(20.dp)))
 
@@ -426,7 +364,7 @@ fun PostDetailScreen(
             text = content,
             style = SpotTheme.typography.medium_400,
             maxLines = Int.MAX_VALUE,
-            softWrap = true,
+            softWrap = true
         )
     }
 }
@@ -434,12 +372,9 @@ fun PostDetailScreen(
 @Composable
 private fun CommentItem(
     comment: CommentResult,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-    ) {
+    Column(modifier = modifier.fillMaxWidth()) {
         CommentUserInfo(
             commentWriterName = comment.commentNickname,
             commentWriterImage = comment.commentProfileUrl
@@ -448,7 +383,7 @@ private fun CommentItem(
         Spacer(Modifier.height(screenHeightDp(7.dp)))
 
         Text(
-            text = comment.content.toString(),
+            text = comment.content,
             style = SpotTheme.typography.medium_400,
             color = SpotTheme.colors.black,
             maxLines = Int.MAX_VALUE,
@@ -467,11 +402,10 @@ fun EditDeleteMenu(
     onReport: () -> Unit
 ) {
     DropdownMenu(
-        modifier = Modifier
-            .background(SpotTheme.colors.white),
+        modifier = Modifier.background(SpotTheme.colors.white),
         shape = SpotShapes.Soft,
         expanded = expanded,
-        onDismissRequest = onDismiss,
+        onDismissRequest = onDismiss
     ) {
         if (isOwner) {
             DropdownMenuItem(
@@ -480,7 +414,7 @@ fun EditDeleteMenu(
                     .wrapContentWidth(),
                 text = {
                     Text(
-                        text = "편집하기",
+                        text = "수정하기",
                         style = SpotTheme.typography.regular_500,
                         color = SpotTheme.colors.black
                     )
@@ -533,5 +467,3 @@ fun EditDeleteMenu(
         }
     }
 }
-
-

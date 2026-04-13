@@ -10,7 +10,7 @@ import com.umcspot.spot.navigation.Route
 import com.umcspot.spot.study.detail.StudyDetailRoute
 import com.umcspot.spot.study.detail.model.StudyDetailTab
 import com.umcspot.spot.study.detail.screen.StudyBoardPostRoute
-import com.umcspot.spot.study.detail.screen.StudyMemoirPostRoute
+import com.umcspot.spot.study.detail.screen.StudyPostContentScreen
 import com.umcspot.spot.study.detail.screen.attendance.StudyAttendanceRoute
 import com.umcspot.spot.study.detail.screen.post.StudyMemoirPostRoute
 import kotlinx.serialization.Serializable
@@ -36,6 +36,8 @@ fun NavGraphBuilder.studyDetailGraph(
     onDetailBackClick: () -> Unit,
     onMemoirPostBackClick: () -> Unit,
     onBoardPostBackClick: () -> Unit,
+    onPostContentBackClick: () -> Unit,
+    onBoardPostClick: (Long, Long) -> Unit = { _, _ -> },
     onAttendanceBackClick: () -> Unit,
     onAttendanceClick: (Long, Long) -> Unit,
     onTabChanged: (StudyDetailTab) -> Unit,
@@ -49,6 +51,7 @@ fun NavGraphBuilder.studyDetailGraph(
             onBackClick = onDetailBackClick,
             onTabChanged = onTabChanged,
             initialTab = currentTab,
+            onBoardPostClick = { postId -> onBoardPostClick(detail.studyId, postId) },
             onAttendanceClick = { schedId -> onAttendanceClick(detail.studyId, schedId) }
         )
     }
@@ -80,6 +83,17 @@ fun NavGraphBuilder.studyDetailGraph(
             onBackClick = onAttendanceBackClick
         )
     }
+
+    composable<StudyPostContent> { backStackEntry ->
+        val args = backStackEntry.toRoute<StudyPostContent>()
+        StudyPostContentScreen(
+            contentPadding = contentPadding,
+            studyId = args.studyId,
+            postId = args.postId,
+            onDeleteClick = onPostContentBackClick,
+            onEditClick = {},
+        )
+    }
 }
 
 @Serializable
@@ -93,3 +107,6 @@ data class StudyBoardPost(val studyId: Long) : Route
 
 @Serializable
 data class StudyAttendance(val studyId: Long, val scheduleId: Long) : Route
+
+@Serializable
+data class StudyPostContent(val studyId: Long, val postId: Long) : Route

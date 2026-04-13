@@ -3,12 +3,13 @@ package com.umcspot.spot.study.detail.model
 import com.umcspot.spot.study.model.MemoirModel
 import com.umcspot.spot.study.model.StudyAttendanceModel
 import com.umcspot.spot.study.model.StudyMemberModel
+import com.umcspot.spot.study.model.StudyPostDetailResult
 import com.umcspot.spot.study.model.StudyPostResult
-import com.umcspot.spot.study.model.StudyPostsResultList
 import com.umcspot.spot.study.model.StudyRecentMemoirModel
 import com.umcspot.spot.study.model.StudyScheduleModel
 import com.umcspot.spot.study.model.TodoModel
 import com.umcspot.spot.study.model.ViewerStatus
+import com.umcspot.spot.ui.state.UiState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.time.LocalDate
@@ -16,7 +17,9 @@ import java.time.LocalDate
 data class StudyDetailState(
     val homeState: StudyHomeState = StudyHomeState(),
     val plannerState: StudyPlannerState = StudyPlannerState(),
-    val postState : StudyPostState = StudyPostState(),
+    val postState : StudyBoardState = StudyBoardState(),
+    val postDetailState: UiState<StudyPostDetailResult> = UiState.Empty,
+    val postEditorState: StudyPostEditorState = StudyPostEditorState(),
     val memoirState: StudyMemoirState = StudyMemoirState(),
     val attendanceState: StudyAttendanceState = StudyAttendanceState(),
     val myUserId: String = "",
@@ -52,10 +55,17 @@ data class StudyPlannerState(
     val isOverlapError: Boolean = false
 )
 
-data class StudyPostState(
+data class StudyBoardState(
     val studyPosts: ImmutableList<StudyPostResult> = persistentListOf(),
     val hasNext: Boolean = false,
     val nextCursor: Long? = null
+)
+
+data class StudyPostEditorState(
+    val title: String = "",
+    val content: String = "",
+    val isPrivate: Boolean = false,
+    val isSubmitting: Boolean = false
 )
 
 data class StudyMemoirState(
