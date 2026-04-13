@@ -1,10 +1,9 @@
-package com.umcspot.spot.mypage.editInterestStudy
+package com.umcspot.spot.mypage.edit.editInterestStudy
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umcspot.spot.model.StudyTheme
-import com.umcspot.spot.study.model.Study
 import com.umcspot.spot.user.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

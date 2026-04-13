@@ -1,4 +1,4 @@
-package com.umcspot.spot.mypage.editInterestRegion
+package com.umcspot.spot.mypage.edit.editInterestRegion
 
 import android.content.Context
 import android.util.Log
