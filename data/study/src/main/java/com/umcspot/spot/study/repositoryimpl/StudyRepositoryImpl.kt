@@ -9,15 +9,19 @@ import com.umcspot.spot.study.datasource.StudyDataSource
 import com.umcspot.spot.study.mapper.toData
 import com.umcspot.spot.study.mapper.toDetailModel
 import com.umcspot.spot.study.mapper.toDomain
+import com.umcspot.spot.study.dto.request.StudyPostCommentRequestDto
 import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.MemoirModel
 import com.umcspot.spot.study.mapper.toDomainList
+import com.umcspot.spot.study.model.BoardCreateModel
 import com.umcspot.spot.study.model.StudyApplicationResultList
 import com.umcspot.spot.study.model.StudyAttendanceListModel
 import com.umcspot.spot.study.model.StudyAttendanceQrModel
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyDetailModel
 import com.umcspot.spot.study.model.StudyMemberModel
+import com.umcspot.spot.study.model.StudyPostDetailResult
+import com.umcspot.spot.study.model.StudyPostsResultList
 import com.umcspot.spot.study.model.StudyRecentMemoirModel
 import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.study.model.StudyScheduleCreateModel
@@ -313,6 +317,24 @@ class StudyRepositoryImpl @Inject constructor(
         response.result.reviewId
     }
 
+    override suspend fun postBoard(
+        studyId: Long,
+        board: BoardCreateModel
+    ): Result<Long> = runCatching {
+        val requestDto = board.toData()
+
+        val response = studyDataSource.postBoard(
+            studyId = studyId,
+            request = requestDto
+        )
+
+        if (!response.isSuccess) {
+            throw Exception(response.message ?: "게시글 작성 실패")
+        }
+
+        response.result.postId.toLong()
+    }
+
     override suspend fun postReviewReaction(studyId: Long, reviewId: Long, reaction: String): Result<Unit?> {
         return runCatching {
             val response = studyDataSource.postReviewReaction(studyId, reviewId, reaction)
@@ -508,4 +530,97 @@ class StudyRepositoryImpl @Inject constructor(
     override suspend fun deleteStudy(studyId: Long): Result<Unit> = runCatching {
         studyDataSource.deleteStudy(studyId)
     }
+}
+    override suspend fun getStudyPostsList(
+        studyId : Long,
+        cursor: Long?,
+        size: Int
+    ) : Result<StudyPostsResultList> =
+        runCatching {
+            val response = studyDataSource.getStudyPostsList(studyId, cursor, size)
+            response.result.toDomainList()
+        }.onFailure {
+            Log.e("StudyRepository", "getStudyPostsList failed", it)
+        }
+
+    override suspend fun getStudyPostDetail(
+        studyId: Long,
+        postId: Long
+    ): Result<StudyPostDetailResult> =
+        runCatching {
+            val response = studyDataSource.getStudyPostDetail(studyId, postId)
+            response.result.toDomain()
+        }.onFailure {
+            Log.e("StudyRepository", "getStudyPostDetail failed", it)
+        }
+
+    override suspend fun studyPostPin(
+        studyId: Long,
+        postId: Long
+    ): Result<Unit> =
+        runCatching {
+            val response = studyDataSource.studyPostPin(studyId, postId)
+            if (!response.isSuccess) {
+                throw Exception(response.message.ifBlank { "게시글 고정에 실패했습니다." })
+            }
+            Unit
+        }
+
+
+    override suspend fun studyPostUnPin(
+        studyId: Long,
+        postId: Long
+    ): Result<Unit> =
+        runCatching {
+            val response = studyDataSource.studyPostUnPin(studyId, postId)
+            if (!response.isSuccess) {
+                throw Exception(response.message.ifBlank { "게시글 고정 해제에 실패했습니다." })
+            }
+            Unit
+        }
+
+
+    override suspend fun studyPostLike(
+        studyId: Long,
+        postId: Long
+    ): Result<Unit> =
+        runCatching {
+            val response = studyDataSource.studyPostLike(studyId, postId)
+            if (!response.isSuccess) {
+                throw Exception(response.message.ifBlank { "게시글 좋아요에 실패했습니다." })
+            }
+            Unit
+        }
+
+
+    override suspend fun studyPostUnLike(
+        studyId: Long,
+        postId: Long
+    ): Result<Unit> =
+        runCatching {
+            val response = studyDataSource.studyPostUnLike(studyId, postId)
+            if (!response.isSuccess) {
+                throw Exception(response.message.ifBlank { "게시글 좋아요 취소에 실패했습니다." })
+            }
+            Unit
+        }
+
+    override suspend fun createStudyPostComment(
+        studyId: Long,
+        postId: Long,
+        content: String
+    ): Result<Unit> =
+        runCatching {
+            val response = studyDataSource.createStudyPostComment(
+                studyId = studyId,
+                postId = postId,
+                request = StudyPostCommentRequestDto(content = content)
+            )
+            if (!response.isSuccess) {
+                throw Exception(response.message.ifBlank { "댓글 작성에 실패했습니다." })
+            }
+            Unit
+        }.onFailure {
+            Log.e("StudyRepository", "createStudyPostComment failed", it)
+        }
 }

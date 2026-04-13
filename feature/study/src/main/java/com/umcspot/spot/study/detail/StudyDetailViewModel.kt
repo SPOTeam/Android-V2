@@ -4,13 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umcspot.spot.study.detail.model.StudyDetailSideEffect
 import com.umcspot.spot.study.detail.model.StudyDetailState
+import com.umcspot.spot.study.detail.model.StudyPostEditorState
+import com.umcspot.spot.study.model.BoardCreateModel
 import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.StudyAttendanceListModel
+import com.umcspot.spot.study.model.StudyPostDetailResult
 import com.umcspot.spot.study.model.StudyScheduleModel
 import com.umcspot.spot.study.model.TodoModel
 import com.umcspot.spot.study.model.ViewerStatus
 import com.umcspot.spot.study.repository.StudyRepository
 import com.umcspot.spot.token.repository.TokenRepository
+import com.umcspot.spot.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.async
@@ -42,6 +46,9 @@ class StudyDetailViewModel @Inject constructor(
     val sideEffect: SharedFlow<StudyDetailSideEffect> = _sideEffect.asSharedFlow()
 
     private var currentUserId: String = ""
+    private var currentDetailStudyId: Long? = null
+    private var currentDetailPostId: Long? = null
+    private val inFlightDetailLikes = mutableSetOf<Long>()
 
     init {
         loadMyUserId()
@@ -174,7 +181,13 @@ class StudyDetailViewModel @Inject constructor(
         }
     }
 
-    fun createSchedule(studyId: Long, title: String, location: String, startAt: LocalDateTime, endAt: LocalDateTime) {
+    fun createSchedule(
+        studyId: Long,
+        title: String,
+        location: String,
+        startAt: LocalDateTime,
+        endAt: LocalDateTime
+    ) {
         viewModelScope.launch {
             studyRepository.createSchedule(studyId, title, location, startAt, endAt)
                 .onSuccess {
@@ -199,7 +212,10 @@ class StudyDetailViewModel @Inject constructor(
         _uiState.update { it.copy(plannerState = it.plannerState.copy(isOverlapError = false)) }
     }
 
-    private fun computeFilteredSchedules(schedules: List<StudyScheduleModel>, selectedDate: LocalDate) =
+    private fun computeFilteredSchedules(
+        schedules: List<StudyScheduleModel>,
+        selectedDate: LocalDate
+    ) =
         schedules.filter {
             val start = it.startAt.toLocalDate()
             val end = it.endAt.toLocalDate()
@@ -208,9 +224,14 @@ class StudyDetailViewModel @Inject constructor(
 
     private fun updateFilteredSchedules() {
         _uiState.update { state ->
-            state.copy(plannerState = state.plannerState.copy(
-                selectedDaySchedules = computeFilteredSchedules(state.plannerState.monthlySchedules, state.plannerState.selectedDate)
-            ))
+            state.copy(
+                plannerState = state.plannerState.copy(
+                    selectedDaySchedules = computeFilteredSchedules(
+                        state.plannerState.monthlySchedules,
+                        state.plannerState.selectedDate
+                    )
+                )
+            )
         }
     }
 
@@ -218,7 +239,8 @@ class StudyDetailViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 plannerState = state.plannerState.copy(
-                    monthlySchedules = state.plannerState.monthlySchedules.filterNot { it.id == scheduleId }.toPersistentList(),
+                    monthlySchedules = state.plannerState.monthlySchedules.filterNot { it.id == scheduleId }
+                        .toPersistentList(),
                     expandedScheduleId = -1L
                 )
             )
@@ -233,7 +255,8 @@ class StudyDetailViewModel @Inject constructor(
 
     fun toggleScheduleMenu(scheduleId: Long) {
         _uiState.update { state ->
-            val nextId = if (state.plannerState.expandedScheduleId == scheduleId) -1L else scheduleId
+            val nextId =
+                if (state.plannerState.expandedScheduleId == scheduleId) -1L else scheduleId
             state.copy(plannerState = state.plannerState.copy(expandedScheduleId = nextId))
         }
     }
@@ -281,10 +304,12 @@ class StudyDetailViewModel @Inject constructor(
             studyRepository.getAttendanceQr(studyId, scheduleId)
                 .onSuccess { model ->
                     _uiState.update { state ->
-                        state.copy(attendanceState = state.attendanceState.copy(
-                            qrCodeImageUrl = model.qrCodeImageUrl,
-                            isAttendanceActive = model.attendanceActive
-                        ))
+                        state.copy(
+                            attendanceState = state.attendanceState.copy(
+                                qrCodeImageUrl = model.qrCodeImageUrl,
+                                isAttendanceActive = model.attendanceActive
+                            )
+                        )
                     }
                 }
                 .onFailure { emitError(it) }
@@ -294,9 +319,11 @@ class StudyDetailViewModel @Inject constructor(
     fun fetchMembersOnly(studyId: Long) {
         viewModelScope.launch {
             studyRepository.getStudyMembers(studyId).onSuccess { members ->
-                _uiState.update { it.copy(
-                    homeState = it.homeState.copy(members = members.toPersistentList())
-                )}
+                _uiState.update {
+                    it.copy(
+                        homeState = it.homeState.copy(members = members.toPersistentList())
+                    )
+                }
             }.onFailure { emitError(it) }
         }
     }
@@ -342,21 +369,26 @@ class StudyDetailViewModel @Inject constructor(
             studyRepository.finishAttendance(studyId, scheduleId)
                 .onSuccess {
                     _uiState.update { state ->
-                        state.copy(attendanceState = state.attendanceState.copy(
-                            isAttendanceActive = false,
-                            qrCodeImageUrl = null
-                        ))
+                        state.copy(
+                            attendanceState = state.attendanceState.copy(
+                                isAttendanceActive = false,
+                                qrCodeImageUrl = null
+                            )
+                        )
                     }
                 }
                 .onFailure { emitError(it) }
         }
     }
 
-    // ── 할 일 (Todo) ──────────────────────────────────
     fun createTodo(studyId: Long, content: String) {
         val selectedDate = uiState.value.plannerState.selectedDate
         viewModelScope.launch {
-            studyRepository.createTodo(studyId, content, selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
+            studyRepository.createTodo(
+                studyId,
+                content,
+                selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+            )
                 .onSuccess { newId ->
                     val newTodo = TodoModel(newId, currentUserId, content, false)
                     _uiState.update { it.copy(plannerState = it.plannerState.copy(todoList = (it.plannerState.todoList + newTodo).toPersistentList())) }
@@ -367,10 +399,19 @@ class StudyDetailViewModel @Inject constructor(
 
     fun toggleTodoStatus(studyId: Long, todoId: Long, isCurrentlyCompleted: Boolean) {
         viewModelScope.launch {
-            val result = if (isCurrentlyCompleted) studyRepository.uncompleteTodo(studyId, todoId) else studyRepository.completeTodo(studyId, todoId)
+            val result = if (isCurrentlyCompleted) {
+                studyRepository.uncompleteTodo(studyId, todoId)
+            } else {
+                studyRepository.completeTodo(studyId, todoId)
+            }
+
             result.onSuccess {
                 _uiState.update { state ->
-                    val newList = state.plannerState.todoList.map { if (it.id == todoId) it.copy(isCompleted = !isCurrentlyCompleted) else it }.toPersistentList()
+                    val newList = state.plannerState.todoList.map { todo ->
+
+                        if (todo.id == todoId) todo.copy(isCompleted = !isCurrentlyCompleted)
+                        else todo
+                    }.toPersistentList()
                     state.copy(plannerState = state.plannerState.copy(todoList = newList))
                 }
             }
@@ -379,13 +420,14 @@ class StudyDetailViewModel @Inject constructor(
 
     fun deleteTodo(studyId: Long, todoId: Long) {
         viewModelScope.launch {
-            studyRepository.deleteTodo(studyId, todoId)
-                .onSuccess {
-                    _uiState.update { state ->
-                        state.copy(plannerState = state.plannerState.copy(todoList = state.plannerState.todoList.filterNot { it.id == todoId }.toPersistentList()))
-                    }
+            studyRepository.deleteTodo(studyId, todoId).onSuccess {
+                _uiState.update { state ->
+                    val updatedTodo = state.plannerState.todoList
+                        .filterNot { it.id == todoId }
+                        .toPersistentList()
+                    state.copy(plannerState = state.plannerState.copy(todoList = updatedTodo))
                 }
-                .onFailure { emitError(it) }
+            }.onFailure { emitError(it) }
         }
     }
 
@@ -394,23 +436,43 @@ class StudyDetailViewModel @Inject constructor(
             studyRepository.getMemberTodos(studyId, memberId, date.toString())
                 .onSuccess { todoList ->
                     _uiState.update { state ->
-                        state.copy(plannerState = state.plannerState.copy(selectedMemberId = memberId.toString(), todoList = todoList.toPersistentList()))
+                        state.copy(
+                            plannerState = state.plannerState.copy(
+                                selectedMemberId = memberId.toString(),
+                                selectedDate = date,
+                                todoList = todoList.toPersistentList()
+                            )
+                        )
                     }
                 }
         }
     }
 
-    // ── 회고록 (Memoir) ──────────────────────────────────
-    fun postMemoir(studyId: Long, activity: String, learned: String, encouragement: String, isPrivate: Boolean, imageFiles: List<File>) {
+    fun postMemoir(
+        studyId: Long,
+        activity: String,
+        learned: String,
+        encouragement: String,
+        isPrivate: Boolean,
+        imageFiles: List<File>
+    ) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            studyRepository.postMemoir(studyId, MemoirCreateModel(activity, learned, encouragement, isPrivate), imageFiles)
+
+            val memoirModel = MemoirCreateModel(
+                activity = activity,
+                learned = learned,
+                encouragement = encouragement,
+                isPrivate = isPrivate
+            )
+
+            studyRepository.postMemoir(studyId, memoirModel, imageFiles)
                 .onSuccess {
                     _sideEffect.emit(StudyDetailSideEffect.MemoirPostSuccess)
-                    fetchAllMemoirs(studyId)
                     fetchStudyHomeDetail(studyId)
                 }
                 .onFailure { emitError(it) }
+
             _uiState.update { it.copy(isLoading = false) }
         }
     }
@@ -447,9 +509,132 @@ class StudyDetailViewModel @Inject constructor(
             "SMILE" -> memoir.reactions.isSmiled
             else -> return
         }
+    }
 
-        updateMemoirReactionUIState(memoirId, reactionType, !isCurrentlySelected)
+    fun postBoard(
+        studyId: Long,
+        title: String,
+        content: String,
+        isPrivate: Boolean,
+    ) {
+        _uiState.update {
+            it.copy(
+                postEditorState = it.postEditorState.copy(
+                    title = title,
+                    content = content,
+                    isPrivate = isPrivate
+                )
+            )
+        }
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    postEditorState = it.postEditorState.copy(isSubmitting = true)
+                )
+            }
 
+            val boardModel = BoardCreateModel(
+                title = title,
+                content = content,
+                isPrivate = isPrivate
+            )
+
+            studyRepository.postBoard(studyId, boardModel)
+                .onSuccess {
+                    _uiState.update { state ->
+                        state.copy(postEditorState = StudyPostEditorState())
+                    }
+                    _sideEffect.emit(StudyDetailSideEffect.BoardPostSuccess)
+                    fetchStudyHomeDetail(studyId)
+                }
+                .onFailure { emitError(it) }
+
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    postEditorState = it.postEditorState.copy(isSubmitting = false)
+                )
+            }
+        }
+    }
+
+    fun fetchStudyBoardPosts(studyId: Long, refresh: Boolean = false) {
+        viewModelScope.launch {
+            val currentState = _uiState.value.postState
+            val cursor = if (refresh) null else currentState.nextCursor
+
+            if (!refresh && !currentState.hasNext && currentState.studyPosts.isNotEmpty()) return@launch
+
+            _uiState.update { it.copy(isLoading = true) }
+
+            studyRepository.getStudyPostsList(
+                studyId = studyId,
+                cursor = cursor,
+                size = 20
+            ).onSuccess { posts ->
+                _uiState.update { state ->
+                    val baseList = if (refresh || cursor == null) emptyList() else state.postState.studyPosts
+                    state.copy(
+                        postState = state.postState.copy(
+                            studyPosts = (baseList + posts.studyPostsList).toPersistentList(),
+                            hasNext = posts.hasNext,
+                            nextCursor = posts.nextCursor
+                        ),
+                        isLoading = false
+                    )
+                }
+            }.onFailure {
+                _uiState.update { state -> state.copy(isLoading = false) }
+                emitError(it)
+            }
+        }
+    }
+
+    fun updatePostTitle(title: String) {
+        _uiState.update {
+            it.copy(postEditorState = it.postEditorState.copy(title = title))
+        }
+    }
+
+    fun updatePostContent(content: String) {
+        _uiState.update {
+            it.copy(postEditorState = it.postEditorState.copy(content = content))
+        }
+    }
+
+    fun togglePostPrivate() {
+        _uiState.update {
+            it.copy(postEditorState = it.postEditorState.copy(isPrivate = !it.postEditorState.isPrivate))
+        }
+    }
+
+    fun resetPostEditor() {
+        _uiState.update {
+            it.copy(postEditorState = StudyPostEditorState())
+        }
+    }
+
+    fun submitPostFromEditor(studyId: Long) {
+        val editor = _uiState.value.postEditorState
+        val title = editor.title.trim()
+        val content = editor.content.trim()
+        if (title.isBlank() || content.isBlank() || editor.isSubmitting) return
+
+        postBoard(
+            studyId = studyId,
+            title = title,
+            content = content,
+            isPrivate = editor.isPrivate
+        )
+    }
+
+    fun toggleMemoirReaction(
+        studyId: Long,
+        memoirId: Long,
+        reactionType: String,
+        isCurrentlySelected: Boolean
+    ) {
         viewModelScope.launch {
             val result = if (isCurrentlySelected) {
                 studyRepository.deleteReviewReaction(studyId, memoirId, reactionType)
@@ -463,7 +648,11 @@ class StudyDetailViewModel @Inject constructor(
         }
     }
 
-    private fun updateMemoirReactionUIState(memoirId: Long, reactionType: String, isSelected: Boolean) {
+    private fun updateMemoirReactionUIState(
+        memoirId: Long,
+        reactionType: String,
+        isSelected: Boolean
+    ) {
         _uiState.update { state ->
             val updatedMemoirs = state.memoirState.memoirs.map { memoir ->
                 if (memoir.memoirId != memoirId) return@map memoir
@@ -504,6 +693,178 @@ class StudyDetailViewModel @Inject constructor(
         }
     }
 
+    fun togglePostPin(studyId: Long, postId: Long, isCurrentlyPinned: Boolean) {
+        viewModelScope.launch {
+            val result = if (isCurrentlyPinned) {
+                studyRepository.studyPostUnPin(studyId, postId)
+            } else {
+                studyRepository.studyPostPin(studyId, postId)
+            }
+
+            result.onSuccess {
+                _uiState.update { state ->
+                    val updatedPosts = state.postState.studyPosts
+                        .map { post ->
+                            if (post.postId == postId) post.copy(isPinned = !isCurrentlyPinned) else post
+                        }
+                        .sortedByDescending { it.isPinned }
+                        .toPersistentList()
+
+                    state.copy(postState = state.postState.copy(studyPosts = updatedPosts))
+                }
+            }.onFailure { emitError(it) }
+        }
+    }
+
+    fun togglePostLike(studyId: Long, postId: Long, isCurrentlyLiked: Boolean) {
+        viewModelScope.launch {
+            val result = if (isCurrentlyLiked) {
+                studyRepository.studyPostUnLike(studyId, postId)
+            } else {
+                studyRepository.studyPostLike(studyId, postId)
+            }
+
+            result.onSuccess {
+                _uiState.update { state ->
+                    val updatedPosts = state.postState.studyPosts
+                        .map { post ->
+                            if (post.postId == postId) {
+                                post.copy(
+                                    isLiked = !isCurrentlyLiked,
+                                    likeCount = if (!isCurrentlyLiked) post.likeCount + 1 else post.likeCount - 1
+                                )
+                            } else post
+                        }
+                        .toPersistentList()
+
+                    state.copy(postState = state.postState.copy(studyPosts = updatedPosts))
+                }
+            }.onFailure { emitError(it) }
+        }
+    }
+
+    fun fetchStudyPostDetail(studyId: Long, postId: Long) {
+        currentDetailStudyId = studyId
+        currentDetailPostId = postId
+        _uiState.update { it.copy(postDetailState = UiState.Loading) }
+
+        viewModelScope.launch {
+            studyRepository.getStudyPostDetail(studyId, postId)
+                .onSuccess { detail ->
+                    _uiState.update { it.copy(postDetailState = UiState.Success(detail)) }
+                }
+                .onFailure { t ->
+                    _uiState.update {
+                        it.copy(postDetailState = UiState.Failure(t.message ?: "게시글을 불러오지 못했습니다."))
+                    }
+                    emitError(t)
+                }
+        }
+    }
+
+    fun clearStudyPostDetail() {
+        currentDetailStudyId = null
+        currentDetailPostId = null
+        _uiState.update { it.copy(postDetailState = UiState.Empty) }
+    }
+
+    fun toggleStudyPostDetailLike() {
+        val currentDetail = (_uiState.value.postDetailState as? UiState.Success)?.data ?: return
+        val studyId = currentDetailStudyId ?: return
+        val postId = currentDetailPostId ?: currentDetail.postId
+
+        if (!inFlightDetailLikes.add(postId)) return
+
+        val wasLiked = currentDetail.isLiked
+        val nowLiked = !wasLiked
+        val delta = if (nowLiked) 1 else -1
+
+        applyDetailLikeLocal(isLiked = nowLiked, delta = delta)
+        syncPostListLikeState(postId = postId, isLiked = nowLiked, delta = delta)
+
+        viewModelScope.launch {
+            try {
+                val result = if (nowLiked) {
+                    studyRepository.studyPostLike(studyId, postId)
+                } else {
+                    studyRepository.studyPostUnLike(studyId, postId)
+                }
+
+                result.onFailure {
+                    applyDetailLikeLocal(isLiked = wasLiked, delta = -delta)
+                    syncPostListLikeState(postId = postId, isLiked = wasLiked, delta = -delta)
+                    emitError(it)
+                }
+            } finally {
+                inFlightDetailLikes.remove(postId)
+            }
+        }
+    }
+
+    fun sendStudyPostComment(studyId: Long, postId: Long, content: String) {
+        val trimmed = content.trim()
+        if (trimmed.isBlank()) return
+        val viewerStatus = _uiState.value.homeState.viewerStatus
+        val isDefinitelyNonMember =
+            viewerStatus == ViewerStatus.NOT_APPLIED || viewerStatus == ViewerStatus.APPLIED
+        if (isDefinitelyNonMember) return
+
+        viewModelScope.launch {
+            studyRepository.createStudyPostComment(
+                studyId = studyId,
+                postId = postId,
+                content = trimmed
+            ).onSuccess {
+                fetchStudyPostDetail(studyId, postId)
+                syncPostListCommentCount(postId, 1)
+            }.onFailure { emitError(it) }
+        }
+    }
+
+    private fun applyDetailLikeLocal(isLiked: Boolean, delta: Int) {
+        _uiState.update { state ->
+            val successState = state.postDetailState as? UiState.Success ?: return@update state
+            val updatedDetail: StudyPostDetailResult = successState.data.copy(
+                isLiked = isLiked,
+                likeCount = (successState.data.likeCount + delta).coerceAtLeast(0)
+            )
+            state.copy(postDetailState = UiState.Success(updatedDetail))
+        }
+    }
+
+    private fun syncPostListLikeState(postId: Long, isLiked: Boolean, delta: Int) {
+        _uiState.update { state ->
+            val updatedPosts = state.postState.studyPosts
+                .map { post ->
+                    if (post.postId == postId) {
+                        post.copy(
+                            isLiked = isLiked,
+                            likeCount = (post.likeCount + delta).coerceAtLeast(0)
+                        )
+                    } else {
+                        post
+                    }
+                }
+                .toPersistentList()
+
+            state.copy(postState = state.postState.copy(studyPosts = updatedPosts))
+        }
+    }
+
+    private fun syncPostListCommentCount(postId: Long, delta: Int) {
+        _uiState.update { state ->
+            val updatedPosts = state.postState.studyPosts
+                .map { post ->
+                    if (post.postId == postId) {
+                        post.copy(commentCount = (post.commentCount + delta).coerceAtLeast(0))
+                    } else {
+                        post
+                    }
+                }
+                .toPersistentList()
+            state.copy(postState = state.postState.copy(studyPosts = updatedPosts))
+        }
+    }
     private suspend fun emitError(t: Throwable) {
         _sideEffect.emit(StudyDetailSideEffect.ShowSnackBar(t.message ?: "오류가 발생했습니다."))
     }

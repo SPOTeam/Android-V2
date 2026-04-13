@@ -32,7 +32,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
@@ -53,6 +56,12 @@ import com.umcspot.spot.study.detail.screen.StudyDetailMemoirScreen
 import com.umcspot.spot.study.detail.screen.StudyDetailPlannerScreen
 import com.umcspot.spot.study.detail.screen.camera.QrScannerScreen
 import com.umcspot.spot.study.model.ViewerStatus
+import com.umcspot.spot.study.detail.model.StudyDetailState
+import com.umcspot.spot.study.detail.model.StudyDetailTab
+import com.umcspot.spot.study.detail.screen.StudyDetailBoardScreen
+import com.umcspot.spot.study.detail.screen.StudyDetailHomeScreen
+import com.umcspot.spot.study.detail.screen.StudyDetailMemoirScreen
+import com.umcspot.spot.study.detail.screen.StudyDetailPlannerScreen
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 import kotlinx.coroutines.delay
@@ -64,6 +73,7 @@ fun StudyDetailRoute(
     studyId: Long,
     onBackClick: () -> Unit,
     onAttendanceClick: (Long) -> Unit,
+    onBoardPostClick: (Long) -> Unit,
     contentPadding: PaddingValues,
     onTabChanged: (StudyDetailTab) -> Unit,
     initialTab: StudyDetailTab,
@@ -99,10 +109,12 @@ fun StudyDetailRoute(
                     showApplyInputDialog = false
                     showApplySuccessDialog = true
                 }
+
                 is StudyDetailSideEffect.ScheduleCreateSuccess -> {
                     showScheduleBottomSheet = false
                     viewModel.clearScheduleError()
                 }
+
                 else -> Unit
             }
         }
@@ -110,6 +122,27 @@ fun StudyDetailRoute(
 
     LaunchedEffect(studyId) {
         viewModel.fetchStudyHomeDetail(studyId)
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(studyId, selectedTab) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event != Lifecycle.Event.ON_RESUME) return@LifecycleEventObserver
+
+            when (selectedTab) {
+                StudyDetailTab.HOME -> viewModel.fetchStudyHomeDetail(studyId)
+                StudyDetailTab.PLANNER -> {
+                    val date = uiState.plannerState.selectedDate
+                    viewModel.fetchMonthlySchedules(studyId, date.year, date.monthValue)
+                }
+                StudyDetailTab.BOARD -> viewModel.fetchStudyBoardPosts(studyId, refresh = true)
+                StudyDetailTab.MEMOIR -> viewModel.fetchAllMemoirs(studyId)
+            }
+        }
+
+        val lifecycle = lifecycleOwner.lifecycle
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
     }
 
     LaunchedEffect(selectedTab) {
@@ -120,6 +153,10 @@ fun StudyDetailRoute(
                 val date = uiState.plannerState.selectedDate
                 viewModel.fetchMonthlySchedules(studyId, date.year, date.monthValue)
             }
+            StudyDetailTab.BOARD -> {
+                viewModel.fetchStudyBoardPosts(studyId, refresh = uiState.postState.studyPosts.isEmpty())
+            }
+
             else -> Unit
         }
     }
@@ -177,6 +214,13 @@ fun StudyDetailRoute(
             onMemoirDelete = { id -> viewModel.deleteMemoir(studyId, id) },
             onMemoirEmojiToggle = { id, type -> viewModel.toggleMemoirReaction(studyId, id, type) },
             onApplyClick = { showApplyInputDialog = true },
+            onPostPinToggle = { postId, isPinned ->
+                viewModel.togglePostPin(studyId, postId, isPinned)
+            },
+            onPostLikeClick = { postId, isLiked ->
+                viewModel.togglePostLike(studyId, postId, isLiked)
+            },
+            onPostClick = onBoardPostClick,
             onBackClick = onBackClick,
             contentPadding = contentPadding,
             lazyListState = lazyListState
@@ -285,6 +329,9 @@ private fun StudyDetailScreen(
     onMemoirDelete: (Long) -> Unit,
     onMemoirEmojiToggle: (Long, String) -> Unit,
     onApplyClick: () -> Unit,
+    onPostPinToggle: (Long, Boolean) -> Unit,
+    onPostLikeClick: (Long, Boolean) -> Unit,
+    onPostClick: (Long) -> Unit,
     onBackClick: () -> Unit,
     contentPadding: PaddingValues,
     lazyListState: LazyListState
@@ -296,7 +343,6 @@ private fun StudyDetailScreen(
             .imePadding()
     ) {
         item {
-            Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
             BackTopBar(title = "스터디", onBackClick = onBackClick)
             AsyncImage(
                 model = uiState.homeState.thumbnailUrl,
@@ -340,6 +386,7 @@ private fun StudyDetailScreen(
                         isMember = isMember,
                         onAttendanceClick = { id, isNow -> onAttendanceClick(id, isNow) }
                     )
+
                     StudyDetailTab.PLANNER -> StudyDetailPlannerScreen(
                         studyId = studyId,
                         plannerState = uiState.plannerState,
@@ -356,7 +403,18 @@ private fun StudyDetailScreen(
                         onTodoDelete = onTodoDelete,
                         onMemberSelected = onMemberSelected
                     )
-                    StudyDetailTab.BOARD -> StudyDetailBoardScreen()
+
+                    StudyDetailTab.BOARD -> StudyDetailBoardScreen(
+                        posts = uiState.postState.studyPosts,
+                        isLoading = uiState.isLoading,
+                        canPin = isOwner,
+                        onPinToggle = onPostPinToggle,
+                        onLikeClick = { postId, isLiked ->
+                            if (isMember) onPostLikeClick(postId, isLiked)
+                        },
+                        onPostClick = onPostClick
+                    )
+
                     StudyDetailTab.MEMOIR -> StudyDetailMemoirScreen(
                         studyId = studyId,
                         memoirs = uiState.memoirState.memoirs,

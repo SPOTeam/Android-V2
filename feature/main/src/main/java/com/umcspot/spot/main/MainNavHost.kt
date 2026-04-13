@@ -1,5 +1,6 @@
 package com.umcspot.spot.main
 
+import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,6 +26,7 @@ import com.umcspot.spot.mypage.navigation.myPageGraph
 import com.umcspot.spot.signup.navigation.signupGraph
 import com.umcspot.spot.study.detail.model.StudyDetailTab
 import com.umcspot.spot.study.detail.navigation.StudyAttendance
+import com.umcspot.spot.study.detail.navigation.StudyPostContent
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.detail.navigation.studyDetailGraph
 import com.umcspot.spot.study.my.navigation.myStudyGraph
@@ -254,8 +256,17 @@ fun MainNavHost(
             onAttendanceClick = { studyId, scheduleId ->
                 navigator.navController.navigate(StudyAttendance(studyId, scheduleId))
             },
+            onBoardPostClick = { studyId, postId ->
+                navigator.navController.navigate(StudyPostContent(studyId, postId))
+            },
+            onBoardPostBackClick = {
+                navigator.popBackStack()
+            },
+            onPostContentBackClick = {
+                navigator.popBackStack()
+            },
             onTabChanged = onStudyTabChanged,
-            currentTab = currentStudyDetailTab,
+            currentTab = currentStudyDetailTab
         )
     }
 }

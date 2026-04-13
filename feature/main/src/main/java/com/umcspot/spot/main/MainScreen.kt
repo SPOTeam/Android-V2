@@ -1,11 +1,21 @@
 package com.umcspot.spot.main
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,8 +46,10 @@ import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.detail.model.StudyDetailTab
 import com.umcspot.spot.study.detail.navigation.StudyAttendance
+import com.umcspot.spot.study.detail.navigation.StudyBoardPost
 import com.umcspot.spot.study.detail.navigation.StudyDetail
 import com.umcspot.spot.study.detail.navigation.StudyMemoirPost
+import com.umcspot.spot.study.detail.navigation.StudyPostContent
 import com.umcspot.spot.study.my.navigation.MyStudy
 import com.umcspot.spot.study.preferCategory.navigation.PreferCategoryFilter
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocationFilter
@@ -143,7 +155,11 @@ fun MainScreen(
                         dest?.hasRoute(StudyDetail::class) == true -> {
                             val studyId = backStackEntry?.toRoute<StudyDetail>()?.studyId
                             if (studyId != null) {
-                                navigator.navigateToStudyMemoirPost(studyId)
+                                if (currentStudyDetailTab == StudyDetailTab.MEMOIR) {
+                                    navigator.navigateToStudyMemoirPost(studyId)
+                                } else if (currentStudyDetailTab == StudyDetailTab.BOARD) {
+                                    navigator.navigateToStudyBoardPost(studyId)
+                                }
                             }
                         }
                     }
@@ -170,7 +186,7 @@ fun MainScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .consumeWindowInsets(innerPadding),
-            contentPadding =  innerPadding,
+            contentPadding = innerPadding,
             onRegisterScrollToTop = { handler -> scrollToTop = handler },
             onBackRequest = { showBackRequestDialog = true },
             onStudyTabChanged = { tab -> currentStudyDetailTab = tab },

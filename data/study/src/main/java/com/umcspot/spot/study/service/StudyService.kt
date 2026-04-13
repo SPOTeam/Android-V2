@@ -11,9 +11,13 @@ import com.umcspot.spot.study.dto.request.ScheduleCreateRequestDto
 import com.umcspot.spot.study.dto.request.StudyApplyRequestDto
 import com.umcspot.spot.study.dto.request.StudyReportRequestDto
 import com.umcspot.spot.study.dto.request.StudyWithdrawRequestDto
+import com.umcspot.spot.study.dto.request.BoardCreateRequestDto
+import com.umcspot.spot.study.dto.request.StudyPostCommentRequestDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.MemoirCreateResponseDto
 import com.umcspot.spot.study.dto.response.ScheduleCreateResponseDto
+import com.umcspot.spot.study.dto.response.BoardCreateResponseDto
+import com.umcspot.spot.study.dto.response.SendStudyPostCommentResponseDto
 import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
@@ -21,6 +25,8 @@ import com.umcspot.spot.study.dto.response.StudyMonthlyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
 import com.umcspot.spot.study.dto.response.StudyAttendanceQrResponseDto
 import com.umcspot.spot.study.dto.response.StudyAttendanceResponseDto
+import com.umcspot.spot.study.dto.response.StudyPostDetailResponseDto
+import com.umcspot.spot.study.dto.response.StudyPostsResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.dto.response.StudyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
@@ -228,6 +234,12 @@ interface StudyService {
         @Part imageFile: List<MultipartBody.Part>?
     ): BaseResponse<MemoirCreateResponseDto>
 
+    @POST("/api/studies/{studyId}/posts")
+    suspend fun postBoard(
+        @Path("studyId") studyId: Long,
+        @Body request: BoardCreateRequestDto,
+    ): BaseResponse<BoardCreateResponseDto>
+
     // 회고록 반응 추가
     @POST("/api/studies/{studyId}/reviews/{reviewId}/reactions")
     suspend fun postReviewReaction(
@@ -311,4 +323,48 @@ interface StudyService {
         @Path("studyId") studyId: Long
     ): NullResultResponse
 
+}
+    @GET("/api/studies/{studyId}/posts")
+    suspend fun getStudyPostsList(
+        @Path("studyId") studyId: Long,
+        @Query("cursor") cursor: Long?,
+        @Query("size") size: Int
+    ): BaseResponse<StudyPostsResponseDto>
+
+    @GET("/api/studies/{studyId}/posts/{postId}")
+    suspend fun getStudyPostDetail(
+        @Path("studyId") studyId: Long,
+        @Path("postId") postId: Long,
+    ): BaseResponse<StudyPostDetailResponseDto>
+
+    @POST("/api/studies/{studyId}/posts/{postId}/pin")
+    suspend fun studyPostPin(
+        @Path("studyId") studyId: Long,
+        @Path("postId") postId: Long,
+    ): NullResultResponse
+
+    @DELETE("/api/studies/{studyId}/posts/{postId}/pin")
+    suspend fun studyPostUnPin(
+        @Path("studyId") studyId: Long,
+        @Path("postId") postId: Long,
+    ): NullResultResponse
+
+    @POST("/api/studies/{studyId}/posts/{postId}/like")
+    suspend fun studyPostLike(
+        @Path("studyId") studyId: Long,
+        @Path("postId") postId: Long,
+    ): NullResultResponse
+
+    @DELETE("/api/studies/{studyId}/posts/{postId}/like")
+    suspend fun studyPostUnLike(
+        @Path("studyId") studyId: Long,
+        @Path("postId") postId: Long,
+    ): NullResultResponse
+
+    @POST("/api/studies/{studyId}/posts/{postId}/comments")
+    suspend fun createStudyPostComment(
+        @Path("studyId") studyId: Long,
+        @Path("postId") postId: Long,
+        @Body request: StudyPostCommentRequestDto
+    ): BaseResponse<SendStudyPostCommentResponseDto>
 }
