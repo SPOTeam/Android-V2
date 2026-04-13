@@ -205,6 +205,7 @@ class RegisterStudyViewModel @Inject constructor(
                 hasFee = currentState.hasFee ?: false,
                 amount = currentState.feeAmount.toIntOrNull() ?: 0,
                 description = currentState.description,
+                isOnline = currentState.activityType == ActivityType.ONLINE,
                 categories = currentState.studyThemes,
                 styles = styles,
                 regionCodes = regionCodes
