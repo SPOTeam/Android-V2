@@ -8,10 +8,14 @@ import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.study.dto.request.ScheduleCreateRequestDto
+import com.umcspot.spot.study.dto.request.BoardCreateRequestDto
+import com.umcspot.spot.study.dto.request.StudyPostCommentRequestDto
 import com.umcspot.spot.study.dto.request.StudyRequestDto
+import com.umcspot.spot.study.dto.response.BoardCreateResponseDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.MemoirCreateResponseDto
 import com.umcspot.spot.study.dto.response.ScheduleCreateResponseDto
+import com.umcspot.spot.study.dto.response.SendStudyPostCommentResponseDto
 import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
@@ -19,6 +23,8 @@ import com.umcspot.spot.study.dto.response.StudyMonthlyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
 import com.umcspot.spot.study.dto.response.StudyAttendanceQrResponseDto
 import com.umcspot.spot.study.dto.response.StudyAttendanceResponseDto
+import com.umcspot.spot.study.dto.response.StudyPostDetailResponseDto
+import com.umcspot.spot.study.dto.response.StudyPostsResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
 import com.umcspot.spot.study.dto.response.StudyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.TodoCreateResponseDto
@@ -99,6 +105,11 @@ interface StudyDataSource {
         imageFiles: List<File>
     ): BaseResponse<MemoirCreateResponseDto>
 
+    suspend fun postBoard(
+        studyId: Long,
+        request: BoardCreateRequestDto,
+    ): BaseResponse<BoardCreateResponseDto>
+
     suspend fun postReviewReaction(studyId: Long, reviewId: Long, reaction: String): BaseResponse<Unit?>
 
     suspend fun deleteReviewReaction(studyId: Long, reviewId: Long, reaction: String): BaseResponse<Unit?>
@@ -132,6 +143,43 @@ interface StudyDataSource {
         applicationId : Long,
         decision : String
     ) : NullResultResponse
+
+    suspend fun getStudyPostsList(
+        studyId : Long,
+        cursor: Long?,
+        size: Int
+    ) : BaseResponse<StudyPostsResponseDto>
+
+    suspend fun getStudyPostDetail(
+        studyId : Long,
+        postId : Long,
+    ) : BaseResponse<StudyPostDetailResponseDto>
+
+    suspend fun studyPostPin(
+        studyId: Long,
+        postId: Long
+    ) : NullResultResponse
+
+    suspend fun studyPostUnPin(
+        studyId: Long,
+        postId: Long
+    ) : NullResultResponse
+
+    suspend fun studyPostLike(
+        studyId: Long,
+        postId: Long
+    ) : NullResultResponse
+
+    suspend fun studyPostUnLike(
+        studyId: Long,
+        postId: Long
+    ) : NullResultResponse
+
+    suspend fun createStudyPostComment(
+        studyId: Long,
+        postId: Long,
+        request: StudyPostCommentRequestDto
+    ): BaseResponse<SendStudyPostCommentResponseDto>
 
     suspend fun createSchedule(
         studyId: Long,

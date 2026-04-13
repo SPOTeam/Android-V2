@@ -75,7 +75,7 @@ fun HomeScreen(
     onQuickMenuClick: (QuickMenuType) -> Unit,
     onPopularClick: () -> Unit,
     onPopularPostClick: (Long) -> Unit,
-    onStudyClick: (StudyResult) -> Unit,
+    onStudyClick: (Long) -> Unit,
     onStudyMoreClick: () -> Unit,
     contentPadding: PaddingValues
 ) {
@@ -279,7 +279,7 @@ fun PopularPostNow(
 fun PopularStudyNow(
     items: List<StudyResult>,
     modifier: Modifier = Modifier,
-    onItemClick: (StudyResult) -> Unit = {},
+    onItemClick: (Long) -> Unit = {},
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         items.forEach { item ->
@@ -288,7 +288,7 @@ fun PopularStudyNow(
                 item = item,
                 modifier = Modifier
                     .fillMaxWidth(),
-                onClick = { onItemClick(item) }
+                onClick = { onItemClick(item.id) }
             )
 
             if (item != items.last()) {
@@ -307,7 +307,7 @@ fun PopularStudyNow(
 fun RecommendStudyNow(
     items: List<StudyResult>,
     modifier: Modifier = Modifier,
-    onItemClick: (StudyResult) -> Unit = {},
+    onItemClick: (Long) -> Unit = {},
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         items.forEach { item ->
@@ -317,7 +317,7 @@ fun RecommendStudyNow(
                 item = item,
                 modifier = Modifier
                     .fillMaxWidth(),
-                onClick = { onItemClick(item) }
+                onClick = { onItemClick(item.id) }
             )
 
             if (item != items.last()) {
@@ -341,7 +341,7 @@ fun HomeScreenContent(
     onPopularClick: () -> Unit,
     onPopularPostClick: (Long) -> Unit,
     onQuickMenuClick: (QuickMenuType) -> Unit,
-    onStudyClick: (StudyResult) -> Unit,
+    onStudyClick: (Long) -> Unit,
     onStudyMoreClick: () -> Unit,
     onRefreshRecommended: () -> Unit,
 ) {

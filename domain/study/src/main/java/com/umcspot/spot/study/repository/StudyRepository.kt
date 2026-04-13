@@ -4,6 +4,7 @@ import com.umcspot.spot.model.FeeRange
 import com.umcspot.spot.model.RecruitingStatus
 import com.umcspot.spot.model.RecruitingStudySort
 import com.umcspot.spot.model.StudyTheme
+import com.umcspot.spot.study.model.BoardCreateModel
 import com.umcspot.spot.study.model.MemoirCreateModel
 import com.umcspot.spot.study.model.MemoirModel
 import com.umcspot.spot.study.model.StudyApplicationResultList
@@ -12,6 +13,8 @@ import com.umcspot.spot.study.model.StudyAttendanceQrModel
 import com.umcspot.spot.study.model.StudyCreateModel
 import com.umcspot.spot.study.model.StudyDetailModel
 import com.umcspot.spot.study.model.StudyMemberModel
+import com.umcspot.spot.study.model.StudyPostDetailResult
+import com.umcspot.spot.study.model.StudyPostsResultList
 import com.umcspot.spot.study.model.StudyRecentMemoirModel
 import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.study.model.StudyScheduleModel
@@ -98,10 +101,14 @@ interface StudyRepository {
         imageFiles: List<File>
     ): Result<Long>
 
+    suspend fun postBoard(
+        studyId: Long,
+        board : BoardCreateModel,
+    ): Result<Long>
+
     suspend fun postReviewReaction(studyId: Long, reviewId: Long, reaction: String): Result<Unit?>
 
     suspend fun deleteReviewReaction(studyId: Long, reviewId: Long, reaction: String): Result<Unit?>
-
 
     suspend fun getCategoryStudies(
         recruitingStatus: RecruitingStatus?,
@@ -162,4 +169,41 @@ interface StudyRepository {
     suspend fun finishAttendance(studyId: Long, scheduleId: Long): Result<Unit>
 
     suspend fun checkAttendance(studyId: Long, scheduleId: Long, token: String): Result<Unit>
+
+    suspend fun getStudyPostsList(
+        studyId : Long,
+        cursor: Long?,
+        size: Int
+    ) : Result<StudyPostsResultList>
+
+    suspend fun getStudyPostDetail(
+        studyId : Long,
+        postId : Long
+    ) : Result<StudyPostDetailResult>
+
+    suspend fun studyPostPin(
+        studyId: Long,
+        postId: Long
+    ) : Result<Unit>
+
+    suspend fun studyPostUnPin(
+        studyId: Long,
+        postId: Long
+    ) : Result<Unit>
+
+    suspend fun studyPostLike(
+        studyId: Long,
+        postId: Long
+    ) : Result<Unit>
+
+    suspend fun studyPostUnLike(
+        studyId: Long,
+        postId: Long
+    ) : Result<Unit>
+
+    suspend fun createStudyPostComment(
+        studyId: Long,
+        postId: Long,
+        content: String
+    ): Result<Unit>
 }

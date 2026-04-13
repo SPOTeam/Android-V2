@@ -22,7 +22,7 @@ fun NavGraphBuilder.homeGraph(
     onQuickMenuClick: (QuickMenuType) -> Unit,
     onPopularClick: () -> Unit,
     onPopularPostClick: (Long) -> Unit,
-    onStudyClick: (StudyResult) -> Unit,
+    onStudyClick: (Long) -> Unit,
     onStudyMoreClick: () -> Unit
 ) {
     composable<Home> {

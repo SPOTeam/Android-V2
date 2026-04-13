@@ -7,19 +7,25 @@ import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.network.model.BaseResponse
 import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.study.datasource.StudyDataSource
+import com.umcspot.spot.study.dto.request.BoardCreateRequestDto
 import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.study.dto.request.ScheduleCreateRequestDto
 import com.umcspot.spot.study.dto.request.StudyApplyRequestDto
+import com.umcspot.spot.study.dto.request.StudyPostCommentRequestDto
 import com.umcspot.spot.study.dto.request.StudyRequestDto
 import com.umcspot.spot.study.dto.request.TodoCreateRequestDto
+import com.umcspot.spot.study.dto.response.BoardCreateResponseDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.MemoirCreateResponseDto
 import com.umcspot.spot.study.dto.response.ScheduleCreateResponseDto
+import com.umcspot.spot.study.dto.response.SendStudyPostCommentResponseDto
 import com.umcspot.spot.study.dto.response.StudyDetailResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemberResponseDto
 import com.umcspot.spot.study.dto.response.StudyMemoirResponseDto
 import com.umcspot.spot.study.dto.response.StudyMonthlyScheduleResponseDto
 import com.umcspot.spot.study.dto.response.StudyApplicationResponseDto
+import com.umcspot.spot.study.dto.response.StudyPostDetailResponseDto
+import com.umcspot.spot.study.dto.response.StudyPostsResponseDto
 import com.umcspot.spot.study.dto.response.StudyAttendanceQrResponseDto
 import com.umcspot.spot.study.dto.response.StudyAttendanceResponseDto
 import com.umcspot.spot.study.dto.response.StudyResponseDto
@@ -32,6 +38,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import javax.inject.Inject
+import kotlin.collections.ifEmpty
 
 class StudyDataSourceImpl @Inject constructor(
     private val studyService: StudyService
@@ -162,6 +169,15 @@ class StudyDataSourceImpl @Inject constructor(
         )
     }
 
+    override suspend fun postBoard(
+        studyId: Long,
+        request: BoardCreateRequestDto
+    ): BaseResponse<BoardCreateResponseDto> =
+       studyService.postBoard(
+            studyId = studyId,
+            request = request
+       )
+
     override suspend fun postReviewReaction(studyId: Long, reviewId: Long, reaction: String): BaseResponse<Unit?> {
         return studyService.postReviewReaction(studyId, reviewId, reaction)
     }
@@ -240,4 +256,51 @@ class StudyDataSourceImpl @Inject constructor(
 
     override suspend fun getAttendanceQr(studyId: Long, scheduleId: Long): BaseResponse<StudyAttendanceQrResponseDto> =
         studyService.getAttendanceQr(studyId, scheduleId)
+
+    override suspend fun getStudyPostsList(
+        studyId: Long,
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyPostsResponseDto> =
+        studyService.getStudyPostsList(studyId, cursor, size)
+
+    override suspend fun getStudyPostDetail(
+        studyId: Long,
+        postId: Long
+    ): BaseResponse<StudyPostDetailResponseDto> =
+        studyService.getStudyPostDetail(studyId,postId)
+
+    override suspend fun studyPostPin(
+        studyId: Long,
+        postId: Long
+    ): NullResultResponse =
+        studyService.studyPostPin(studyId,postId)
+
+
+    override suspend fun studyPostUnPin(
+        studyId: Long,
+        postId: Long
+    ): NullResultResponse =
+        studyService.studyPostUnPin(studyId,postId)
+
+
+    override suspend fun studyPostLike(
+        studyId: Long,
+        postId: Long
+    ): NullResultResponse =
+        studyService.studyPostLike(studyId,postId)
+
+
+    override suspend fun studyPostUnLike(
+        studyId: Long,
+        postId: Long
+    ): NullResultResponse =
+        studyService.studyPostUnLike(studyId,postId)
+
+    override suspend fun createStudyPostComment(
+        studyId: Long,
+        postId: Long,
+        request: StudyPostCommentRequestDto
+    ): BaseResponse<SendStudyPostCommentResponseDto> =
+        studyService.createStudyPostComment(studyId, postId, request)
 }
