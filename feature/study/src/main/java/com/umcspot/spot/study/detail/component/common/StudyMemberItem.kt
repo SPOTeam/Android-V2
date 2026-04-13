@@ -1,6 +1,7 @@
 package com.umcspot.spot.study.detail.component.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,9 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.umcspot.spot.designsystem.R
@@ -30,6 +31,10 @@ fun StudyMemberItem(
     isLeader: Boolean = false,
     showLeaderIcon: Boolean = true,
     isSelected: Boolean = true,
+    iconSize: Dp = 44.dp,
+    selectedBorderColor: Color = Color.Transparent,
+    selectedTextColor: Color = SpotTheme.colors.black,
+    unselectedTextColor: Color = SpotTheme.colors.gray400,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
@@ -37,14 +42,18 @@ fun StudyMemberItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .then(if (onClick != null) Modifier.noRippleClickable { onClick() } else Modifier)
-            .graphicsLayer(alpha = if (isSelected) 1f else 0.5f)
     ) {
         Box(contentAlignment = Alignment.BottomEnd) {
             AsyncImage(
                 model = profileUrl,
                 contentDescription = null,
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(iconSize)
+                    .then(
+                        if (isSelected && selectedBorderColor != Color.Transparent)
+                            Modifier.border(1.dp, selectedBorderColor, CircleShape)
+                        else Modifier
+                    )
                     .clip(CircleShape)
                     .background(SpotTheme.colors.gray100),
                 contentScale = ContentScale.Crop,
@@ -52,12 +61,11 @@ fun StudyMemberItem(
                 error = painterResource(id = R.drawable.spot_logo)
             )
 
-
             if (showLeaderIcon && isLeader) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_leader),
                     contentDescription = null,
-                    modifier = Modifier.size(14.dp),
+                    modifier = Modifier.size(if (iconSize == 44.dp) 14.dp else 10.dp),
                     tint = Color.Unspecified
                 )
             }
@@ -68,7 +76,7 @@ fun StudyMemberItem(
         Text(
             text = name,
             style = SpotTheme.typography.small_500,
-            color = if (isSelected) SpotTheme.colors.black else SpotTheme.colors.gray400
+            color = if (isSelected) selectedTextColor else unselectedTextColor
         )
     }
 }

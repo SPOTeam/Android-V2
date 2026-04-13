@@ -194,7 +194,7 @@ fun RecruitingStudyScreen(
 
                 is UiState.Failure -> {
                     EmptyAlert(
-                        painter = painterResource(R.drawable.emoji_sad),
+                        painter = painterResource(R.drawable.ic_sad),
                         alertTitle = "조건에 맞는 스터디가 없어요.",
                         alertDes = "필터를 재설정하고 스터디를 찾아보세요."
                     )
@@ -202,7 +202,7 @@ fun RecruitingStudyScreen(
 
                 is UiState.Empty -> {
                     EmptyAlert(
-                        painter = painterResource(R.drawable.emoji_sad),
+                        painter = painterResource(R.drawable.ic_sad),
                         alertTitle = "조건에 맞는 스터디가 없어요.",
                         alertDes = "필터를 재설정하고 스터디를 찾아보세요."
                     )

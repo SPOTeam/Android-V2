@@ -18,6 +18,7 @@ import com.umcspot.spot.study.model.StudyPostsResultList
 import com.umcspot.spot.study.model.StudyRecentMemoirModel
 import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.study.model.StudyScheduleModel
+import com.umcspot.spot.study.model.StudyUpdateModel
 import com.umcspot.spot.study.model.TodoModel
 import java.io.File
 import java.time.LocalDateTime
@@ -34,20 +35,20 @@ interface StudyRepository {
     ): Result<StudyResultList>
 
     suspend fun getPreferLocationStudies(
-        recruitingStatus : RecruitingStatus?,
+        recruitingStatus: RecruitingStatus?,
         feeRange: FeeRange?,
         categories: List<String>?,
         sortBy: RecruitingStudySort?,
         cursor: Long?,
         size: Int,
-        regionCodes : List<String>?
+        regionCodes: List<String>?
     ): Result<StudyResultList>
 
     suspend fun getPreferCategoryStudies(
-        category : StudyTheme?,
-        recruitingStatus : RecruitingStatus?,
+        category: StudyTheme?,
+        recruitingStatus: RecruitingStatus?,
         feeRange: FeeRange?,
-        isOnline : Boolean?,
+        isOnline: Boolean?,
         sortBy: RecruitingStudySort?,
         cursor: Long?,
         size: Int,
@@ -55,11 +56,27 @@ interface StudyRepository {
 
     suspend fun createStudy(studyCreateModel: StudyCreateModel, imageFile: File?): Result<Long>
 
+    suspend fun withdrawStudy(
+        studyId: Long,
+        withdrawReason: String,
+        nextOwnerId: Long?
+    ): Result<Unit>
+
     suspend fun applyStudy(studyId: Long, message: String): Result<Unit>
+
+    suspend fun updateStudy(
+        studyId: Long,
+        studyUpdateModel: StudyUpdateModel,
+        imageFile: File?
+    ): Result<Unit>
 
     suspend fun getStudyDetail(studyId: Long): Result<StudyDetailModel>
 
     suspend fun getStudyMembers(studyId: Long): Result<List<StudyMemberModel>>
+
+    suspend fun likeStudy(studyId: Long): Result<Unit>
+
+    suspend fun unlikeStudy(studyId: Long): Result<Unit>
 
     suspend fun getUpcomingSchedules(studyId: Long): Result<List<StudyScheduleModel>>
 
@@ -114,7 +131,7 @@ interface StudyRepository {
         recruitingStatus: RecruitingStatus?,
         feeRange: FeeRange?,
         category: String?,
-        isOnline : Boolean?,
+        isOnline: Boolean?,
         sortBy: RecruitingStudySort,
         cursor: Long?,
         size: Int,
@@ -142,12 +159,12 @@ interface StudyRepository {
 
     suspend fun getStudyApplications(
         studyId: Long
-    ) : Result<StudyApplicationResultList>
+    ): Result<StudyApplicationResultList>
 
     suspend fun entryAcceptance(
         applicationId: Long,
         decision: String
-    ) : Result<Unit>
+    ): Result<Unit>
 
     suspend fun createSchedule(
         studyId: Long,
@@ -170,6 +187,13 @@ interface StudyRepository {
 
     suspend fun checkAttendance(studyId: Long, scheduleId: Long, token: String): Result<Unit>
 
+    suspend fun reportStudyMember(
+        studyId: Long,
+        targetMemberId: Long,
+        reason: String
+    ): Result<Unit>
+
+    suspend fun deleteStudy(studyId: Long): Result<Unit>
     suspend fun getStudyPostsList(
         studyId : Long,
         cursor: Long?,

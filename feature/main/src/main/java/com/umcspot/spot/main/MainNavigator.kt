@@ -12,7 +12,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.umcspot.spot.alert.navigation.Alert
 import com.umcspot.spot.alert.navigation.navigateToAlert
+import com.umcspot.spot.category.navigation.CategoryGraph
 import com.umcspot.spot.category.navigation.navigateToCategory
+import com.umcspot.spot.category.navigation.navigateToCategoryFilter
 import com.umcspot.spot.feature.board.boardList.navigation.BoardList
 import com.umcspot.spot.feature.board.main.navigation.Board
 import com.umcspot.spot.feature.board.main.navigation.navigateToBoard
@@ -22,15 +24,17 @@ import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.JJim
 import com.umcspot.spot.jjim.navigation.navigateToJJim
-import com.umcspot.spot.mypage.cancelMemberShip.navigation.CancelMemberShip
-import com.umcspot.spot.mypage.editInterestRegion.navigation.EditRegion
-import com.umcspot.spot.mypage.editInterestStudy.navigation.EditInterest
-import com.umcspot.spot.mypage.main.navigation.MyPage
-import com.umcspot.spot.mypage.main.navigation.navigateToMyPage
-import com.umcspot.spot.mypage.participating.navigation.ParticipatingStudy
-import com.umcspot.spot.mypage.recruiting.application.navigation.STUDY_APPLICATION_ROUTE
-import com.umcspot.spot.mypage.recruiting.navigation.MyRecruitingStudy
-import com.umcspot.spot.mypage.waiting.navigation.WaitingStudy
+import com.umcspot.spot.mypage.navigation.MyPageGraph
+import com.umcspot.spot.mypage.navigation.navigateToCancelMembership
+import com.umcspot.spot.mypage.navigation.navigateToEditInterestRegion
+import com.umcspot.spot.mypage.navigation.navigateToEditInterestStudy
+import com.umcspot.spot.mypage.navigation.navigateToEditStudy
+import com.umcspot.spot.mypage.navigation.navigateToLeaveStudy
+import com.umcspot.spot.mypage.navigation.navigateToMyPage
+import com.umcspot.spot.mypage.navigation.navigateToMyRecruitingStudy
+import com.umcspot.spot.mypage.navigation.navigateToParticipatingStudy
+import com.umcspot.spot.mypage.navigation.navigateToStudyApplications
+import com.umcspot.spot.mypage.navigation.navigateToWaitingStudy
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.Landing
 import com.umcspot.spot.signup.navigation.Saving
@@ -49,6 +53,7 @@ import com.umcspot.spot.study.my.navigation.MyStudy
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
 import com.umcspot.spot.study.preferCategory.navigation.PreferCategory
 import com.umcspot.spot.study.preferCategory.navigation.PreferCategoryFilter
+import com.umcspot.spot.study.preferCategory.navigation.navigateToPreferCategoryStudyFilter
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocation
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocationFilter
 import com.umcspot.spot.study.preferLocation.navigation.navigateToPreferLocationStudy
@@ -77,17 +82,16 @@ class MainNavigator(
             }
 
     fun navigate(tab: MainNavTab) {
-        val navOptions =
-            navOptions {
-                navController.currentDestination?.route?.let {
-                    popUpTo(it) {
-                        inclusive = true
-                        saveState = true
-                    }
+        val navOptions = navOptions {
+            navController.currentDestination?.route?.let {
+                popUpTo(it) {
+                    inclusive = true
+                    saveState = true
                 }
-                launchSingleTop = true
-                restoreState = true
             }
+            launchSingleTop = true
+            restoreState = true
+        }
         when (tab) {
             MainNavTab.HOME -> navController.navigateToHome(navOptions)
             MainNavTab.CATEGORY -> navController.navigateToCategory(navOptions)
@@ -123,16 +127,9 @@ class MainNavigator(
         Posting::class,
         BoardList::class,
         JJim::class,
-        MyPage::class,
-        ParticipatingStudy::class,
-        MyRecruitingStudy::class,
-        WaitingStudy::class,
-        EditInterest::class,
-        EditRegion::class,
-        CancelMemberShip::class,
         MyStudy::class,
-        StudyPostContent::class
-    ) || inAnyGraphRoutes(POST_CONTENT_ROUTE) || inAnyGraphRoutes(STUDY_APPLICATION_ROUTE)
+        MyPageGraph.StudyApplications::class
+    ) || inAnyGraphRoutes(POST_CONTENT_ROUTE)|| (currentDestination?.route?.contains(POST_CONTENT_ROUTE) == true)
 
     @Composable
     fun showToTopFab(): Boolean = inAnyGraph(
@@ -142,11 +139,13 @@ class MainNavigator(
         PreferCategory::class,
         BoardList::class,
         JJim::class,
-        ParticipatingStudy::class,
-        MyRecruitingStudy::class,
-        WaitingStudy::class,
-        MyStudy::class
-    ) || inAnyGraphRoutes(STUDY_APPLICATION_ROUTE)
+        MyStudy::class,
+        CategoryGraph.Category::class,
+        MyPageGraph.ParticipatingStudy::class,
+        MyPageGraph.MyRecruitingStudy::class,
+        MyPageGraph.WaitingStudy::class,
+        MyPageGraph.StudyApplications::class
+    )
 
     @Composable
     fun showMultipleFab(): Boolean = inAnyGraph(Home::class, BoardList::class, StudyDetail::class)
@@ -155,11 +154,7 @@ class MainNavigator(
     fun showBottomBar(): Boolean {
         val dest = currentDestination ?: return false
         val inMainTabs = MainNavTab.contains { dest.hasRoute(it::class) }
-
-        val showBottomBar = dest.isInAnyGraph(
-            Board::class, Recruiting::class
-        )
-
+        val showBottomBar = dest.isInAnyGraph(Board::class, Recruiting::class)
         return inMainTabs || showBottomBar
     }
 
@@ -178,6 +173,7 @@ class MainNavigator(
     fun navigateToLanding(navOptions: NavOptions? = null) {
         navController.navigateToLanding(navOptions)
     }
+
     fun navigateToSignUp(navOptions: NavOptions? = null) {
         navController.navigateToSignUp(navOptions)
     }
@@ -192,6 +188,14 @@ class MainNavigator(
 
     fun navigateToHome(navOptions: NavOptions? = null) {
         navController.navigateToHome(navOptions)
+    }
+
+    fun navigateToCategory(navOptions: NavOptions? = null) {
+        navController.navigateToCategory(navOptions)
+    }
+
+    fun navigateToCategoryFilter(navOptions: NavOptions? = null) {
+        navController.navigateToCategoryFilter(navOptions)
     }
 
     fun navigateToMyStudy(navOptions: NavOptions? = null) {
@@ -234,9 +238,56 @@ class MainNavigator(
         navController.navigateToStudyMemoirPost(studyId)
     }
 
-    fun navigateToStudyBoardPost(studyId: Long) {
-        navController.navigateToStudyBoardPost(studyId)
+    fun navigateToMyPage(navOptions: NavOptions? = null) {
+        navController.navigateToMyPage(navOptions)
     }
+
+
+    fun navigateToParticipatingStudy(navOptions: NavOptions? = null) {
+        navController.navigateToParticipatingStudy(navOptions)
+    }
+
+    fun navigateToMyRecruitingStudy(navOptions: NavOptions? = null) {
+        navController.navigateToMyRecruitingStudy(navOptions)
+    }
+
+    fun navigateToWaitingStudy(navOptions: NavOptions? = null) {
+        navController.navigateToWaitingStudy(navOptions)
+    }
+
+    fun navigateToEditInterestStudy(navOptions: NavOptions? = null) {
+        navController.navigateToEditInterestStudy(navOptions)
+    }
+
+    fun navigateToEditInterestRegion(navOptions: NavOptions? = null) {
+        navController.navigateToEditInterestRegion(navOptions)
+    }
+
+    fun navigateToCancelMembership(navOptions: NavOptions? = null) {
+        navController.navigateToCancelMembership(navOptions)
+    }
+
+    fun navigateToEditStudy(studyId: Long, navOptions: NavOptions? = null) {
+        navController.navigateToEditStudy(studyId, navOptions)
+    }
+
+    fun navigateToLeaveStudy(
+        studyId: Long,
+        isOwner: Boolean,
+        studyName: String,
+        studyDescription: String,
+        profileImageUrl: String?,
+        navOptions: NavOptions? = null
+    ) {
+        navController.navigateToLeaveStudy(studyId, isOwner, studyName, studyDescription, profileImageUrl, navOptions)
+    }
+
+    fun navigateToStudyApplications(studyId: Long) = navController.navigateToStudyApplications(studyId)
+
+    fun navigateToPreferCategoryStudyFilter(navOptions: NavOptions? = null) {
+        navController.navigateToPreferCategoryStudyFilter(navOptions)
+    }
+
 
     fun navigateToHomeAfterLogin() {
         val navOptions = navOptions {

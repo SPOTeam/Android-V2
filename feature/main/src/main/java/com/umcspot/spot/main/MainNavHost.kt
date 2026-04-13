@@ -10,9 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
 import com.umcspot.spot.alert.navigation.alertGraph
-import com.umcspot.spot.category.navigation.categoryFilterGraph
 import com.umcspot.spot.category.navigation.categoryGraph
-import com.umcspot.spot.category.navigation.navigateToCategoryFilter
 import com.umcspot.spot.feature.board.boardList.navigation.boardListGraph
 import com.umcspot.spot.feature.board.boardList.navigation.navigateToBoardList
 import com.umcspot.spot.feature.board.main.navigation.boardGraph
@@ -23,23 +21,8 @@ import com.umcspot.spot.feature.board.post.posting.navigation.postingGraph
 import com.umcspot.spot.home.navigation.homeGraph
 import com.umcspot.spot.jjim.navigation.jjimGraph
 import com.umcspot.spot.model.QuickMenuType
-import com.umcspot.spot.mypage.cancelMemberShip.navigation.cancelMemberShipGraph
-import com.umcspot.spot.mypage.cancelMemberShip.navigation.navigateToCancelMembership
-import com.umcspot.spot.mypage.editInterestRegion.navigation.interestRegionGraph
-import com.umcspot.spot.mypage.editInterestRegion.navigation.navigateToEditInterestRegion
-import com.umcspot.spot.mypage.editInterestStudy.navigation.interestStudyGraph
-import com.umcspot.spot.mypage.editInterestStudy.navigation.navigateToEditInterestStudy
-import com.umcspot.spot.mypage.main.navigation.MyPage
-import com.umcspot.spot.mypage.main.navigation.mypageGraph
-import com.umcspot.spot.mypage.participating.navigation.navigateToParticipatingStudy
-import com.umcspot.spot.mypage.participating.navigation.participatingGraph
-import com.umcspot.spot.mypage.recruiting.application.navigation.navigateToStudyApplications
-import com.umcspot.spot.mypage.recruiting.application.navigation.recruitingStudyApplicationsGraph
-import com.umcspot.spot.mypage.recruiting.navigation.myRecruitingStudyGraph
-import com.umcspot.spot.mypage.recruiting.navigation.navigateToMyRecruitingStudy
-import com.umcspot.spot.mypage.waiting.navigation.navigateToWaitingStudy
-import com.umcspot.spot.mypage.waiting.navigation.waitingStudyGraph
-import com.umcspot.spot.signup.navigation.navigateToLanding
+import com.umcspot.spot.mypage.navigation.MyPageGraph
+import com.umcspot.spot.mypage.navigation.myPageGraph
 import com.umcspot.spot.signup.navigation.signupGraph
 import com.umcspot.spot.study.detail.model.StudyDetailTab
 import com.umcspot.spot.study.detail.navigation.StudyAttendance
@@ -66,13 +49,14 @@ fun MainNavHost(
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
     onStudyTabChanged: (StudyDetailTab) -> Unit,
     currentStudyDetailTab: StudyDetailTab,
-    onBackRequest : () -> Unit
+    onBackRequest: () -> Unit,
 ) {
     val clearStackNavOptions = navOptions {
         popUpTo(0) { inclusive = true }
         launchSingleTop = true
         restoreState = false
     }
+
     NavHost(
         navController = navigator.navController,
         startDestination = navigator.startDestination,
@@ -82,7 +66,6 @@ fun MainNavHost(
         popEnterTransition = { EnterTransition.None },
         popExitTransition = { ExitTransition.None },
     ) {
-
         signupGraph(
             navigateToLanding = { navigator.navigateToLanding(clearStackNavOptions) },
             navigateToSignUp = { navigator.navigateToSignUp() },
@@ -104,121 +87,87 @@ fun MainNavHost(
             },
             onPopularClick = { navigator.navigateToBoard() },
             onPopularPostClick = { navigator.navController.navigateToPostContent(it) },
-            onStudyClick = { navigator.navigateToStudyDetail(it) },
-            onStudyMoreClick = {  }
-        )
-        categoryGraph(
-            contentPadding = contentPadding,
-            onRegisterScrollToTop = onRegisterScrollToTop,
-            onItemClick = { navigator.navController.navigateToStudyDetail(it) },
-            onFilterClick = { navigator.navController.navigateToCategoryFilter() },
+            onStudyClick = { studyId ->
+                navigator.navigateToStudyDetail(studyId)
+            },
+            onStudyMoreClick = {
+                navigator.navigateToRecruitingStudy()
+            },
+            onRegisterScrollToTop = onRegisterScrollToTop
         )
 
-        categoryFilterGraph(
+        categoryGraph(
             navController = navigator.navController,
             contentPadding = contentPadding,
-            onAcceptFilterClick = { navigator.popBackStack() }
+            onRegisterScrollToTop = onRegisterScrollToTop,
+            onItemClick = { navigator.navigateToStudyDetail(it) },
+            onFilterClick = { navigator.navigateToCategoryFilter() },
+            onRegisterStudyClick = { navigator.navigateToRegisterStudy() },
+            navigateUp = { navigator.navigateUp() }
         )
 
         myStudyGraph(
             contentPadding = contentPadding,
-            navigateToStudyDetail = { studyId ->
-                navigator.navController.navigateToStudyDetail(studyId)
-            }
+            navigateToStudyDetail = { navigator.navController.navigateToStudyDetail(it) },
+            onRegisterScrollToTop = onRegisterScrollToTop
         )
 
         jjimGraph(
             contentPadding = contentPadding,
             onRegisterScrollToTop = onRegisterScrollToTop,
-            onMoveToStudyClick = { navigator.navigateToRecruitingStudy() },
             onItemClick = { navigator.navigateToStudyDetail(it) }
         )
 
-
-        mypageGraph(
-            contentPadding = contentPadding,
-            onParticipatingClick = { navigator.navController.navigateToParticipatingStudy() },
-            onMyRecruitingClick = { navigator.navController.navigateToMyRecruitingStudy() },
-            onMyAppliedClick = { navigator.navController.navigateToWaitingStudy() },
-            onEditInterestClick = { navigator.navController.navigateToEditInterestStudy() },
-            onEditInterestLocationClick = { navigator.navController.navigateToEditInterestRegion() },
-            onCancelMemberShipClick = { navigator.navController.navigateToCancelMembership() },
-            onLogoutClick = {
-                navigator.navController.navigateToLanding(clearStackNavOptions)
-            }
-        )
-
-        participatingGraph(
+        myPageGraph(
             contentPadding = contentPadding,
             onRegisterScrollToTop = onRegisterScrollToTop,
             onStudyClick = { navigator.navigateToStudyDetail(it) },
-            moveToRecruitingStudy = { navigator.navigateToRecruitingStudy() }
-        )
-
-        myRecruitingStudyGraph(
-            contentPadding = contentPadding,
-            onRegisterScrollToTop = onRegisterScrollToTop,
-            onStudyClick = { navigator.navigateToStudyDetail(it) },
-            moveToMakeStudy = {  },
-            moveToCheckApplied = { navigator.navController.navigateToStudyApplications(it) }
-        )
-
-        recruitingStudyApplicationsGraph(
-            contentPadding = contentPadding,
-            onRegisterScrollToTop = onRegisterScrollToTop,
-        )
-
-        waitingStudyGraph(
-            contentPadding = contentPadding,
-            onRegisterScrollToTop = onRegisterScrollToTop,
-            onStudyClick = { navigator.navigateToStudyDetail(it) },
-            moveToRecruitingStudy = { navigator.navigateToRecruitingStudy() },
-        )
-
-        interestStudyGraph(
-            contentPadding = contentPadding,
-            moveToMyInterestStudy = { navigator.navController.navigateToPreferCategoryStudy(
-                navOptions {
-                    popUpTo<MyPage> { inclusive = false }
-                    launchSingleTop = true
-                    restoreState = false
-                }
-            ) },
-            moveToMyPage = { navigator.navController.popBackStack() }
-        )
-
-        interestRegionGraph(
-            contentPadding = contentPadding,
-            moveToMyInterestStudy = {
-                navigator.navigateToPreferLocationStudy(
-                    navOptions {
-                        popUpTo<MyPage> { inclusive = false }
-                        launchSingleTop = true
-                        restoreState = false
+            onLogoutClick = { navigator.navigateToLanding(clearStackNavOptions) },
+            navigateToStudyDetail = { studyId ->
+                navigator.navigateToStudyDetail(
+                    studyId = studyId,
+                    navOptions = navOptions {
+                        popUpTo<MyPageGraph.EditStudy> { inclusive = true }
                     }
                 )
             },
-            moveToMyPage = { navigator.navController.popBackStack() }
+            moveToRecruitingStudy = { navigator.navigateToRecruitingStudy() },
+            moveToPreferCategoryStudy = {
+                navigator.navigateToEditInterestStudy(
+                    navOptions = navOptions {
+                        popUpTo<MyPageGraph.MyPage> { inclusive = false }
+                        launchSingleTop = true
+                    }
+                )
+            },
+            moveToPreferLocationStudy = {
+                navigator.navigateToEditInterestRegion(
+                    navOptions = navOptions {
+                        popUpTo<MyPageGraph.MyPage> { inclusive = false }
+                        launchSingleTop = true
+                    }
+                )
+            },
+            successCancelMemberShip = { navigator.navigateToLanding(clearStackNavOptions) },
+            navigateUp = { navigator.navigateUp() },
+            navigateToParticipatingStudy = { navigator.navigateToParticipatingStudy() },
+            navigateToMyRecruitingStudy = { navigator.navigateToMyRecruitingStudy() },
+            navigateToWaitingStudy = { navigator.navigateToWaitingStudy() },
+            navigateToEditInterestStudy = { navigator.navigateToEditInterestStudy() },
+            navigateToEditInterestRegion = { navigator.navigateToEditInterestRegion() },
+            navigateToCancelMembership = { navigator.navigateToCancelMembership() },
+            navigateToEditStudy = { navigator.navigateToEditStudy(it) },
+            navigateToLeaveStudy = { id, owner, name, desc, url ->
+                navigator.navigateToLeaveStudy(id, owner, name, desc, url)
+            },
+            navigateToStudyApplications = { navigator.navigateToStudyApplications(it) }
         )
-
-        cancelMemberShipGraph(
-            contentPadding = contentPadding,
-            successCancelMemberShip = { navigator.navController.navigateToLanding(clearStackNavOptions) },
-            moveToParticipatingStudy = { navigator.navController.navigateToParticipatingStudy(
-                navOptions {
-                    popUpTo<MyPage> { inclusive = false }
-                    launchSingleTop = true
-                    restoreState = false
-                }
-            ) }
-        )
-        /************/
 
 
         recruitingStudyGraph(
             contentPadding = contentPadding,
             onRegisterScrollToTop = onRegisterScrollToTop,
-            onItemClick = { },
+            onItemClick = {},
             onFilterClick = { navigator.navigateToRecruitingStudyFilter() },
         )
 
@@ -231,7 +180,7 @@ fun MainNavHost(
         preferLocationStudyGraph(
             contentPadding = contentPadding,
             onRegisterScrollToTop = onRegisterScrollToTop,
-            onItemClick = { },
+            onItemClick = {},
             onFilterClick = { navigator.navigateToPreferLocationStudyFilter() },
         )
 
@@ -244,7 +193,7 @@ fun MainNavHost(
         preferCategoryStudyGraph(
             contentPadding = contentPadding,
             onRegisterScrollToTop = onRegisterScrollToTop,
-            onItemClick = { },
+            onItemClick = {},
             onFilterClick = { navigator.navController.navigateToPreferCategoryStudyFilter() },
         )
 
@@ -271,7 +220,7 @@ fun MainNavHost(
         postingGraph(
             contentPadding = contentPadding,
             onBackRequest = onBackRequest,
-            onSubmitSuccess = {navigator.navController.popBackStack()}
+            onSubmitSuccess = { navigator.navController.popBackStack() }
         )
 
         postContentGraph(
@@ -288,7 +237,7 @@ fun MainNavHost(
 
         registerStudyGraph(
             contentPadding = contentPadding,
-            onBackClick = { navigator.navigateToHome(clearStackNavOptions) },
+            onBackClick = { navigator.popBackStack() },
             navigateToStudyDetail = { studyId ->
                 navigator.navigateToStudyDetail(
                     studyId = studyId,
@@ -301,15 +250,9 @@ fun MainNavHost(
 
         studyDetailGraph(
             contentPadding = contentPadding,
-            onDetailBackClick = {
-                navigator.navigateToMyStudy(clearStackNavOptions)
-            },
-            onMemoirPostBackClick = {
-                navigator.popBackStack()
-            },
-            onAttendanceBackClick = {
-                navigator.popBackStack()
-            },
+            onDetailBackClick = { navigator.popBackStack() },
+            onMemoirPostBackClick = { navigator.popBackStack() },
+            onAttendanceBackClick = { navigator.popBackStack() },
             onAttendanceClick = { studyId, scheduleId ->
                 navigator.navController.navigate(StudyAttendance(studyId, scheduleId))
             },

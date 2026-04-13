@@ -16,11 +16,13 @@ fun NavController.navigateToMyStudy(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.myStudyGraph(
     contentPadding: PaddingValues,
     navigateToStudyDetail: (Long) -> Unit,
+    onRegisterScrollToTop: ((() -> Unit)?) -> Unit
 ) {
     composable<MyStudy> {
         MyStudyRoute(
             contentPadding = contentPadding,
-            navigateToStudyDetail = navigateToStudyDetail
+            navigateToStudyDetail = navigateToStudyDetail,
+            onRegisterScrollToTop = onRegisterScrollToTop
         )
     }
 }

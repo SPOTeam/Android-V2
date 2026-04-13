@@ -1,13 +1,12 @@
 package com.umcspot.spot.study.my.component
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -26,14 +25,13 @@ fun MyStudyListContent(
 ) {
     LazyColumn(
         state = listState,
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(0.dp)
+        modifier = Modifier.fillMaxSize()
     ) {
-        items(
+        itemsIndexed(
             items = studies,
-            key = { it.id }
-        ) { item ->
-            Spacer(Modifier.height(screenHeightDp(5.dp)))
+            key = { _, item -> item.id }
+        ) { index, item ->
+            Spacer(Modifier.height(screenHeightDp(12.dp)))
 
             StudyListItem(
                 item = item,
@@ -41,15 +39,14 @@ fun MyStudyListContent(
                 onClick = { onItemClick(item.id) }
             )
 
-            if (studies.indexOf(item) != studies.lastIndex) {
-                Spacer(Modifier.height(screenHeightDp(5.dp)))
+            Spacer(Modifier.height(screenHeightDp(12.dp)))
+
+            if (index != studies.lastIndex) {
                 HorizontalDivider(
                     modifier = Modifier.fillMaxWidth(),
                     color = SpotTheme.colors.G300,
                     thickness = 1.dp
                 )
-            } else {
-                Spacer(Modifier.height(screenHeightDp(5.dp)))
             }
         }
     }

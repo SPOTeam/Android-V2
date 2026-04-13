@@ -11,8 +11,10 @@ import com.umcspot.spot.study.dto.request.BoardCreateRequestDto
 import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.study.dto.request.ScheduleCreateRequestDto
 import com.umcspot.spot.study.dto.request.StudyApplyRequestDto
+import com.umcspot.spot.study.dto.request.StudyReportRequestDto
 import com.umcspot.spot.study.dto.request.StudyPostCommentRequestDto
 import com.umcspot.spot.study.dto.request.StudyRequestDto
+import com.umcspot.spot.study.dto.request.StudyWithdrawRequestDto
 import com.umcspot.spot.study.dto.request.TodoCreateRequestDto
 import com.umcspot.spot.study.dto.response.BoardCreateResponseDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
@@ -67,18 +69,35 @@ class StudyDataSourceImpl @Inject constructor(
         size: Int,
         regionCodes: List<String>?
     ): BaseResponse<StudyResponseDto> =
-        studyService.getPreferLocationStudies(recruitingStatus, feeCategory, categories, null, sortType, cursor, size, regionCodes)
+        studyService.getPreferLocationStudies(
+            recruitingStatus,
+            feeCategory,
+            categories,
+            null,
+            sortType,
+            cursor,
+            size,
+            regionCodes
+        )
 
     override suspend fun getPreferCategoryStudies(
         category: StudyTheme?,
         recruitingStatus: RecruitingStatus?,
         feeCategory: FeeRange?,
-        isOnline : Boolean?,
+        isOnline: Boolean?,
         sortType: RecruitingStudySort?,
         cursor: Long?,
         size: Int,
     ): BaseResponse<StudyResponseDto> =
-        studyService.getPreferCategoryStudies(category, recruitingStatus, feeCategory, isOnline, sortType, cursor, size)
+        studyService.getPreferCategoryStudies(
+            category,
+            recruitingStatus,
+            feeCategory,
+            isOnline,
+            sortType,
+            cursor,
+            size
+        )
 
     override suspend fun createStudy(
         request: StudyRequestDto,
@@ -92,6 +111,32 @@ class StudyDataSourceImpl @Inject constructor(
         return studyService.createStudy(requestPart, imagePart)
     }
 
+    override suspend fun updateStudy(
+        studyId: Long,
+        request: StudyRequestDto,
+        imageFile: File?
+    ): NullResultResponse {
+        val requestPart = request.toMultipartBodyPart("request")
+        val imagePart = imageFile?.let { file ->
+            val requestBody = file.asRequestBody("image/*".toMediaTypeOrNull())
+            MultipartBody.Part.createFormData("imageFile", file.name, requestBody)
+        }
+        return studyService.updateStudy(studyId, requestPart, imagePart)
+    }
+
+    override suspend fun withdrawStudy(
+        studyId: Long,
+        withdrawReason: String,
+        nextOwnerId: Long?
+    ): NullResultResponse =
+        studyService.withdrawStudy(
+            studyId = studyId,
+            request = StudyWithdrawRequestDto(
+                withdrawReason = withdrawReason,
+                nextOwnerId = nextOwnerId
+            )
+        )
+
     override suspend fun applyStudy(studyId: Long, message: String): NullResultResponse {
         return studyService.applyStudy(
             studyId = studyId,
@@ -104,6 +149,12 @@ class StudyDataSourceImpl @Inject constructor(
 
     override suspend fun getStudyMembers(studyId: Long): BaseResponse<StudyMemberResponseDto> =
         studyService.getStudyMembers(studyId)
+
+    override suspend fun likeStudy(studyId: Long): NullResultResponse =
+        studyService.likeStudy(studyId)
+
+    override suspend fun unlikeStudy(studyId: Long): NullResultResponse =
+        studyService.unlikeStudy(studyId)
 
     override suspend fun getUpcomingSchedules(studyId: Long): BaseResponse<StudyScheduleResponseDto> =
         studyService.getUpcomingSchedules(studyId)
@@ -145,7 +196,11 @@ class StudyDataSourceImpl @Inject constructor(
     override suspend fun getMemberTodos(studyId: Long, memberId: Long, date: String) =
         studyService.getMemberTodos(studyId, memberId, date)
 
-    override suspend fun getStudyMemoirs(studyId: Long, cursor: Long?, size: Int): BaseResponse<StudyMemoirResponseDto> =
+    override suspend fun getStudyMemoirs(
+        studyId: Long,
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyMemoirResponseDto> =
         studyService.getStudyMemoirs(studyId, cursor, size)
 
     override suspend fun deleteMemoir(studyId: Long, memoirId: Long): BaseResponse<Unit?> =
@@ -169,6 +224,11 @@ class StudyDataSourceImpl @Inject constructor(
         )
     }
 
+    override suspend fun postReviewReaction(
+        studyId: Long,
+        reviewId: Long,
+        reaction: String
+    ): BaseResponse<Unit?> {
     override suspend fun postBoard(
         studyId: Long,
         request: BoardCreateRequestDto
@@ -182,9 +242,14 @@ class StudyDataSourceImpl @Inject constructor(
         return studyService.postReviewReaction(studyId, reviewId, reaction)
     }
 
-    override suspend fun deleteReviewReaction(studyId: Long, reviewId: Long, reaction: String): BaseResponse<Unit?> {
+    override suspend fun deleteReviewReaction(
+        studyId: Long,
+        reviewId: Long,
+        reaction: String
+    ): BaseResponse<Unit?> {
         return studyService.deleteReviewReaction(studyId, reviewId, reaction)
     }
+
     override suspend fun getCategoryStudies(
         recruitingStatus: RecruitingStatus?,
         feeCategory: FeeRange?,
@@ -231,7 +296,7 @@ class StudyDataSourceImpl @Inject constructor(
         applicationId: Long,
         decision: String
     ): NullResultResponse =
-        studyService.entryAcceptance(applicationId,decision)
+        studyService.entryAcceptance(applicationId, decision)
 
     override suspend fun createSchedule(
         studyId: Long,
@@ -251,12 +316,33 @@ class StudyDataSourceImpl @Inject constructor(
     override suspend fun finishAttendance(studyId: Long, scheduleId: Long): NullResultResponse =
         studyService.finishAttendance(studyId, scheduleId)
 
-    override suspend fun checkAttendance(studyId: Long, scheduleId: Long, token: String): NullResultResponse =
+    override suspend fun checkAttendance(
+        studyId: Long,
+        scheduleId: Long,
+        token: String
+    ): NullResultResponse =
         studyService.checkAttendance(studyId, scheduleId, token)
 
-    override suspend fun getAttendanceQr(studyId: Long, scheduleId: Long): BaseResponse<StudyAttendanceQrResponseDto> =
+    override suspend fun getAttendanceQr(
+        studyId: Long,
+        scheduleId: Long
+    ): BaseResponse<StudyAttendanceQrResponseDto> =
         studyService.getAttendanceQr(studyId, scheduleId)
 
+    override suspend fun reportStudyMember(
+        studyId: Long,
+        targetMemberId: Long,
+        reason: String
+    ): NullResultResponse =
+        studyService.reportStudyMember(
+            studyId = studyId,
+            targetMemberId = targetMemberId,
+            request = StudyReportRequestDto(reason = reason)
+        )
+
+    override suspend fun deleteStudy(studyId: Long): NullResultResponse =
+        studyService.deleteStudy(studyId)
+}
     override suspend fun getStudyPostsList(
         studyId: Long,
         cursor: Long?,

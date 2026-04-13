@@ -1,40 +1,24 @@
 package com.umcspot.spot.mypage.waiting
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.SpotSpinner
-import com.umcspot.spot.designsystem.component.button.TextButton
-import com.umcspot.spot.designsystem.component.button.TextButtonState
-import com.umcspot.spot.designsystem.component.empty.EmptyAlert
+import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.component.empty.EmptyAlertWithButton
 import com.umcspot.spot.designsystem.component.study.StudyListItem
-import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.study.model.StudyResult
@@ -44,15 +28,15 @@ import com.umcspot.spot.ui.state.UiState
 import kotlinx.coroutines.launch
 
 @Composable
-fun WaitingStudyScreen(
-    contentPadding : PaddingValues,
+fun WaitingStudyRoute(
+    contentPadding: PaddingValues,
+    onBackClick: () -> Unit,
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
-    onStudyClick : (Long) -> Unit,
-    moveToRecruitingStudy : () -> Unit,
-    viewmodel : WaitingStudyViewModel = hiltViewModel()
+    onStudyClick: (Long) -> Unit,
+    moveToRecruitingStudy: () -> Unit,
+    viewmodel: WaitingStudyViewModel = hiltViewModel()
 ) {
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
-
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
@@ -65,9 +49,7 @@ fun WaitingStudyScreen(
     LaunchedEffect(Unit) {
         viewmodel.loadWaitingStudy()
         onRegisterScrollToTop {
-            scope.launch {
-                listState.animateScrollToItem(0)
-            }
+            scope.launch { listState.animateScrollToItem(0) }
         }
     }
 
@@ -76,7 +58,6 @@ fun WaitingStudyScreen(
             val layoutInfo = listState.layoutInfo
             val totalItems = layoutInfo.totalItemsCount
             val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-
             totalItems > 0 && lastVisibleItemIndex >= totalItems - 3
         }
     }
@@ -84,91 +65,98 @@ fun WaitingStudyScreen(
     LaunchedEffect(shouldLoadMore.value) {
         if (shouldLoadMore.value) {
             val successData = (ui as? UiState.Success)?.data
-            if (successData?.hasNext == true) {
-                viewmodel.loadNextPage()
-            }
+            if (successData?.hasNext == true) viewmodel.loadNextPage()
         }
     }
 
-    when (ui) {
-        is UiState.Loading -> {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(SpotTheme.colors.white),
-                contentAlignment = Alignment.Center
-            ) {
-                SpotSpinner(size = screenWidthDp(30.dp))
-            }
-        }
-        is UiState.Empty, is UiState.Failure -> {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(SpotTheme.colors.white),
-                contentAlignment = Alignment.Center
-            ) {
-                EmptyAlertWithButton(
-                    alertTitle = "대기 중인 스터디가 아직 없어요.",
-                    alertDes = "스팟에서 내 목표를 이뤄봐요",
-                    buttonText = "스터디 둘러보기",
-                    painter = painterResource(R.drawable.study_default),
-                    onClick = { moveToRecruitingStudy() },
-                )
-            }
-        }
-        is UiState.Success -> {
-            WaitingStudyScreenContent(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.White)
-                    .padding(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding())
-                    .padding(horizontal = screenWidthDp(17.dp)),
-                studyList = itemList,
-                listState = listState,
-                onStudyClick = onStudyClick,
-            )
-        }
-    }
+    WaitingStudyScreen(
+        contentPadding = contentPadding,
+        uiState = ui,
+        itemList = itemList,
+        listState = listState,
+        onBackClick = onBackClick,
+        onStudyClick = onStudyClick,
+        moveToRecruitingStudy = moveToRecruitingStudy
+    )
 }
 
 @Composable
-fun WaitingStudyScreenContent(
-    modifier: Modifier = Modifier,
-    studyList: List<StudyResult>,
+private fun WaitingStudyScreen(
+    contentPadding: PaddingValues,
+    uiState: UiState<*>,
+    itemList: List<StudyResult>,
     listState: LazyListState,
+    onBackClick: () -> Unit,
     onStudyClick: (Long) -> Unit,
+    moveToRecruitingStudy: () -> Unit
 ) {
-    LazyColumn(
-        state = listState,
-        modifier = modifier,
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(SpotTheme.colors.white)
+            .padding(
+                top = contentPadding.calculateTopPadding(),
+                bottom = contentPadding.calculateBottomPadding()
+            )
     ) {
-        items(
-            items = studyList,
-            key = { it.id }
-        ) { item ->
-            Spacer(Modifier.height(screenHeightDp(5.dp)))
+        Column(modifier = Modifier.fillMaxSize()) {
+            
+            BackTopBar(
+                title = "대기 중인 스터디",
+                onBackClick = onBackClick,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.TopStart
-            ) {
-                StudyListItem(
-                    item = item,
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = { onStudyClick(item.id) }
-                )
-            }
+            when (uiState) {
+                is UiState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        SpotSpinner(size = screenWidthDp(30.dp))
+                    }
+                }
 
-            if (studyList.indexOf(item) != studyList.lastIndex) {
-                Spacer(Modifier.height(screenHeightDp(5.dp)))
+                is UiState.Empty, is UiState.Failure -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        EmptyAlertWithButton(
+                            alertTitle = "대기 중인 스터디가 아직 없어요.",
+                            alertDes = "스팟에서 내 목표를 이뤄봐요",
+                            buttonText = "스터디 둘러보기",
+                            painter = painterResource(R.drawable.study_default),
+                            onClick = { moveToRecruitingStudy() },
+                        )
+                    }
+                }
 
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    color = SpotTheme.colors.G300,
-                    thickness = 1.dp
-                )
+                is UiState.Success -> {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = screenWidthDp(17.dp)),
+                        contentPadding = PaddingValues(bottom = screenHeightDp(20.dp))
+                    ) {
+                        items(
+                            items = itemList,
+                            key = { it.id }
+                        ) { item ->
+                            Spacer(Modifier.height(screenHeightDp(5.dp)))
+
+                            StudyListItem(
+                                item = item,
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = { onStudyClick(item.id) }
+                            )
+
+                            if (itemList.indexOf(item) != itemList.lastIndex) {
+                                Spacer(Modifier.height(screenHeightDp(5.dp)))
+                                HorizontalDivider(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = SpotTheme.colors.G300,
+                                    thickness = 1.dp
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }

@@ -3,7 +3,7 @@ package com.umcspot.spot.main
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
-import com.umcspot.spot.category.navigation.Category
+import com.umcspot.spot.category.navigation.CategoryGraph
 import com.umcspot.spot.designsystem.R.drawable.home_default
 import com.umcspot.spot.designsystem.R.drawable.category_default
 import com.umcspot.spot.designsystem.R.drawable.study_default
@@ -16,7 +16,7 @@ import com.umcspot.spot.main.R.string.ic_category_desc
 import com.umcspot.spot.main.R.string.ic_mystudy_desc
 import com.umcspot.spot.main.R.string.ic_jjim_desc
 import com.umcspot.spot.main.R.string.ic_mypage_desc
-import com.umcspot.spot.mypage.main.navigation.MyPage
+import com.umcspot.spot.mypage.navigation.MyPageGraph
 import com.umcspot.spot.study.my.navigation.MyStudy
 import com.umcspot.spot.navigation.MainTabRoute
 import com.umcspot.spot.navigation.Route
@@ -34,7 +34,7 @@ enum class MainNavTab(
     CATEGORY(
         icon = category_default,
         contentDescription = ic_category_desc,
-        route = Category
+        route = CategoryGraph.Category
     ),
     MYSTUDY(
         icon = study_default,
@@ -49,7 +49,7 @@ enum class MainNavTab(
     MYPAGE(
         icon = mypage_default,
         contentDescription = ic_mypage_desc,
-        route = MyPage
+        route = MyPageGraph.MyPage
     );
 
     companion object {

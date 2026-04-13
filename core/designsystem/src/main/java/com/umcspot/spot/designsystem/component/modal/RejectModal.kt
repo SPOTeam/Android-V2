@@ -139,7 +139,7 @@ fun RejectModal(
 @Composable
 fun RejectDialog(
     visible: Boolean,
-    painter : Painter = painterResource(R.drawable.emoji_sad),
+    painter : Painter = painterResource(R.drawable.ic_sad),
     painterTint : Color = Color.Unspecified,
     modalTitle : String,
     modalDes : String?,
@@ -171,7 +171,7 @@ private fun RejectDialog_Preview() {
     SpotTheme {
         RejectDialog(
             visible = true,
-            painter = painterResource(R.drawable.emoji_sad),
+            painter = painterResource(R.drawable.ic_sad),
             painterTint = SpotTheme.colors.R500,
             modalTitle = "나가시겠어요?",
             modalDes = "지금 나가면, 쓰던 글은 저장되지 않아요.",

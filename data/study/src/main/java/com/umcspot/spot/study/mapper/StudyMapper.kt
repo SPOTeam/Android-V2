@@ -1,5 +1,6 @@
 package com.umcspot.spot.study.mapper
 
+import com.umcspot.spot.model.ImageRef
 import com.umcspot.spot.model.formatCreatedAt
 import com.umcspot.spot.study.dto.request.MemoirCreateRequestDto
 import com.umcspot.spot.model.toImageRef
@@ -47,6 +48,7 @@ import com.umcspot.spot.study.model.StudyResult
 import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.study.model.StudyScheduleCreateModel
 import com.umcspot.spot.study.model.StudyScheduleModel
+import com.umcspot.spot.study.model.StudyUpdateModel
 import com.umcspot.spot.study.model.TodoModel
 import com.umcspot.spot.study.model.ViewerStatus
 import java.time.LocalDateTime
@@ -59,6 +61,19 @@ fun StudyCreateModel.toData(): StudyRequestDto = StudyRequestDto(
     hasFee = this.hasFee,
     amount = this.amount,
     description = this.description,
+    isOnline = this.isOnline,
+    categories = this.categories,
+    styles = this.styles,
+    regionCodes = this.regionCodes
+)
+
+fun StudyUpdateModel.toData(): StudyRequestDto = StudyRequestDto(
+    name = this.name,
+    maxMembers = this.maxMembers,
+    hasFee = this.hasFee,
+    amount = this.amount,
+    description = this.description,
+    isOnline = this.isOnline,
     categories = this.categories,
     styles = this.styles,
     regionCodes = this.regionCodes
@@ -99,7 +114,14 @@ fun StudyDetailResponseDto.toDomain(): StudyDetailModel = StudyDetailModel(
     title = this.title,
     description = this.description,
     thumbnailUrl = this.thumbnailUrl,
+    maxMembers = this.maxMembers,
+    hasFee = this.hasFee,
+    amount = this.amount,
     categories = this.categories,
+    styles = this.styles,
+    regionCodes = this.regionCodes,
+    isOnline = this.isOnline,
+    isLiked = this.isLiked,
     totalMembers = this.statistics.totalMembers,
     currentMembers = this.statistics.currentMembers,
     likeCount = this.statistics.likeCount,
@@ -194,13 +216,13 @@ fun BoardCreateModel.toData(): BoardCreateRequestDto = BoardCreateRequestDto(
 fun StudyApplicationResponseDto.toDomainList(): StudyApplicationResultList =
     StudyApplicationResultList(applies = this.applies.map {it.toDomain()})
 
-fun StudyApplication.toDomain() : StudyApplicationResult =
+fun StudyApplication.toDomain(): StudyApplicationResult =
     StudyApplicationResult(
         applicantId = this.applicantId.toLong(),
         memberId = this.memberId.toLong(),
         nickname = this.nickname,
         description = this.description,
-        profileImageUrl = this.profileImageUrl.toImageRef()
+        profileImageUrl = this.profileImageUrl?.toImageRef() ?: ImageRef.Name("ic_study_default")
     )
 
 fun StudyAttendanceResponseDto.toDomain(): StudyAttendanceListModel =

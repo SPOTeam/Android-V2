@@ -5,15 +5,31 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -21,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
+import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.component.button.SpotActivationButton
 import com.umcspot.spot.designsystem.theme.SpotTheme
@@ -30,8 +47,13 @@ import com.umcspot.spot.study.detail.component.common.StudyDetailTabRow
 import com.umcspot.spot.study.detail.component.common.StudyHeaderSection
 import com.umcspot.spot.study.detail.component.planner.ScheduleBottomSheet
 import com.umcspot.spot.study.detail.component.planner.ScheduleDetailBottomSheet
-import com.umcspot.spot.study.detail.model.*
-import com.umcspot.spot.study.detail.screen.*
+import com.umcspot.spot.study.detail.model.StudyDetailSideEffect
+import com.umcspot.spot.study.detail.model.StudyDetailState
+import com.umcspot.spot.study.detail.model.StudyDetailTab
+import com.umcspot.spot.study.detail.screen.StudyDetailBoardScreen
+import com.umcspot.spot.study.detail.screen.StudyDetailHomeScreen
+import com.umcspot.spot.study.detail.screen.StudyDetailMemoirScreen
+import com.umcspot.spot.study.detail.screen.StudyDetailPlannerScreen
 import com.umcspot.spot.study.detail.screen.camera.QrScannerScreen
 import com.umcspot.spot.study.model.ViewerStatus
 import com.umcspot.spot.study.detail.model.StudyDetailState
@@ -67,8 +89,8 @@ fun StudyDetailRoute(
 
     var showScheduleBottomSheet by rememberSaveable { mutableStateOf(false) }
     var showScheduleDetailBottomSheet by rememberSaveable { mutableStateOf(false) }
-    var selectedScheduleId by remember { mutableStateOf<Long?>(null) }
-    var selectedScheduleIsNow by remember { mutableStateOf(false) }
+    var selectedScheduleId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var selectedScheduleIsNow by rememberSaveable { mutableStateOf(false) }
 
     var isScannerOpen by remember { mutableStateOf(false) }
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
@@ -145,14 +167,18 @@ fun StudyDetailRoute(
 
     BackHandler { onBackClick() }
 
-    Box(modifier = Modifier.fillMaxSize().background(SpotTheme.colors.white)) {
-
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(SpotTheme.colors.white)
+    ) {
         StudyDetailScreen(
             studyId = studyId,
             uiState = uiState,
             selectedTab = selectedTab,
             isOwner = isOwner,
             isMember = isMember,
+            onLikeClick = { viewModel.toggleLike(studyId) },
             onAttendanceClick = { scheduleId, isNow ->
                 if (!isMember) return@StudyDetailScreen
                 if (isOwner) {
@@ -223,6 +249,60 @@ fun StudyDetailRoute(
                 }
             }
         }
+
+        if (isScannerOpen) {
+            QrScannerScreen(
+                onQrScanned = { isScannerOpen = false },
+                onClose = { isScannerOpen = false }
+            )
+        }
+
+        ScheduleDetailBottomSheet(
+            visible = showScheduleDetailBottomSheet,
+            onDismiss = { showScheduleDetailBottomSheet = false },
+            isNow = selectedScheduleIsNow,
+            onAttendanceClick = {
+                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            },
+            onDeleteClick = {
+                selectedScheduleId?.let { id ->
+                    viewModel.deleteSchedule(studyId, id)
+                }
+                showScheduleDetailBottomSheet = false
+            }
+        )
+
+        ScheduleBottomSheet(
+            visible = showScheduleBottomSheet,
+            onDismiss = {
+                showScheduleBottomSheet = false
+                viewModel.clearScheduleError()
+            },
+            studyId = studyId,
+            isOverlapError = uiState.plannerState.isOverlapError,
+            onClearError = { viewModel.clearScheduleError() },
+            onCreateSchedule = { title, memo, start, end ->
+                viewModel.createSchedule(studyId, title, memo, start, end)
+            }
+        )
+
+        if (showApplyInputDialog) {
+            SpotStudyApplyDialog(
+                onDismissRequest = { showApplyInputDialog = false },
+                onApplySubmit = { message -> viewModel.applyStudy(studyId, message) }
+            )
+        }
+
+        if (showApplySuccessDialog) {
+            SpotStudyDialog(
+                onDismissRequest = { showApplySuccessDialog = false },
+                title = "신청 완료",
+                description = "스터디를 신청 완료했어요!\n수락 여부는 알람 탭에서 확인 가능해요.",
+                buttonText = "확인",
+                showCheckIcon = true,
+                onButtonClick = { showApplySuccessDialog = false }
+            )
+        }
     }
 }
 
@@ -233,6 +313,7 @@ private fun StudyDetailScreen(
     selectedTab: StudyDetailTab,
     isOwner: Boolean,
     isMember: Boolean,
+    onLikeClick: () -> Unit,
     onAttendanceClick: (Long, Boolean) -> Unit,
     onTabSelected: (StudyDetailTab) -> Unit,
     onDateSelected: (LocalDate) -> Unit,
@@ -257,7 +338,9 @@ private fun StudyDetailScreen(
 ) {
     LazyColumn(
         state = lazyListState,
-        modifier = Modifier.fillMaxSize().imePadding()
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding()
     ) {
         item {
             BackTopBar(title = "스터디", onBackClick = onBackClick)
@@ -267,10 +350,16 @@ private fun StudyDetailScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(screenHeightDp(160.dp)),
-                contentScale = ContentScale.Crop
+                contentScale = if (uiState.homeState.thumbnailUrl != null) ContentScale.Crop else ContentScale.Fit,
+                placeholder = painterResource(R.drawable.ic_default),
+                error = painterResource(R.drawable.ic_default)
             )
-            StudyHeaderSection(uiState.homeState)
+            StudyHeaderSection(
+                homeState = uiState.homeState,
+                onLikeClick = onLikeClick
+            )
         }
+
         item {
             StudyDetailTabRow(selectedTab = selectedTab, onTabSelected = onTabSelected)
             Spacer(modifier = Modifier.height(screenHeightDp(18.dp)))

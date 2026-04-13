@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.G400
+import com.umcspot.spot.designsystem.theme.G500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.ui.extension.noRippleClickable
 import com.umcspot.spot.ui.extension.screenHeightDp
@@ -54,6 +55,34 @@ fun SpotActivationButton(
             text = buttonText,
             style = style,
             color = textColor 
+        )
+    }
+}
+
+@Composable
+fun SpotCancelButton(
+    buttonText: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val borderColor = SpotTheme.colors.G500
+    val textColor = SpotTheme.colors.G500
+    val shape = RoundedCornerShape(10.dp)
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .border(width = 1.dp, color = borderColor, shape = shape)
+            .noRippleClickable(onClick = onClick)
+            .padding(vertical = screenHeightDp(9.dp)),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = buttonText,
+            style = SpotTheme.typography.h5,
+            color = textColor
         )
     }
 }

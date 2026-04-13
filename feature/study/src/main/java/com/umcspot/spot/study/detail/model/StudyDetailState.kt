@@ -1,5 +1,6 @@
 package com.umcspot.spot.study.detail.model
 
+import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.study.model.MemoirModel
 import com.umcspot.spot.study.model.StudyAttendanceModel
 import com.umcspot.spot.study.model.StudyMemberModel
@@ -30,11 +31,12 @@ data class StudyHomeState(
     val studyTitle: String = "",
     val studyDescription: String = "",
     val thumbnailUrl: String? = null,
-    val categories: ImmutableList<String> = persistentListOf(),
+    val categories: ImmutableList<StudyTheme> = persistentListOf(),
     val currentMembers: Int = 0,
     val totalMembers: Int = 0,
     val likeCount: Int = 0,
     val hitCount: Int = 0,
+    val isLiked: Boolean = false,
     val viewerStatus: ViewerStatus = ViewerStatus.UNKNOWN,
     val isJoined: Boolean = false,
     val isHost: Boolean = false,

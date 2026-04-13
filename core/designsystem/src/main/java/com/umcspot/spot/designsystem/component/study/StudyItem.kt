@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -21,20 +20,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.component.button.ClickSurface
-import com.umcspot.spot.designsystem.component.button.TextButton
-import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.shapes.SpotShapes
+import com.umcspot.spot.designsystem.theme.R500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ImageRef
 import com.umcspot.spot.study.model.StudyResult
+import com.umcspot.spot.ui.extension.noRippleClickable
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 
@@ -46,71 +44,62 @@ fun StudyListItem(
     meetballSlot: (@Composable () -> Unit)? = null,
     checkAppliedSlot: (@Composable () -> Unit)? = null
 ) {
-    ClickSurface(
-        onClick = { onClick(item) },
+    Row(
         modifier = modifier
+            .noRippleClickable { onClick(item) }
+            .padding(screenWidthDp(7.dp)),
+        horizontalArrangement = Arrangement.spacedBy(screenWidthDp(13.dp)),
+        verticalAlignment = Alignment.Top
     ) {
-        Row(
-            modifier = Modifier.padding(screenWidthDp(7.dp)),
-            horizontalArrangement = Arrangement.spacedBy(13.dp),
-            verticalAlignment = Alignment.Top
+        StudyThumbnail(
+            imageRef = item.profileImageUrl,
+            modifier = Modifier
+                .size(screenWidthDp(73.dp))
+                .clip(SpotShapes.Hard)
+        )
+
+        Column(
+            modifier = Modifier
+                .wrapContentWidth()
+                .height(screenHeightDp(73.dp))
+                .padding(screenHeightDp(4.dp))
         ) {
-            StudyThumbnail(
-                imageRef = item.profileImageUrl,
-                modifier = Modifier
-                    .size(screenWidthDp(73.dp))
-                    .clip(SpotShapes.Hard)
-            )
-
-            // 텍스트 + 통계
-            Column(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .height(screenHeightDp(73.dp))
-                    .padding(screenHeightDp(4.dp))
-            ) {
-                Row{
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                    ) {
-                        Text(
-                            text = item.name,
-                            style = SpotTheme.typography.h5,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text = item.description,
-                            style = SpotTheme.typography.regular_400,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                    if (checkAppliedSlot != null) {
-                        checkAppliedSlot()
-                    }
-
-                    if(meetballSlot != null) {
-                        meetballSlot()
-                    }
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Row(horizontalArrangement = Arrangement.spacedBy(screenWidthDp(4.dp))) {
-                    Stat(
-                        iconRes = R.drawable.group,
-                        count1 = item.currentMembers,
-                        count2 = item.maxMembers
+            Row {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = item.name,
+                        style = SpotTheme.typography.h5,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-                    Stat(
-                        iconRes = R.drawable.eye, count2 = item.hitCount
-                    )
-                    Stat(
-                        iconRes = R.drawable.like_default, count2 = item.likeCount
+                    Text(
+                        text = item.description,
+                        style = SpotTheme.typography.regular_400,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
+                checkAppliedSlot?.invoke()
+                meetballSlot?.invoke()
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(screenWidthDp(4.dp))) {
+                Stat(
+                    iconRes = R.drawable.group,
+                    count1 = item.currentMembers,
+                    count2 = item.maxMembers
+                )
+                Stat(
+                    iconRes = R.drawable.eye,
+                    count2 = item.hitCount
+                )
+                Stat(
+                    iconRes = if (item.isLiked) R.drawable.ic_like_filled else R.drawable.like_default,
+                    count2 = item.likeCount,
+                    tint = if (item.isLiked) SpotTheme.colors.R500 else Color.Unspecified
+                )
             }
         }
     }
@@ -120,7 +109,8 @@ fun StudyListItem(
 private fun Stat(
     @DrawableRes iconRes: Int,
     count1: Int = 0,
-    count2: Int
+    count2: Int,
+    tint: Color = Color.Unspecified
 ) {
     fun cap(n: Int) = if (n >= 1000) "999+" else n.toString()
     val display = if (count1 != 0) "${cap(count1)} / ${cap(count2)}" else cap(count2)
@@ -135,7 +125,7 @@ private fun Stat(
         Icon(
             painter = painterResource(iconRes),
             contentDescription = null,
-            tint = Color.Unspecified,
+            tint = tint,
             modifier = Modifier.size(screenWidthDp(14.dp))
         )
 
@@ -146,10 +136,9 @@ private fun Stat(
 @Composable
 fun StudyThumbnail(
     imageRef: ImageRef?,
-    @DrawableRes placeholder: Int = R.drawable.spot_logo, // 적절한 플레이스홀더
+    @DrawableRes placeholder: Int = R.drawable.ic_default,
     modifier: Modifier = Modifier
 ) {
-    val ctx = LocalContext.current
     val context = LocalContext.current
 
     when (val img = imageRef) {
@@ -159,6 +148,7 @@ fun StudyThumbnail(
             Image(
                 painter = painterResource(safeId),
                 contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier = modifier
             )
         }
@@ -169,6 +159,7 @@ fun StudyThumbnail(
                 contentDescription = null,
                 placeholder = painterResource(placeholder),
                 error = painterResource(placeholder),
+                contentScale = ContentScale.Crop,
                 modifier = modifier
             )
         }
@@ -177,6 +168,7 @@ fun StudyThumbnail(
             Image(
                 painter = painterResource(placeholder),
                 contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier = modifier
             )
         }
@@ -187,66 +179,9 @@ fun StudyThumbnail(
                 contentDescription = null,
                 placeholder = painterResource(placeholder),
                 error = painterResource(placeholder),
+                contentScale = ContentScale.Crop,
                 modifier = modifier
             )
-
         }
     }
 }
-
-/* ============== Preview ============== */
-
-@Preview(showBackground = true, widthDp = 326)
-@Composable
-private fun StudyListItemPreview() {
-    SpotTheme {
-        StudyListItem(
-            item = StudyResult(
-                id = 1,
-                name = "Sample Study",
-                description = "Sample GoalSample GoalSample GoalSample GoalSample GoalSample Goal",
-                maxMembers = 10,
-                currentMembers = 5,
-                likeCount = 400,
-                isLiked = false,
-                hitCount = 1200,
-                profileImageUrl = ImageRef.Name("spot_logo"),
-                isOwner = false,
-                isAlone = false
-            ),
-            modifier = Modifier.padding(10.dp),
-            onClick = {},
-            checkAppliedSlot = {
-                TextButton(
-                    modifier = Modifier
-                        .width(screenWidthDp(60.dp))
-                        .height(screenHeightDp(26.dp)),
-                    text = "신청 확인",
-                    style = SpotTheme.typography.regular_500,
-                    onClick = {},
-                    state = TextButtonState.B500State,
-                    shape = SpotShapes.Hard
-                )
-            }
-//            meetballSlot = {
-//                Box {
-//                    Box(
-//                        modifier = Modifier
-//                            .padding(top = screenHeightDp(4.dp))
-//                            .width(screenWidthDp(24.dp))
-//                            .height(screenWidthDp(22.dp))
-//                            .clip(SpotShapes.Hard),
-//                        contentAlignment = Alignment.Center
-//                    ) {
-//                        Icon(
-//                            painter = painterResource(R.drawable.meetball),
-//                            contentDescription = null,
-//                            modifier = Modifier.size(screenWidthDp(14.dp))
-//                        )
-//                    }
-//                }
-//            }
-        )
-    }
-}
-

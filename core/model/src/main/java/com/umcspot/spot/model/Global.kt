@@ -29,24 +29,6 @@ enum class RecruitingStudySort(val label: String) {
     HITS("조회수 높은 순"),
     LIKES("관심 많은 순")
 }
-enum class ActivityType(
-    val label: String
-) {
-    ONLINE("온라인"),
-    OFFLINE("오프라인")
-}
-
-enum class FeeRange(
-    val label: String
-) {
-    NONE("없음"),
-    BELOW_10K("1만원 미만"),
-    FROM_10K_TO_20K("1만원대"),
-    FROM_20K_TO_30K("2만원대"),
-    FROM_30K_TO_40K("3만원대"),
-    FROM_40K_TO_50K("4만원대"),
-    ABOVE_50K("5만원 이상")
-}
 
 enum class StudyTheme(
     val title: String
@@ -81,12 +63,39 @@ enum class StudyStyle {
     STRUCTURED_AND_PLANNED
 }
 
-enum class RecruitingStatus(
-    val value: String
-) {
+enum class ActivityType(val label: String) {
+    ONLINE("온라인"),
+    OFFLINE("오프라인");
+
+    companion object {
+        fun from(value: String): ActivityType? =
+            entries.firstOrNull { it.name == value }
+    }
+}
+
+enum class FeeRange(val label: String) {
+    NONE("없음"),
+    BELOW_10K("1만원 미만"),
+    FROM_10K_TO_20K("1만원대"),
+    FROM_20K_TO_30K("2만원대"),
+    FROM_30K_TO_40K("3만원대"),
+    FROM_40K_TO_50K("4만원대"),
+    ABOVE_50K("5만원 이상");
+
+    companion object {
+        fun from(value: String): FeeRange? =
+            entries.firstOrNull { it.name == value }
+    }
+}
+
+enum class RecruitingStatus(val value: String) {
     RECRUITING("모집중"),
-    COMPLETED("모집완료"),
-//    BEFORE("모집전")
+    COMPLETED("모집완료");
+
+    companion object {
+        fun from(value: String): RecruitingStatus? =
+            entries.firstOrNull { it.name == value }
+    }
 }
 
 enum class SocialLoginType(

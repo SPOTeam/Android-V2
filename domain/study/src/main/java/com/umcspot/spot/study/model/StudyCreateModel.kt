@@ -9,6 +9,7 @@ data class StudyCreateModel(
     val hasFee: Boolean,
     val amount: Int,
     val description: String,
+    val isOnline: Boolean,
     val categories: List<StudyTheme>,
     val styles: List<StudyStyle>,
     val regionCodes: List<String>
@@ -53,4 +54,12 @@ enum class StudyPersonality(
     companion object {
         val entriesList = entries.toList()
     }
+}
+
+enum class LeaveReason(val label: String, val apiValue: String) {
+    FINISHED("스터디가 종료되었어요", "FINISHED"),
+    NO_MORE_NEEDS("스터디가 더 이상 필요하지 않아요", "NO_MORE_NEEDS"),
+    NOT_FIT("스터디가 저와 맞지 않아요", "NOT_FIT"),
+    JOIN_ANOTHER_STUDY("다른 스터디에 참여하고 싶어요", "JOIN_ANOTHER_STUDY"),
+    ETC("기타", "ETC")
 }

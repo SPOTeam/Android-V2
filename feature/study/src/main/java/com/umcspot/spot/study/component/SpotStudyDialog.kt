@@ -32,6 +32,7 @@ import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.SpotActivationButton
 import com.umcspot.spot.designsystem.theme.B200
 import com.umcspot.spot.designsystem.theme.B500
+import com.umcspot.spot.designsystem.theme.R500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
@@ -178,6 +179,73 @@ fun SpotStudyDialog(
 }
 
 @Composable
+fun LeaveStudyDialog(
+    visible: Boolean,
+    onDismissRequest: () -> Unit,
+    onButtonClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    if (!visible) return
+
+    Dialog(onDismissRequest = onDismissRequest) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(
+                    color = SpotTheme.colors.white,
+                    shape = RoundedCornerShape(14.dp)
+                )
+                .padding(17.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            IconButton(
+                onClick = onDismissRequest,
+                modifier = Modifier
+                    .size(20.dp)
+                    .align(Alignment.End)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.dismiss),
+                    contentDescription = "닫기",
+                    tint = SpotTheme.colors.black
+                )
+            }
+
+            Spacer(modifier = Modifier.height(screenHeightDp(4.dp)))
+
+            Icon(
+                painter = painterResource(id = R.drawable.ic_sad),
+                contentDescription = null,
+                modifier = Modifier.size(33.dp),
+                tint = SpotTheme.colors.R500
+            )
+
+            Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
+
+            Text(
+                text = "정말 나가시겠어요?",
+                style = SpotTheme.typography.h2,
+                color = SpotTheme.colors.black,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
+
+            SpotActivationButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = screenWidthDp(68.dp)),
+                buttonText = "스터디 나가기",
+                isEnabled = true,
+                onClick = onButtonClick,
+                style = SpotTheme.typography.h5
+            )
+
+            Spacer(modifier = Modifier.height(screenHeightDp(4.dp)))
+        }
+    }
+}
+@Composable
 private fun SpotStudyDialogContent(
     onDismissRequest: () -> Unit,
     title: String,
@@ -229,14 +297,18 @@ private fun SpotStudyDialogContent(
 
         Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
 
-        Text(
-            text = description,
-            style = SpotTheme.typography.regular_500,
-            color = SpotTheme.colors.black,
-            textAlign = TextAlign.Center
-        )
+        if (description.isNotBlank()) {
+            Text(
+                text = description,
+                style = SpotTheme.typography.regular_500,
+                color = SpotTheme.colors.black,
+                textAlign = TextAlign.Center
+            )
 
-        Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
+            Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
+        }
+
+
 
         SpotActivationButton(
             modifier = Modifier

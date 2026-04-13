@@ -28,6 +28,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
 import com.umcspot.spot.alert.navigation.Alert
 import com.umcspot.spot.alert.navigation.navigateToAlert
+import com.umcspot.spot.category.navigation.CategoryGraph
 import com.umcspot.spot.designsystem.component.FloatingMultipleButton
 import com.umcspot.spot.designsystem.component.FloatingToUpButton
 import com.umcspot.spot.designsystem.component.appBar.AppBarHome
@@ -40,14 +41,7 @@ import com.umcspot.spot.feature.board.post.posting.navigation.navigateToPostingN
 import com.umcspot.spot.home.navigation.Home
 import com.umcspot.spot.jjim.navigation.JJim
 import com.umcspot.spot.main.component.MainBottomBar
-import com.umcspot.spot.mypage.cancelMemberShip.navigation.CancelMemberShip
-import com.umcspot.spot.mypage.editInterestRegion.navigation.EditRegion
-import com.umcspot.spot.mypage.editInterestStudy.navigation.EditInterest
-import com.umcspot.spot.mypage.main.navigation.MyPage
-import com.umcspot.spot.mypage.participating.navigation.ParticipatingStudy
-import com.umcspot.spot.mypage.recruiting.application.navigation.STUDY_APPLICATION_ROUTE
-import com.umcspot.spot.mypage.recruiting.navigation.MyRecruitingStudy
-import com.umcspot.spot.mypage.waiting.navigation.WaitingStudy
+import com.umcspot.spot.mypage.navigation.MyPageGraph
 import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.detail.model.StudyDetailTab
@@ -72,16 +66,6 @@ fun MainScreen(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val dest = backStackEntry?.destination
 
-    val currentStudyId = remember(backStackEntry) {
-        try {
-            backStackEntry?.toRoute<StudyDetail>()?.studyId
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    var isScheduleSheetVisible by remember { mutableStateOf(false) }
-
     var scrollToTop by remember { mutableStateOf<(() -> Unit)?>(null) }
     var showBackRequestDialog by remember { mutableStateOf(false) }
     var currentStudyDetailTab by rememberSaveable { mutableStateOf(StudyDetailTab.HOME) }
@@ -99,9 +83,18 @@ fun MainScreen(
                 val isFullPage = dest?.hasRoute(RegisterStudy::class) == true ||
                         dest?.hasRoute(StudyDetail::class) == true ||
                         dest?.hasRoute(StudyMemoirPost::class) == true ||
-                        dest?.hasRoute(StudyBoardPost::class) == true ||
-                        dest?.hasRoute(StudyAttendance::class) == true
-
+                        dest?.hasRoute(StudyAttendance::class) == true ||
+                        dest?.hasRoute(MyPageGraph.EditStudy::class) == true ||
+                        dest?.hasRoute(MyPageGraph.LeaveStudy::class) == true ||
+                        dest?.hasRoute(JJim::class) == true ||
+                        dest?.hasRoute(MyStudy::class) == true ||
+                        dest?.hasRoute(MyPageGraph.EditInterest::class) == true ||
+                        dest?.hasRoute(MyPageGraph.EditRegion::class) == true ||
+                        dest?.hasRoute(CategoryGraph.CategoryFilter::class) == true ||
+                        dest?.hasRoute(MyPageGraph.MyPage::class) == true ||
+                        dest?.hasRoute(MyPageGraph.ParticipatingStudy::class) == true ||
+                        dest?.hasRoute(MyPageGraph.MyRecruitingStudy::class) == true ||
+                        dest?.hasRoute(MyPageGraph.WaitingStudy::class) == true
                 if (isFullPage) {
                 } else if (navigator.showBackTopBar()) {
                     val title = when {
@@ -115,16 +108,9 @@ fun MainScreen(
                         dest?.hasRoute(BoardList::class) == true -> "스터디 파트너들의 이야기"
                         dest?.hasRoute(JJim::class) == true -> "찜한 스터디"
                         dest?.hasRoute(MyStudy::class) == true -> "내 스터디"
-                        dest?.hasRoute(MyPage::class) == true -> "마이페이지"
-                        dest?.hasRoute(ParticipatingStudy::class) == true -> "참여 중인 스터디"
-                        dest?.hasRoute(MyRecruitingStudy::class) == true -> "모집 중인 스터디"
-                        dest?.hasRoute(WaitingStudy::class) == true -> "대기 중인 스터디"
-                        dest?.hasRoute(EditInterest::class) == true -> "관심 분야"
-                        dest?.hasRoute(EditRegion::class) == true -> "관심 지역"
-                        dest?.hasRoute(CancelMemberShip::class) == true -> "회원 탈퇴"
+                        dest?.hasRoute(MyPageGraph.StudyApplications::class) == true -> "신청 확인"
+                        dest?.hasRoute(MyPageGraph.CancelMemberShip::class) == true -> "회원 탈퇴"
                         dest?.routeMatches(POST_CONTENT_ROUTE) == true -> "스터디 파트너들의 이야기"
-                        dest?.hasRoute(StudyPostContent::class) == true -> "스터디 파트너들의 이야기"
-                        dest?.routeMatches(STUDY_APPLICATION_ROUTE) == true -> "신청 확인"
                         else -> ""
                     }
                     BackTopBar(
@@ -154,9 +140,9 @@ fun MainScreen(
                 showToTop = navigator.showToTopFab(),
                 onClickToTop = { scrollToTop?.invoke() },
                 showMultiple = navigator.showMultipleFab() && (
-                        dest?.hasRoute(BoardList::class) == true ||
-                                (dest?.hasRoute(StudyDetail::class) == true && currentStudyDetailTab == StudyDetailTab.MEMOIR) ||
-                                (dest?.hasRoute(StudyDetail::class) == true && currentStudyDetailTab == StudyDetailTab.BOARD)
+                        dest?.hasRoute(Home::class) == true ||
+                                dest?.hasRoute(BoardList::class) == true ||
+                                (dest?.hasRoute(StudyDetail::class) == true && currentStudyDetailTab == StudyDetailTab.MEMOIR)
                         ),
                 onClickMultiple = {
                     when {

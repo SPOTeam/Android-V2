@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.theme.G400
+import com.umcspot.spot.designsystem.theme.R500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.study.detail.mapper.formatCount
 import com.umcspot.spot.study.detail.mapper.toCategoryString
@@ -20,7 +22,10 @@ import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 
 @Composable
-fun StudyHeaderSection(homeState: StudyHomeState) {
+fun StudyHeaderSection(
+    homeState: StudyHomeState,
+    onLikeClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -40,8 +45,12 @@ fun StudyHeaderSection(homeState: StudyHomeState) {
                 text = homeState.hitCount.formatCount
             )
             StudyDetailInfoItem(
-                iconRes = R.drawable.ic_like_count,
-                text = homeState.likeCount.formatCount
+                iconRes = if (homeState.isLiked) R.drawable.ic_like_filled
+                else R.drawable.ic_like_count,
+                text = homeState.likeCount.formatCount,
+                tint = if (homeState.isLiked) SpotTheme.colors.R500
+                else SpotTheme.colors.G400,
+                onClick = onLikeClick
             )
         }
 
