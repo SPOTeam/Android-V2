@@ -1,6 +1,5 @@
-package com.umcspot.spot.mypage.editInterestRegion.screen
+package com.umcspot.spot.mypage.edit.editInterestRegion.screen
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,13 +19,8 @@ import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 
 @Composable
-fun ErrorRegionScreen(
-    msg: String,
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun EmptyRegionScreen() {
     Column(
-        modifier = modifier.clickable { onRetry() },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -38,7 +32,7 @@ fun ErrorRegionScreen(
         )
         Spacer(modifier = Modifier.height(screenHeightDp(16.dp)))
         Text(
-            text = "정보를 가져오지 못했어요.\n화면을 터치해 다시 시도해주세요.",
+            text = "관심 지역을 하나 이상 설정해주세요.\n지역은 10개까지 설정 가능합니다.",
             style = SpotTheme.typography.h5,
             color = SpotTheme.colors.gray500,
             textAlign = TextAlign.Center

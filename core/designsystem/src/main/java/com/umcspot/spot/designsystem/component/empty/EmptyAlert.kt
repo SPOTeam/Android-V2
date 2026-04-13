@@ -19,14 +19,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.umcspot.spot.designsystem.R
+import com.umcspot.spot.designsystem.component.button.SpotActivationButton
 import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.G400
+import com.umcspot.spot.designsystem.theme.G500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
@@ -107,6 +108,44 @@ fun EmptyAlertWithButton(
             shape = SpotShapes.Soft,
             onClick = onClick,
             state = TextButtonState.B500State
+        )
+    }
+}
+
+@Composable
+fun EmptyAlertNeutral(
+    modifier: Modifier = Modifier,
+    alertTitle: String,
+    alertDes: String,
+    buttonText: String,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = modifier.background(SpotTheme.colors.white),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = alertTitle,
+            style = SpotTheme.typography.h3,
+            color = SpotTheme.colors.G500,
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(screenHeightDp(4.dp)))
+        Text(
+            text = alertDes,
+            style = SpotTheme.typography.large_500,
+            color = SpotTheme.colors.G400,
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(screenHeightDp(40.dp)))
+        SpotActivationButton(
+            modifier = Modifier
+                .width(screenWidthDp(156.dp))
+                .height(screenHeightDp(39.dp)),
+            buttonText = buttonText,
+            isEnabled = true,
+            onClick = onClick
         )
     }
 }
