@@ -79,6 +79,7 @@ class StudyDetailViewModel @Inject constructor(
                             totalMembers = model.totalMembers,
                             likeCount = model.likeCount,
                             hitCount = model.hitCount,
+                            isLiked = model.isLiked,
                             viewerStatus = model.viewerStatus,
                             isJoined = model.viewerStatus == ViewerStatus.APPROVED || model.viewerStatus == ViewerStatus.OWNER,
                             isHost = model.viewerStatus == ViewerStatus.OWNER
@@ -122,6 +123,41 @@ class StudyDetailViewModel @Inject constructor(
                     _uiState.update { it.copy(isLoading = false) }
                     emitError(t)
                 }
+        }
+    }
+
+    fun toggleLike(studyId: Long) {
+        val isCurrentlyLiked = _uiState.value.homeState.isLiked
+
+        _uiState.update { state ->
+            state.copy(
+                homeState = state.homeState.copy(
+                    isLiked = !isCurrentlyLiked,
+                    likeCount = if (isCurrentlyLiked) state.homeState.likeCount - 1
+                    else state.homeState.likeCount + 1
+                )
+            )
+        }
+
+        viewModelScope.launch {
+            val result = if (isCurrentlyLiked) {
+                studyRepository.unlikeStudy(studyId)
+            } else {
+                studyRepository.likeStudy(studyId)
+            }
+
+            result.onFailure {
+                _uiState.update { state ->
+                    state.copy(
+                        homeState = state.homeState.copy(
+                            isLiked = isCurrentlyLiked,
+                            likeCount = if (isCurrentlyLiked) state.homeState.likeCount + 1
+                            else state.homeState.likeCount - 1
+                        )
+                    )
+                }
+                emitError(it)
+            }
         }
     }
 

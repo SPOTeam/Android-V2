@@ -27,22 +27,30 @@ import java.io.File
 
 interface StudyDataSource {
     suspend fun getRecommendedStudies(): BaseResponse<StudyResponseDto>
-    suspend fun getRecruitingStudies(feeCategory: FeeRange?, categories: List<String>?, isOnline: Boolean?, sortBy: RecruitingStudySort?, cursor: Long?, size: Int): BaseResponse<StudyResponseDto>
+    suspend fun getRecruitingStudies(
+        feeCategory: FeeRange?,
+        categories: List<String>?,
+        isOnline: Boolean?,
+        sortBy: RecruitingStudySort?,
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyResponseDto>
+
     suspend fun getPreferLocationStudies(
-        recruitingStatus : RecruitingStatus?,
+        recruitingStatus: RecruitingStatus?,
         feeCategory: FeeRange?,
         categories: List<String>?,
         sortType: RecruitingStudySort?,
         cursor: Long?,
         size: Int,
-        regionCodes : List<String>?
+        regionCodes: List<String>?
     ): BaseResponse<StudyResponseDto>
 
     suspend fun getPreferCategoryStudies(
-        category : StudyTheme?,
-        recruitingStatus : RecruitingStatus?,
+        category: StudyTheme?,
+        recruitingStatus: RecruitingStatus?,
         feeCategory: FeeRange?,
-        isOnline : Boolean?,
+        isOnline: Boolean?,
         sortType: RecruitingStudySort?,
         cursor: Long?,
         size: Int,
@@ -53,14 +61,30 @@ interface StudyDataSource {
         imageFile: File?
     ): BaseResponse<CreateStudyResponseDto>
 
+    suspend fun updateStudy(
+        studyId: Long,
+        request: StudyRequestDto,
+        imageFile: File?
+    ): NullResultResponse
+
     suspend fun applyStudy(
         studyId: Long,
         message: String
     ): NullResultResponse
 
+    suspend fun withdrawStudy(
+        studyId: Long,
+        withdrawReason: String,
+        nextOwnerId: Long?
+    ): NullResultResponse
+
     suspend fun getStudyDetail(studyId: Long): BaseResponse<StudyDetailResponseDto>
 
     suspend fun getStudyMembers(studyId: Long): BaseResponse<StudyMemberResponseDto>
+
+    suspend fun likeStudy(studyId: Long): NullResultResponse
+
+    suspend fun unlikeStudy(studyId: Long): NullResultResponse
 
     suspend fun getUpcomingSchedules(studyId: Long): BaseResponse<StudyScheduleResponseDto>
 
@@ -87,9 +111,17 @@ interface StudyDataSource {
 
     suspend fun deleteTodo(studyId: Long, todoId: Long): BaseResponse<Unit?>
 
-    suspend fun getMemberTodos(studyId: Long, memberId: Long, date: String): BaseResponse<TodoQueryResponseDto>
+    suspend fun getMemberTodos(
+        studyId: Long,
+        memberId: Long,
+        date: String
+    ): BaseResponse<TodoQueryResponseDto>
 
-    suspend fun getStudyMemoirs(studyId: Long, cursor: Long?, size: Int): BaseResponse<StudyMemoirResponseDto>
+    suspend fun getStudyMemoirs(
+        studyId: Long,
+        cursor: Long?,
+        size: Int
+    ): BaseResponse<StudyMemoirResponseDto>
 
     suspend fun deleteMemoir(studyId: Long, memoirId: Long): BaseResponse<Unit?>
 
@@ -99,12 +131,20 @@ interface StudyDataSource {
         imageFiles: List<File>
     ): BaseResponse<MemoirCreateResponseDto>
 
-    suspend fun postReviewReaction(studyId: Long, reviewId: Long, reaction: String): BaseResponse<Unit?>
+    suspend fun postReviewReaction(
+        studyId: Long,
+        reviewId: Long,
+        reaction: String
+    ): BaseResponse<Unit?>
 
-    suspend fun deleteReviewReaction(studyId: Long, reviewId: Long, reaction: String): BaseResponse<Unit?>
+    suspend fun deleteReviewReaction(
+        studyId: Long,
+        reviewId: Long,
+        reaction: String
+    ): BaseResponse<Unit?>
 
     suspend fun getCategoryStudies(
-        recruitingStatus : RecruitingStatus?,
+        recruitingStatus: RecruitingStatus?,
         feeCategory: FeeRange?,
         category: String?,
         isOnline: Boolean?,
@@ -119,7 +159,7 @@ interface StudyDataSource {
     ): BaseResponse<StudyResponseDto>
 
     suspend fun getMyPageStudy(
-        statuses : List<String>,
+        statuses: List<String>,
         cursor: Long?,
         size: Int
     ): BaseResponse<StudyResponseDto>
@@ -129,9 +169,9 @@ interface StudyDataSource {
     ): BaseResponse<StudyApplicationResponseDto>
 
     suspend fun entryAcceptance(
-        applicationId : Long,
-        decision : String
-    ) : NullResultResponse
+        applicationId: Long,
+        decision: String
+    ): NullResultResponse
 
     suspend fun createSchedule(
         studyId: Long,
@@ -149,6 +189,18 @@ interface StudyDataSource {
 
     suspend fun checkAttendance(studyId: Long, scheduleId: Long, token: String): NullResultResponse
 
-    suspend fun getAttendanceQr(studyId: Long, scheduleId: Long): BaseResponse<StudyAttendanceQrResponseDto>
+    suspend fun getAttendanceQr(
+        studyId: Long,
+        scheduleId: Long
+    ): BaseResponse<StudyAttendanceQrResponseDto>
+
+    suspend fun reportStudyMember(
+        studyId: Long,
+        targetMemberId: Long,
+        reason: String
+    ): NullResultResponse
+
+    suspend fun deleteStudy(studyId: Long): NullResultResponse
+
 
 }

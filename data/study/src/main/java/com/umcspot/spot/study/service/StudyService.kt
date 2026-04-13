@@ -9,6 +9,8 @@ import com.umcspot.spot.study.dto.request.TodoCreateRequestDto
 import com.umcspot.spot.network.model.NullResultResponse
 import com.umcspot.spot.study.dto.request.ScheduleCreateRequestDto
 import com.umcspot.spot.study.dto.request.StudyApplyRequestDto
+import com.umcspot.spot.study.dto.request.StudyReportRequestDto
+import com.umcspot.spot.study.dto.request.StudyWithdrawRequestDto
 import com.umcspot.spot.study.dto.response.CreateStudyResponseDto
 import com.umcspot.spot.study.dto.response.MemoirCreateResponseDto
 import com.umcspot.spot.study.dto.response.ScheduleCreateResponseDto
@@ -28,6 +30,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
@@ -97,10 +100,27 @@ interface StudyService {
         @Part imageFile: MultipartBody.Part?
     ): BaseResponse<CreateStudyResponseDto>
 
+    // 스터디 수정하기
+    @Multipart
+    @PATCH("/api/studies/{studyId}")
+    suspend fun updateStudy(
+        @Path("studyId") studyId: Long,
+        @Part request: MultipartBody.Part,
+        @Part imageFile: MultipartBody.Part?
+    ): NullResultResponse
+
+    // 스터디 신청하기
     @POST("/api/studies/{studyId}/apply")
     suspend fun applyStudy(
         @Path("studyId") studyId: Long,
         @Body request: StudyApplyRequestDto
+    ): NullResultResponse
+
+    // 스터디 나가기
+    @POST("/api/studies/{studyId}/withdraw")
+    suspend fun withdrawStudy(
+        @Path("studyId") studyId: Long,
+        @Body request: StudyWithdrawRequestDto
     ): NullResultResponse
 
     // 스터디 디테일 조회
@@ -114,6 +134,18 @@ interface StudyService {
     suspend fun getStudyMembers(
         @Path("studyId") studyId: Long
     ): BaseResponse<StudyMemberResponseDto>
+
+    // 스터디 좋아요
+    @POST("/api/studies/{studyId}/like")
+    suspend fun likeStudy(
+        @Path("studyId") studyId: Long
+    ): NullResultResponse
+
+    // 스터디 좋아요 취소
+    @DELETE("/api/studies/{studyId}/like")
+    suspend fun unlikeStudy(
+        @Path("studyId") studyId: Long
+    ): NullResultResponse
 
     // 다가오는 일정 조회
     @GET("/api/studies/{studyId}/schedules/upcoming")
@@ -266,5 +298,17 @@ interface StudyService {
         @Path("studyId") studyId: Long,
         @Path("scheduleId") scheduleId: Long
     ): BaseResponse<StudyAttendanceQrResponseDto>
+
+    @POST("/api/studies/{studyId}/members/{targetMemberId}/report")
+    suspend fun reportStudyMember(
+        @Path("studyId") studyId: Long,
+        @Path("targetMemberId") targetMemberId: Long,
+        @Body request: StudyReportRequestDto
+    ): NullResultResponse
+
+    @DELETE("/api/studies/{studyId}")
+    suspend fun deleteStudy(
+        @Path("studyId") studyId: Long
+    ): NullResultResponse
 
 }

@@ -8,6 +8,7 @@ data class StudyApplicationResponseDto(
     @SerialName("applies")
     val applies: List<StudyApplication>
 )
+
 @Serializable
 data class StudyApplication(
     @SerialName("applicantId")
@@ -19,5 +20,5 @@ data class StudyApplication(
     @SerialName("description")
     val description: String,
     @SerialName("profileImageUrl")
-    val profileImageUrl: String,
+    val profileImageUrl: String?
 )

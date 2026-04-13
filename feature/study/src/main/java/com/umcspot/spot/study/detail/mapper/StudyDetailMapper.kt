@@ -11,10 +11,8 @@ fun LocalDateTime.toUiTime(): String {
     return this.format(formatter).lowercase()
 }
 
-fun ImmutableList<String>.toCategoryString(): String {
-    return this.mapNotNull { categoryName ->
-        StudyTheme.entries.find { it.name == categoryName }?.title
-    }.joinToString(" / ")
+fun ImmutableList<StudyTheme>.toCategoryString(): String {
+    return this.joinToString(" / ") { it.title }
 }
 
 val Int.formatCount: String

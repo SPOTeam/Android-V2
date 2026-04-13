@@ -22,6 +22,7 @@ import com.umcspot.spot.study.model.StudyRecentMemoirModel
 import com.umcspot.spot.study.model.StudyResultList
 import com.umcspot.spot.study.model.StudyScheduleCreateModel
 import com.umcspot.spot.study.model.StudyScheduleModel
+import com.umcspot.spot.study.model.StudyUpdateModel
 import com.umcspot.spot.study.model.TodoModel
 import com.umcspot.spot.study.repository.StudyRepository
 import java.io.File
@@ -130,6 +131,36 @@ class StudyRepositoryImpl @Inject constructor(
         response.result.studyId
     }
 
+
+    override suspend fun updateStudy(
+        studyId: Long,
+        studyUpdateModel: StudyUpdateModel,
+        imageFile: File?
+    ): Result<Unit> = runCatching {
+        val requestDto = studyUpdateModel.toData()
+        val response = studyDataSource.updateStudy(studyId, requestDto, imageFile)
+        if (!response.isSuccess) {
+            throw Exception(response.message ?: "스터디 수정 실패")
+        }
+        Unit
+    }.onFailure { e ->
+        Log.e("StudyRepository", "updateStudy failed: studyId=$studyId", e)
+    }
+
+    override suspend fun withdrawStudy(
+        studyId: Long,
+        withdrawReason: String,
+        nextOwnerId: Long?
+    ): Result<Unit> = runCatching {
+        val response = studyDataSource.withdrawStudy(studyId, withdrawReason, nextOwnerId)
+        if (!response.isSuccess) {
+            throw Exception(response.message ?: "스터디 탈퇴 실패")
+        }
+        Unit
+    }.onFailure { e ->
+        Log.e("StudyRepository", "withdrawStudy failed: studyId=$studyId", e)
+    }
+
     override suspend fun applyStudy(studyId: Long, message: String): Result<Unit> = runCatching {
         val response = studyDataSource.applyStudy(studyId, message)
         if (response.isSuccess) {
@@ -148,8 +179,24 @@ class StudyRepositoryImpl @Inject constructor(
     override suspend fun getStudyMembers(studyId: Long): Result<List<StudyMemberModel>> =
         runCatching {
             val response = studyDataSource.getStudyMembers(studyId)
-            response.result.members.map { it.toDomain() }
+            response.result.members
+                .map { it.toDomain() }
+                .sortedByDescending { it.isLeader }
         }
+
+    override suspend fun likeStudy(studyId: Long): Result<Unit> = runCatching {
+        studyDataSource.likeStudy(studyId)
+        Unit
+    }.onFailure { e ->
+        Log.e("StudyRepository", "likeStudy failed: studyId=$studyId", e)
+    }
+
+    override suspend fun unlikeStudy(studyId: Long): Result<Unit> = runCatching {
+        studyDataSource.unlikeStudy(studyId)
+        Unit
+    }.onFailure { e ->
+        Log.e("StudyRepository", "unlikeStudy failed: studyId=$studyId", e)
+    }
 
     override suspend fun getUpcomingSchedules(studyId: Long): Result<List<StudyScheduleModel>> =
         runCatching {
@@ -449,4 +496,16 @@ class StudyRepositoryImpl @Inject constructor(
             if (!response.isSuccess) throw Exception(response.message ?: "QR 조회 실패")
             response.result.toDomain()
         }
+
+    override suspend fun reportStudyMember(
+        studyId: Long,
+        targetMemberId: Long,
+        reason: String
+    ): Result<Unit> = runCatching {
+        studyDataSource.reportStudyMember(studyId, targetMemberId, reason)
+    }
+
+    override suspend fun deleteStudy(studyId: Long): Result<Unit> = runCatching {
+        studyDataSource.deleteStudy(studyId)
+    }
 }

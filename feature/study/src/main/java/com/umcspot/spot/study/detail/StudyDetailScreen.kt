@@ -5,19 +5,36 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.component.button.SpotActivationButton
 import com.umcspot.spot.designsystem.theme.SpotTheme
@@ -27,8 +44,13 @@ import com.umcspot.spot.study.detail.component.common.StudyDetailTabRow
 import com.umcspot.spot.study.detail.component.common.StudyHeaderSection
 import com.umcspot.spot.study.detail.component.planner.ScheduleBottomSheet
 import com.umcspot.spot.study.detail.component.planner.ScheduleDetailBottomSheet
-import com.umcspot.spot.study.detail.model.*
-import com.umcspot.spot.study.detail.screen.*
+import com.umcspot.spot.study.detail.model.StudyDetailSideEffect
+import com.umcspot.spot.study.detail.model.StudyDetailState
+import com.umcspot.spot.study.detail.model.StudyDetailTab
+import com.umcspot.spot.study.detail.screen.StudyDetailBoardScreen
+import com.umcspot.spot.study.detail.screen.StudyDetailHomeScreen
+import com.umcspot.spot.study.detail.screen.StudyDetailMemoirScreen
+import com.umcspot.spot.study.detail.screen.StudyDetailPlannerScreen
 import com.umcspot.spot.study.detail.screen.camera.QrScannerScreen
 import com.umcspot.spot.study.model.ViewerStatus
 import com.umcspot.spot.ui.extension.screenHeightDp
@@ -54,19 +76,19 @@ fun StudyDetailRoute(
 
     val isOwner = uiState.homeState.viewerStatus == ViewerStatus.OWNER
     val isMember = uiState.homeState.viewerStatus == ViewerStatus.APPROVED || isOwner
-    
+
     var showScheduleBottomSheet by rememberSaveable { mutableStateOf(false) }
     var showScheduleDetailBottomSheet by rememberSaveable { mutableStateOf(false) }
-    var selectedScheduleId by remember { mutableStateOf<Long?>(null) }
-    var selectedScheduleIsNow by remember { mutableStateOf(false) }
-    
+    var selectedScheduleId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var selectedScheduleIsNow by rememberSaveable { mutableStateOf(false) }
+
     var isScannerOpen by remember { mutableStateOf(false) }
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) isScannerOpen = true
     }
-    
+
     var showApplyInputDialog by remember { mutableStateOf(false) }
     var showApplySuccessDialog by remember { mutableStateOf(false) }
 
@@ -108,14 +130,18 @@ fun StudyDetailRoute(
 
     BackHandler { onBackClick() }
 
-    Box(modifier = Modifier.fillMaxSize().background(SpotTheme.colors.white)) {
-
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(SpotTheme.colors.white)
+    ) {
         StudyDetailScreen(
             studyId = studyId,
             uiState = uiState,
             selectedTab = selectedTab,
             isOwner = isOwner,
             isMember = isMember,
+            onLikeClick = { viewModel.toggleLike(studyId) },
             onAttendanceClick = { scheduleId, isNow ->
                 if (!isMember) return@StudyDetailScreen
                 if (isOwner) {
@@ -182,10 +208,7 @@ fun StudyDetailRoute(
 
         if (isScannerOpen) {
             QrScannerScreen(
-                onQrScanned = { token ->
-                    isScannerOpen = false
-                    
-                },
+                onQrScanned = { isScannerOpen = false },
                 onClose = { isScannerOpen = false }
             )
         }
@@ -201,6 +224,7 @@ fun StudyDetailRoute(
                 selectedScheduleId?.let { id ->
                     viewModel.deleteSchedule(studyId, id)
                 }
+                showScheduleDetailBottomSheet = false
             }
         )
 
@@ -237,6 +261,7 @@ fun StudyDetailRoute(
         }
     }
 }
+
 @Composable
 private fun StudyDetailScreen(
     studyId: Long,
@@ -244,7 +269,8 @@ private fun StudyDetailScreen(
     selectedTab: StudyDetailTab,
     isOwner: Boolean,
     isMember: Boolean,
-    onAttendanceClick: (Long, Boolean) -> Unit, 
+    onLikeClick: () -> Unit,
+    onAttendanceClick: (Long, Boolean) -> Unit,
     onTabSelected: (StudyDetailTab) -> Unit,
     onDateSelected: (LocalDate) -> Unit,
     onMonthChanged: (Int, Int) -> Unit,
@@ -265,7 +291,9 @@ private fun StudyDetailScreen(
 ) {
     LazyColumn(
         state = lazyListState,
-        modifier = Modifier.fillMaxSize().imePadding()
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding()
     ) {
         item {
             Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
@@ -276,10 +304,16 @@ private fun StudyDetailScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(screenHeightDp(160.dp)),
-                contentScale = ContentScale.Crop
+                contentScale = if (uiState.homeState.thumbnailUrl != null) ContentScale.Crop else ContentScale.Fit,
+                placeholder = painterResource(R.drawable.ic_default),
+                error = painterResource(R.drawable.ic_default)
             )
-            StudyHeaderSection(uiState.homeState)
+            StudyHeaderSection(
+                homeState = uiState.homeState,
+                onLikeClick = onLikeClick
+            )
         }
+
         item {
             StudyDetailTabRow(selectedTab = selectedTab, onTabSelected = onTabSelected)
             Spacer(modifier = Modifier.height(screenHeightDp(18.dp)))

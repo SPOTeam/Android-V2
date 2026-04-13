@@ -10,9 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.ui.extension.noRippleClickable
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 
@@ -20,7 +22,9 @@ import com.umcspot.spot.ui.extension.screenWidthDp
 fun StudyDetailInfoItem(
     iconRes: Int,
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    tint: Color = SpotTheme.colors.black,
+    onClick: (() -> Unit)? = null
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -30,12 +34,16 @@ fun StudyDetailInfoItem(
                 horizontal = screenWidthDp(3.dp),
                 vertical = screenHeightDp(1.5.dp)
             )
+            .then(
+                if (onClick != null) Modifier.noRippleClickable { onClick() }
+                else Modifier
+            )
     ) {
         Icon(
             painter = painterResource(id = iconRes),
             contentDescription = null,
             modifier = Modifier.size(screenWidthDp(14.dp)),
-            tint = SpotTheme.colors.black
+            tint = tint
         )
         Spacer(modifier = Modifier.width(screenWidthDp(4.dp)))
         Text(
