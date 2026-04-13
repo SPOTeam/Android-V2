@@ -52,9 +52,7 @@ import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.SpotSpinner
 import com.umcspot.spot.designsystem.component.comment.CommentField
 import com.umcspot.spot.designsystem.component.modal.AcceptDialog
-import com.umcspot.spot.designsystem.component.modal.AcceptModal
 import com.umcspot.spot.designsystem.component.modal.DeleteDialog
-import com.umcspot.spot.designsystem.component.modal.RejectDialog
 import com.umcspot.spot.designsystem.component.modal.ReportDialog
 import com.umcspot.spot.designsystem.component.post.CommentUserInfo
 import com.umcspot.spot.designsystem.component.post.CountView
