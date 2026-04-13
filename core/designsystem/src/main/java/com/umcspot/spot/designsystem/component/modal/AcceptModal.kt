@@ -1,7 +1,6 @@
 package com.umcspot.spot.designsystem.component.modal
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,14 +22,14 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.component.button.TextButton
-import com.umcspot.spot.designsystem.component.button.TextButtonState
+import com.umcspot.spot.designsystem.component.button.SpotActivationButton
+import com.umcspot.spot.designsystem.component.button.SpotCancelButton
 import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.ui.extension.noRippleClickable
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 
@@ -38,14 +37,17 @@ import com.umcspot.spot.ui.extension.screenWidthDp
 fun AcceptModal(
     painter: Painter,
     painterTint: Color,
-    modalTitle : String,
-    modalDes : String?,
-    okButtonText : String,
+    modalTitle: String,
+    modalDes: String?,
+    okButtonText: String,
     noButtonText: String?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    onDismiss:() -> Unit = {}
+    onDismiss: () -> Unit = {}
 ) {
+    val isSingleButton = noButtonText == null
+    val horizontalPadding = if (isSingleButton) screenWidthDp(68.dp) else 0.dp
+
     Card(
         modifier = modifier
             .width(screenWidthDp(326.dp))
@@ -64,23 +66,21 @@ fun AcceptModal(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
                 Image(
                     painter = painterResource(R.drawable.dismiss),
                     contentDescription = null,
-                    modifier = Modifier.clickable { onDismiss() }
+                    modifier = Modifier.noRippleClickable { onDismiss() }
                 )
             }
 
             Image(
                 painter = painter,
                 contentDescription = null,
-                modifier = Modifier
-                    .size(screenWidthDp(33.dp)),
-                colorFilter = ColorFilter.tint(painterTint)
+                modifier = Modifier.size(screenWidthDp(24.dp)),
+                colorFilter = if (painterTint != Color.Unspecified) ColorFilter.tint(painterTint) else null
             )
 
             Spacer(Modifier.height(screenHeightDp(7.dp)))
@@ -90,43 +90,43 @@ fun AcceptModal(
                 text = modalTitle,
                 style = SpotTheme.typography.h2,
                 textAlign = TextAlign.Center
-
             )
 
             Spacer(Modifier.height(screenHeightDp(20.dp)))
 
-            if(modalDes != null) {
+            if (modalDes != null) {
                 Text(
                     text = modalDes,
                     style = SpotTheme.typography.regular_500,
                     textAlign = TextAlign.Center
                 )
-
                 Spacer(Modifier.height(screenHeightDp(20.dp)))
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                TextButton(
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = horizontalPadding),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                SpotActivationButton(
                     modifier = Modifier
-                        .width(screenWidthDp(141.dp))
+                        .weight(1f)
                         .height(screenHeightDp(39.dp)),
-                    text = okButtonText,
-                    style = SpotTheme.typography.h5,
+                    buttonText = okButtonText,
+                    isEnabled = true,
                     onClick = onClick,
-                    shape = SpotShapes.Soft,
-                    state = TextButtonState.B500State,
+                    style = SpotTheme.typography.h5
                 )
 
-                if(noButtonText != null) {
-                    TextButton(
+
+                if (noButtonText != null) {
+                    SpotCancelButton(
                         modifier = Modifier
-                            .width(screenWidthDp(141.dp))
+                            .weight(1f)
                             .height(screenHeightDp(39.dp)),
-                        text = noButtonText,
-                        style = SpotTheme.typography.h5,
-                        onClick = onDismiss,
-                        shape = SpotShapes.Soft,
-                        state = TextButtonState.G500State,
+                        buttonText = noButtonText,
+                        onClick = onDismiss
                     )
                 }
             }
@@ -139,9 +139,9 @@ fun AcceptDialog(
     visible: Boolean,
     painter: Painter = painterResource(R.drawable.ic_check),
     painterTint: Color = Color.Unspecified,
-    modalTitle : String,
-    modalDes : String?,
-    okButtonText : String,
+    modalTitle: String,
+    modalDes: String?,
+    okButtonText: String,
     noButtonText: String?,
     onClick: () -> Unit,
     onDismiss: () -> Unit,
@@ -157,22 +157,6 @@ fun AcceptDialog(
             noButtonText = noButtonText,
             onClick = onClick,
             onDismiss = onDismiss,
-        )
-    }
-}
-
-@Preview(showBackground = true, widthDp = 360, heightDp = 640)
-@Composable
-private fun AcceptDialog_Preview() {
-    SpotTheme {
-        AcceptDialog(
-            visible = true,
-            modalTitle = "스터디원 신고 완료",
-            modalDes = "스터디원 신고가 완료되었어요.\n쾌적한 서비스 이용을 위해 항상 노력하겠습니다.",
-            noButtonText = "취소",
-            okButtonText = "확인",
-            onClick = {},
-            onDismiss = {}
         )
     }
 }
