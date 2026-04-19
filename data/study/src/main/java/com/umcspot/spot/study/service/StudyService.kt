@@ -323,7 +323,6 @@ interface StudyService {
         @Path("studyId") studyId: Long
     ): NullResultResponse
 
-}
     @GET("/api/studies/{studyId}/posts")
     suspend fun getStudyPostsList(
         @Path("studyId") studyId: Long,

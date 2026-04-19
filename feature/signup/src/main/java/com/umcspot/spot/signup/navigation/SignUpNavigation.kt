@@ -46,6 +46,7 @@ fun NavGraphBuilder.signupGraph(
     composable<Landing> {
         LandingRoute(
             navigateToSignUp = navigateToSignUp,
+            navigateToHome = navigateToHome,
         )
     }
     composable<SignUp> {

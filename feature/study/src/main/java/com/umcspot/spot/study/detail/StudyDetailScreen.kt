@@ -32,10 +32,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
@@ -56,12 +56,6 @@ import com.umcspot.spot.study.detail.screen.StudyDetailMemoirScreen
 import com.umcspot.spot.study.detail.screen.StudyDetailPlannerScreen
 import com.umcspot.spot.study.detail.screen.camera.QrScannerScreen
 import com.umcspot.spot.study.model.ViewerStatus
-import com.umcspot.spot.study.detail.model.StudyDetailState
-import com.umcspot.spot.study.detail.model.StudyDetailTab
-import com.umcspot.spot.study.detail.screen.StudyDetailBoardScreen
-import com.umcspot.spot.study.detail.screen.StudyDetailHomeScreen
-import com.umcspot.spot.study.detail.screen.StudyDetailMemoirScreen
-import com.umcspot.spot.study.detail.screen.StudyDetailPlannerScreen
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 import kotlinx.coroutines.delay

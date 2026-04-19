@@ -530,7 +530,7 @@ class StudyRepositoryImpl @Inject constructor(
     override suspend fun deleteStudy(studyId: Long): Result<Unit> = runCatching {
         studyDataSource.deleteStudy(studyId)
     }
-}
+
     override suspend fun getStudyPostsList(
         studyId : Long,
         cursor: Long?,

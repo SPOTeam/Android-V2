@@ -14,5 +14,6 @@ fun TokenResponseDto.toDomain() : TokenResult =
     TokenResult (
         userId = this.userId,
         accessToken = this.accessToken,
-        refreshToken = this.refreshToken
+        refreshToken = this.refreshToken,
+        isNewMember = this.isNewMember
     )

@@ -242,6 +242,9 @@ class MainNavigator(
         navController.navigateToMyPage(navOptions)
     }
 
+    fun navigateToStudyBoardPost(studyId: Long) {
+        navController.navigateToStudyBoardPost(studyId)
+    }
 
     fun navigateToParticipatingStudy(navOptions: NavOptions? = null) {
         navController.navigateToParticipatingStudy(navOptions)

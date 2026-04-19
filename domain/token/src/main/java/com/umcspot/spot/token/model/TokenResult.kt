@@ -4,4 +4,5 @@ data class TokenResult (
     val userId : String,
     val accessToken : String,
     val refreshToken : String,
+    val isNewMember : Boolean
 )
