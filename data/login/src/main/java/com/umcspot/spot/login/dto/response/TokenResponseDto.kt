@@ -10,5 +10,7 @@ data class TokenResponseDto(
     @SerialName("accessToken")
     val accessToken: String,
     @SerialName("refreshToken")
-    val refreshToken: String
+    val refreshToken: String,
+    @SerialName("isNewMember")
+    val isNewMember: Boolean
 )

@@ -20,7 +20,7 @@ class LoginRepositoryImpl @Inject constructor(
     override suspend fun finishSocialLogin(
         type: SocialLoginType,
         accessToken: String
-    ): Result<Unit> =
+    ): Result<Boolean> =
         runCatching {
             val response = loginDataStore.getCallBackToken(type.title, accessToken)
             val tokenResult: TokenResult = response.result.toDomain()
@@ -37,6 +37,8 @@ class LoginRepositoryImpl @Inject constructor(
                     userId = tokenResult.userId
                 )
             }
+
+            tokenResult.isNewMember
         }
 
     override suspend fun refreshTokenData(

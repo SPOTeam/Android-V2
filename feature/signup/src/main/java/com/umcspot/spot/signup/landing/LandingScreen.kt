@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun LandingRoute(
     navigateToSignUp: () -> Unit,
+    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LandingViewModel = hiltViewModel(),
 ) {
@@ -58,6 +59,7 @@ fun LandingRoute(
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
                 is LandingSideEffect.NavigateToSignUp -> navigateToSignUp()
+                is LandingSideEffect.NavigateToHome -> navigateToHome()
                 is LandingSideEffect.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(effect.message)
                 }

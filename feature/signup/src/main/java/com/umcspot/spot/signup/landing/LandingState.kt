@@ -6,5 +6,6 @@ data class LandingState(
 
 sealed interface LandingSideEffect {
     data object NavigateToSignUp : LandingSideEffect
+    data object NavigateToHome : LandingSideEffect
     data class ShowSnackBar(val message: String) : LandingSideEffect
 }

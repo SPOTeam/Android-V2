@@ -147,8 +147,6 @@ interface StudyDataSource {
         request: BoardCreateRequestDto,
     ): BaseResponse<BoardCreateResponseDto>
 
-    suspend fun postReviewReaction(studyId: Long, reviewId: Long, reaction: String): BaseResponse<Unit?>
-
     suspend fun deleteReviewReaction(
         studyId: Long,
         reviewId: Long,
@@ -250,6 +248,5 @@ interface StudyDataSource {
     ): NullResultResponse
 
     suspend fun deleteStudy(studyId: Long): NullResultResponse
-
 
 }

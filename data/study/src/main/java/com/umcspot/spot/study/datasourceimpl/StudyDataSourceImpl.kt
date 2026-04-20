@@ -224,11 +224,6 @@ class StudyDataSourceImpl @Inject constructor(
         )
     }
 
-    override suspend fun postReviewReaction(
-        studyId: Long,
-        reviewId: Long,
-        reaction: String
-    ): BaseResponse<Unit?> {
     override suspend fun postBoard(
         studyId: Long,
         request: BoardCreateRequestDto
@@ -342,7 +337,7 @@ class StudyDataSourceImpl @Inject constructor(
 
     override suspend fun deleteStudy(studyId: Long): NullResultResponse =
         studyService.deleteStudy(studyId)
-}
+
     override suspend fun getStudyPostsList(
         studyId: Long,
         cursor: Long?,

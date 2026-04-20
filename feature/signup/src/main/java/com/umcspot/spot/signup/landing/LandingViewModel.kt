@@ -91,14 +91,18 @@ class LandingViewModel @Inject constructor(
 
     private fun requestServerLogin(type: SocialLoginType, accessToken: String) =
         viewModelScope.launch {
-            runSuspendCatching {
-                loginRepository.finishSocialLogin(type = type, accessToken = accessToken)
-            }.onSuccess {
-                _uiState.update { it.copy(isLoading = false) }
-                _sideEffect.emit(LandingSideEffect.NavigateToSignUp)
-            }.onFailure { e ->
-                handleLoginError("서버 로그인 실패", e)
-            }
+            loginRepository.finishSocialLogin(type, accessToken)
+                .onSuccess { isNewMember ->
+                    _uiState.update { it.copy(isLoading = false) }
+                    if (isNewMember) {
+                        _sideEffect.emit(LandingSideEffect.NavigateToSignUp)
+                    } else {
+                        _sideEffect.emit(LandingSideEffect.NavigateToHome)
+                    }
+                }
+                .onFailure { e ->
+                    handleLoginError("서버 로그인 실패", e)
+                }
         }
 
     private fun handleLoginError(msg: String, e: Throwable? = null) = viewModelScope.launch {
