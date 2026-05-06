@@ -391,29 +391,41 @@ class StudyDetailViewModel @Inject constructor(
             )
                 .onSuccess { newId ->
                     val newTodo = TodoModel(newId, currentUserId, content, false)
-                    _uiState.update { it.copy(plannerState = it.plannerState.copy(todoList = (it.plannerState.todoList + newTodo).toPersistentList())) }
+                    _uiState.update { it.copy(
+                        plannerState = it.plannerState.copy(
+                            todoList = (it.plannerState.todoList + newTodo).toPersistentList(),
+                            selectedMemberId = currentUserId
+                        )
+                    )}
                 }
                 .onFailure { emitError(it) }
         }
     }
 
     fun toggleTodoStatus(studyId: Long, todoId: Long, isCurrentlyCompleted: Boolean) {
+        _uiState.update { state ->
+            val newList = state.plannerState.todoList.map { todo ->
+                if (todo.id == todoId) todo.copy(isCompleted = !isCurrentlyCompleted)
+                else todo
+            }.toPersistentList()
+            state.copy(plannerState = state.plannerState.copy(todoList = newList))
+        }
+
         viewModelScope.launch {
             val result = if (isCurrentlyCompleted) {
                 studyRepository.uncompleteTodo(studyId, todoId)
             } else {
                 studyRepository.completeTodo(studyId, todoId)
             }
-
-            result.onSuccess {
+            result.onFailure {
                 _uiState.update { state ->
                     val newList = state.plannerState.todoList.map { todo ->
-
-                        if (todo.id == todoId) todo.copy(isCompleted = !isCurrentlyCompleted)
+                        if (todo.id == todoId) todo.copy(isCompleted = isCurrentlyCompleted)
                         else todo
                     }.toPersistentList()
                     state.copy(plannerState = state.plannerState.copy(todoList = newList))
                 }
+                emitError(it)
             }
         }
     }
@@ -497,17 +509,6 @@ class StudyDetailViewModel @Inject constructor(
                     _uiState.update { it.copy(isLoading = false) }
                     emitError(it)
                 }
-        }
-    }
-
-    fun toggleMemoirReaction(studyId: Long, memoirId: Long, reactionType: String) {
-        val memoir = _uiState.value.memoirState.memoirs.find { it.memoirId == memoirId } ?: return
-        val isCurrentlySelected = when (reactionType) {
-            "FIRE" -> memoir.reactions.isFired
-            "HEART" -> memoir.reactions.isHearted
-            "STAR" -> memoir.reactions.isStarred
-            "SMILE" -> memoir.reactions.isSmiled
-            else -> return
         }
     }
 
@@ -629,12 +630,9 @@ class StudyDetailViewModel @Inject constructor(
         )
     }
 
-    fun toggleMemoirReaction(
-        studyId: Long,
-        memoirId: Long,
-        reactionType: String,
-        isCurrentlySelected: Boolean
-    ) {
+    fun toggleMemoirReaction(studyId: Long, memoirId: Long, reactionType: String, isCurrentlySelected: Boolean) {
+        updateMemoirReactionUIState(memoirId, reactionType, !isCurrentlySelected)
+
         viewModelScope.launch {
             val result = if (isCurrentlySelected) {
                 studyRepository.deleteReviewReaction(studyId, memoirId, reactionType)
@@ -647,16 +645,10 @@ class StudyDetailViewModel @Inject constructor(
             }
         }
     }
-
-    private fun updateMemoirReactionUIState(
-        memoirId: Long,
-        reactionType: String,
-        isSelected: Boolean
-    ) {
+    private fun updateMemoirReactionUIState(memoirId: Long, reactionType: String, isSelected: Boolean) {
         _uiState.update { state ->
             val updatedMemoirs = state.memoirState.memoirs.map { memoir ->
                 if (memoir.memoirId != memoirId) return@map memoir
-
                 val diff = if (isSelected) 1 else -1
                 memoir.copy(
                     reactions = when (reactionType) {

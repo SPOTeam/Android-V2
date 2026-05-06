@@ -2,31 +2,48 @@ package com.umcspot.spot.study.detail.component.planner
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.SpotActivationButton
 import com.umcspot.spot.designsystem.shapes.SpotShapes
@@ -34,7 +51,6 @@ import com.umcspot.spot.designsystem.theme.B100
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.designsystem.theme.Y400
-import com.umcspot.spot.ui.extension.noRippleClickable
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 import kotlinx.coroutines.delay
@@ -44,6 +60,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleBottomSheet(
     visible: Boolean,
@@ -57,6 +74,7 @@ fun ScheduleBottomSheet(
 
     val context = LocalContext.current
     val keyboard = LocalSoftwareKeyboardController.current
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var title by remember { mutableStateOf("") }
     var locationMemo by remember { mutableStateOf("") }
@@ -80,163 +98,126 @@ fun ScheduleBottomSheet(
         }
     }
 
-    Dialog(
+    ModalBottomSheet(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false,
-            decorFitsSystemWindows = false,
-            dismissOnClickOutside = false
-        )
+        sheetState = sheetState,
+        shape = SpotShapes.RoundTop,
+        containerColor = SpotTheme.colors.white,
+        dragHandle = {},
+        contentWindowInsets = { WindowInsets(0) },
+        tonalElevation = 0.dp
     ) {
-        BackHandler { onDismiss() }
-
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomCenter
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(screenHeightDp(533.dp) + navBarPadding)
+                .imePadding()
+                .padding(horizontal = screenWidthDp(17.dp))
         ) {
             Box(
                 modifier = Modifier
-                    .matchParentSize()
-                    .background(SpotTheme.colors.black.copy(alpha = 0.4f))
-                    .noRippleClickable { onDismiss() }
-            )
+                    .fillMaxWidth()
+                    .padding(vertical = screenHeightDp(16.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "새로운 일정",
+                    style = SpotTheme.typography.h4,
+                    color = SpotTheme.colors.black
+                )
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .size(screenWidthDp(24.dp))
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.dismiss),
+                        contentDescription = null,
+                        tint = SpotTheme.colors.black
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .animateContentSize()
+            ) {
+                Spacer(modifier = Modifier.height(screenHeightDp(24.dp)))
+                Text(text = "일정", style = SpotTheme.typography.h5, color = SpotTheme.colors.black)
+                Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
+                ScheduleInputField(value = title, onValueChange = { if (it.length <= 20) title = it }, placeholder = "제목")
+                Spacer(modifier = Modifier.height(screenHeightDp(8.dp)))
+                ScheduleInputField(value = locationMemo, onValueChange = { if (it.length <= 20) locationMemo = it }, placeholder = "위치 메모")
+                Spacer(modifier = Modifier.height(screenHeightDp(32.dp)))
+                Text(text = "일시", style = SpotTheme.typography.h4, color = SpotTheme.colors.black)
+                Spacer(modifier = Modifier.height(screenHeightDp(12.dp)))
+                DateTimeSelectorRow(
+                    label = "시작",
+                    date = startDate,
+                    time = startTime,
+                    onDateClick = {
+                        DatePickerDialog(context, { _, y, m, d -> startDate = LocalDate.of(y, m + 1, d) }, startDate.year, startDate.monthValue - 1, startDate.dayOfMonth).show()
+                    },
+                    onTimeClick = {
+                        TimePickerDialog(context, { _, h, min -> startTime = LocalTime.of(h, min) }, startTime.hour, startTime.minute, false).show()
+                    }
+                )
+                Spacer(modifier = Modifier.height(screenHeightDp(8.dp)))
+                DateTimeSelectorRow(
+                    label = "종료",
+                    date = endDate,
+                    time = endTime,
+                    onDateClick = {
+                        DatePickerDialog(context, { _, y, m, d -> endDate = LocalDate.of(y, m + 1, d) }, endDate.year, endDate.monthValue - 1, endDate.dayOfMonth).show()
+                    },
+                    onTimeClick = {
+                        TimePickerDialog(context, { _, h, min -> endTime = LocalTime.of(h, min) }, endTime.hour, endTime.minute, false).show()
+                    }
+                )
+            }
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(screenHeightDp(533.dp) + navBarPadding)
-                    .clip(SpotShapes.RoundTop)
-                    .background(SpotTheme.colors.white)
-                    .imePadding()
-                    .padding(horizontal = screenWidthDp(17.dp))
+                    .padding(bottom = navBarPadding)
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = screenHeightDp(16.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "새로운 일정",
-                        style = SpotTheme.typography.h4,
-                        color = SpotTheme.colors.black
-                    )
-                    IconButton(
-                        onClick = onDismiss,
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .size(screenWidthDp(24.dp))
+                if (isOverlapError) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.dismiss),
+                            painter = painterResource(id = R.drawable.error),
                             contentDescription = null,
-                            tint = SpotTheme.colors.black
+                            tint = SpotTheme.colors.Y400,
+                            modifier = Modifier.size(screenWidthDp(16.dp))
+                        )
+                        Spacer(modifier = Modifier.width(screenWidthDp(4.dp)))
+                        Text(
+                            text = "기존 일정이 있는 시간대에는 일정 생성이 불가합니다.",
+                            style = SpotTheme.typography.regular_500,
+                            color = SpotTheme.colors.black
                         )
                     }
+                    Spacer(modifier = Modifier.height(screenHeightDp(15.dp)))
                 }
 
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState())
-                        .animateContentSize()
-                ) {
-                    Spacer(Modifier.height(screenHeightDp(24.dp)))
-                    Text(
-                        text = "일정",
-                        style = SpotTheme.typography.h5,
-                        color = SpotTheme.colors.black
-                    )
-                    Spacer(Modifier.height(screenHeightDp(7.dp)))
-
-                    ScheduleInputField(
-                        value = title,
-                        onValueChange = { if (it.length <= 20) title = it },
-                        placeholder = "제목"
-                    )
-                    Spacer(Modifier.height(screenHeightDp(8.dp)))
-
-                    ScheduleInputField(
-                        value = locationMemo,
-                        onValueChange = { if (it.length <= 20) locationMemo = it },
-                        placeholder = "위치 메모"
-                    )
-                    Spacer(Modifier.height(screenHeightDp(32.dp)))
-
-                    Text(
-                        text = "일시",
-                        style = SpotTheme.typography.h4,
-                        color = SpotTheme.colors.black
-                    )
-                    Spacer(Modifier.height(screenHeightDp(12.dp)))
-
-                    DateTimeSelectorRow(
-                        label = "시작",
-                        date = startDate,
-                        time = startTime,
-                        onDateClick = {
-                            DatePickerDialog(context, { _, y, m, d -> startDate = LocalDate.of(y, m + 1, d) }, startDate.year, startDate.monthValue - 1, startDate.dayOfMonth).show()
-                        },
-                        onTimeClick = {
-                            TimePickerDialog(context, { _, h, min -> startTime = LocalTime.of(h, min) }, startTime.hour, startTime.minute, false).show()
+                SpotActivationButton(
+                    buttonText = "추가",
+                    isEnabled = isEnabled,
+                    onClick = {
+                        studyId?.let {
+                            keyboard?.hide()
+                            onCreateSchedule(title, locationMemo, startDateTime, endDateTime)
                         }
-                    )
-
-                    Spacer(Modifier.height(screenHeightDp(8.dp)))
-
-                    DateTimeSelectorRow(
-                        label = "종료",
-                        date = endDate,
-                        time = endTime,
-                        onDateClick = {
-                            DatePickerDialog(context, { _, y, m, d -> endDate = LocalDate.of(y, m + 1, d) }, endDate.year, endDate.monthValue - 1, endDate.dayOfMonth).show()
-                        },
-                        onTimeClick = {
-                            TimePickerDialog(context, { _, h, min -> endTime = LocalTime.of(h, min) }, endTime.hour, endTime.minute, false).show()
-                        }
-                    )
-                }
-
-                Column(
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = navBarPadding)
-                ) {
-                    if (isOverlapError) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.error),
-                                contentDescription = null,
-                                tint = SpotTheme.colors.Y400,
-                                modifier = Modifier.size(screenWidthDp(16.dp))
-                            )
-                            Spacer(Modifier.width(screenWidthDp(4.dp)))
-                            Text(
-                                text = "기존 일정이 있는 시간대에는 일정 생성이 불가합니다.",
-                                style = SpotTheme.typography.regular_500,
-                                color = SpotTheme.colors.black
-                            )
-                        }
-                        Spacer(Modifier.height(screenHeightDp(15.dp)))
-                    }
-
-                    SpotActivationButton(
-                        buttonText = "추가",
-                        isEnabled = isEnabled,
-                        onClick = {
-                            studyId?.let {
-                                keyboard?.hide()
-                                onCreateSchedule(title, locationMemo, startDateTime, endDateTime)
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = screenHeightDp(13.dp))
-                    )
-                }
+                        .padding(bottom = screenHeightDp(13.dp))
+                )
             }
         }
     }
@@ -258,7 +239,10 @@ private fun ScheduleInputField(
                 color = if (isFocused) SpotTheme.colors.B500 else SpotTheme.colors.gray200,
                 shape = RoundedCornerShape(6.dp)
             )
-            .padding(horizontal = screenWidthDp(10.dp), vertical = screenHeightDp(7.dp)),
+            .padding(
+                horizontal = screenWidthDp(10.dp),
+                vertical = screenHeightDp(7.dp)
+            ),
         contentAlignment = Alignment.CenterStart
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -305,8 +289,15 @@ private fun DateTimeSelectorRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, SpotTheme.colors.gray200, RoundedCornerShape(6.dp))
-            .padding(horizontal = screenWidthDp(10.dp), vertical = screenHeightDp(7.dp)),
+            .border(
+                width = 1.dp,
+                color = SpotTheme.colors.gray200,
+                shape = RoundedCornerShape(6.dp)
+            )
+            .padding(
+                horizontal = screenWidthDp(10.dp),
+                vertical = screenHeightDp(7.dp)
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -317,19 +308,25 @@ private fun DateTimeSelectorRow(
         )
         Row {
             DateTimeBadge(text = date.format(dateFormatter), onClick = onDateClick)
-            Spacer(Modifier.width(screenWidthDp(6.dp)))
+            Spacer(modifier = Modifier.width(screenWidthDp(6.dp)))
             DateTimeBadge(text = time.format(timeFormatter).lowercase(), onClick = onTimeClick)
         }
     }
 }
 
 @Composable
-private fun DateTimeBadge(text: String, onClick: () -> Unit) {
+private fun DateTimeBadge(
+    text: String,
+    onClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .background(SpotTheme.colors.B100, RoundedCornerShape(6.dp))
             .clickable { onClick() }
-            .padding(horizontal = screenWidthDp(9.dp), vertical = screenHeightDp(1.dp))
+            .padding(
+                horizontal = screenWidthDp(9.dp),
+                vertical = screenHeightDp(1.dp)
+            )
     ) {
         Text(
             text = text,

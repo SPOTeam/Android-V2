@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
@@ -60,11 +61,11 @@ fun StudyDetailBoardScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Image(
+                    Icon(
                         painter = painterResource(R.drawable.document),
                         contentDescription = null,
-                        colorFilter = ColorFilter.tint(SpotTheme.colors.gray400),
-                        modifier = Modifier.size(screenWidthDp(33.dp))
+                        modifier = Modifier.size(screenWidthDp(33.dp)),
+                        tint = SpotTheme.colors.gray400
                     )
                     Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
                     Text(

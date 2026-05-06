@@ -4,6 +4,8 @@ import android.Manifest
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.LocalOverscrollConfiguration
+import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,9 +58,11 @@ import com.umcspot.spot.study.detail.screen.StudyDetailHomeScreen
 import com.umcspot.spot.study.detail.screen.StudyDetailMemoirScreen
 import com.umcspot.spot.study.detail.screen.StudyDetailPlannerScreen
 import com.umcspot.spot.study.detail.screen.camera.QrScannerScreen
+import com.umcspot.spot.study.model.MemoirModel
 import com.umcspot.spot.study.model.ViewerStatus
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -74,6 +79,7 @@ fun StudyDetailRoute(
     viewModel: StudyDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val memoirs = uiState.memoirState.memoirs
     var selectedTab by rememberSaveable { mutableStateOf(initialTab) }
     val scope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()
@@ -116,24 +122,24 @@ fun StudyDetailRoute(
 
     LaunchedEffect(studyId) {
         viewModel.fetchStudyHomeDetail(studyId)
+        viewModel.fetchAllMemoirs(studyId)
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(studyId, selectedTab) {
         val observer = LifecycleEventObserver { _, event ->
             if (event != Lifecycle.Event.ON_RESUME) return@LifecycleEventObserver
-
             when (selectedTab) {
                 StudyDetailTab.HOME -> viewModel.fetchStudyHomeDetail(studyId)
                 StudyDetailTab.PLANNER -> {
                     val date = uiState.plannerState.selectedDate
                     viewModel.fetchMonthlySchedules(studyId, date.year, date.monthValue)
                 }
+
                 StudyDetailTab.BOARD -> viewModel.fetchStudyBoardPosts(studyId, refresh = true)
-                StudyDetailTab.MEMOIR -> viewModel.fetchAllMemoirs(studyId)
+                StudyDetailTab.MEMOIR -> Unit
             }
         }
-
         val lifecycle = lifecycleOwner.lifecycle
         lifecycle.addObserver(observer)
         onDispose { lifecycle.removeObserver(observer) }
@@ -142,13 +148,17 @@ fun StudyDetailRoute(
     LaunchedEffect(selectedTab) {
         onTabChanged(selectedTab)
         when (selectedTab) {
-            StudyDetailTab.MEMOIR -> viewModel.fetchAllMemoirs(studyId)
+            StudyDetailTab.MEMOIR -> Unit
             StudyDetailTab.PLANNER -> {
                 val date = uiState.plannerState.selectedDate
                 viewModel.fetchMonthlySchedules(studyId, date.year, date.monthValue)
             }
+
             StudyDetailTab.BOARD -> {
-                viewModel.fetchStudyBoardPosts(studyId, refresh = uiState.postState.studyPosts.isEmpty())
+                viewModel.fetchStudyBoardPosts(
+                    studyId,
+                    refresh = uiState.postState.studyPosts.isEmpty()
+                )
             }
 
             else -> Unit
@@ -169,6 +179,7 @@ fun StudyDetailRoute(
         StudyDetailScreen(
             studyId = studyId,
             uiState = uiState,
+            memoirs = memoirs,
             selectedTab = selectedTab,
             isOwner = isOwner,
             isMember = isMember,
@@ -206,7 +217,9 @@ fun StudyDetailRoute(
                 viewModel.fetchMemberTodos(studyId, id, uiState.plannerState.selectedDate)
             },
             onMemoirDelete = { id -> viewModel.deleteMemoir(studyId, id) },
-            onMemoirEmojiToggle = { id, type -> viewModel.toggleMemoirReaction(studyId, id, type) },
+            onMemoirEmojiToggle = { id, type, isCurrentlySelected ->
+                viewModel.toggleMemoirReaction(studyId, id, type, isCurrentlySelected)
+            },
             onApplyClick = { showApplyInputDialog = true },
             onPostPinToggle = { postId, isPinned ->
                 viewModel.togglePostPin(studyId, postId, isPinned)
@@ -259,9 +272,7 @@ fun StudyDetailRoute(
                 cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
             },
             onDeleteClick = {
-                selectedScheduleId?.let { id ->
-                    viewModel.deleteSchedule(studyId, id)
-                }
+                selectedScheduleId?.let { id -> viewModel.deleteSchedule(studyId, id) }
                 showScheduleDetailBottomSheet = false
             }
         )
@@ -304,6 +315,7 @@ fun StudyDetailRoute(
 private fun StudyDetailScreen(
     studyId: Long,
     uiState: StudyDetailState,
+    memoirs: ImmutableList<MemoirModel>,
     selectedTab: StudyDetailTab,
     isOwner: Boolean,
     isMember: Boolean,
@@ -321,7 +333,7 @@ private fun StudyDetailScreen(
     onTodoDelete: (Long, Long) -> Unit,
     onMemberSelected: (Long) -> Unit,
     onMemoirDelete: (Long) -> Unit,
-    onMemoirEmojiToggle: (Long, String) -> Unit,
+    onMemoirEmojiToggle: (Long, String, Boolean) -> Unit,
     onApplyClick: () -> Unit,
     onPostPinToggle: (Long, Boolean) -> Unit,
     onPostLikeClick: (Long, Boolean) -> Unit,
@@ -330,91 +342,110 @@ private fun StudyDetailScreen(
     contentPadding: PaddingValues,
     lazyListState: LazyListState
 ) {
-    LazyColumn(
-        state = lazyListState,
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding()
+    val bottomPadding = if (
+        uiState.homeState.viewerStatus == ViewerStatus.NOT_APPLIED ||
+        uiState.homeState.viewerStatus == ViewerStatus.APPLIED
+    ) screenHeightDp(100.dp) else screenHeightDp(20.dp)
+
+    CompositionLocalProvider(
+        LocalOverscrollFactory provides null,
     ) {
-        item {
-            BackTopBar(title = "스터디", onBackClick = onBackClick)
-            AsyncImage(
-                model = uiState.homeState.thumbnailUrl,
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(screenHeightDp(160.dp)),
-                contentScale = if (uiState.homeState.thumbnailUrl != null) ContentScale.Crop else ContentScale.Fit,
-                placeholder = painterResource(R.drawable.ic_default),
-                error = painterResource(R.drawable.ic_default)
-            )
-            StudyHeaderSection(
-                homeState = uiState.homeState,
-                onLikeClick = onLikeClick
-            )
-        }
+        LazyColumn(
+            state = lazyListState,
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
+        ) {
+            stickyHeader {
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(contentPadding.calculateTopPadding())
+                        .background(SpotTheme.colors.white)
+                )
+                BackTopBar(
+                    title = "스터디",
+                    onBackClick = onBackClick,
+                    modifier = Modifier.background(SpotTheme.colors.white)
+                )
+            }
 
-        item {
-            StudyDetailTabRow(selectedTab = selectedTab, onTabSelected = onTabSelected)
-            Spacer(modifier = Modifier.height(screenHeightDp(18.dp)))
-        }
+            item {
+                AsyncImage(
+                    model = uiState.homeState.thumbnailUrl,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(screenHeightDp(160.dp)),
+                    contentScale = if (uiState.homeState.thumbnailUrl != null) ContentScale.Crop else ContentScale.Fit,
+                    placeholder = painterResource(R.drawable.ic_default),
+                    error = painterResource(R.drawable.ic_default)
+                )
+                StudyHeaderSection(
+                    homeState = uiState.homeState,
+                    onLikeClick = onLikeClick
+                )
+            }
 
-        item {
-            val bottomPadding = if (
-                uiState.homeState.viewerStatus == ViewerStatus.NOT_APPLIED ||
-                uiState.homeState.viewerStatus == ViewerStatus.APPLIED
-            ) 100.dp else 20.dp
+            item {
+                StudyDetailTabRow(selectedTab = selectedTab, onTabSelected = onTabSelected)
+                Spacer(modifier = Modifier.height(screenHeightDp(18.dp)))
+            }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = screenWidthDp(17.dp))
-                    .padding(bottom = contentPadding.calculateBottomPadding() + bottomPadding)
-            ) {
-                when (selectedTab) {
-                    StudyDetailTab.HOME -> StudyDetailHomeScreen(
-                        description = uiState.homeState.studyDescription,
-                        members = uiState.homeState.members,
-                        schedules = uiState.homeState.schedules,
-                        recentMemoirs = uiState.homeState.recentMemoirs,
-                        isMember = isMember,
-                        onAttendanceClick = { id, isNow -> onAttendanceClick(id, isNow) }
-                    )
+            item {
+                val contentBottomPadding = contentPadding.calculateBottomPadding()
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = screenWidthDp(17.dp))
+                        .padding(bottom = contentBottomPadding + bottomPadding)
+                ) {
+                    when (selectedTab) {
+                        StudyDetailTab.HOME -> StudyDetailHomeScreen(
+                            description = uiState.homeState.studyDescription,
+                            members = uiState.homeState.members,
+                            schedules = uiState.homeState.schedules,
+                            recentMemoirs = uiState.homeState.recentMemoirs,
+                            isMember = isMember,
+                            onAttendanceClick = { id, isNow -> onAttendanceClick(id, isNow) }
+                        )
 
-                    StudyDetailTab.PLANNER -> StudyDetailPlannerScreen(
-                        studyId = studyId,
-                        plannerState = uiState.plannerState,
-                        members = uiState.homeState.members,
-                        isOwner = isOwner,
-                        isMember = isMember,
-                        onAttendanceClick = { id, isNow -> onAttendanceClick(id, isNow) },
-                        onDateSelected = onDateSelected,
-                        onMonthChanged = onMonthChanged,
-                        onAddingSchedule = onAddingSchedule,
-                        onAddingTodo = onAddingTodo,
-                        onTodoCreate = onTodoCreate,
-                        onTodoToggle = onTodoToggle,
-                        onTodoDelete = onTodoDelete,
-                        onMemberSelected = onMemberSelected
-                    )
+                        StudyDetailTab.PLANNER -> StudyDetailPlannerScreen(
+                            studyId = studyId,
+                            myUserId = uiState.myUserId,
+                            plannerState = uiState.plannerState,
+                            members = uiState.homeState.members,
+                            isOwner = isOwner,
+                            isMember = isMember,
+                            onAttendanceClick = { id, isNow -> onAttendanceClick(id, isNow) },
+                            onDateSelected = onDateSelected,
+                            onMonthChanged = onMonthChanged,
+                            onAddingSchedule = onAddingSchedule,
+                            onAddingTodo = onAddingTodo,
+                            onTodoCreate = onTodoCreate,
+                            onTodoToggle = onTodoToggle,
+                            onTodoDelete = onTodoDelete,
+                            onMemberSelected = onMemberSelected
+                        )
 
-                    StudyDetailTab.BOARD -> StudyDetailBoardScreen(
-                        posts = uiState.postState.studyPosts,
-                        isLoading = uiState.isLoading,
-                        canPin = isOwner,
-                        onPinToggle = onPostPinToggle,
-                        onLikeClick = { postId, isLiked ->
-                            if (isMember) onPostLikeClick(postId, isLiked)
-                        },
-                        onPostClick = onPostClick
-                    )
+                        StudyDetailTab.BOARD -> StudyDetailBoardScreen(
+                            posts = uiState.postState.studyPosts,
+                            isLoading = uiState.isLoading,
+                            canPin = isOwner,
+                            onPinToggle = onPostPinToggle,
+                            onLikeClick = { postId, isLiked ->
+                                if (isMember) onPostLikeClick(postId, isLiked)
+                            },
+                            onPostClick = onPostClick
+                        )
 
-                    StudyDetailTab.MEMOIR -> StudyDetailMemoirScreen(
-                        studyId = studyId,
-                        memoirs = uiState.memoirState.memoirs,
-                        onDeleteMemoir = onMemoirDelete,
-                        onEmojiToggle = onMemoirEmojiToggle
-                    )
+                        StudyDetailTab.MEMOIR -> StudyDetailMemoirScreen(
+                            studyId = studyId,
+                            memoirs = memoirs,
+                            onDeleteMemoir = onMemoirDelete,
+                            onEmojiToggle = onMemoirEmojiToggle
+                        )
+                    }
                 }
             }
         }

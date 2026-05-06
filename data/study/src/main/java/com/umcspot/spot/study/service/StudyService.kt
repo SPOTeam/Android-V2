@@ -186,21 +186,21 @@ interface StudyService {
     suspend fun completeTodo(
         @Path("studyId") studyId: Long,
         @Path("todoId") todoId: Long
-    ): BaseResponse<Unit?>
+    ): NullResultResponse
 
     // 투두 리스트 미완료
     @POST("/api/studies/{studyId}/todos/{todoId}/uncomplete")
     suspend fun uncompleteTodo(
         @Path("studyId") studyId: Long,
         @Path("todoId") todoId: Long
-    ): BaseResponse<Unit?>
+    ): NullResultResponse
 
     // 투두 삭제
     @DELETE("/api/studies/{studyId}/todos/{todoId}")
     suspend fun deleteTodo(
         @Path("studyId") studyId: Long,
         @Path("todoId") todoId: Long
-    ): BaseResponse<Unit?>
+    ): NullResultResponse
 
     // 투두 리스트 조회
     @GET("/api/studies/{studyId}/todos/members/{memberId}")
@@ -223,7 +223,7 @@ interface StudyService {
     suspend fun deleteMemoir(
         @Path("studyId") studyId: Long,
         @Path("reviewId") reviewId: Long
-    ): BaseResponse<Unit?>
+    ): NullResultResponse
 
     // 회고록 작성
     @Multipart
@@ -246,7 +246,7 @@ interface StudyService {
         @Path("studyId") studyId: Long,
         @Path("reviewId") reviewId: Long,
         @Query("reaction") reaction: String
-    ): BaseResponse<Unit?>
+    ): NullResultResponse
 
     // 회고록 반응 삭제
     @DELETE("/api/studies/{studyId}/reviews/{reviewId}/reactions")
@@ -254,7 +254,7 @@ interface StudyService {
         @Path("studyId") studyId: Long,
         @Path("reviewId") reviewId: Long,
         @Query("reaction") reaction: String
-    ): BaseResponse<Unit?>
+    ): NullResultResponse
 
     @GET("/api/studies/me")
     suspend fun getMyPageStudy(

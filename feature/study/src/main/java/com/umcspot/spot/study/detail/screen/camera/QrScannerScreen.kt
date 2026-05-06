@@ -1,7 +1,9 @@
 package com.umcspot.spot.study.detail.screen.camera
 
 import androidx.activity.compose.BackHandler
+import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -15,9 +17,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +42,8 @@ import com.umcspot.spot.designsystem.theme.B400
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.designsystem.theme.Y400
 import com.umcspot.spot.study.detail.model.QrScanState
+import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
 
 @Composable
 fun QrScannerScreen(
@@ -53,7 +57,7 @@ fun QrScannerScreen(
     var scanState by remember { mutableStateOf(QrScanState.DEFAULT) }
     val isProcessedRef = remember { mutableStateOf(false) }
 
-    val scannerBoxSize = 280.dp
+    val scannerBoxSize = screenWidthDp(280.dp)
 
     val strokeColor = when (scanState) {
         QrScanState.DEFAULT -> SpotTheme.colors.white
@@ -93,7 +97,6 @@ fun QrScannerScreen(
             boxSize = scannerBoxSize,
             strokeColor = strokeColor
         )
-
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -103,17 +106,21 @@ fun QrScannerScreen(
                 color = SpotTheme.colors.white,
                 style = SpotTheme.typography.regular_500,
                 modifier = Modifier
-                    .offset(y = scannerBoxSize / 2 + 16.dp)
+                    .offset(y = scannerBoxSize / 2 + screenHeightDp(32.dp))
                     .background(
                         color = SpotTheme.colors.black.copy(alpha = 0.8f),
                         shape = RoundedCornerShape(6.dp)
                     )
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(
+                        horizontal = screenWidthDp(16.dp),
+                        vertical = screenHeightDp(8.dp)
+                    )
             )
         }
     }
 }
 
+@OptIn(ExperimentalGetImage::class)
 @Composable
 private fun CameraPreview(
     cameraProviderFuture: com.google.common.util.concurrent.ListenableFuture<ProcessCameraProvider>,

@@ -45,7 +45,6 @@ fun EmojiOptionPopup(
                 modifier = Modifier
                     .size(screenWidthDp(18.dp))
                     .clip(RoundedCornerShape(screenWidthDp(6.dp)))
-                    // 선택된 이모지 배경색 (B200 사용)
                     .background(if (states[index]) SpotTheme.colors.B200 else Color.Transparent)
                     .noRippleClickable { onToggle(index) },
                 contentAlignment = Alignment.Center
@@ -65,9 +64,9 @@ fun MemoirSectionItem(
     label: String,
     text: String,
     maxLines: Int,
-    onOverflowDetected: (Boolean) -> Unit
+    onLineCountMeasured: (Int) -> Unit = {}
 ) {
-    if (text.isBlank()) return // 비어있으면 렌더링 X
+    if (text.isBlank() || maxLines <= 0) return
 
     Column(modifier = Modifier.padding(vertical = screenHeightDp(6.dp))) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -75,7 +74,7 @@ fun MemoirSectionItem(
                 modifier = Modifier
                     .size(screenWidthDp(8.dp))
                     .clip(CircleShape)
-                    .background(SpotTheme.colors.B200) // 디자인 시스템 컬러 사용
+                    .background(SpotTheme.colors.B200)
             )
             Spacer(modifier = Modifier.width(screenWidthDp(6.dp)))
             Text(
@@ -93,8 +92,7 @@ fun MemoirSectionItem(
             maxLines = maxLines,
             overflow = TextOverflow.Ellipsis,
             onTextLayout = { result ->
-                // 실제 텍스트가 잘렸는지 여부를 상위로 전달
-                onOverflowDetected(result.hasVisualOverflow)
+                onLineCountMeasured(result.lineCount)
             }
         )
     }
@@ -107,11 +105,8 @@ fun EmojiBadge(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    // 💡 개수가 0이고 선택도 안 된 상태면 아예 보여주지 않음 (디자인 규칙)
     if (count <= 0 && !isSelected) return
-
     val visualIconSize = if (iconRes == R.drawable.ic_laugh) screenWidthDp(18.dp) else screenWidthDp(14.dp)
-    // 선택 여부에 따른 배경색 (B200)
     val backgroundColor = if (isSelected) SpotTheme.colors.B200 else Color.Transparent
 
     Row(
@@ -135,13 +130,13 @@ fun EmojiBadge(
             )
         }
 
-        // 💡 숫자가 0보다 클 때만 간격과 텍스트 노출
+        
         if (count > 0) {
             Spacer(modifier = Modifier.width(screenWidthDp(2.dp)))
             Text(
                 text = count.toString(),
                 style = SpotTheme.typography.small_400,
-                color = SpotTheme.colors.B500 // 강조 컬러
+                color = SpotTheme.colors.B500 
             )
         }
     }
