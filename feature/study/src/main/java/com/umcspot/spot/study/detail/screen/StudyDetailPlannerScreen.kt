@@ -53,6 +53,7 @@ import java.time.temporal.WeekFields
 @Composable
 fun StudyDetailPlannerScreen(
     studyId: Long,
+    myUserId: String,
     plannerState: StudyPlannerState,
     members: ImmutableList<StudyMemberModel>,
     isOwner: Boolean,
@@ -83,6 +84,9 @@ fun StudyDetailPlannerScreen(
     var currentDisplayMonth by remember { mutableStateOf(YearMonth.from(plannerState.selectedDate)) }
     var isInitialized by remember { mutableStateOf(false) }
 
+    val isMyTodoSelected = plannerState.selectedMemberId.isEmpty() ||
+            plannerState.selectedMemberId == myUserId
+
     LaunchedEffect(monthState) {
         snapshotFlow { monthState.firstVisibleMonth }
             .collect { month ->
@@ -93,6 +97,12 @@ fun StudyDetailPlannerScreen(
                     isInitialized = true
                 }
             }
+    }
+
+    LaunchedEffect(members) {
+        if (plannerState.selectedMemberId.isEmpty() && members.isNotEmpty()) {
+            onMemberSelected(members.first().id)
+        }
     }
 
     val isAvailableDate = remember(plannerState.selectedDate) {
@@ -184,11 +194,10 @@ fun StudyDetailPlannerScreen(
         HorizontalDivider(thickness = 0.5.dp, color = SpotTheme.colors.gray300)
         Spacer(modifier = Modifier.height(screenHeightDp(16.dp)))
 
-        // Todo 생성 버튼 - 멤버만 활성화
         StudyDetailCreateButton(
             text = "Todo",
             isStudyMember = isMember,
-            enabled = isAvailableDate && isMember,
+            enabled = isAvailableDate && isMember && isMyTodoSelected,
             onButtonClick = {
                 if (isAvailableDate && isMember) {
                     isAddingTodoField = true

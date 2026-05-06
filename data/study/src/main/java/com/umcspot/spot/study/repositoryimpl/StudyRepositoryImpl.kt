@@ -338,14 +338,16 @@ class StudyRepositoryImpl @Inject constructor(
     override suspend fun postReviewReaction(studyId: Long, reviewId: Long, reaction: String): Result<Unit?> {
         return runCatching {
             val response = studyDataSource.postReviewReaction(studyId, reviewId, reaction)
-            if (response.isSuccess) response.result else throw Exception(response.message)
+            if (!response.isSuccess) throw Exception(response.message)
+            Unit
         }
     }
 
     override suspend fun deleteReviewReaction(studyId: Long, reviewId: Long, reaction: String): Result<Unit?> {
         return runCatching {
             val response = studyDataSource.deleteReviewReaction(studyId, reviewId, reaction)
-            if (response.isSuccess) response.result else throw Exception(response.message)
+            if (!response.isSuccess) throw Exception(response.message)
+            Unit
         }
     }
 

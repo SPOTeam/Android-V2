@@ -40,7 +40,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import javax.inject.Inject
-import kotlin.collections.ifEmpty
 
 class StudyDataSourceImpl @Inject constructor(
     private val studyService: StudyService
@@ -184,13 +183,13 @@ class StudyDataSourceImpl @Inject constructor(
         return studyService.createTodo(studyId, request)
     }
 
-    override suspend fun completeTodo(studyId: Long, todoId: Long): BaseResponse<Unit?> =
+    override suspend fun completeTodo(studyId: Long, todoId: Long): NullResultResponse =
         studyService.completeTodo(studyId, todoId)
 
-    override suspend fun uncompleteTodo(studyId: Long, todoId: Long): BaseResponse<Unit?> =
+    override suspend fun uncompleteTodo(studyId: Long, todoId: Long): NullResultResponse =
         studyService.uncompleteTodo(studyId, todoId)
 
-    override suspend fun deleteTodo(studyId: Long, todoId: Long): BaseResponse<Unit?> =
+    override suspend fun deleteTodo(studyId: Long, todoId: Long): NullResultResponse =
         studyService.deleteTodo(studyId, todoId)
 
     override suspend fun getMemberTodos(studyId: Long, memberId: Long, date: String) =
@@ -203,7 +202,7 @@ class StudyDataSourceImpl @Inject constructor(
     ): BaseResponse<StudyMemoirResponseDto> =
         studyService.getStudyMemoirs(studyId, cursor, size)
 
-    override suspend fun deleteMemoir(studyId: Long, memoirId: Long): BaseResponse<Unit?> =
+    override suspend fun deleteMemoir(studyId: Long, memoirId: Long): NullResultResponse =
         studyService.deleteMemoir(studyId, memoirId)
 
     override suspend fun postMemoir(
@@ -233,7 +232,7 @@ class StudyDataSourceImpl @Inject constructor(
             request = request
        )
 
-    override suspend fun postReviewReaction(studyId: Long, reviewId: Long, reaction: String): BaseResponse<Unit?> {
+    override suspend fun postReviewReaction(studyId: Long, reviewId: Long, reaction: String): NullResultResponse {
         return studyService.postReviewReaction(studyId, reviewId, reaction)
     }
 
@@ -241,7 +240,7 @@ class StudyDataSourceImpl @Inject constructor(
         studyId: Long,
         reviewId: Long,
         reaction: String
-    ): BaseResponse<Unit?> {
+    ): NullResultResponse {
         return studyService.deleteReviewReaction(studyId, reviewId, reaction)
     }
 

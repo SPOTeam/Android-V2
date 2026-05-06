@@ -62,9 +62,9 @@ fun StudyDetailToDoItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = screenHeightDp(6.dp))
+            .padding(vertical = screenHeightDp(6.dp), horizontal = screenWidthDp(7.dp))
             .bringIntoViewRequester(bringIntoViewRequester),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
         Icon(
             painter = painterResource(
@@ -73,7 +73,7 @@ fun StudyDetailToDoItem(
             contentDescription = null,
             tint = if (isCompleted) SpotTheme.colors.B500 else SpotTheme.colors.gray300,
             modifier = Modifier
-                .size(screenWidthDp(24.dp))
+                .size(screenWidthDp(18.dp))
                 .noRippleClickable {
                     if (isMyToDo && !isEditing) onCheckedChange(!isCompleted)
                 }

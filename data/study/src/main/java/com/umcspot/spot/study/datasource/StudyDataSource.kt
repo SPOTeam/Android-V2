@@ -111,11 +111,11 @@ interface StudyDataSource {
         dueDate: String
     ): BaseResponse<TodoCreateResponseDto>
 
-    suspend fun completeTodo(studyId: Long, todoId: Long): BaseResponse<Unit?>
+    suspend fun completeTodo(studyId: Long, todoId: Long): NullResultResponse
 
-    suspend fun uncompleteTodo(studyId: Long, todoId: Long): BaseResponse<Unit?>
+    suspend fun uncompleteTodo(studyId: Long, todoId: Long): NullResultResponse
 
-    suspend fun deleteTodo(studyId: Long, todoId: Long): BaseResponse<Unit?>
+    suspend fun deleteTodo(studyId: Long, todoId: Long): NullResultResponse
 
     suspend fun getMemberTodos(
         studyId: Long,
@@ -129,7 +129,7 @@ interface StudyDataSource {
         size: Int
     ): BaseResponse<StudyMemoirResponseDto>
 
-    suspend fun deleteMemoir(studyId: Long, memoirId: Long): BaseResponse<Unit?>
+    suspend fun deleteMemoir(studyId: Long, memoirId: Long): NullResultResponse
 
     suspend fun postMemoir(
         studyId: Long,
@@ -137,21 +137,22 @@ interface StudyDataSource {
         imageFiles: List<File>
     ): BaseResponse<MemoirCreateResponseDto>
 
-    suspend fun postReviewReaction(
-        studyId: Long,
-        reviewId: Long,
-        reaction: String
-    ): BaseResponse<Unit?>
     suspend fun postBoard(
         studyId: Long,
         request: BoardCreateRequestDto,
     ): BaseResponse<BoardCreateResponseDto>
 
+    suspend fun postReviewReaction(
+        studyId: Long,
+        reviewId: Long,
+        reaction: String
+    ): NullResultResponse
+
     suspend fun deleteReviewReaction(
         studyId: Long,
         reviewId: Long,
         reaction: String
-    ): BaseResponse<Unit?>
+    ): NullResultResponse
 
     suspend fun getCategoryStudies(
         recruitingStatus: RecruitingStatus?,
