@@ -143,7 +143,7 @@ private fun HomeScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(SpotTheme.colors.white)
             .padding(
                 top = contentPadding.calculateTopPadding(),
                 bottom = contentPadding.calculateBottomPadding()

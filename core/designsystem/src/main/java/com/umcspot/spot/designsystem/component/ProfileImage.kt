@@ -16,6 +16,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ImageRef
+import com.umcspot.spot.ui.extension.screenWidthDp
 
 @Composable
 fun ProfileImage(
@@ -63,7 +64,7 @@ private fun preview() {
     SpotTheme {
         ProfileImage(
             imageRef = ImageRef.Name("sample"),
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier.size(screenWidthDp(33.dp))
         )
     }
 }

@@ -1,19 +1,18 @@
-package com.umcspot.spot.feature.board.boardList
+﻿package com.umcspot.spot.feature.board.boardList
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -22,8 +21,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -31,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -39,11 +37,12 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -165,6 +164,8 @@ fun BoardListScreen(
             .background(SpotTheme.colors.white)
             .padding(top = topPad, bottom = bottomPad),
     ) {
+        Spacer(modifier = Modifier.height(screenHeightDp(18.dp)))
+
         SelectedLocationTabs(
             tabs = tabItems.map { it?.korean ?: "전체" },
             selectedIndex = selectedTab,
@@ -291,6 +292,9 @@ private fun SelectedLocationTabs(
 
     val scrimWidth = screenWidthDp(24.dp)
     val bg = SpotTheme.colors.white
+    val density = LocalDensity.current
+    val textWidths = remember(tabs) { mutableStateMapOf<Int, androidx.compose.ui.unit.Dp>() }
+    val minTabWidth = screenWidthDp(50.dp)
 
     Box(
         modifier = Modifier
@@ -323,7 +327,7 @@ private fun SelectedLocationTabs(
     ) {
         ScrollableTabRow(
             selectedTabIndex = selectedIndex,
-            edgePadding = 0.dp,
+            edgePadding = screenWidthDp(17.dp),
             containerColor = Color.Transparent,
             divider = {
                 HorizontalDivider(
@@ -332,19 +336,34 @@ private fun SelectedLocationTabs(
                 )
             },
             indicator = { tabPositions ->
-                TabRowDefaults.SecondaryIndicator(
+                val currentTab = tabPositions.getOrNull(selectedIndex) ?: return@ScrollableTabRow
+                val textWidth = textWidths[selectedIndex] ?: 0.dp
+                val indicatorWidth = if (textWidth > 0.dp) {
+                    maxOf(minTabWidth, textWidth)
+                } else {
+                    minTabWidth
+                }
+                val indicatorOffsetX = currentTab.left + (currentTab.width - indicatorWidth) / 2
+
+                Box(
                     modifier = Modifier
-                        .tabIndicatorOffset(tabPositions[selectedIndex])
-                        .padding(horizontal = screenWidthDp(17.dp))
-                        .height(1.dp),
-                    color = SpotTheme.colors.B500
+                        .fillMaxWidth()
+                        .wrapContentSize(Alignment.BottomStart)
+                        .offset(x = indicatorOffsetX)
+                        .width(indicatorWidth)
+                        .height(1.dp)
+                        .background(SpotTheme.colors.B500)
                 )
             }
         ) {
             tabs.forEachIndexed { index, name ->
+                val textWidth = textWidths[index] ?: 0.dp
+                val tabWidth = if (textWidth > 0.dp) maxOf(minTabWidth, textWidth) else minTabWidth
+
                 Tab(
                     modifier = Modifier
-                        .wrapContentWidth(),
+                        .width(tabWidth)
+                        .padding(horizontal = screenWidthDp(7.dp)), // 1) 탭 간 간격
                     selected = selectedIndex == index,
                     onClick = { onTabSelected(index) },
                     selectedContentColor = SpotTheme.colors.black,
@@ -353,8 +372,14 @@ private fun SelectedLocationTabs(
                     Text(
                         text = name,
                         style = SpotTheme.typography.h5,
+                        onTextLayout = { textLayoutResult ->
+                            textWidths[index] = with(density) { textLayoutResult.size.width.toDp() }
+                        },
                         modifier = Modifier
-                            .padding(horizontal = screenWidthDp(7.dp), vertical = screenHeightDp(4.dp))
+                            .padding(
+                                vertical = screenHeightDp(4.dp)       // 4) 탭 높이(세로 여백)
+                            ),
+                        textAlign = TextAlign.Center
                     )
                 }
             }

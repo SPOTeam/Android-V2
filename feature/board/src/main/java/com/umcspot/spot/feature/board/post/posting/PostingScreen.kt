@@ -264,13 +264,14 @@ private fun BottomToolsRow(
     ) {
         Row(
             modifier = Modifier
-                .padding(horizontal = screenWidthDp(5.dp), vertical = screenHeightDp(2.dp))
-                .clickable(
-                    onClick = onClickAddPhoto
-                )
+                .clip(SpotShapes.Hard)
+                .clickable(onClick = onClickAddPhoto)
+                .padding(horizontal = screenWidthDp(5.dp), vertical = screenHeightDp(2.dp)),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
         ) {
             Image(
-                modifier = Modifier.size(screenWidthDp(20.dp)),
+                modifier = Modifier.size(screenWidthDp(14.dp)),
                 painter = painterResource(R.drawable.camera),
                 contentDescription = "사진 추가",
             )

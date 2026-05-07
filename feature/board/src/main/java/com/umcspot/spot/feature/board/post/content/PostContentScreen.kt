@@ -557,13 +557,12 @@ private fun preview() {
 
             // 2) 구분선
             item(key = "divider") {
-                Spacer(Modifier.height(8.dp))
                 HorizontalDivider(
                     modifier = Modifier.fillMaxWidth(),
                     thickness = 1.dp,
                     color = SpotTheme.colors.gray200
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(screenHeightDp(18.dp)))
             }
 
             items(

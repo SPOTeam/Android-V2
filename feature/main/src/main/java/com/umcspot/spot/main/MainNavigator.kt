@@ -45,7 +45,6 @@ import com.umcspot.spot.signup.navigation.navigateToLanding
 import com.umcspot.spot.signup.navigation.navigateToSaving
 import com.umcspot.spot.signup.navigation.navigateToSignUp
 import com.umcspot.spot.study.detail.navigation.StudyDetail
-import com.umcspot.spot.study.detail.navigation.StudyPostContent
 import com.umcspot.spot.study.detail.navigation.navigateToStudyBoardPost
 import com.umcspot.spot.study.detail.navigation.navigateToStudyDetail
 import com.umcspot.spot.study.detail.navigation.navigateToStudyMemoirPost
@@ -128,7 +127,8 @@ class MainNavigator(
         BoardList::class,
         JJim::class,
         MyStudy::class,
-        MyPageGraph.StudyApplications::class
+        MyPageGraph.StudyApplications::class,
+        MyPageGraph.CancelMemberShip::class
     ) || inAnyGraphRoutes(POST_CONTENT_ROUTE)|| (currentDestination?.route?.contains(POST_CONTENT_ROUTE) == true)
 
     @Composable

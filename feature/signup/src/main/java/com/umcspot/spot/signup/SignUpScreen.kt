@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -26,7 +28,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.umcspot.spot.designsystem.component.button.SpotActivationButton
+import com.umcspot.spot.designsystem.component.button.TextButton
+import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.signup.component.ConsentItem
@@ -84,8 +87,7 @@ fun SignUpScreen(
 
     var showPrivacyDialog by rememberSaveable { mutableStateOf(false) }
     var showUniqueDialog by rememberSaveable { mutableStateOf(false) }
-
-
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -139,12 +141,18 @@ fun SignUpScreen(
 
         Spacer(Modifier.height(screenHeightDp(24.dp)))
 
-        SpotActivationButton(
-            modifier = Modifier.fillMaxWidth(),
-            buttonText = "다음",
-            isEnabled = uiState.isPrivacyChecked && uiState.isUniqueChecked,
-            onClick = onNextClick
+        TextButton(
+            modifier = Modifier
+                .padding(vertical = screenHeightDp(10.dp))
+                .width(screenWidthDp(326.dp))
+                .heightIn(screenHeightDp(47.dp)),
+            text = "다음",
+            style = SpotTheme.typography.h3,
+            enabled = uiState.isPrivacyChecked && uiState.isUniqueChecked,
+            onClick = onNextClick,
+            shape = SpotShapes.Soft
         )
+
         Spacer(Modifier.height(screenHeightDp(13.dp)))
     }
 
