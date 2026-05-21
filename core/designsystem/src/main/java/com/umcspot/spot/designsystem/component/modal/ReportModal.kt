@@ -146,7 +146,7 @@ fun ReportModal(
                 )
             )
 
-            Spacer(Modifier.height(screenHeightDp(16.dp)))
+            Spacer(Modifier.height(screenHeightDp(20.dp)))
 
             TextButton(
                 modifier = Modifier
