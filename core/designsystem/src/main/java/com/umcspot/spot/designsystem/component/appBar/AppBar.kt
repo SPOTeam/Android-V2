@@ -60,7 +60,7 @@ fun AppBarHome (
         Image(
             painter = painterResource(id = R.drawable.spot_logo),
             contentDescription = "App Logo",
-            modifier = Modifier.size(screenWidthDp(33.dp))
+            modifier = Modifier.size(screenWidthDp(25.dp))
         )
 
         Row(verticalAlignment = Alignment.CenterVertically) {

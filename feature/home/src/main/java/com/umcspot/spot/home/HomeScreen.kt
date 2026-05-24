@@ -47,7 +47,6 @@ import com.umcspot.spot.designsystem.component.SpotSpinner
 import com.umcspot.spot.designsystem.component.study.StudyListItem
 import com.umcspot.spot.designsystem.component.weather.WeatherCard
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.Black
 import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.SpotTheme
@@ -202,7 +201,7 @@ private fun HomeScreen(
                 title = "지금 가장 인기있는 스터디",
                 onIconClick = onStudyMoreClick,
                 iconRes = R.drawable.arrow_right,
-                iconTint = SpotTheme.colors.B500
+                iconTint = SpotTheme.colors.primary
             )
             HomeStudyList(
                 state = uiState.popularStudies,
@@ -225,6 +224,8 @@ private fun HomeScreen(
                 state = uiState.recommendStudies,
                 onStudyClick = onStudyClick
             )
+
+            Spacer(modifier = Modifier.height(screenHeightDp(24.dp)))
         }
     }
 }
