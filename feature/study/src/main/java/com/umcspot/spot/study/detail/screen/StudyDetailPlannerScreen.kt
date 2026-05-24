@@ -31,7 +31,6 @@ import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.daysOfWeek
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.SpotPlannerCalendar
-import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.study.detail.component.common.StudyDetailCreateButton
 import com.umcspot.spot.study.detail.component.common.StudyMemberItem
@@ -87,6 +86,10 @@ fun StudyDetailPlannerScreen(
     val isMyTodoSelected = plannerState.selectedMemberId.isEmpty() ||
             plannerState.selectedMemberId == myUserId
 
+    val scheduledDates = remember(plannerState.monthlySchedules) {
+        plannerState.monthlySchedules.map { it.startAt.toLocalDate() }.toSet()
+    }
+
     LaunchedEffect(monthState) {
         snapshotFlow { monthState.firstVisibleMonth }
             .collect { month ->
@@ -138,7 +141,7 @@ fun StudyDetailPlannerScreen(
             Icon(
                 painter = painterResource(id = if (isExpanded) R.drawable.arrow_up else R.drawable.arrow_down),
                 contentDescription = null,
-                tint = SpotTheme.colors.B500,
+                tint = SpotTheme.colors.primary,
                 modifier = Modifier
                     .size(screenWidthDp(14.dp))
                     .noRippleClickable { isExpanded = !isExpanded }
@@ -152,6 +155,7 @@ fun StudyDetailPlannerScreen(
             monthState = monthState,
             selectedDate = plannerState.selectedDate,
             daysOfWeek = daysOfWeekList,
+            scheduledDates = scheduledDates,
             onDateSelected = onDateSelected
         )
 
@@ -265,7 +269,7 @@ fun StudyDetailPlannerScreen(
                 StudyDetailToDoItem(
                     text = todo.content,
                     isCompleted = todo.isCompleted,
-                    isMyToDo = true,
+                    isMyToDo = isMyTodoSelected,
                     onCheckedChange = { onTodoToggle(studyId, todo.id, todo.isCompleted) },
                     onDeleteClick = { onTodoDelete(studyId, todo.id) }
                 )

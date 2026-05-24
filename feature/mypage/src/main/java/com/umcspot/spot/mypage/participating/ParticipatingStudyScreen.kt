@@ -31,6 +31,7 @@ import com.umcspot.spot.designsystem.theme.R500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ImageRef
 import com.umcspot.spot.study.component.SpotStudyDialog
+import com.umcspot.spot.study.component.SpotStudyDialogIcon
 import com.umcspot.spot.study.model.StudyResult
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
@@ -102,7 +103,7 @@ fun ParticipatingRoute(
             title = "스터디원 신고",
             description = "스터디원 신고가 완료됐어요!\n쾌적한 서비스 이용을 위해 항상 노력할게요.",
             buttonText = "확인",
-            showCheckIcon = true,
+            icon = SpotStudyDialogIcon.CHECK,
             onButtonClick = { viewmodel.dismissReportSuccess() }
         )
     }
@@ -119,7 +120,7 @@ fun ParticipatingRoute(
             title = "스터디 삭제 완료",
             description = "",
             buttonText = "확인",
-            showCheckIcon = true,
+            icon = SpotStudyDialogIcon.CHECK,
             onButtonClick = { viewmodel.dismissDeleteSuccess() }
         )
     }

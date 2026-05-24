@@ -12,8 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.umcspot.spot.designsystem.theme.R500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.ui.extension.noRippleClickable
+import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 
 @Composable
@@ -24,13 +26,13 @@ fun DeleteMenuPopup(onDelete: () -> Unit) {
             .background(SpotTheme.colors.white, RoundedCornerShape(8.dp))
             .border(1.dp, SpotTheme.colors.gray200, RoundedCornerShape(8.dp))
             .noRippleClickable { onDelete() }
-            .padding(vertical = 10.dp),
-        contentAlignment = Alignment.Center
+            .padding(vertical = screenHeightDp(6.dp), horizontal = screenWidthDp(10.dp)),
+        contentAlignment = Alignment.CenterStart
     ) {
         Text(
             text = "삭제하기", 
-            style = SpotTheme.typography.regular_400, 
-            color = Color.Red
+            style = SpotTheme.typography.regular_500,
+            color = SpotTheme.colors.error
         )
     }
 }

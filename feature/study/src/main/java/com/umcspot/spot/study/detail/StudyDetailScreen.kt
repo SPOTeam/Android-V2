@@ -46,6 +46,7 @@ import com.umcspot.spot.designsystem.component.button.SpotActivationButton
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.study.component.SpotStudyApplyDialog
 import com.umcspot.spot.study.component.SpotStudyDialog
+import com.umcspot.spot.study.component.SpotStudyDialogIcon
 import com.umcspot.spot.study.detail.component.common.StudyDetailTabRow
 import com.umcspot.spot.study.detail.component.common.StudyHeaderSection
 import com.umcspot.spot.study.detail.component.planner.ScheduleBottomSheet
@@ -75,6 +76,7 @@ fun StudyDetailRoute(
     onBoardPostClick: (Long) -> Unit,
     contentPadding: PaddingValues,
     onTabChanged: (StudyDetailTab) -> Unit,
+    onIsMemberChanged: (Boolean) -> Unit,
     initialTab: StudyDetailTab,
     viewModel: StudyDetailViewModel = hiltViewModel()
 ) {
@@ -165,8 +167,15 @@ fun StudyDetailRoute(
         }
     }
 
+    LaunchedEffect(isMember) {
+        onIsMemberChanged(isMember)
+    }
+
     DisposableEffect(Unit) {
-        onDispose { onTabChanged(StudyDetailTab.HOME) }
+        onDispose {
+            onTabChanged(StudyDetailTab.HOME)
+            onIsMemberChanged(false)
+        }
     }
 
     BackHandler { onBackClick() }
@@ -304,7 +313,7 @@ fun StudyDetailRoute(
                 title = "신청 완료",
                 description = "스터디를 신청 완료했어요!\n수락 여부는 알람 탭에서 확인 가능해요.",
                 buttonText = "확인",
-                showCheckIcon = true,
+                icon = SpotStudyDialogIcon.CHECK,
                 onButtonClick = { showApplySuccessDialog = false }
             )
         }
@@ -364,7 +373,7 @@ private fun StudyDetailScreen(
                         .background(SpotTheme.colors.white)
                 )
                 BackTopBar(
-                    title = "스터디",
+                    title = if (isMember) "내 스터디" else "스터디",
                     onBackClick = onBackClick,
                     modifier = Modifier.background(SpotTheme.colors.white)
                 )

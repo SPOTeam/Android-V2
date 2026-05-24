@@ -23,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -39,8 +38,6 @@ import com.umcspot.spot.designsystem.component.location.RegionItem
 import com.umcspot.spot.designsystem.component.location.RegionSearchTextField
 import com.umcspot.spot.designsystem.component.location.SearchResultItem
 import com.umcspot.spot.designsystem.component.modal.AcceptDialog
-import com.umcspot.spot.designsystem.theme.B500
-import com.umcspot.spot.designsystem.theme.G200
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.mypage.edit.editInterestRegion.screen.EmptyRegionScreen
 import com.umcspot.spot.mypage.edit.editInterestRegion.screen.ErrorRegionScreen
@@ -105,7 +102,7 @@ fun EditInterestRegionScreen(
             Text(
                 text = "내가 스터디하고 싶은 지역은?",
                 style = SpotTheme.typography.h3,
-                color = Color.Black
+                color = SpotTheme.colors.black
             )
 
             if (!isSearching) {
@@ -151,7 +148,7 @@ fun EditInterestRegionScreen(
                 when (val state = uiState) {
                     is UiState.Loading -> {
                         SpotSpinner(
-                            strokeColor = SpotTheme.colors.B500
+                            strokeColor = SpotTheme.colors.primary
                         )
                     }
 
@@ -200,7 +197,7 @@ fun EditInterestRegionScreen(
                                             )
                                             HorizontalDivider(
                                                 thickness = 0.5.dp,
-                                                color = SpotTheme.colors.G200
+                                                color = SpotTheme.colors.gray200
                                             )
                                         }
                                     } else if (!isSearching) {
@@ -245,7 +242,7 @@ fun EditInterestRegionScreen(
         AcceptDialog(
             visible = true,
             painter = painterResource(id = R.drawable.ic_check),
-            painterTint = SpotTheme.colors.B500,
+            painterTint = SpotTheme.colors.primary,
             modalTitle = "수정 완료",
             modalDes = "수정이 완료되었어요.\n새로운 관심 지역에 맞는 스터디를 확인해보세요!",
             okButtonText = "내 지역 스터디 보기",

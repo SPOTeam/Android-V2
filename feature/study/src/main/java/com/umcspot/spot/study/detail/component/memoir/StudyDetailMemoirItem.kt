@@ -46,8 +46,8 @@ fun StudyDetailMemoirItem(
                 .clip(RoundedCornerShape(6.dp))
                 .background(SpotTheme.colors.gray100),
             contentScale = ContentScale.Crop,
-            placeholder = painterResource(id = R.drawable.spot_logo),
-            error = painterResource(id = R.drawable.spot_logo)
+            placeholder = painterResource(id = R.drawable.memoir_sample_img),
+            error = painterResource(id = R.drawable.memoir_sample_img)
         )
         
         Spacer(modifier = Modifier.height(7.dp))
@@ -78,7 +78,8 @@ fun StudyDetailMemoirItem(
                     .clip(CircleShape)
                     .background(SpotTheme.colors.gray100),
                 contentScale = ContentScale.Crop,
-                error = painterResource(id = R.drawable.spot_logo)
+                placeholder = painterResource(id = R.drawable.profile_sample_png),
+                error = painterResource(id = R.drawable.profile_sample_png)
             )
             Text(
                 text = writerName,

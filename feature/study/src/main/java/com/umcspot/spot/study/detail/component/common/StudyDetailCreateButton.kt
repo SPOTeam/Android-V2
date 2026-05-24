@@ -31,9 +31,7 @@ fun StudyDetailCreateButton(
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(14.dp))
-            .background(
-                if (enabled) SpotTheme.colors.B100 else SpotTheme.colors.B100.copy(alpha = 0.5f)
-            )
+            .background(SpotTheme.colors.B100)
             .noRippleClickable {
                 if (enabled) onButtonClick() 
             }
@@ -50,7 +48,7 @@ fun StudyDetailCreateButton(
             text = text,
             style = SpotTheme.typography.h5,
             
-            color = if (enabled) SpotTheme.colors.gray500 else SpotTheme.colors.gray400
+            color = SpotTheme.colors.gray500
         )
 
         if (isStudyMember) {

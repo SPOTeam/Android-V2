@@ -37,12 +37,7 @@ fun RegionItem(
                 color = SpotTheme.colors.B500,
                 shape = RoundedCornerShape(10.dp)
             )
-            .padding(
-                top = screenHeightDp(10.dp),
-                bottom = screenHeightDp(10.dp),
-                start = screenWidthDp(10.dp),
-                end = if (isReadOnly) screenWidthDp(11.5.dp) else screenWidthDp(4.dp)
-            ),
+            .padding(all = screenWidthDp(10.dp)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {

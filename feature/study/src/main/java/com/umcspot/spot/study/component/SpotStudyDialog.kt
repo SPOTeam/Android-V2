@@ -1,9 +1,12 @@
 package com.umcspot.spot.study.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,12 +33,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.SpotActivationButton
-import com.umcspot.spot.designsystem.theme.B200
-import com.umcspot.spot.designsystem.theme.B500
-import com.umcspot.spot.designsystem.theme.R500
+import com.umcspot.spot.designsystem.component.button.SpotCancelButton
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
+
+enum class SpotStudyDialogIcon {
+    CHECK, DELETE, SAD, NONE
+}
 
 @Composable
 fun SpotStudyApplyDialog(
@@ -103,14 +108,14 @@ private fun SpotStudyApplyDialogContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(screenHeightDp(141.dp))
+                .height(screenHeightDp(120.dp))
                 .background(
                     color = SpotTheme.colors.white,
                     shape = RoundedCornerShape(6.dp)
                 )
                 .border(
                     width = 1.dp,
-                    color = SpotTheme.colors.B200,
+                    color = SpotTheme.colors.primarySoft,
                     shape = RoundedCornerShape(6.dp)
                 )
                 .padding(vertical = screenHeightDp(7.dp), horizontal = screenWidthDp(10.dp))
@@ -162,7 +167,8 @@ fun SpotStudyDialog(
     description: String,
     buttonText: String,
     onButtonClick: () -> Unit,
-    showCheckIcon: Boolean = true,
+    icon: SpotStudyDialogIcon = SpotStudyDialogIcon.CHECK,
+    cancelButtonText: String? = null,
     modifier: Modifier = Modifier
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
@@ -172,7 +178,8 @@ fun SpotStudyDialog(
             description = description,
             buttonText = buttonText,
             onButtonClick = onButtonClick,
-            showCheckIcon = showCheckIcon,
+            icon = icon,
+            cancelButtonText = cancelButtonText,
             modifier = modifier
         )
     }
@@ -187,64 +194,17 @@ fun LeaveStudyDialog(
 ) {
     if (!visible) return
 
-    Dialog(onDismissRequest = onDismissRequest) {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .background(
-                    color = SpotTheme.colors.white,
-                    shape = RoundedCornerShape(14.dp)
-                )
-                .padding(17.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            IconButton(
-                onClick = onDismissRequest,
-                modifier = Modifier
-                    .size(20.dp)
-                    .align(Alignment.End)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.dismiss),
-                    contentDescription = "닫기",
-                    tint = SpotTheme.colors.black
-                )
-            }
-
-            Spacer(modifier = Modifier.height(screenHeightDp(4.dp)))
-
-            Icon(
-                painter = painterResource(id = R.drawable.ic_sad),
-                contentDescription = null,
-                modifier = Modifier.size(33.dp),
-                tint = SpotTheme.colors.R500
-            )
-
-            Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
-
-            Text(
-                text = "정말 나가시겠어요?",
-                style = SpotTheme.typography.h2,
-                color = SpotTheme.colors.black,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
-
-            SpotActivationButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = screenWidthDp(68.dp)),
-                buttonText = "스터디 나가기",
-                isEnabled = true,
-                onClick = onButtonClick,
-                style = SpotTheme.typography.h5
-            )
-
-            Spacer(modifier = Modifier.height(screenHeightDp(4.dp)))
-        }
-    }
+    SpotStudyDialog(
+        onDismissRequest = onDismissRequest,
+        title = "정말 나가시겠어요?",
+        description = "",
+        buttonText = "스터디 나가기",
+        onButtonClick = onButtonClick,
+        icon = SpotStudyDialogIcon.SAD,
+        modifier = modifier
+    )
 }
+
 @Composable
 private fun SpotStudyDialogContent(
     onDismissRequest: () -> Unit,
@@ -252,7 +212,8 @@ private fun SpotStudyDialogContent(
     description: String,
     buttonText: String,
     onButtonClick: () -> Unit,
-    showCheckIcon: Boolean,
+    icon: SpotStudyDialogIcon,
+    cancelButtonText: String? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -278,14 +239,34 @@ private fun SpotStudyDialogContent(
             )
         }
 
-        if (showCheckIcon) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_check),
-                contentDescription = "완료",
-                modifier = Modifier.size(33.dp),
-                tint = SpotTheme.colors.B500
-            )
-            Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
+        when (icon) {
+            SpotStudyDialogIcon.CHECK -> {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_check),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
+                    tint = SpotTheme.colors.primary
+                )
+                Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
+            }
+            SpotStudyDialogIcon.DELETE -> {
+                Image(
+                    painter = painterResource(id = R.drawable.delete),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
+            }
+            SpotStudyDialogIcon.SAD -> {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_sad),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
+                    tint = SpotTheme.colors.error
+                )
+                Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
+            }
+            SpotStudyDialogIcon.NONE -> Unit
         }
 
         Text(
@@ -304,20 +285,33 @@ private fun SpotStudyDialogContent(
                 color = SpotTheme.colors.black,
                 textAlign = TextAlign.Center
             )
-
             Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
         }
 
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            SpotActivationButton(
+                modifier = Modifier
+                    .width(screenWidthDp(156.dp))
+                    .height(screenHeightDp(39.dp)),
+                buttonText = buttonText,
+                isEnabled = true,
+                onClick = onButtonClick,
+                style = SpotTheme.typography.h5
+            )
 
-
-        SpotActivationButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = screenWidthDp(68.dp)),
-            buttonText = buttonText,
-            isEnabled = true,
-            onClick = onButtonClick,
-            style = SpotTheme.typography.h5
-        )
+            if (cancelButtonText != null) {
+                Spacer(modifier = Modifier.width(10.dp))
+                SpotCancelButton(
+                    modifier = Modifier
+                        .width(screenWidthDp(156.dp))
+                        .height(screenHeightDp(39.dp)),
+                    buttonText = cancelButtonText,
+                    onClick = onDismissRequest
+                )
+            }
+        }
     }
 }

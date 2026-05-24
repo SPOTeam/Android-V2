@@ -140,7 +140,7 @@ fun StudyDetailToDoItem(
                     contentDescription = null,
                     tint = SpotTheme.colors.gray400,
                     modifier = Modifier
-                        .size(screenWidthDp(24.dp))
+                        .size(screenWidthDp(14.dp))
                         .noRippleClickable { showMenu = true }
                 )
                 if (showMenu) {

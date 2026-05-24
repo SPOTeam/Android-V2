@@ -165,7 +165,10 @@ private fun RegisterStudyScreen(
             .padding(contentPadding),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        StepProgressBar(currentStep = pagerState.currentPage + 1)
+        StepProgressBar(
+            currentStep = pagerState.currentPage + 1,
+            isCurrentStepValid = isStepValid(pagerState.currentPage)
+        )
 
         Column(
             modifier = Modifier

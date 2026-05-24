@@ -47,6 +47,7 @@ import com.umcspot.spot.designsystem.theme.G400
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.study.component.LeaveStudyDialog
 import com.umcspot.spot.study.component.SpotStudyDialog
+import com.umcspot.spot.study.component.SpotStudyDialogIcon
 import com.umcspot.spot.study.detail.component.common.StudyMemberItem
 import com.umcspot.spot.study.model.LeaveReason
 import com.umcspot.spot.study.model.StudyMemberModel
@@ -78,7 +79,7 @@ fun LeaveStudyRoute(
             title = "나가기 완료",
             description = "",
             buttonText = "확인",
-            showCheckIcon = true,
+            icon = SpotStudyDialogIcon.CHECK,
             onButtonClick = { viewModel.dismissLeaveSuccess(); onLeaveSuccess() }
         )
     }

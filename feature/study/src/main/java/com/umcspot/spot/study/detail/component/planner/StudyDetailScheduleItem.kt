@@ -21,10 +21,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.theme.B100
-import com.umcspot.spot.designsystem.theme.B50
-import com.umcspot.spot.designsystem.theme.B500
-import com.umcspot.spot.designsystem.theme.R500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.ui.extension.noRippleClickable
 import com.umcspot.spot.ui.extension.screenHeightDp
@@ -44,7 +40,7 @@ fun StudyDetailScheduleItem(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .background(SpotTheme.colors.B50)
+            .background(SpotTheme.colors.primaryFaint)
             .noRippleClickable { onScheduleClick(scheduleId) }
             .padding(
                 horizontal = screenWidthDp(12.dp),
@@ -57,11 +53,11 @@ fun StudyDetailScheduleItem(
         ) {
             Text(
                 text = title,
-                style = SpotTheme.typography.h4,
+                style = SpotTheme.typography.medium_500,
                 color = SpotTheme.colors.black,
             )
 
-            Spacer(modifier = Modifier.height(screenHeightDp(10.dp)))
+            Spacer(modifier = Modifier.height(screenHeightDp(4.dp)))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -70,7 +66,7 @@ fun StudyDetailScheduleItem(
                 Box(
                     modifier = Modifier
                         .background(
-                            color = SpotTheme.colors.B100,
+                            color = SpotTheme.colors.primarySoftest,
                             shape = RoundedCornerShape(6.dp)
                         )
                         .padding(horizontal = screenWidthDp(4.dp), vertical = screenHeightDp(1.dp))
@@ -78,7 +74,7 @@ fun StudyDetailScheduleItem(
                     Text(
                         text = "일시",
                         style = SpotTheme.typography.small_500,
-                        color = SpotTheme.colors.B500
+                        color = SpotTheme.colors.primary
                     )
                 }
 
@@ -97,7 +93,7 @@ fun StudyDetailScheduleItem(
                 Box(
                     modifier = Modifier
                         .background(
-                            color = SpotTheme.colors.R500,
+                            color = SpotTheme.colors.error,
                             shape = RoundedCornerShape(14.dp)
                         )
                         .padding(horizontal = screenWidthDp(5.dp), vertical = screenHeightDp(1.dp))

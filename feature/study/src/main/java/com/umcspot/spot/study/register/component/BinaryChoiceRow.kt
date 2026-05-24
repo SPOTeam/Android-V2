@@ -36,13 +36,13 @@ fun BinaryChoiceRow(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Spacer(modifier = Modifier.width(screenWidthDp(6.5.dp)))
+            Spacer(modifier = Modifier.width(screenWidthDp(6.dp)))
             VerticalDivider(
-                modifier = Modifier.height(screenHeightDp(12.dp)),
+                modifier = Modifier.height(screenHeightDp(27.dp)),
                 thickness = 1.dp,
                 color = SpotTheme.colors.gray300
             )
-            Spacer(modifier = Modifier.width(screenWidthDp(6.5.dp)))
+            Spacer(modifier = Modifier.width(screenWidthDp(6.dp)))
         }
 
         SelectionChip(

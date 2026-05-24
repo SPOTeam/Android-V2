@@ -46,10 +46,8 @@ import com.umcspot.spot.signup.navigation.CheckList
 import com.umcspot.spot.signup.navigation.SignUp
 import com.umcspot.spot.study.detail.model.StudyDetailTab
 import com.umcspot.spot.study.detail.navigation.StudyAttendance
-import com.umcspot.spot.study.detail.navigation.StudyBoardPost
 import com.umcspot.spot.study.detail.navigation.StudyDetail
 import com.umcspot.spot.study.detail.navigation.StudyMemoirPost
-import com.umcspot.spot.study.detail.navigation.StudyPostContent
 import com.umcspot.spot.study.my.navigation.MyStudy
 import com.umcspot.spot.study.preferCategory.navigation.PreferCategoryFilter
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocationFilter
@@ -69,6 +67,7 @@ fun MainScreen(
     var scrollToTop by remember { mutableStateOf<(() -> Unit)?>(null) }
     var showBackRequestDialog by remember { mutableStateOf(false) }
     var currentStudyDetailTab by rememberSaveable { mutableStateOf(StudyDetailTab.HOME) }
+    var currentStudyIsMember by rememberSaveable { mutableStateOf(false) }
 
     val hasUnreadAlert by mainViewModel.hasUnreadAlert.collectAsStateWithLifecycle()
     val isHome = dest?.hasRoute(Home::class) == true
@@ -142,7 +141,9 @@ fun MainScreen(
                 showMultiple = navigator.showMultipleFab() && (
                         dest?.hasRoute(Home::class) == true ||
                                 dest?.hasRoute(BoardList::class) == true ||
-                                (dest?.hasRoute(StudyDetail::class) == true && currentStudyDetailTab == StudyDetailTab.MEMOIR)
+                                (dest?.hasRoute(StudyDetail::class) == true &&
+                                        currentStudyDetailTab == StudyDetailTab.MEMOIR &&
+                                        currentStudyIsMember)
                         ),
                 onClickMultiple = {
                     when {
@@ -191,6 +192,7 @@ fun MainScreen(
             onBackRequest = { showBackRequestDialog = true },
             onStudyTabChanged = { tab -> currentStudyDetailTab = tab },
             currentStudyDetailTab = currentStudyDetailTab,
+            onStudyIsMemberChanged = { currentStudyIsMember = it }
         )
     }
 

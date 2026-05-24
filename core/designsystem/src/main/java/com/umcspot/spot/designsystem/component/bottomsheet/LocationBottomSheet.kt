@@ -197,7 +197,7 @@ fun LocationBottomSheet(
                         Spacer(Modifier.height(screenHeightDp(18.dp)))
 
                         Text(
-                            text = "스터디를 진행하고 싶은 지역을 추가해주세요.",
+                            text = "스터디를 진행할 지역을 추가해주세요.",
                             style = SpotTheme.typography.h3,
                             color = SpotTheme.colors.black
                         )
@@ -205,7 +205,7 @@ fun LocationBottomSheet(
                         Spacer(Modifier.height(screenHeightDp(4.dp)))
 
                         Text(
-                            text = "최대 10개까지 추가할 수 있어요",
+                            text = "최대 3개까지 추가할 수 있어요",
                             style = SpotTheme.typography.h5,
                             color = SpotTheme.colors.gray400
                         )
@@ -276,7 +276,7 @@ fun LocationBottomSheet(
                                 .background(SpotTheme.colors.white)
                         ) {
                             if (results.isNotEmpty()) {
-                                val isMaxSelected = selected.size >= 10
+                                val isMaxSelected = selected.size >= 3
 
                                 HorizontalDivider(thickness = 0.5.dp, color = SpotTheme.colors.G200)
                                 LazyColumn(
@@ -294,7 +294,7 @@ fun LocationBottomSheet(
                                                     text = row.fullName,
                                                     style = SpotTheme.typography.h5,
                                                     maxLines = 1,
-                                                    color = if (isMaxSelected && !isAlreadySelected) {
+                                                    color = if (isMaxSelected) {
                                                         SpotTheme.colors.gray400
                                                     } else {
                                                         LocalContentColor.current

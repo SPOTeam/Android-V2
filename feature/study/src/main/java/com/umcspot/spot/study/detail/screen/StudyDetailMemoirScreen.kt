@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.study.component.SpotStudyDialog
+import com.umcspot.spot.study.component.SpotStudyDialogIcon
 import com.umcspot.spot.study.detail.component.memoir.MemoirExpandButton
 import com.umcspot.spot.study.detail.component.memoir.MemoirFooter
 import com.umcspot.spot.study.detail.component.memoir.MemoirHeader
@@ -67,7 +69,7 @@ fun StudyDetailMemoirScreen(
                     painter = painterResource(R.drawable.document),
                     contentDescription = null,
                     modifier = Modifier.size(screenWidthDp(33.dp)),
-                    tint = SpotTheme.colors.gray400
+                    tint = SpotTheme.colors.gray300
                 )
                 Spacer(modifier = Modifier.height(screenHeightDp(20.dp)))
                 Text(
@@ -98,7 +100,7 @@ fun StudyDetailMemoirScreen(
             )
             if (index < memoirs.lastIndex) {
                 HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = screenHeightDp(1.dp)),
                     thickness = 0.5.dp,
                     color = SpotTheme.colors.gray300
                 )
@@ -116,6 +118,8 @@ fun MemoirItemView(
     var isExpanded by remember { mutableStateOf(false) }
     var isEmojiPopupVisible by remember { mutableStateOf(false) }
     var isDeleteMenuVisible by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     var section1Lines by remember { mutableIntStateOf(0) }
     var section2Lines by remember { mutableIntStateOf(0) }
     var section3Lines by remember { mutableIntStateOf(0) }
@@ -136,6 +140,20 @@ fun MemoirItemView(
 
     val formattedDate = remember(memoir.createdAt) { memoir.createdAt.toFormattedMemoirDate() }
 
+    if (showDeleteDialog) {
+        SpotStudyDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = "회고록을 삭제하시겠어요?",
+            description = "한번 삭제한 글은 되돌릴 수 없어요.",
+            buttonText = "삭제",
+            icon = SpotStudyDialogIcon.DELETE,
+            onButtonClick = {
+                showDeleteDialog = false
+                onDeleteClick()
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -149,7 +167,7 @@ fun MemoirItemView(
             onDeleteMenuToggle = { isDeleteMenuVisible = !isDeleteMenuVisible },
             onDeleteClick = {
                 isDeleteMenuVisible = false
-                onDeleteClick()
+                showDeleteDialog = true
             }
         )
 
@@ -160,30 +178,39 @@ fun MemoirItemView(
                 .fillMaxWidth()
                 .animateContentSize()
         ) {
-            MemoirSectionItem(
-                label = "오늘 한 일",
-                text = memoir.activity,
-                maxLines = if (isExpanded) Int.MAX_VALUE else section1Max,
-                onLineCountMeasured = { section1Lines = it }
-            )
-            MemoirSectionItem(
-                label = "새롭게 배운 점",
-                text = memoir.learned,
-                maxLines = if (isExpanded) Int.MAX_VALUE else section2Max,
-                onLineCountMeasured = { section2Lines = it }
-            )
-            MemoirSectionItem(
-                label = "고생한 나에게 한 마디",
-                text = memoir.encouragement,
-                maxLines = if (isExpanded) Int.MAX_VALUE else section3Max,
-                onLineCountMeasured = { section3Lines = it }
-            )
-
-            if (everOverflowed) {
-                MemoirExpandButton(
-                    isExpanded = isExpanded,
-                    onToggle = { isExpanded = !isExpanded }
+            if (memoir.isPrivate) {
+                Text(
+                    text = "이 글은 스터디원에게만 노출됩니다.",
+                    style = SpotTheme.typography.medium_400,
+                    color = SpotTheme.colors.black,
+                    modifier = Modifier.fillMaxWidth()
                 )
+            } else {
+                MemoirSectionItem(
+                    label = "오늘 한 일",
+                    text = memoir.activity,
+                    maxLines = if (isExpanded) Int.MAX_VALUE else section1Max,
+                    onLineCountMeasured = { section1Lines = it }
+                )
+                MemoirSectionItem(
+                    label = "새롭게 배운 점",
+                    text = memoir.learned,
+                    maxLines = if (isExpanded) Int.MAX_VALUE else section2Max,
+                    onLineCountMeasured = { section2Lines = it }
+                )
+                MemoirSectionItem(
+                    label = "고생한 나에게 한 마디",
+                    text = memoir.encouragement,
+                    maxLines = if (isExpanded) Int.MAX_VALUE else section3Max,
+                    onLineCountMeasured = { section3Lines = it }
+                )
+
+                if (everOverflowed) {
+                    MemoirExpandButton(
+                        isExpanded = isExpanded,
+                        onToggle = { isExpanded = !isExpanded }
+                    )
+                }
             }
         }
 
@@ -196,6 +223,7 @@ fun MemoirItemView(
 
         MemoirFooter(
             formattedDate = formattedDate,
+            isPrivate = memoir.isPrivate,
             isFired = memoir.reactions.isFired,
             isHearted = memoir.reactions.isHearted,
             isStarred = memoir.reactions.isStarred,

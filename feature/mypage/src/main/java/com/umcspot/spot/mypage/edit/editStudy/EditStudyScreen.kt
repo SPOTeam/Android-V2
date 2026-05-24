@@ -30,6 +30,7 @@ import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ActivityType
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.study.component.SpotStudyDialog
+import com.umcspot.spot.study.component.SpotStudyDialogIcon
 import com.umcspot.spot.study.register.component.StepProgressBar
 import com.umcspot.spot.study.register.model.RegisterStudySideEffect
 import com.umcspot.spot.study.register.model.RegisterStudyState
@@ -79,7 +80,7 @@ fun EditStudyRoute(
             title = "스터디 수정 완료",
             description = "스터디 정보가 수정되었어요!\n스팟을 계속 즐겨봐요!",
             buttonText = "내 스터디 보러가기",
-            showCheckIcon = true,
+            icon = SpotStudyDialogIcon.CHECK,
             onButtonClick = { navigateToStudyDetail(studyId) }
         )
     }
@@ -102,7 +103,7 @@ fun EditStudyRoute(
         Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
 
         BackTopBar(
-            title = "스터디 수정",
+            title = "스터디 정보 수정",
             onBackClick = handleBackPress,
             modifier = Modifier.fillMaxWidth()
         )

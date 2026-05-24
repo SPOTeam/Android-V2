@@ -73,7 +73,7 @@ fun StudyInfoScreen(
         Spacer(modifier = Modifier.height(screenHeightDp(40.dp)))
 
         Text(
-            text = "스터디의 성격을 표현하는 단어를 모두 선택해봐요.",
+            text = "스터디의 성격을 표현하는 단어 선택 (2중 택1)",
             style = SpotTheme.typography.h5
         )
 

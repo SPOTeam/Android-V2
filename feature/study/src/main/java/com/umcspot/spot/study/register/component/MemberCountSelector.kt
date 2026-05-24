@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -42,7 +44,8 @@ fun MemberCountSelector(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val memberOptions = remember { persistentListOf(2, 3, 4, 5) }
+    val memberOptions = remember { persistentListOf(2, 3, 4, 5, 6, 7, 8, 9, 10) }
+    val itemHeight = screenHeightDp(30.dp)
 
     Row(
         modifier = modifier
@@ -52,7 +55,7 @@ fun MemberCountSelector(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Box(
-            modifier = Modifier.height(screenHeightDp(30.dp)),
+            modifier = Modifier.height(itemHeight),
             contentAlignment = Alignment.CenterStart
         ) {
             Text(
@@ -68,7 +71,7 @@ fun MemberCountSelector(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(screenHeightDp(30.dp))
+                        .height(itemHeight)
                         .border(
                             width = 1.dp,
                             color = SpotTheme.colors.gray200,
@@ -83,8 +86,9 @@ fun MemberCountSelector(
                     Text(
                         text = memberCount.toString(),
                         style = SpotTheme.typography.regular_500,
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.Start
                     )
-
                     Icon(
                         painter = painterResource(
                             id = if (expanded) R.drawable.arrow_up else R.drawable.arrow_down
@@ -98,9 +102,10 @@ fun MemberCountSelector(
                 if (expanded) {
                     Spacer(modifier = Modifier.height(screenHeightDp(4.dp)))
 
-                    Column(
+                    LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .height(itemHeight * 5)
                             .background(
                                 color = SpotTheme.colors.white,
                                 shape = RoundedCornerShape(6.dp)
@@ -112,28 +117,27 @@ fun MemberCountSelector(
                             )
                             .clip(RoundedCornerShape(6.dp))
                     ) {
-                        memberOptions.forEachIndexed { index, selectionOption ->
+                        itemsIndexed(memberOptions) { index, selectionOption ->
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(screenHeightDp(30.dp))
+                                    .height(itemHeight)
                                     .noRippleClickable {
                                         onMemberCountChange(selectionOption)
                                         expanded = false
-                                    },
-                                contentAlignment = Alignment.Center
+                                    }
+                                    .padding(horizontal = screenWidthDp(10.dp)),
+                                contentAlignment = Alignment.CenterStart
                             ) {
                                 Text(
                                     text = selectionOption.toString(),
-                                    style = SpotTheme.typography.regular_500,
-                                    textAlign = TextAlign.Center
+                                    style = SpotTheme.typography.regular_500
                                 )
                             }
-
                             if (index < memberOptions.lastIndex) {
                                 HorizontalDivider(
                                     color = SpotTheme.colors.gray300,
-                                    thickness = 0.5.dp,
+                                    thickness = 0.5.dp
                                 )
                             }
                         }
@@ -144,7 +148,7 @@ fun MemberCountSelector(
             Spacer(modifier = Modifier.width(screenWidthDp(7.dp)))
 
             Box(
-                modifier = Modifier.height(screenHeightDp(30.dp)),
+                modifier = Modifier.height(itemHeight),
                 contentAlignment = Alignment.Center
             ) {
                 Text(

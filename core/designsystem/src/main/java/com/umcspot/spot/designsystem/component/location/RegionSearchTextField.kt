@@ -3,6 +3,7 @@ package com.umcspot.spot.designsystem.component.location
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -17,10 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.umcspot.spot.designsystem.R
-import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 
 @Composable
@@ -58,11 +56,11 @@ fun RegionSearchTextField(
             }
         },
         singleLine = true,
-        shape = SpotShapes.Soft,
+        shape = RoundedCornerShape(10.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = SpotTheme.colors.B500,
+            focusedBorderColor = SpotTheme.colors.primary,
             unfocusedBorderColor = SpotTheme.colors.gray300,
-            cursorColor = SpotTheme.colors.B500,
+            cursorColor = SpotTheme.colors.primary,
             focusedContainerColor = Color.Transparent,
             unfocusedContainerColor = Color.Transparent
         ),
@@ -70,6 +68,6 @@ fun RegionSearchTextField(
             .fillMaxWidth()
             .focusRequester(focusRequester)
             .onFocusChanged { fs -> onFocusChanged(fs.isFocused) }
-            .padding(vertical = screenHeightDp(10.dp))
+            .padding(all = screenWidthDp(10.dp))
     )
 }

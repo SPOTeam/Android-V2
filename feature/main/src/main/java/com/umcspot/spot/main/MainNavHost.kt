@@ -48,6 +48,7 @@ fun MainNavHost(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
     onStudyTabChanged: (StudyDetailTab) -> Unit,
+    onStudyIsMemberChanged: (Boolean) -> Unit,
     currentStudyDetailTab: StudyDetailTab,
     onBackRequest: () -> Unit,
 ) {
@@ -133,7 +134,7 @@ fun MainNavHost(
             },
             moveToRecruitingStudy = { navigator.navigateToRecruitingStudy() },
             moveToPreferCategoryStudy = {
-                navigator.navigateToEditInterestStudy(
+                navigator.navigateToPreferCategoryStudy(
                     navOptions = navOptions {
                         popUpTo<MyPageGraph.MyPage> { inclusive = false }
                         launchSingleTop = true
@@ -141,7 +142,7 @@ fun MainNavHost(
                 )
             },
             moveToPreferLocationStudy = {
-                navigator.navigateToEditInterestRegion(
+                navigator.navigateToPreferLocationStudy(
                     navOptions = navOptions {
                         popUpTo<MyPageGraph.MyPage> { inclusive = false }
                         launchSingleTop = true
@@ -266,6 +267,7 @@ fun MainNavHost(
                 navigator.popBackStack()
             },
             onTabChanged = onStudyTabChanged,
+            onIsMemberChanged = onStudyIsMemberChanged,
             currentTab = currentStudyDetailTab
         )
     }

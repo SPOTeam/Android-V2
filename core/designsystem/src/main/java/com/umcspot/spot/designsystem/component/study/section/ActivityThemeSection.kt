@@ -15,37 +15,22 @@ import com.umcspot.spot.designsystem.shapes.SpotShapes
 import com.umcspot.spot.model.StudyTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
-import kotlinx.collections.immutable.ImmutableList
-
-@Composable
-fun ActivityThemeSection(
-    selectedTheme: StudyTheme?,
-    onSelect: (StudyTheme) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    BaseActivityThemeSection(
-        modifier = modifier,
-        isThemeSelected = { it == selectedTheme }, 
-        isThemeEnabled = { true },                 
-        onSelect = onSelect
-    )
-}
 
 @Composable
 fun ActivityThemeSection(
     selectedThemes: List<StudyTheme>,
     onSelect: (StudyTheme) -> Unit,
     modifier: Modifier = Modifier,
-    maxSelection: Int = 3
+    maxSelection: Int = 3,
+    enabled: Boolean = true
 ) {
     val isMaxSelected = selectedThemes.size >= maxSelection
 
     BaseActivityThemeSection(
         modifier = modifier,
         isThemeSelected = { selectedThemes.contains(it) },
-        
-        isThemeEnabled = { theme -> !isMaxSelected || selectedThemes.contains(theme) },
-        onSelect = onSelect
+        isThemeEnabled = { theme -> enabled && (!isMaxSelected || selectedThemes.contains(theme)) },
+        onSelect = { if (enabled) onSelect(it) }
     )
 }
 

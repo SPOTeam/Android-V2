@@ -3,6 +3,7 @@ package com.umcspot.spot.study.register.screen
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -136,29 +137,40 @@ fun StudyIntroduceScreen(
         Box(
             modifier = Modifier
                 .size(width = screenWidthDp(80.dp), height = screenHeightDp(80.dp))
-                .clip(RoundedCornerShape(6.dp))
-                .background(if (selectedImageUri != null) SpotTheme.colors.black else SpotTheme.colors.G100)
-                .noRippleClickable {
-                    photoPickerLauncher.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                    )
-                },
-            contentAlignment = Alignment.Center
         ) {
-            if (selectedImageUri != null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(SpotTheme.colors.G100)
+                    .noRippleClickable {
+                        photoPickerLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    }
+            ) {
                 AsyncImage(
                     model = selectedImageUri,
-                    contentDescription = "Selected Study Image",
+                    contentDescription = "스터디 이미지",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    placeholder = painterResource(R.drawable.img_spot_study_sample_1),
+                    error = painterResource(R.drawable.img_spot_study_sample_1),
+                    fallback = painterResource(R.drawable.img_spot_study_sample_1)
                 )
-            } else {
-                Icon(
-                    painter = painterResource(id = R.drawable.license),
-                    contentDescription = "Upload Image",
-                    tint = SpotTheme.colors.G400,
-                    modifier = Modifier.size(screenWidthDp(24.dp))
-                )
+
+                if (selectedImageUri != null) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.dismiss),
+                        contentDescription = "이미지 제거",
+                        tint = SpotTheme.colors.white,
+                        modifier = Modifier
+                            .size(screenWidthDp(16.dp))
+                            .align(Alignment.TopEnd)
+                            .padding(top = screenHeightDp(4.dp), end = screenWidthDp(4.dp))
+                            .noRippleClickable { onImageSelected(null) }
+                    )
+                }
             }
         }
     }

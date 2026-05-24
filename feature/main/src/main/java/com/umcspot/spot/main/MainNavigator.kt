@@ -53,6 +53,7 @@ import com.umcspot.spot.study.my.navigation.MyStudy
 import com.umcspot.spot.study.my.navigation.navigateToMyStudy
 import com.umcspot.spot.study.preferCategory.navigation.PreferCategory
 import com.umcspot.spot.study.preferCategory.navigation.PreferCategoryFilter
+import com.umcspot.spot.study.preferCategory.navigation.navigateToPreferCategoryStudy
 import com.umcspot.spot.study.preferCategory.navigation.navigateToPreferCategoryStudyFilter
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocation
 import com.umcspot.spot.study.preferLocation.navigation.PreferLocationFilter
@@ -256,6 +257,10 @@ class MainNavigator(
 
     fun navigateToWaitingStudy(navOptions: NavOptions? = null) {
         navController.navigateToWaitingStudy(navOptions)
+    }
+
+    fun navigateToPreferCategoryStudy(navOptions: NavOptions? = null) {
+        navController.navigateToPreferCategoryStudy(navOptions)
     }
 
     fun navigateToEditInterestStudy(navOptions: NavOptions? = null) {

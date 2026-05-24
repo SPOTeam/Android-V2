@@ -23,16 +23,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kizitonwose.calendar.compose.CalendarState
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.core.DayPosition
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.B100
-import com.umcspot.spot.designsystem.theme.B400
-import com.umcspot.spot.designsystem.theme.B500
-import com.umcspot.spot.designsystem.theme.Black
-import com.umcspot.spot.designsystem.theme.G300
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
 import java.time.DayOfWeek
@@ -46,6 +40,7 @@ fun SpotPlannerCalendar(
     monthState: CalendarState,
     selectedDate: LocalDate,
     daysOfWeek: List<DayOfWeek>,
+    scheduledDates: Set<LocalDate> = emptySet(),
     onDateSelected: (LocalDate) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -61,7 +56,7 @@ fun SpotPlannerCalendar(
                     textAlign = TextAlign.Center,
                     text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.KOREAN),
                     style = SpotTheme.typography.regular_500,
-                    color = if (dayOfWeek == DayOfWeek.SUNDAY) SpotTheme.colors.B500 else SpotTheme.colors.Black
+                    color = if (dayOfWeek == DayOfWeek.SUNDAY) SpotTheme.colors.primary else SpotTheme.colors.black
                 )
             }
         }
@@ -75,6 +70,7 @@ fun SpotPlannerCalendar(
                         date = day.date,
                         isCurrentMonth = day.position == DayPosition.MonthDate,
                         isSelected = selectedDate == day.date,
+                        hasSchedule = day.date in scheduledDates,
                         onClick = onDateSelected
                     )
                 }
@@ -82,6 +78,7 @@ fun SpotPlannerCalendar(
         } else {
             CustomWeekRow(
                 selectedDate = selectedDate,
+                scheduledDates = scheduledDates,
                 onDateSelected = onDateSelected
             )
         }
@@ -91,6 +88,7 @@ fun SpotPlannerCalendar(
 @Composable
 fun CustomWeekRow(
     selectedDate: LocalDate,
+    scheduledDates: Set<LocalDate> = emptySet(),
     onDateSelected: (LocalDate) -> Unit
 ) {
     val daysFromMonday = (selectedDate.dayOfWeek.value - 1).toLong()
@@ -104,6 +102,7 @@ fun CustomWeekRow(
                     date = date,
                     isCurrentMonth = true,
                     isSelected = selectedDate == date,
+                    hasSchedule = date in scheduledDates,
                     onClick = onDateSelected
                 )
             }
@@ -116,10 +115,10 @@ private fun DayCell(
     date: LocalDate,
     isCurrentMonth: Boolean,
     isSelected: Boolean,
+    hasSchedule: Boolean = false,
     onClick: (LocalDate) -> Unit
 ) {
     val isSunday = date.dayOfWeek == DayOfWeek.SUNDAY
-    val isToday = date == LocalDate.now()
 
     Column(
         modifier = Modifier
@@ -137,7 +136,7 @@ private fun DayCell(
             modifier = Modifier
                 .size(29.dp)
                 .clip(SpotShapes.Hard)
-                .background(if (isSelected) SpotTheme.colors.B100 else Color.Transparent),
+                .background(if (isSelected) SpotTheme.colors.primarySoftest else Color.Transparent),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -146,20 +145,20 @@ private fun DayCell(
             ) {
                 Text(
                     text = date.dayOfMonth.toString(),
-                    style = SpotTheme.typography.regular_500.copy(fontSize = 16.sp),
+                    style = SpotTheme.typography.regular_500,
                     color = when {
-                        !isCurrentMonth -> SpotTheme.colors.G300
-                        isSunday -> SpotTheme.colors.B500
-                        else -> SpotTheme.colors.Black
+                        !isCurrentMonth -> SpotTheme.colors.gray300
+                        isSunday -> SpotTheme.colors.primary
+                        else -> SpotTheme.colors.black
                     }
                 )
 
-                if (isToday && isCurrentMonth) {
+                if (hasSchedule && isCurrentMonth) {
                     Box(
                         modifier = Modifier
                             .padding(top = 2.dp)
                             .size(4.dp)
-                            .background(SpotTheme.colors.B400, CircleShape)
+                            .background(SpotTheme.colors.primaryStrong, CircleShape)
                     )
                 } else {
                     Spacer(modifier = Modifier.height(6.dp))

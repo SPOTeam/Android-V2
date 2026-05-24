@@ -86,8 +86,8 @@ fun MultiButtonState.resolveColors(
     isPressed: Boolean,
     checked: Boolean
 ): MultiButtonColors = when {
-    !enabled -> disabled
     checked -> selected
+    !enabled -> disabled
     isPressed -> pressed
     else -> normal
 }
@@ -97,7 +97,7 @@ fun MultiButton(
     text: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    shape : Shape = SpotShapes.Hard,
+    shape : Shape = SpotShapes.Soft,
     state: MultiButtonState = MultiButtonState.XOUTLINEState,
     checked: Boolean = false,
     onClick: (newChecked: Boolean) -> Unit,

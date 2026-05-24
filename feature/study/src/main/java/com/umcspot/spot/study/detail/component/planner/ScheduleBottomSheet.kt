@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
@@ -47,10 +48,7 @@ import androidx.compose.ui.unit.dp
 import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.SpotActivationButton
 import com.umcspot.spot.designsystem.shapes.SpotShapes
-import com.umcspot.spot.designsystem.theme.B100
-import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
-import com.umcspot.spot.designsystem.theme.Y400
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 import kotlinx.coroutines.delay
@@ -146,23 +144,52 @@ fun ScheduleBottomSheet(
                     .animateContentSize()
             ) {
                 Spacer(modifier = Modifier.height(screenHeightDp(24.dp)))
-                Text(text = "일정", style = SpotTheme.typography.h5, color = SpotTheme.colors.black)
+                Text(
+                    text = "일정",
+                    style = SpotTheme.typography.h5,
+                    color = SpotTheme.colors.black
+                )
                 Spacer(modifier = Modifier.height(screenHeightDp(7.dp)))
-                ScheduleInputField(value = title, onValueChange = { if (it.length <= 20) title = it }, placeholder = "제목")
+                ScheduleInputField(
+                    value = title,
+                    onValueChange = { if (it.length <= 20) title = it },
+                    placeholder = "제목",
+                    isRequired = true
+                )
                 Spacer(modifier = Modifier.height(screenHeightDp(8.dp)))
-                ScheduleInputField(value = locationMemo, onValueChange = { if (it.length <= 20) locationMemo = it }, placeholder = "위치 메모")
+                ScheduleInputField(
+                    value = locationMemo,
+                    onValueChange = { if (it.length <= 20) locationMemo = it },
+                    placeholder = "위치 메모"
+                )
                 Spacer(modifier = Modifier.height(screenHeightDp(32.dp)))
-                Text(text = "일시", style = SpotTheme.typography.h4, color = SpotTheme.colors.black)
+                Text(
+                    text = "일시",
+                    style = SpotTheme.typography.h4,
+                    color = SpotTheme.colors.black
+                )
                 Spacer(modifier = Modifier.height(screenHeightDp(12.dp)))
                 DateTimeSelectorRow(
                     label = "시작",
                     date = startDate,
                     time = startTime,
                     onDateClick = {
-                        DatePickerDialog(context, { _, y, m, d -> startDate = LocalDate.of(y, m + 1, d) }, startDate.year, startDate.monthValue - 1, startDate.dayOfMonth).show()
+                        DatePickerDialog(
+                            context,
+                            { _, y, m, d -> startDate = LocalDate.of(y, m + 1, d) },
+                            startDate.year,
+                            startDate.monthValue - 1,
+                            startDate.dayOfMonth
+                        ).show()
                     },
                     onTimeClick = {
-                        TimePickerDialog(context, { _, h, min -> startTime = LocalTime.of(h, min) }, startTime.hour, startTime.minute, false).show()
+                        TimePickerDialog(
+                            context,
+                            { _, h, min -> startTime = LocalTime.of(h, min) },
+                            startTime.hour,
+                            startTime.minute,
+                            false
+                        ).show()
                     }
                 )
                 Spacer(modifier = Modifier.height(screenHeightDp(8.dp)))
@@ -171,10 +198,22 @@ fun ScheduleBottomSheet(
                     date = endDate,
                     time = endTime,
                     onDateClick = {
-                        DatePickerDialog(context, { _, y, m, d -> endDate = LocalDate.of(y, m + 1, d) }, endDate.year, endDate.monthValue - 1, endDate.dayOfMonth).show()
+                        DatePickerDialog(
+                            context,
+                            { _, y, m, d -> endDate = LocalDate.of(y, m + 1, d) },
+                            endDate.year,
+                            endDate.monthValue - 1,
+                            endDate.dayOfMonth
+                        ).show()
                     },
                     onTimeClick = {
-                        TimePickerDialog(context, { _, h, min -> endTime = LocalTime.of(h, min) }, endTime.hour, endTime.minute, false).show()
+                        TimePickerDialog(
+                            context,
+                            { _, h, min -> endTime = LocalTime.of(h, min) },
+                            endTime.hour,
+                            endTime.minute,
+                            false
+                        ).show()
                     }
                 )
             }
@@ -192,7 +231,7 @@ fun ScheduleBottomSheet(
                         Icon(
                             painter = painterResource(id = R.drawable.error),
                             contentDescription = null,
-                            tint = SpotTheme.colors.Y400,
+                            tint = SpotTheme.colors.secondary,
                             modifier = Modifier.size(screenWidthDp(16.dp))
                         )
                         Spacer(modifier = Modifier.width(screenWidthDp(4.dp)))
@@ -227,7 +266,8 @@ fun ScheduleBottomSheet(
 private fun ScheduleInputField(
     value: String,
     onValueChange: (String) -> Unit,
-    placeholder: String
+    placeholder: String,
+    isRequired: Boolean = false
 ) {
     var isFocused by remember { mutableStateOf(false) }
 
@@ -236,7 +276,7 @@ private fun ScheduleInputField(
             .fillMaxWidth()
             .border(
                 width = 1.dp,
-                color = if (isFocused) SpotTheme.colors.B500 else SpotTheme.colors.gray200,
+                color = if (isFocused) SpotTheme.colors.primary else SpotTheme.colors.gray200,
                 shape = RoundedCornerShape(6.dp)
             )
             .padding(
@@ -254,7 +294,7 @@ private fun ScheduleInputField(
                     .onFocusChanged { isFocused = it.isFocused },
                 singleLine = true,
                 textStyle = SpotTheme.typography.medium_500.copy(color = SpotTheme.colors.black),
-                cursorBrush = SolidColor(SpotTheme.colors.B500),
+                cursorBrush = SolidColor(SpotTheme.colors.primary),
                 decorationBox = { innerTextField ->
                     if (value.isEmpty()) {
                         Text(
@@ -266,11 +306,23 @@ private fun ScheduleInputField(
                     innerTextField()
                 }
             )
-            Text(
-                text = "(${value.length}/20)",
-                style = SpotTheme.typography.regular_500,
-                color = SpotTheme.colors.gray400
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                if (isRequired) {
+                    Box(
+                        modifier = Modifier
+                            .size(4.dp)
+                            .background(SpotTheme.colors.error, CircleShape)
+                    )
+                }
+                Text(
+                    text = "(${value.length}/20)",
+                    style = SpotTheme.typography.regular_500,
+                    color = SpotTheme.colors.gray400
+                )
+            }
         }
     }
 }
@@ -321,7 +373,7 @@ private fun DateTimeBadge(
 ) {
     Box(
         modifier = Modifier
-            .background(SpotTheme.colors.B100, RoundedCornerShape(6.dp))
+            .background(SpotTheme.colors.primarySoftest, RoundedCornerShape(6.dp))
             .clickable { onClick() }
             .padding(
                 horizontal = screenWidthDp(9.dp),

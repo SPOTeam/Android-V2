@@ -42,6 +42,7 @@ import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.component.button.SpotActivationButton
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.study.component.SpotStudyDialog
+import com.umcspot.spot.study.component.SpotStudyDialogIcon
 import com.umcspot.spot.study.detail.StudyDetailViewModel
 import com.umcspot.spot.study.detail.component.planner.attendance.StudyAttendanceListSection
 import com.umcspot.spot.study.model.AttendanceStatus
@@ -128,7 +129,7 @@ fun StudyAttendanceRoute(
                 title = "출석체크를 마감할까요?",
                 description = "이 작업은 되돌릴 수 없어요.\n미결인 스터디원은 결석 처리됩니다.",
                 buttonText = "출석체크 마감",
-                showCheckIcon = false,
+                icon = SpotStudyDialogIcon.NONE,
                 onButtonClick = {
                     showFinishDialog = false
                     viewModel.finishAttendance(studyId, scheduleId)
@@ -161,7 +162,7 @@ fun StudyAttendanceStartScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
-        BackTopBar(title = "출석체크", onBackClick = onBackClick)
+        BackTopBar(title = "일정 상세", onBackClick = onBackClick)
 
         Column(
             modifier = Modifier
@@ -173,8 +174,8 @@ fun StudyAttendanceStartScreen(
             Text(text = "스터디 출석 QR", style = SpotTheme.typography.h5)
             Spacer(modifier = Modifier.height(screenHeightDp(8.dp)))
             Text(
-                text = "출석체크를 시작하면 출석 QR코드가 생성됩니다.",
-                style = SpotTheme.typography.regular_400,
+                text = "출석체크를 시작하면 출석 QR코드가 생성됩니다.\n출석체크 시작 시간대 : 일정 시작 30분전 ~ 일정 종료",
+                style = SpotTheme.typography.regular_500,
                 color = SpotTheme.colors.gray400
             )
 
@@ -258,8 +259,8 @@ fun StudyAttendanceProgressScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
-                    text = "오늘 스터디에 참석한 팀원들에게 QR코드를 보여주세요!",
-                    style = SpotTheme.typography.regular_400,
+                    text = "QR코드를 인식하면 출석이 인증됩니다.\n오늘 스터디에 참석한 팀원들에게 QR코드를 보여주세요!",
+                    style = SpotTheme.typography.regular_500,
                     color = SpotTheme.colors.gray400,
                     modifier = Modifier.fillMaxWidth()
                 )

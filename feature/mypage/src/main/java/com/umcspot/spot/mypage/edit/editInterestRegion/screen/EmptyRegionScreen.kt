@@ -25,7 +25,7 @@ fun EmptyRegionScreen() {
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_location),
+            painter = painterResource(id = R.drawable.ic_location_unfilled),
             contentDescription = null,
             tint = SpotTheme.colors.gray500,
             modifier = Modifier.size(screenWidthDp(33.dp))

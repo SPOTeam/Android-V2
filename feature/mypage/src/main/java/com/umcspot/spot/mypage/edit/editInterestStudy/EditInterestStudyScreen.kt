@@ -18,18 +18,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.component.button.SpotActivationButton
 import com.umcspot.spot.designsystem.component.button.SpotCancelButton
-import com.umcspot.spot.designsystem.component.modal.AcceptDialog
 import com.umcspot.spot.designsystem.component.study.section.ActivityThemeSection
-import com.umcspot.spot.designsystem.theme.B500
 import com.umcspot.spot.designsystem.theme.SpotTheme
+import com.umcspot.spot.study.component.SpotStudyDialog
+import com.umcspot.spot.study.component.SpotStudyDialogIcon
 import com.umcspot.spot.ui.extension.screenHeightDp
 import com.umcspot.spot.ui.extension.screenWidthDp
 
@@ -51,6 +49,17 @@ fun EditInterestStudyScreen(
 
     LaunchedEffect(selectedThemes) {
         if (!editMode) draftThemes = selectedThemes
+    }
+
+    if (showDialog) {
+        SpotStudyDialog(
+            onDismissRequest = { showDialog = false; moveToMyPage() },
+            title = "수정 완료",
+            description = "수정이 완료되었어요.\n새로운 관심 분야에 맞는 스터디를 확인해보세요!",
+            buttonText = "내 관심사 스터디 보기",
+            icon = SpotStudyDialogIcon.CHECK,
+            onButtonClick = { showDialog = false; moveToMyInterestStudy() }
+        )
     }
 
     Column(
@@ -93,7 +102,8 @@ fun EditInterestStudyScreen(
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    maxSelection = 10
+                    maxSelection = 10,
+                    enabled = editMode
                 )
             }
 
@@ -137,22 +147,4 @@ fun EditInterestStudyScreen(
             }
         }
     }
-
-    AcceptDialog(
-        visible = showDialog,
-        painter = painterResource(id = R.drawable.ic_check),
-        painterTint = SpotTheme.colors.B500,
-        modalTitle = "수정 완료",
-        modalDes = "수정이 완료되었어요.\n새로운 관심 분야에 맞는 스터디를 확인해보세요!",
-        okButtonText = "내 관심 스터디 보기",
-        noButtonText = null,
-        onClick = {
-            showDialog = false
-            moveToMyInterestStudy()
-        },
-        onDismiss = {
-            showDialog = false
-            moveToMyPage()
-        }
-    )
 }

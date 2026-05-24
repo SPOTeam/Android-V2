@@ -41,6 +41,7 @@ fun NavGraphBuilder.studyDetailGraph(
     onAttendanceBackClick: () -> Unit,
     onAttendanceClick: (Long, Long) -> Unit,
     onTabChanged: (StudyDetailTab) -> Unit,
+    onIsMemberChanged: (Boolean) -> Unit,
     currentTab: StudyDetailTab,
 ) {
     composable<StudyDetail> { backStackEntry ->
@@ -50,6 +51,7 @@ fun NavGraphBuilder.studyDetailGraph(
             studyId = detail.studyId,
             onBackClick = onDetailBackClick,
             onTabChanged = onTabChanged,
+            onIsMemberChanged = onIsMemberChanged,
             initialTab = currentTab,
             onBoardPostClick = { postId -> onBoardPostClick(detail.studyId, postId) },
             onAttendanceClick = { schedId -> onAttendanceClick(detail.studyId, schedId) }

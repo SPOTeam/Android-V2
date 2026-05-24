@@ -33,6 +33,8 @@ class RegisterStudyViewModel @Inject constructor(
     private val studyRepository: StudyRepository
 ) : ViewModel() {
 
+    private val CONSONANTS_VOWELS_ONLY_REGEX = Regex("^[ㄱ-ㅎㅏ-ㅣ]+$")
+
     private val _uiState = MutableStateFlow(RegisterStudyState())
     val uiState = _uiState.asStateFlow()
 
@@ -82,7 +84,7 @@ class RegisterStudyViewModel @Inject constructor(
     }
 
     fun addSelectedRegion(region: LocationRow) {
-        if (_uiState.value.selectedRegions.size < 10 && !_uiState.value.selectedRegions.contains(
+        if (_uiState.value.selectedRegions.size < 3 && !_uiState.value.selectedRegions.contains(
                 region
             )
         ) {
@@ -157,7 +159,11 @@ class RegisterStudyViewModel @Inject constructor(
     fun isStepValid(step: Int): Boolean {
         val state = _uiState.value
         return when (step) {
-            0 -> state.studyName.isNotBlank() && state.studyThemes.isNotEmpty()
+            0 -> {
+                val isNameValid = state.studyName.isNotBlank() &&
+                        !CONSONANTS_VOWELS_ONLY_REGEX.matches(state.studyName)
+                isNameValid && state.studyThemes.isNotEmpty()
+            }
             1 -> {
                 if (state.activityType == null) return false
                 if (state.activityType == ActivityType.OFFLINE) state.selectedRegions.isNotEmpty() else true
