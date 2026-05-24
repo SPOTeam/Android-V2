@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.umcspot.spot.designsystem.component.ProfileImage
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.model.ImageRef
+import com.umcspot.spot.ui.extension.screenHeightDp
+import com.umcspot.spot.ui.extension.screenWidthDp
 
 @Composable
 fun UserInfo(
@@ -25,22 +28,21 @@ fun UserInfo(
 ) {
     Row(
         modifier = modifier
-            .wrapContentSize()
+            .wrapContentSize(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         ProfileImage(
             imageRef = postWriterImage,
-            modifier = Modifier.size(44.dp)
+            modifier = Modifier.size(screenWidthDp(44.dp))
         )
-        Spacer(Modifier.width(10.dp))
-        Column (
-
-        ) {
+        Spacer(Modifier.width(screenWidthDp(7.dp)))
+        Column {
             Text(
                 text = postWriterName,
                 style = SpotTheme.typography.medium_400
             )
 
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(screenHeightDp(4.dp)))
 
             Text(
                 text = postWriteAt,

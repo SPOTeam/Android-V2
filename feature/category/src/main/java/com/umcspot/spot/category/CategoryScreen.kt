@@ -124,13 +124,15 @@ private fun CategoryScreen(
                 bottom = contentPadding.calculateBottomPadding()
             )
     ) {
+        Spacer(Modifier.height(screenHeightDp(18.dp)))
+
         CategoryTabs(
             tabs = allTabs,
             selectedIndex = selectedIndex,
             onTabSelected = onTabSelected
         )
 
-        Spacer(Modifier.height(screenHeightDp(12.dp)))
+       Spacer(Modifier.height(screenHeightDp(12.dp)))
 
         CategoryHeaderRow(
             size = studyList.size,
