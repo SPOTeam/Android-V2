@@ -53,7 +53,7 @@ fun DeleteModal(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(17.dp),
+                .padding(screenWidthDp(17.dp), screenHeightDp(17.dp)),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

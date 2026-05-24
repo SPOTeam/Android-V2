@@ -1,4 +1,4 @@
-package com.umcspot.spot.feature.board.main
+﻿package com.umcspot.spot.feature.board.main
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -79,7 +79,7 @@ fun BoardScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(SpotTheme.colors.white)
             .padding(top = topPad, bottom = bottomPad)
     ) {
         LazyColumn(
@@ -321,14 +321,11 @@ private fun RecentCardList(
     onItemClick: (RecentPostResult) -> Unit
 ) {
     ShapeBox(
+        modifier = Modifier.fillMaxWidth(),
         shape = SpotShapes.Soft,
         color = SpotTheme.colors.white,
         borderWidth = 1.dp,
         borderColor = SpotTheme.colors.G200,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(SpotShapes.Soft)
-            .height(screenHeightDp(162.dp))
     ) {
         when (items) {
             is UiState.Loading, is UiState.Empty, is UiState.Failure -> {
@@ -345,7 +342,7 @@ private fun RecentCardList(
 
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .padding(screenWidthDp(7.dp)),
                     verticalArrangement = Arrangement.spacedBy(screenHeightDp(7.dp))
                 ) {

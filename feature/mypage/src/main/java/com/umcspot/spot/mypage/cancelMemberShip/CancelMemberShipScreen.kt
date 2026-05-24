@@ -78,7 +78,7 @@ fun CancelMemberShipScreen(
         Row {
             Text(text = "복구가", style = SpotTheme.typography.regular_500)
 
-            Spacer(modifier = Modifier.width(screenWidthDp(8.dp)))
+            Spacer(modifier = Modifier.width(screenWidthDp(3.dp)))
 
             Text(
                 text = "불가능",
@@ -142,6 +142,7 @@ fun CancelMemberShipScreen(
             onDismiss = { showDialog = false },
             onClick = {
                 viewmodel.leaveSpot()
+                showSuccessDialog = true
                 showDialog = false
             },
             onCancel = { showDialog = false }

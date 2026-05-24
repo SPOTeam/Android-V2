@@ -18,7 +18,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -34,6 +33,7 @@ import com.umcspot.spot.designsystem.component.FloatingToUpButton
 import com.umcspot.spot.designsystem.component.appBar.AppBarHome
 import com.umcspot.spot.designsystem.component.appBar.BackTopBar
 import com.umcspot.spot.designsystem.component.modal.RejectDialog
+import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.feature.board.boardList.navigation.BoardList
 import com.umcspot.spot.feature.board.post.content.navigation.POST_CONTENT_ROUTE
 import com.umcspot.spot.feature.board.post.posting.navigation.Posting
@@ -179,7 +179,7 @@ fun MainScreen(
             }
         },
         modifier = Modifier
-            .background(Color.White)
+            .background(SpotTheme.colors.white)
             .fillMaxSize()
     ) { innerPadding ->
         MainNavHost(

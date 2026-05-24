@@ -30,6 +30,7 @@ import com.umcspot.spot.designsystem.R
 import com.umcspot.spot.designsystem.component.button.TextButton
 import com.umcspot.spot.designsystem.component.button.TextButtonState
 import com.umcspot.spot.designsystem.shapes.SpotShapes
+import com.umcspot.spot.designsystem.theme.G400
 import com.umcspot.spot.designsystem.theme.R500
 import com.umcspot.spot.designsystem.theme.SpotTheme
 import com.umcspot.spot.ui.extension.screenHeightDp
@@ -83,7 +84,9 @@ fun RejectModal(
                 contentDescription = null,
                 modifier = Modifier
                     .size(screenWidthDp(33.dp)),
-                colorFilter = ColorFilter.tint(painterTint)
+                colorFilter = painterTint
+                    .takeUnless { it == Color.Unspecified }
+                    ?.let { ColorFilter.tint(it) }
             )
 
             Spacer(Modifier.height(screenHeightDp(7.dp)))
@@ -180,6 +183,26 @@ private fun RejectDialog_Preview() {
             onDismiss = {},
             onClick = {},
             onCancel = {}
+        )
+    }
+}
+
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 640)
+@Composable
+private fun CancelMembbershipDialog_Preview() {
+    SpotTheme {
+        RejectDialog(
+            visible = true,
+            painter = painterResource(R.drawable.cancel_membership),
+            painterTint = SpotTheme.colors.G400,
+            modalTitle = "정말 탈퇴할까요?",
+            modalDes = null,
+            okButtonText = "탈퇴",
+            noButtonText = "취소",
+            onDismiss = {  },
+            onClick = { },
+            onCancel = { }
         )
     }
 }
