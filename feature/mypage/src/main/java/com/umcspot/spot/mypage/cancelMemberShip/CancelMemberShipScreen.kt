@@ -141,9 +141,8 @@ fun CancelMemberShipScreen(
             noButtonText = "취소",
             onDismiss = { showDialog = false },
             onClick = {
-                viewmodel.leaveSpot()
-                showSuccessDialog = true
                 showDialog = false
+                viewmodel.leaveSpot()
             },
             onCancel = { showDialog = false }
         )
