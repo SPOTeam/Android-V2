@@ -3,6 +3,7 @@ package com.umcspot.spot.designsystem.component.appBar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -46,6 +47,7 @@ fun AppBarHome (
     hasAlert: Boolean = false,
     onSearchClick: () -> Unit,
     onAlertClick: () -> Unit,
+    onLogoClick : () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -57,16 +59,22 @@ fun AppBarHome (
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
+
         Image(
             painter = painterResource(id = R.drawable.spot_logo),
             contentDescription = "App Logo",
-            modifier = Modifier.size(screenWidthDp(33.dp))
+            modifier = Modifier
+                .size(screenWidthDp(33.dp))
+                .clickable(
+                    onClick = onLogoClick
+                )
         )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(
                 modifier = Modifier.size(screenWidthDp(32.dp)),
-                onClick = onSearchClick) {
+                onClick = onSearchClick
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.search),
                     contentDescription = "Search",
@@ -98,7 +106,8 @@ fun TopBarPreview_NoNotification() {
         AppBarHome(
             hasAlert = false,
             onSearchClick = {},
-            onAlertClick = {}
+            onAlertClick = {},
+            onLogoClick = {}
         )
     }
 }
@@ -110,7 +119,8 @@ fun TopBarPreview_WithNotification() {
         AppBarHome(
             hasAlert = true,
             onSearchClick = {},
-            onAlertClick = {}
+            onAlertClick = {},
+            onLogoClick = {}
         )
     }
 }

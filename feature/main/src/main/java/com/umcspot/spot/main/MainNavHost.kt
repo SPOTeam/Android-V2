@@ -131,6 +131,7 @@ fun MainNavHost(
                     }
                 )
             },
+            navigateToMakeStudy = {navigator.navigateToRegisterStudy()},
             moveToRecruitingStudy = { navigator.navigateToRecruitingStudy() },
             moveToPreferCategoryStudy = {
                 navigator.navigateToEditInterestStudy(
@@ -167,7 +168,7 @@ fun MainNavHost(
         recruitingStudyGraph(
             contentPadding = contentPadding,
             onRegisterScrollToTop = onRegisterScrollToTop,
-            onItemClick = {},
+            onItemClick = { navigator.navigateToStudyDetail(it)},
             onFilterClick = { navigator.navigateToRecruitingStudyFilter() },
         )
 

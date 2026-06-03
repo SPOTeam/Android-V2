@@ -75,7 +75,7 @@ fun RecruitingStudyScreen(
     viewmodel: RecruitingStudyViewModel = hiltViewModel(),
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
     onFilterClick: () -> Unit,
-    onItemClick: (StudyResult) -> Unit
+    onItemClick: (Long) -> Unit
 ) {
     val state by viewmodel.uiState.collectAsStateWithLifecycle()
     val sort by viewmodel.sortType.collectAsStateWithLifecycle()
@@ -228,7 +228,7 @@ private fun RecruitingStudyScreenContent(
     modifier: Modifier = Modifier,
     studies: List<StudyResult>,
     listState: LazyListState,
-    onItemClick: (StudyResult) -> Unit,
+    onItemClick: (Long) -> Unit,
 ) {
     LazyColumn(
         state = listState,
@@ -245,7 +245,7 @@ private fun RecruitingStudyScreenContent(
                 item = item,
                 modifier = Modifier
                     .fillMaxWidth(),
-                onClick = { onItemClick(item) }
+                onClick = { onItemClick(item.id) }
             )
 
             if(studies.indexOf(item) != studies.lastIndex) {

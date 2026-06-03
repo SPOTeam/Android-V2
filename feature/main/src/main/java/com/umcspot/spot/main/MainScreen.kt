@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navOptions
 import androidx.navigation.toRoute
 import com.umcspot.spot.alert.navigation.Alert
 import com.umcspot.spot.alert.navigation.navigateToAlert
@@ -39,6 +40,7 @@ import com.umcspot.spot.feature.board.post.content.navigation.POST_CONTENT_ROUTE
 import com.umcspot.spot.feature.board.post.posting.navigation.Posting
 import com.umcspot.spot.feature.board.post.posting.navigation.navigateToPostingNew
 import com.umcspot.spot.home.navigation.Home
+import com.umcspot.spot.home.navigation.navigateToHome
 import com.umcspot.spot.jjim.navigation.JJim
 import com.umcspot.spot.main.component.MainBottomBar
 import com.umcspot.spot.mypage.navigation.MyPageGraph
@@ -125,8 +127,15 @@ fun MainScreen(
                 } else {
                     AppBarHome(
                         hasAlert = hasUnreadAlert,
-                        onSearchClick = { /* TODO */ },
+                        onSearchClick = {  },
                         onAlertClick = { navController.navigateToAlert() },
+                        onLogoClick = {
+                            navController.navigateToHome(
+                                navOptions = navOptions {
+                                    popUpTo<Home> { inclusive = true }
+                                }
+                            )
+                        },
                         modifier = Modifier.statusBarsPadding()
                     )
                 }

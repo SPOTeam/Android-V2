@@ -18,7 +18,7 @@ fun NavGraphBuilder.recruitingStudyGraph(
     contentPadding : PaddingValues,
     onRegisterScrollToTop: ((() -> Unit)?) -> Unit,
     onFilterClick : () -> Unit,
-    onItemClick : (StudyResult) -> Unit
+    onItemClick : (Long) -> Unit
 ) {
     composable<Recruiting> {
         RecruitingStudyScreen(
