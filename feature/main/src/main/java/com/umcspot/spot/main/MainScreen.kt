@@ -127,7 +127,6 @@ fun MainScreen(
                 } else {
                     AppBarHome(
                         hasAlert = hasUnreadAlert,
-                        onSearchClick = {  },
                         onAlertClick = { navController.navigateToAlert() },
                         onLogoClick = {
                             navController.navigateToHome(
