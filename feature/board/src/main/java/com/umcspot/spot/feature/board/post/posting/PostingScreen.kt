@@ -24,9 +24,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -290,7 +289,6 @@ private fun BottomToolsRow(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BoardCategorySelector(
     selected: PostType,
@@ -311,18 +309,14 @@ fun BoardCategorySelector(
 
             Spacer(modifier = Modifier.width(screenWidthDp(7.dp)))
 
-            ExposedDropdownMenuBox (
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }
-            ) {
+            Box {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .menuAnchor() // ★ anchor 지정
                         .width(screenWidthDp(85.dp))
                         .border(1.dp, SpotTheme.colors.G200, SpotShapes.Hard)
                         .clip(SpotShapes.Hard)
-                        .clickable { expanded = true }
+                        .clickable { expanded = !expanded }
                         .padding(
                             horizontal = screenWidthDp(10.dp),
                             vertical = screenHeightDp(6.dp)
@@ -343,14 +337,15 @@ fun BoardCategorySelector(
                     )
                 }
 
-                ExposedDropdownMenu(
+                DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
+                    shape = SpotShapes.Hard,
                     modifier = Modifier
                         .background(SpotTheme.colors.white)
                         .width(screenWidthDp(85.dp))
                 ) {
-                    PostType.entries.forEach { type ->
+                    PostType.entries.forEachIndexed { index, type ->
                         DropdownMenuItem(
                             modifier = Modifier
                                 .height(screenHeightDp(30.dp))
@@ -368,6 +363,14 @@ fun BoardCategorySelector(
                                 expanded = false
                             }
                         )
+
+                        if (index != PostType.entries.lastIndex) {
+                            HorizontalDivider(
+                                modifier = Modifier.fillMaxWidth(),
+                                thickness = 1.dp,
+                                color = SpotTheme.colors.gray300
+                            )
+                        }
                     }
                 }
             }

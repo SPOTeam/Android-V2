@@ -51,8 +51,14 @@ fun CancelMemberShipScreen(
 
     LaunchedEffect(status) {
         when(status) {
-            "MEMBER4006" -> { showFailDialog = true }
-            "MEMBER200" -> { showSuccessDialog = true }
+            "MEMBER4006" -> {
+                showFailDialog = true
+                viewmodel.resetLeaveStatus()
+            }
+            "MEMBER200" -> {
+                showSuccessDialog = true
+                viewmodel.resetLeaveStatus()
+            }
         }
     }
 
@@ -141,9 +147,8 @@ fun CancelMemberShipScreen(
             noButtonText = "취소",
             onDismiss = { showDialog = false },
             onClick = {
-                viewmodel.leaveSpot()
-                showSuccessDialog = true
                 showDialog = false
+                viewmodel.leaveSpot()
             },
             onCancel = { showDialog = false }
         )

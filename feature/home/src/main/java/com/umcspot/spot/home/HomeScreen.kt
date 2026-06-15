@@ -225,6 +225,7 @@ private fun HomeScreen(
                 state = uiState.recommendStudies,
                 onStudyClick = onStudyClick
             )
+            Spacer(modifier = Modifier.height(screenHeightDp(24.dp)))
         }
     }
 }

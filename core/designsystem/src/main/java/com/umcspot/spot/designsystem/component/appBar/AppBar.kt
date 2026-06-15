@@ -3,6 +3,7 @@ package com.umcspot.spot.designsystem.component.appBar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -44,8 +45,8 @@ import com.umcspot.spot.ui.extension.screenWidthDp
 @Composable
 fun AppBarHome (
     hasAlert: Boolean = false,
-    onSearchClick: () -> Unit,
     onAlertClick: () -> Unit,
+    onLogoClick : () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -57,36 +58,28 @@ fun AppBarHome (
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
+
         Image(
             painter = painterResource(id = R.drawable.spot_logo),
             contentDescription = "App Logo",
-            modifier = Modifier.size(screenWidthDp(33.dp))
+            modifier = Modifier
+                .size(screenWidthDp(33.dp))
+                .clickable(
+                    onClick = onLogoClick
+                )
         )
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(
-                modifier = Modifier.size(screenWidthDp(32.dp)),
-                onClick = onSearchClick) {
-                Icon(
-                    painter = painterResource(id = R.drawable.search),
-                    contentDescription = "Search",
-                    modifier = Modifier.size(screenWidthDp(24.dp))
-                )
-            }
-            Spacer(modifier = Modifier.width(screenWidthDp(8.dp)))
-            IconButton(
-                modifier = Modifier.size(screenWidthDp(32.dp)),
-                onClick = onAlertClick
-            ) {
-                Icon(
-                    painter = painterResource(
-                        id = if (hasAlert) R.drawable.alert_noti else R.drawable.alert
-                    ),
-                    contentDescription = if (hasAlert) "New Notifications" else "Notifications",
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(screenWidthDp(24.dp))
-                )
-            }
+        IconButton(
+            modifier = Modifier.size(screenWidthDp(32.dp)),
+            onClick = onAlertClick
+        ) {
+            Icon(
+                painter = painterResource(
+                    id = if (hasAlert) R.drawable.alert_noti else R.drawable.alert
+                ),
+                contentDescription = if (hasAlert) "New Notifications" else "Notifications",
+                tint = Color.Unspecified,
+                modifier = Modifier.size(screenWidthDp(24.dp))
+            )
         }
     }
 }
@@ -97,8 +90,8 @@ fun TopBarPreview_NoNotification() {
     SpotTheme {
         AppBarHome(
             hasAlert = false,
-            onSearchClick = {},
-            onAlertClick = {}
+            onAlertClick = {},
+            onLogoClick = {}
         )
     }
 }
@@ -109,8 +102,8 @@ fun TopBarPreview_WithNotification() {
     SpotTheme{
         AppBarHome(
             hasAlert = true,
-            onSearchClick = {},
-            onAlertClick = {}
+            onAlertClick = {},
+            onLogoClick = {}
         )
     }
 }

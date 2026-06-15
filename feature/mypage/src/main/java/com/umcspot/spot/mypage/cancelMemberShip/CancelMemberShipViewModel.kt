@@ -30,5 +30,8 @@ class CancelMemberShipViewModel @Inject constructor(
                 }
         }
     }
-}
 
+    fun resetLeaveStatus() {
+        _leaveStatus.value = ""
+    }
+}

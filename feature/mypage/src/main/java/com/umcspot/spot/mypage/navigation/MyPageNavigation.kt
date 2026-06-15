@@ -104,6 +104,7 @@ fun NavGraphBuilder.myPageGraph(
     navigateToParticipatingStudy: () -> Unit,
     navigateToMyRecruitingStudy: () -> Unit,
     navigateToWaitingStudy: () -> Unit,
+    navigateToMakeStudy: () -> Unit,
     navigateToEditInterestStudy: () -> Unit,
     navigateToEditInterestRegion: () -> Unit,
     navigateToCancelMembership: () -> Unit,
@@ -141,7 +142,7 @@ fun NavGraphBuilder.myPageGraph(
                 onBackClick = navigateUp,
                 onRegisterScrollToTop = onRegisterScrollToTop,
                 onStudyClick = onStudyClick,
-                moveToMakeStudy = {},
+                moveToMakeStudy = navigateToMakeStudy,
                 moveToCheckApplied = navigateToStudyApplications
             )
         }
