@@ -45,7 +45,6 @@ import com.umcspot.spot.ui.extension.screenWidthDp
 @Composable
 fun AppBarHome (
     hasAlert: Boolean = false,
-    onSearchClick: () -> Unit,
     onAlertClick: () -> Unit,
     onLogoClick : () -> Unit,
     modifier: Modifier = Modifier
@@ -69,32 +68,18 @@ fun AppBarHome (
                     onClick = onLogoClick
                 )
         )
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(
-                modifier = Modifier.size(screenWidthDp(32.dp)),
-                onClick = onSearchClick
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.search),
-                    contentDescription = "Search",
-                    modifier = Modifier.size(screenWidthDp(24.dp))
-                )
-            }
-            Spacer(modifier = Modifier.width(screenWidthDp(8.dp)))
-            IconButton(
-                modifier = Modifier.size(screenWidthDp(32.dp)),
-                onClick = onAlertClick
-            ) {
-                Icon(
-                    painter = painterResource(
-                        id = if (hasAlert) R.drawable.alert_noti else R.drawable.alert
-                    ),
-                    contentDescription = if (hasAlert) "New Notifications" else "Notifications",
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(screenWidthDp(24.dp))
-                )
-            }
+        IconButton(
+            modifier = Modifier.size(screenWidthDp(32.dp)),
+            onClick = onAlertClick
+        ) {
+            Icon(
+                painter = painterResource(
+                    id = if (hasAlert) R.drawable.alert_noti else R.drawable.alert
+                ),
+                contentDescription = if (hasAlert) "New Notifications" else "Notifications",
+                tint = Color.Unspecified,
+                modifier = Modifier.size(screenWidthDp(24.dp))
+            )
         }
     }
 }
@@ -105,7 +90,6 @@ fun TopBarPreview_NoNotification() {
     SpotTheme {
         AppBarHome(
             hasAlert = false,
-            onSearchClick = {},
             onAlertClick = {},
             onLogoClick = {}
         )
@@ -118,7 +102,6 @@ fun TopBarPreview_WithNotification() {
     SpotTheme{
         AppBarHome(
             hasAlert = true,
-            onSearchClick = {},
             onAlertClick = {},
             onLogoClick = {}
         )
